@@ -1,5 +1,5 @@
 {
-   "assembly_annotation_pipeline": {
+    "assembly_annotation": {
         "label": "",
         "template": "",
         "url": "",
@@ -7,8 +7,8 @@
         "description": "",
         "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
-   },
-   "mtbseq": {
+    },
+    "mtbseq": {
         "label": "",
         "template": "",
         "order": 1,
@@ -16,8 +16,8 @@
         "end": "mag_met",
         "url": "",
         "description": ""
-   },
-   "wgmlst_taranis": {
+    },
+    "wgmlst_taranis": {
         "label": "",
         "template": "",
         "order": 1,
@@ -26,8 +26,8 @@
         "url": "",
         "description": "",
         "depends_on": "assembly_annotation_pipeline"
-   },
-   "wgmlst_chewbbaca" {
+    },
+    "wgmlst_chewbbaca" {
         "label": "",
         "template": "",
         "order": 1,
