@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import requests
 import json
+import requests
 
 
 class RestServiceApi:
@@ -8,22 +8,23 @@ class RestServiceApi:
         self.request_url = server + url
         self.headers = {"content-type": "application/json"}
 
-
     def get_request(self, request_info, parameter, value):
-        url_http = str(self.request_url + request_info + '?' + parameter + '=' + value)
+        url_http = str(self.request_url + request_info + "?" + parameter + '=' + value)
         try:
-            r = requests.get(url_http, headers=self.headers)
-            return json.loads(r.text)
-        except:
+            req = requests.get(url_http, headers=self.headers)
+            return json.loads(req.text)
+        except requests.HTTPError:
             return False
 
     def put_request(self, request_info, parameter, value):
-        url_http = str(self.request_url + request_info + '?' + parameter + '=' + value)
+        url_http = str(self.request_url
+                       + request_info + '?' + parameter + '=' + value)
         try:
-            r = requests.get(url_http,  headers=self.headers)
+            requests.get(url_http, headers=self.headers)
             return True
-        except:
+        except requests.HTTPError:
             return False
+
 
 """ Example usage
     rest_api = RestServiceApi('http://localhost:8000/', 'drylab/api/')
@@ -33,20 +34,20 @@ class RestServiceApi:
 """ Example request for iSkyLIMS
     Request:    'drylab/api/services?state=<servicese_state>'
     Method:     get
-    Description:    return all services defined on iSkyLIMS which have the state
-            defined in the requested with the following information:
-                'pk', 'serviceRequestNumber','serviceStatus', 'serviceUserId',
-                'serviceCreatedOnDate', 'serviceSeqCenter', 'serviceAvailableService',
-                'serviceFileExt', 'serviceNotes
+    Description:   return all services defined on iSkyLIMS which have the state
+        defined in the requested with the following information:
+           'pk', 'serviceRequestNumber','serviceStatus', 'serviceUserId',
+            'serviceCreatedOnDate', 'serviceSeqCenter', 'serviceAvailableService',
+            'serviceFileExt', 'serviceNotes
 
     Request:    'drylab/api/resolution?state=<resolution_state>'
     Method:     get
-    Description:    return all resolutions defined on iSkyLIMS which have the state
-            defined in the requested with the following information:
-                'pk', 'resolutionNumber', 'resolutionFullNumber', 'resolutionServiceID',
-                'resolutionDate', 'resolutionEstimatedDate', 'resolutionOnQueuedDate' ,
-                'resolutionOnInProgressDate' , 'resolutionDeliveryDate' ,
-                'resolutionNotes', 'resolutionPipelines'
+    Description: return all resolutions defined on iSkyLIMS which have the
+        state defined in the requested with the following information:
+            'pk', 'resolutionNumber', 'resolutionFullNumber',
+            'resolutionServiceID', 'resolutionDate', 'resolutionEstimatedDate',
+            'resolutionOnQueuedDate', 'resolutionOnInProgressDate',
+            'resolutionDeliveryDate', 'resolutionNotes', 'resolutionPipelines'
 
     Request:    'drylab/api/serviceFullData?service=<service_nuber>'
     Method:     get
