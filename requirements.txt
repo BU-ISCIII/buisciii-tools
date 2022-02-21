@@ -1,4 +1,5 @@
 click
+questionary
 jinja2
 jsonschema
 packaging
