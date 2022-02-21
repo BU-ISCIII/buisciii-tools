@@ -20,7 +20,7 @@ cat <<EOF > viralrecon.sbatch
 export NXF_OPTS="-Xms500M -Xmx4G"
 
 nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.3/workflow/main.nf \\
-          -c ./hpc_isciii.config \\
+          -c /scratch/bi/pipelines/config_files/hpc_slurm.config \\
           --input samplesheet.csv \\
           --outdir $(date '+%Y%m%d')_viralrecon_mapping \\
           --platform illumina \\
@@ -28,14 +28,13 @@ nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.3/workflow/main.nf \\
           --variant_caller ivar \\
           --consensus_caller bcftools \\
           --fasta "/data/bi/references/virus/2019-nCoV/genome/NC_045512.2.fasta" \\
-	  --gff "/data/bi/references/virus/2019-nCoV/genes/NC_045512.2.gff" \\
-	  --primer_bed "/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4/nCoV-2019.artic.V4.scheme.bed" \\
-	  --kraken2_db "/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz" \\
+          --gff "/data/bi/references/virus/2019-nCoV/genes/NC_045512.2.gff" \\
+          --primer_bed "/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4/nCoV-2019.artic.V4.scheme.bed" \\
+          --kraken2_db "/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz" \\
           --skip_assembly \\
           --skip_nextclade
 EOF
 
 ## Create summary report
-RUN=$(ls ../../RAW/)
-DATE=$(date '+%Y%m%d')
-echo "bash create_summary_report.sh ./$(date '+%Y%m%d')_viralrecon_mapping/multiqc/summary_variants_metrics_mqc.csv ./$(date '+%Y%m%d')_viralrecon_mapping/variants/ivar/consensus/bcftools/ ./$(date '+%Y%m%d')_viralrecon_mapping/kraken2/ ./samples_id.txt mapping_illumina.tab '${RUN}\ticasas\thuman\tNC_045512.2'" > _03_create_summary.sh
+echo "python ./percentajeNs.py *_mapping/variants/varscan2/consensus %Ns.tab"  > _02_run_percentage_Ns.sh
+echo "bash create_summary_report_manually.sh" > _03_create_stats_table.sh
