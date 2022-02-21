@@ -6,6 +6,7 @@ services {
         order = 1
         description: ""
         clean: [03-assembly/trimming/trimmed,01-preprocessing/]
+        no_copy: [RAW, TMP, 02-kmerfinder]
    },
    mtbseq {
         label = ""
