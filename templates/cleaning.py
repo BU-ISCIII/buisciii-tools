@@ -49,14 +49,28 @@ class Cleanup(self):
         else:
             return self.removes
         
-    
-    def show_to_rename(self):
-        print(self.renames)
+    def show_renameable_dirs(self, to_stdout = True):
+        """
+        Print or return the list of objects that must be renamed in this service
+        Usage: object.show_renameables_dirs(to_stdout = [BOOL])
+
+        Params:
+            to_stdout [BOOL]: if True, print the list. If False, return the list.
+        """
+
+        if to_stdout:
+            print(self.renames)
+            return
+        else:
+            return self.renames
 
     def remove(self):
 
-    def doitall(self):
 
     def rename(self):
+
+
+    def full_clean_job(self):
+
 
 
