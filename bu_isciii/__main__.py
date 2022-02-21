@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
-import sys
+#import sys
 import os
 import logging
 
 import click
-from click.types import File
 from rich import print
-from rich.prompt import Confirm
 import rich.console
 import rich.logging
 import rich.traceback
@@ -56,10 +54,6 @@ def run_bu_isciii():
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
-    try:
-        pass
-    except:
-        pass
 
     # Lanch the click cli
     bu_isciii_cli()
