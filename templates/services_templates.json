@@ -12,12 +12,12 @@
     },
     "mtbseq": {
         "label": "",
-        "template": "",
+        "template": "mtbseq",
         "order": 1,
         "begin": "base",
         "end": "mag_met",
-        "url": "",
-        "description": ""
+        "url": "https://github.com/ngs-fzb/MTBseq_source",
+        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq"
     },
     "wgmlst_taranis": {
         "label": "",
