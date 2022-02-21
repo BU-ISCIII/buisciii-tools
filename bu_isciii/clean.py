@@ -125,7 +125,6 @@ class CleanUp(self):
         Params:
 
         """
-
         pass
 
         '''
@@ -133,7 +132,7 @@ class CleanUp(self):
 
         for old_name in self.nocopy:
             new_name = old_name + '_NC'
-            os.rename(old_name, new_name)
+            os.rename(old_name, new_name
         '''
         return
 
