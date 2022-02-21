@@ -125,12 +125,16 @@ class CleanUp(self):
         Params:
 
         """
+
+        pass
+
+        '''
         for _, dirs, folders in os.walk():
 
         for old_name in self.nocopy:
             new_name = old_name + '_NC'
             os.rename(old_name, new_name)
-
+        '''
         return
 
     def revert_renaming(self, verbose = True):
