@@ -11,13 +11,16 @@ def list_pipelines ():
     """
     return
 
+def load_json():
+    """
+    Load pipelines json
+    """
+    return
+
 
 # Print the table
 
-table = Table(
-    title="BU-ISCIII Tools"
-    )
-
+table = Table(title="BU-ISCIII Tools")
 table.add_column("Pipeline name", justify="right", style="cyan", no_wrap=True)
 table.add_column("Latest Release", style="magenta")
 table.add_column("Released", justify="right", style="green")
