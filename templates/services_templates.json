@@ -42,5 +42,5 @@
         "depends_on": "assembly_annotation_pipeline",
         "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
-   }
+    }
 }
