@@ -31,8 +31,27 @@ import os
 
 # Local imports
 
-class CleanUp(self):
-    def __init__(self,):
-        self.base_directory =
-        self.removes =
-        self.renames =
+class NewService(self):
+    def __init__(self,resolution_id,service_folder,service_label,service_id):
+        self.resolution_id = resolution_id
+        self.service_folder = service_folder
+        self.service_label = service_label
+        self.service_id = service_id
+
+    def create_folder(self):
+        return True
+
+    def copy_template(self):
+        return True
+
+    def get_resolution_id(self):
+        return self.resolution_id
+
+    def get_service_folder(self):
+        return self.service_folder
+
+    def get_service_label(self):
+        return self.service_label
+
+    def get_service_id(self):
+        return self.get_service_id
