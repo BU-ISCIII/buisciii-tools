@@ -31,16 +31,16 @@ jobs:
   black_lint:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v2
-
+        - name: Setup
+          uses: actions/checkout@v2
         - name: Check code lints with Black
-        uses: psf/black@stable
+          uses: psf/black@stable
 
     # If the above check failed, post a comment on the PR explaining the failure
         - name: Post PR comment
-        if: failure()
-        uses: mshick/add-pr-comment@v1
-        with:
+          if: failure()
+          uses: mshick/add-pr-comment@v1
+          with:
             message: |
                 ## Python linting (`black`) is failing
                 To keep the code consistent with lots of contributors, we run automated code consistency checks.
