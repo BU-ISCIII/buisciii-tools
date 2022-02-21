@@ -75,7 +75,7 @@ class CleanUp(self):
         else:
             return self.renames
 
-    def delete(self, sacreditems=["lablog","logs"], verbose = True):
+    def delete(self, sacredtexts=["lablog","logs"], verbose = True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
@@ -94,7 +94,7 @@ class CleanUp(self):
 
         for item_to_remove in self.removes:
             for content in os.listdir(item_to_remove):
-                if content not in sacreditems:
+                if content not in sacredtexts:
                     os.remove(content)
                     if verbose:
                         print(f'Removed: {content}')
@@ -119,8 +119,7 @@ class CleanUp(self):
 
 
 
-
-
-
     def full_clean_job(self):
+        self.rename()
+        self.delete()
 
