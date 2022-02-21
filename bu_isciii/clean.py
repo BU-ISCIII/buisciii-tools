@@ -41,9 +41,9 @@ class CleanUp(self):
         # access the api/the json/the whatever with the service name to obtain
         
         self.resolution_name = resolution_name
-        self.base_directory =
-        self.delete =
-        self.nocopy =
+        # self.base_directory =
+        # self.delete =
+        # self.nocopy =
 
 
     def show_removable_dirs(self, to_stdout = True):
