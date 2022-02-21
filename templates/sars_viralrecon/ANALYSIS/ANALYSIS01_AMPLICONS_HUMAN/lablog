@@ -36,5 +36,5 @@ nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.3/workflow/main.nf \\
 EOF
 
 ## Create summary report
-echo "python ./percentajeNs.py *_mapping/variants/varscan2/consensus %Ns.tab"  > _02_run_percentage_Ns.sh
+echo "python ./percentajeNs.py */variants/ivar/consensus/bcftools %Ns.tab"  > _02_run_percentage_Ns.sh
 echo "bash create_summary_report_manually.sh" > _03_create_stats_table.sh
