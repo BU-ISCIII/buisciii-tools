@@ -19,7 +19,7 @@ TO DO:
     -INIT: where to find the needed values
     -PATH: where to be placed
         -BASE_DIRECTORY: where is it? How do we know where it is?
-    
+
     -DESCRIPTION
         -SCRIPT
         -CLASS
@@ -39,7 +39,7 @@ import os
 class CleanUp:
     def __init__(self,resolution_name):
         # access the api/the json/the whatever with the service name to obtain
-        
+
         self.resolution_name = resolution_name
         # self.base_directory =
         # self.delete =
