@@ -34,11 +34,20 @@ class Cleanup(self):
         self.renames = 
 
 
-    def show_to_remove(self, to_stdout = True):
+    def show_removable_dirs(self, to_stdout = True):
+        """
+        Print or return the list of objects that must be deleted in this service
+        Usage: object.show_removable_dirs(to_stdout = [BOOL])
 
+        Params:
+            to_stdout [BOOL]: if True, print the list. If False, return the list.
+        """
+        if to_stdout:
+            print(self.removes)
+            return
         
-
-        print(self.removes)
+        else:
+            return self.removes
         
     
     def show_to_rename(self):
