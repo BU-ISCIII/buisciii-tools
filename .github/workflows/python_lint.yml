@@ -35,8 +35,7 @@ jobs:
           uses: actions/checkout@v2
         - name: Check code lints with Black
           uses: psf/black@stable
-
-    # If the above check failed, post a comment on the PR explaining the failure
+        # If the above check failed, post a comment on the PR explaining the failure
         - name: Post PR comment
           if: failure()
           uses: mshick/add-pr-comment@v1
