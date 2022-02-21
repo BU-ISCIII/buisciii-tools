@@ -1,0 +1,36 @@
+#module load Nextflow/21.10.6
+
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+echo "sample,fastq_1,fastq_2" > samplesheet.csv
+cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz"; done >> samplesheet.csv
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > viralrecon.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 2:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_viralrecon.log
+#SBATCH --chdir $scratch_dir
+
+export NXF_OPTS="-Xms500M -Xmx4G"
+
+nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.3/workflow/main.nf \\
+          -c ./hpc_isciii.config \\
+          --input samplesheet.csv \\
+          --outdir $(date '+%Y%m%d')_viralrecon_mapping \\
+          --platform illumina \\
+          --protocol amplicon \\
+          --variant_caller ivar \\
+          --consensus_caller bcftools \\
+          --fasta "/data/bi/references/virus/2019-nCoV/genome/NC_045512.2.fasta" \\
+	  --gff "/data/bi/references/virus/2019-nCoV/genes/NC_045512.2.gff" \\
+	  --primer_bed "/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4/nCoV-2019.artic.V4.scheme.bed" \\
+	  --kraken2_db "/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz" \\
+          --skip_assembly \\
+          --skip_nextclade
+EOF
