@@ -35,6 +35,7 @@ nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.3/workflow/main.nf \\
           --skip_nextclade
 EOF
 
+#conda activate nf-core-viralrecon-1.2.0dev
 ## Create summary report
 echo "python ./percentajeNs.py */variants/ivar/consensus/bcftools %Ns.tab"  > _02_run_percentage_Ns.sh
 echo "bash create_summary_report_manually.sh" > _03_create_stats_table.sh
