@@ -10,7 +10,7 @@ VERSION: 1.0
 CREATED: 21-2-2022
 REVISED: 21-2-2022
 REVISED BY:
-DESCRIPTION: 
+DESCRIPTION:
 OPTIONS:
 
 USAGE:
@@ -21,7 +21,7 @@ TO DO:
     -INIT: where to find the needed values
     -PATH: where to be placed
         -BASE_DIRECTORY: where is it? How do we know where it is?
-    
+
 
     -NAMING: let's be honest, those are terrible
 ================================================================
@@ -38,15 +38,15 @@ class CleanUp(self):
     def __init__(self,):
         # access the api/the json/the whatever with the service name to obtain
         self.base_directory =
-        self.removes = 
-        self.renames = 
+        self.removes =
+        self.renames =
 
 
     def show_removable_dirs(self, to_stdout = True):
         """
         Print or return the list of objects that must be deleted in this service
-        
-        Usage: 
+
+        Usage:
             object.show_removable_dirs(to_stdout = [BOOL])
 
         Params:
@@ -57,12 +57,12 @@ class CleanUp(self):
             return
         else:
             return self.removes
-        
+
     def show_nocopy_dirs(self, to_stdout = True):
         """
         Print or return the list of objects that must be renamed in this service
-        
-        Usage: 
+
+        Usage:
             object.show_nocopy_dirs(to_stdout = [BOOL])
 
         Params:
@@ -80,10 +80,10 @@ class CleanUp(self):
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
         deleted
-        
+
         Usage:
             object.delete()
-        
+
         Params:
             sacreditems [list]: names (str) of the files that shall not be deleted.
 
@@ -107,7 +107,7 @@ class CleanUp(self):
         delivery system.
 
         Usage:
-        
+
         Params:
 
         """
