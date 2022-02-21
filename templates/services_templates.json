@@ -11,7 +11,7 @@
           "folders":["03-assembly/trimming/trimmed","01-preprocessing/sample_name", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "02-kmerfinder"]
+        "no_copy": ["RAW", "TMP", "01-preprocessing"]
     },
     "mtbseq": {
         "label": "",
@@ -39,7 +39,7 @@
           "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "02-kmerfinder"]
+        "no_copy": ["RAW", "TMP", "01-preprocessing"]
     },
     "wgmlst_chewbbaca": {
         "label": "",
@@ -54,7 +54,7 @@
           "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "02-kmerfinder"]
+        "no_copy": ["RAW", "TMP", "01-preprocessing"]
     },
     "sars_viralrecon": {
         "label": "",
