@@ -31,7 +31,7 @@ END_OF_HEADER
 ================================================================
 '''
 # Generic imports
-import sys
+# import sys
 import os
 
 # Local imports
