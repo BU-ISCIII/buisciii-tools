@@ -36,7 +36,7 @@ import os
 
 # Local imports
 
-class CleanUp(self):
+class CleanUp:
     def __init__(self,resolution_name):
         # access the api/the json/the whatever with the service name to obtain
         
@@ -162,16 +162,17 @@ class CleanUp(self):
         """
         for root, dirs, _ in os.walk():
             if len(dirs) > 0:
-                if '_DEL' in directory:
-                    del_path = os.path.join(root,directory)
+                for directory in dirs:
+                    if '_DEL' in directory:
+                        del_path = os.path.join(root,directory)
 
-                    reverted_name = directory - '_DEL'
-                    reverted_path = os.path.join(root, reverted_name)
+                        reverted_name = directory - '_DEL'
+                        reverted_path = os.path.join(root, reverted_name)
 
-                    os.replace(del_path, reverted_path)
+                        os.replace(del_path, reverted_path)
 
-                    if verbose:
-                        print(f"Reverted {directory} to {reverted_name}.")
+                        if verbose:
+                            print(f"Reverted {directory} to {reverted_name}.")
 
         return 
 
@@ -182,12 +183,12 @@ class CleanUp(self):
         Perform the whole cleaning of the service 
         """
 
-        if '_NC' in ____ or '_DEL' in ___:
+        # if '_NC' in ____ or '_DEL' in ___:
 
             # print that a previous usage of this was detected
 
         
-        self.rename()
-        self.delete()
+        # self.rename()
+        # self.delete()
 
         return 
