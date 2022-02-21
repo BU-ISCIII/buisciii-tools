@@ -22,10 +22,10 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed","01-preprocessing", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP"],
+        "no_copy": ["RAW", "TMP"]
     },
     "wgmlst_taranis": {
         "label": "",
@@ -37,7 +37,7 @@
         "description": "Multilocus sequence typing (MLST) using Taranis",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed","01-preprocessing", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"]
@@ -52,7 +52,7 @@
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}", "work"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"]
@@ -60,7 +60,7 @@
     "sars_viralrecon": {
         "label": "",
         "template": "sars_viralrecon",
-        "url": "",
+        "url": "https://github.com/BU-ISCIII/viralrecon",
         "order": 1,
         "begin": "",
         "end": "mag_met",
