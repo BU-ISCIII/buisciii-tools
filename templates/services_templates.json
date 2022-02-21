@@ -1,10 +1,12 @@
 {
     "assembly_annotation": {
         "label": "",
-        "template": "",
+        "template": "assembly",
         "url": "",
         "order": 1,
-        "description": "",
+        "begin": "",
+        "end": "",
+        "description": "Nextflow assembly pipeline to assemble bacterial genomes",
         "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
     },
