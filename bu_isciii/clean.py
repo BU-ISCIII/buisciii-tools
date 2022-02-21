@@ -17,7 +17,13 @@ USAGE:
 
 REQUIREMENTS:
 
-TO DO: 
+TO DO:
+    -INIT: where to find the needed values
+    -PATH: where to be placed
+        -BASE_DIRECTORY: where is it? How do we know where it is?
+    
+
+    -NAMING: let's be honest, those are terrible
 ================================================================
 END_OF_HEADER
 ================================================================
@@ -31,6 +37,7 @@ import os
 class CleanUp(self):
     def __init__(self,):
         # access the api/the json/the whatever with the service name to obtain
+        self.base_directory =
         self.removes = 
         self.renames = 
 
@@ -68,7 +75,7 @@ class CleanUp(self):
         else:
             return self.renames
 
-    def delete_removes(self, sacreditems=["lablog","logs"],verbose = True):
+    def delete_removes(self, sacreditems=["lablog","logs"], verbose = True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
@@ -82,13 +89,16 @@ class CleanUp(self):
 
         """
 
+        for _, dirs, _ in os.walk():
+            if
+
         for item_to_remove in self.removes:
             for content in os.listdir(item_to_remove):
                 if content not in sacreditems:
                     os.remove(content)
                     if verbose:
                         print(f'Removed: {content}')
-                        
+
 
 
     def rename_renamables(self):
@@ -101,10 +111,13 @@ class CleanUp(self):
         Params:
 
         """
-        
+        for _, dirs, _ in os.walk():
+
         for old_name in self.renames:
             new_name = old_name + '_NC'
             os.rename(old_name, new_name)
+
+
 
 
 
