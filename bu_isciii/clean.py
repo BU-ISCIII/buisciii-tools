@@ -146,7 +146,7 @@ class CleanUp:
                         os.replace(nc_path, reverted_path)
                         if verbose:
                             print(f"Reverted {directory} to {reverted_name}.")
-        return 
+        return
 
     def revert_delete_renaming(self, verbose=True):
         """
@@ -163,7 +163,7 @@ class CleanUp:
                         if verbose:
                             print(f"Reverted {directory} to {reverted_name}.")
 
-        return 
+        return
 
     def full_clean_job(self):
 
