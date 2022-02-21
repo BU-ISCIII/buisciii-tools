@@ -6,10 +6,8 @@ HEADER
 INSTITUTION: BU-ISCIII
 AUTHOR: Guillermo J. Gorines Cordero
 MAIL: guillermo.gorines@urjc.es
-VERSION: 1.0
 CREATED: 21-2-2022
 REVISED: 21-2-2022
-REVISED BY:
 DESCRIPTION:
 OPTIONS:
 
@@ -21,8 +19,12 @@ TO DO:
     -INIT: where to find the needed values
     -PATH: where to be placed
         -BASE_DIRECTORY: where is it? How do we know where it is?
-
-
+    
+    -DESCRIPTION
+        -SCRIPT
+        -CLASS
+        -METHODS
+            -revert_delete_renaming
     -NAMING: let's be honest, those are terrible
 ================================================================
 END_OF_HEADER
@@ -148,7 +150,7 @@ class CleanUp(self):
                         os.replace(nc_path, reverted_path)
 
                         if verbose:
-                            print(f"Reverted {directory} to {reverted_name}")
+                            print(f"Reverted {directory} to {reverted_name}.")
         return 
 
     def revert_delete_renaming(self, verbose = True):
@@ -158,8 +160,15 @@ class CleanUp(self):
         for root, dirs, _ in os.walk():
             if len(dirs) > 0:
                 if '_DEL' in directory:
-                    del_path = os.path.join()
+                    del_path = os.path.join(root,directory)
 
+                    reverted_name = directory - '_DEL'
+                    reverted_path = os.path.join(root, reverted_name)
+
+                    os.replace(del_path, reverted_path)
+
+                    if verbose:
+                        print(f"Reverted {directory} to {reverted_name}.")
 
         return 
 
@@ -175,7 +184,6 @@ class CleanUp(self):
             # print that a previous usage of this was detected
 
         
-
         self.rename()
         self.delete()
 
