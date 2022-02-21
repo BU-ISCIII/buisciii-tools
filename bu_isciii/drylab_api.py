@@ -2,6 +2,7 @@
 import requests
 import json
 
+
 class RestServiceApi:
     def __init__(self, server, url):
         self.request_url = server + url
@@ -26,8 +27,8 @@ class RestServiceApi:
 
 """ Example usage
     rest_api = RestServiceApi('http://localhost:8000/', 'drylab/api/')
-    services_queue = rest_api.get_request('service/','state', 'queued')
-    update_resolution = rest_api.put_request(resolution, 'finish' )
+    services_queue = rest_api.get_request('service/', 'state', 'queued')
+    update_resolution = rest_api.put_request(resolution, 'finish')
 """
 """ Example request for iSkyLIMS
     Request:    'drylab/api/services?state=<servicese_state>'
@@ -36,13 +37,13 @@ class RestServiceApi:
             defined in the requested with the following information:
                 'pk', 'serviceRequestNumber','serviceStatus', 'serviceUserId',
                 'serviceCreatedOnDate', 'serviceSeqCenter', 'serviceAvailableService',
-                'serviceFileExt' , 'serviceNotes
+                'serviceFileExt', 'serviceNotes
 
     Request:    'drylab/api/resolution?state=<resolution_state>'
     Method:     get
     Description:    return all resolutions defined on iSkyLIMS which have the state
             defined in the requested with the following information:
-                'pk','resolutionNumber', 'resolutionFullNumber','resolutionServiceID',
+                'pk', 'resolutionNumber', 'resolutionFullNumber', 'resolutionServiceID',
                 'resolutionDate', 'resolutionEstimatedDate', 'resolutionOnQueuedDate' ,
                 'resolutionOnInProgressDate' , 'resolutionDeliveryDate' ,
                 'resolutionNotes', 'resolutionPipelines'
@@ -52,23 +53,23 @@ class RestServiceApi:
     Description:    return the Samples, resolutions, and the information requested
             when creating the service with the following information:
             Related to service:
-                'pk', 'serviceRequestNumber','serviceStatus', 'serviceUserId',
+                'pk', 'serviceRequestNumber', 'serviceStatus', 'serviceUserId',
                 'serviceCreatedOnDate', 'serviceSeqCenter', 'serviceAvailableService',
-                'serviceFileExt' , 'serviceNotes
+                'serviceFileExt', 'serviceNotes'
             Related to Resolutions:
-                'pk','resolutionNumber', 'resolutionFullNumber','resolutionServiceID',
-                'resolutionDate', 'resolutionEstimatedDate', 'resolutionOnQueuedDate' ,
-                'resolutionOnInProgressDate' , 'resolutionDeliveryDate' ,
+                'pk','resolutionNumber', 'resolutionFullNumber', 'resolutionServiceID',
+                'resolutionDate', 'resolutionEstimatedDate', 'resolutionOnQueuedDate',
+                'resolutionOnInProgressDate', 'resolutionDeliveryDate',
                 'resolutionNotes', 'resolutionPipelines'
             Related to Samples:
-                'runName', 'projectName', 'sampleName' , 'samplePath'
+                'runName', 'projectName', 'sampleName', 'samplePath'
 
 
     Request:    'drylab/api/samplesInService?service=<service_number>'
     Method:     get
     Description:    Return the <run name> , <project name>, <sample name> and
             <sample path> for all samples requested in the service
-                'runName', 'projectName', 'sampleName' , 'samplePath'
+                'runName', 'projectName', 'sampleName', 'samplePath'
 
 
     Request:    'drylab/api/update?resolution=<resolution_state>
