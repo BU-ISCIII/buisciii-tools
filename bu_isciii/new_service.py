@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 =============================================================
 HEADER
 =============================================================
@@ -24,7 +24,7 @@ TO DO:
 ================================================================
 END_OF_HEADER
 ================================================================
-'''
+"""
 # Generic imports
 # import sys
 # import os
@@ -38,12 +38,23 @@ import bu_isciii.utils
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
-    stderr=True, style="dim", highlight=False, force_terminal=bu_isciii.utils.rich_force_colors()
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
-class NewService:
 
-    def __init__(self, resolution_id=None, service_folder=None, service_label=None, service_id=None, path=None, no_create_folder=False):
+class NewService:
+    def __init__(
+        self,
+        resolution_id=None,
+        service_folder=None,
+        service_label=None,
+        service_id=None,
+        path=None,
+        no_create_folder=False,
+    ):
         if resolution_id == None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         self.service_folder = service_folder
