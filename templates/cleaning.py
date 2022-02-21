@@ -26,6 +26,7 @@ END_OF_HEADER
 import sys
 import os
 
+# Local imports
 
 class Cleanup(self):
     def __init__(self,):
@@ -37,7 +38,9 @@ class Cleanup(self):
     def show_removable_dirs(self, to_stdout = True):
         """
         Print or return the list of objects that must be deleted in this service
-        Usage: object.show_removable_dirs(to_stdout = [BOOL])
+        
+        Usage: 
+            object.show_removable_dirs(to_stdout = [BOOL])
 
         Params:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
@@ -52,7 +55,9 @@ class Cleanup(self):
     def show_renameable_dirs(self, to_stdout = True):
         """
         Print or return the list of objects that must be renamed in this service
-        Usage: object.show_renameables_dirs(to_stdout = [BOOL])
+        
+        Usage: 
+            object.show_renameables_dirs(to_stdout = [BOOL])
 
         Params:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
@@ -64,10 +69,27 @@ class Cleanup(self):
         else:
             return self.renames
 
-    def remove(self):
+    def delete_removes(self):
+        """
+        Remove the files that must be deleted for the delivery of the service
+        
+        Usage:
+            object.delete_removes()
+        
+        Params:
 
 
-    def rename(self):
+        """
+
+        for item_to_remove in self.removes:
+
+            os.remove()
+
+
+    def rename_renamables(self):
+        
+        
+        os.rename()
 
 
     def full_clean_job(self):
