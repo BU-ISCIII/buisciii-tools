@@ -1,0 +1,9 @@
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+mkdir 01-preprocessing
+mkdir 02-kmerfinder
+mkdir 99-stats
+ln -s /data/bi/pipelines/bacterial_qc .
+#conda activate nextflow
+echo 'nextflow run /data/bi/pipelines/bacterial_assembly-nf/main.nf -bg -resume --reads "00-reads/*_R{1,2}.fastq.gz" --fasta ../../REFERENCES/@@@@@_genomic.fna --gtf ../../REFERENCES/@@@@@_genomic.gff --outdir 03-assembly -profile hpc_isciii' > _01_nf_assembly.sh
+#nohup bash _01_nf_assembly.sh &> $(date '+%Y%m%d')_assembly01.log &
