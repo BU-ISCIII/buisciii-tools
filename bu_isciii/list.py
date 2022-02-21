@@ -3,7 +3,7 @@
 from rich.console import Console
 from rich.table import Table
 
-# Funcion
+# Funciones
 
 def list_pipelines ():
     """
@@ -16,7 +16,6 @@ def load_json():
     Load pipelines json
     """
     return
-
 
 # Print the table
 
