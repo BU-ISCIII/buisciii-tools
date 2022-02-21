@@ -55,5 +55,19 @@
           "files":[""]
         },
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
+    },
+    "sars_viralrecon": {
+        "label": "",
+        "template": "sars_viralrecon",
+        "url": "",
+        "order": 1,
+        "begin": "",
+        "end": "mag_met",
+        "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
+        "clean": {
+          "folders":["work"],
+          "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
+        },
+        "no_copy": ["RAW", "TMP"]
     }
 }
