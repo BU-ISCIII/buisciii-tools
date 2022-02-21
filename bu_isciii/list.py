@@ -3,21 +3,28 @@
 from rich.console import Console
 from rich.table import Table
 
-# Pruebas
+# Funcion
 
-table = Table(title="BU-ISCIII Tools")
+def list_pipelines ():
+    """
+    Print out a list of all pipelines of BU-ISCIII
+    """
+    return
 
-table.add_column("Released", justify="right", style="cyan", no_wrap=True)
-table.add_column("Title", style="magenta")
-table.add_column("Box Office", justify="right", style="green")
 
-table.add_row("Dec 20, 2019", "Star Wars: The Rise of Skywalker", "$952,110,690")
-table.add_row("May 25, 2018", "Solo: A Star Wars Story", "$393,151,347")
-table.add_row("Dec 15, 2017", "Star Wars Ep. V111: The Last Jedi", "$1,332,539,889")
-table.add_row("Dec 16, 2016", "Rogue One: A Star Wars Story", "$1,332,439,889")
+# Print the table
+
+table = Table(
+    title="BU-ISCIII Tools"
+    )
+
+table.add_column("Pipeline name", justify="right", style="cyan", no_wrap=True)
+table.add_column("Latest Release", style="magenta")
+table.add_column("Released", justify="right", style="green")
+table.add_column("Last Pulled", justify="right", style="green")
+
+table.add_row("viralrecon", "2.3.1", "Two weeks ago", "4 months ago")
 
 console = Console()
 console.print(table)
 
-def list_pipelines ():
-    
