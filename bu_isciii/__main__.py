@@ -13,13 +13,14 @@ import rich.logging
 import rich.traceback
 
 import bu_isciii
+import bu_isciii.utils
 import bu_isciii.new_service
 
 log = logging.getLogger()
 
 def run_bu_isciii():
     # Set up rich stderr console
-    stderr = rich.console.Console(stderr=True, force_terminal=utils.rich_force_colors())
+    stderr = rich.console.Console(stderr=True, force_terminal=bu_isciii.utils.rich_force_colors())
 
     # Set up the rich traceback
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
@@ -76,7 +77,7 @@ class CustomHelpOrder(click.Group):
 
 
 @click.group(cls=CustomHelpOrder)
-#@click.version_option(nf_core.__version__)
+@click.version_option(bu_isciii.__version__)
 @click.option("-v", "--verbose", is_flag=True, default=False, help="Print verbose output to the console.")
 @click.option("-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>")
 def bu_isciii_cli(verbose, log_file):
@@ -88,7 +89,7 @@ def bu_isciii_cli(verbose, log_file):
     log.addHandler(
         rich.logging.RichHandler(
             level=logging.DEBUG if verbose else logging.INFO,
-            console=rich.console.Console(stderr=True, force_terminal=nf_core.utils.rich_force_colors()),
+            console=rich.console.Console(stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()),
             show_time=False,
             markup=True,
         )
@@ -120,10 +121,10 @@ def list(keywords, sort, json, show_archived):
     print("I will list available services")
 
 @bu_isciii_cli.command(help_priority=2)
-@click.argument("resolution", required=False, metavar="<resolution id>")
-@click.argument("folder", required=False, metavar="<folder>")
-@click.argument("service_label", required=False, metavar="<service label>")
-@click.argument("service_id", required=False, metavar="<service id>")
+@click.argument("resolution", required=True, metavar="<resolution id>")
+@click.argument("folder", required=True, metavar="<folder>")
+@click.argument("service_label", required=True, metavar="<service label>")
+@click.argument("service_id", required=True, metavar="<service id>")
 @click.option(
     "-p",
     "--path",
@@ -136,7 +137,7 @@ def new_service(resolution, folder, service_label, service_id, path, no_create_f
     '''
     Create new service, it will create folder and copy template depending on selected service.
     '''
-    new_ser = bu_isciii.new_service.NewService(resolution,folder,service_label,service_id, path, no-create-folder)
+    new_ser = bu_isciii.new_service.NewService(resolution,folder,service_label,service_id, path, no_create_folder)
     new_ser.create_folder()
 
 if __name__ == "__main__":

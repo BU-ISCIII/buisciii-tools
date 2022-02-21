@@ -1,4 +1,4 @@
-!/usr/bin/env python
+#!/usr/bin/env python
 """
 Common utility function for bu-isciii package.
 """

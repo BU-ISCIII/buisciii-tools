@@ -34,11 +34,13 @@ END_OF_HEADER
 
 class NewService:
 
-    def __init__(self, resolution_id, service_folder, service_label, service_id):
+    def __init__(self, resolution_id, service_folder, service_label, service_id, path, no_create_folder):
         self.resolution_id = resolution_id
         self.service_folder = service_folder
         self.service_label = service_label
         self.service_id = service_id
+        self.path = path
+        self.no_create_folder = no_create_folder
 
     def create_folder(self):
         print("I will create the service folder!")
