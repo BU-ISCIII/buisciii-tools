@@ -58,12 +58,12 @@ class CleanUp(self):
         else:
             return self.removes
         
-    def show_renameable_dirs(self, to_stdout = True):
+    def show_nocopy_dirs(self, to_stdout = True):
         """
         Print or return the list of objects that must be renamed in this service
         
         Usage: 
-            object.show_renameables_dirs(to_stdout = [BOOL])
+            object.show_nocopy_dirs(to_stdout = [BOOL])
 
         Params:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
@@ -75,14 +75,14 @@ class CleanUp(self):
         else:
             return self.renames
 
-    def delete_removes(self, sacreditems=["lablog","logs"], verbose = True):
+    def delete(self, sacreditems=["lablog","logs"], verbose = True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
         deleted
         
         Usage:
-            object.delete_removes()
+            object.delete()
         
         Params:
             sacreditems [list]: names (str) of the files that shall not be deleted.
@@ -101,7 +101,7 @@ class CleanUp(self):
 
 
 
-    def rename_renamables(self):
+    def rename(self):
         """
         Rename the files and directories with a _NC so it is not copied into the
         delivery system.
