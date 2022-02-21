@@ -8,10 +8,10 @@
         "end": "",
         "description": "Nextflow assembly pipeline to assemble bacterial genomes",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed","01-preprocessing/sample_name", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "01-preprocessing"]
+        "no_copy": ["RAW", "TMP"]
     },
     "mtbseq": {
         "label": "",
@@ -20,11 +20,12 @@
         "begin": "base",
         "end": "mag_met",
         "url": "https://github.com/ngs-fzb/MTBseq_source",
+        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
+          "folders":["03-assembly/trimming/trimmed","01-preprocessing", "work"],
           "files":[""]
         },
-        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq"
+        "no_copy": ["RAW", "TMP"],
     },
     "wgmlst_taranis": {
         "label": "",
@@ -34,12 +35,12 @@
         "end": "mag_met",
         "url": "https://github.com/BU-ISCIII/taranis",
         "description": "Multilocus sequence typing (MLST) using Taranis",
-        "depends_on": "assembly_annotation_pipeline",
+        "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
+          "folders":["03-assembly/trimming/trimmed","01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "01-preprocessing"]
+        "no_copy": ["RAW", "TMP"]
     },
     "wgmlst_chewbbaca": {
         "label": "",
@@ -49,12 +50,12 @@
         "end": "mag_met",
         "url": "https://github.com/B-UMMI/chewBBACA",
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
-        "depends_on": "assembly_annotation_pipeline",
+        "depends_on": "assembly_annotation",
         "clean": {
           "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "01-preprocessing"]
+        "no_copy": ["RAW", "TMP"]
     },
     "sars_viralrecon": {
         "label": "",
