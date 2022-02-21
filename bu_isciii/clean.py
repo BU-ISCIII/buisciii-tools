@@ -30,7 +30,7 @@ import os
 
 class CleanUp(self):
     def __init__(self,):
-        # access the api with the service name to obtain
+        # access the api/the json/the whatever with the service name to obtain
         self.removes = 
         self.renames = 
 
@@ -48,7 +48,6 @@ class CleanUp(self):
         if to_stdout:
             print(self.removes)
             return
-        
         else:
             return self.removes
         
@@ -69,27 +68,45 @@ class CleanUp(self):
         else:
             return self.renames
 
-    def delete_removes(self):
+    def delete_removes(self, sacreditems=["lablog","logs"],verbose = True):
         """
         Remove the files that must be deleted for the delivery of the service
+        Their contains, except for the lablog file, and the logs dir, will be
+        deleted
         
         Usage:
             object.delete_removes()
         
         Params:
-
+            sacreditems [list]: names (str) of the files that shall not be deleted.
 
         """
 
         for item_to_remove in self.removes:
-
-            os.remove()
+            for content in os.listdir(item_to_remove):
+                if content not in sacreditems:
+                    os.remove(content)
+                    if verbose:
+                        print(f'Removed: {content}')
+                        
 
 
     def rename_renamables(self):
+        """
+        Rename the files and directories with a _NC so it is not copied into the
+        delivery system.
+
+        Usage:
         
+        Params:
+
+        """
         
-        os.rename()
+        for old_name in self.renames:
+            new_name = old_name + '_NC'
+            os.rename(old_name, new_name)
+
+
 
 
     def full_clean_job(self):
