@@ -17,8 +17,7 @@ class RestServiceApi:
             return False
 
     def put_request(self, request_info, parameter, value):
-        url_http = str(self.request_url
-                       + request_info + "?" + parameter + "=" + value)
+        url_http = str(self.request_url + request_info + "?" + parameter + "=" + value)
         try:
             requests.get(url_http, headers=self.headers)
             return True
