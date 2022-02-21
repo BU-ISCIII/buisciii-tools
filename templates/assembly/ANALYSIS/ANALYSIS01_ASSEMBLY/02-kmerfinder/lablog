@@ -1,0 +1,9 @@
+#module load singularity/singularity-2.6.0
+
+kmerFinder_DB=/data/bi/references/kmerfinder/20190108_stable_dirs/bacteria
+kmerFinder_path=/data/bi/pipelines/kmerfinder_v3.0.simg
+
+cat ../samples_id.txt | xargs -I % echo "qsub -V -b y -j y -cwd -N KMERFINDER -q all.q@obelix13 -q all.q@obelix16 singularity run --bind $PWD:/media --bind $kmerFinder_DB:/mnt --bind ../01-preprocessing:/workdir $kmerFinder_path -i /workdir/%/%_R1_filtered.fastq.gz /workdir/%/%_R2_filtered.fastq.gz -o /media/% -db /mnt/bacteria.ATG -tax /mnt/bacteria.name -x" > _00_kmerfinder.sh
+
+echo "cat ../samples_id.txt | xargs -I % awk '{FS=\"\t\"} NR==2 {print \$1}' %/results.txt | awk '{count[\$0]++} END{for (i in count) {print count[i], i}}' | sort -nr" > _02_find_common_reference.sh
+echo "bash _02_find_common_reference.sh | head -n1 | tr ' ' '\t' | cut -f2 | while read in; do bash /data/bi/references/bacteria/download_reference.sh \${in} ../../../REFERENCES/; done" > _03_download_reference.sh

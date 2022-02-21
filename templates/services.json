@@ -1,0 +1,39 @@
+services {
+   assembly_annotation_pipeline {
+        label = ""
+        template = ""
+        url = ""
+        order = 1
+        description: ""
+        clean_folders: [trimming,"*.fastq.gz"]
+   },
+   mtbseq {
+        label = ""
+        template = ""
+        order = 1
+        begin = base
+        end = mag_met
+        url = ""
+        description = ""
+   }
+   wgMLST_taranis {
+        label = ""
+        template = ""
+        order = 1
+        begin = base
+        end = mag_met
+        url = ""
+        description = ""
+        depends_on = assembly_annotation_pipeline,
+   }
+   wgMLST_chewbbaca {
+        label = ""
+        template = ""
+        order = 1
+        begin = base
+        end = mag_met
+        url = ""
+        description = ""
+        depends_on = assembly_annotation_pipeline,
+   }
+}
