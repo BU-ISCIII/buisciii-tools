@@ -15,7 +15,7 @@ class RestServiceApi:
         try:
             r = requests.get(url_http, headers=self.headers)
             return json.loads(r.text)
-        except:
+        except Exception:
             return False
 
     def put_request(self, request_info, parameter, value):
@@ -23,7 +23,7 @@ class RestServiceApi:
         try:
             r = requests.get(url_http, headers=self.headers)
             return True
-        except:
+        except Exception:
             return False
 
 
