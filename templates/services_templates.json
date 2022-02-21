@@ -7,7 +7,10 @@
         "begin": "",
         "end": "",
         "description": "Nextflow assembly pipeline to assemble bacterial genomes",
-        "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
+        "clean": {
+          "folders":["03-assembly/trimming/trimmed","01-preprocessing/sample_name", "work"],
+          "files":[""]
+        },
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
     },
     "mtbseq": {
@@ -17,6 +20,10 @@
         "begin": "base",
         "end": "mag_met",
         "url": "https://github.com/ngs-fzb/MTBseq_source",
+        "clean": {
+          "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
+          "files":[""]
+        },
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq"
     },
     "wgmlst_taranis": {
@@ -28,7 +35,10 @@
         "url": "https://github.com/BU-ISCIII/taranis",
         "description": "Multilocus sequence typing (MLST) using Taranis",
         "depends_on": "assembly_annotation_pipeline",
-        "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
+        "clean": {
+          "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
+          "files":[""]
+        },
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
     },
     "wgmlst_chewbbaca": {
@@ -40,7 +50,10 @@
         "url": "https://github.com/B-UMMI/chewBBACA",
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation_pipeline",
-        "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
+        "clean": {
+          "folders":["03-assembly/trimming/trimmed","01-preprocessing/{sample_name}", "work"],
+          "files":[""]
+        },
         "no_copy": ["RAW", "TMP", "02-kmerfinder"]
     }
 }
