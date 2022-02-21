@@ -41,6 +41,7 @@ class NewService:
         self.service_id = service_id
 
     def create_folder(self):
+        print("I will create the service folder!")
         return True
 
     def copy_template(self):
