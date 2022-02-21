@@ -36,6 +36,7 @@ import os
 
 # Local imports
 
+
 class CleanUp:
     def __init__(self, resolution_name):
         # access the api/the json/the whatever with the service name to obtain
@@ -78,7 +79,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def delete(self, sacredtexts=['lablog','logs'], verbose=True):
+    def delete(self, sacredtexts=['lablog', 'logs'], verbose=True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
@@ -164,18 +165,13 @@ class CleanUp:
 
         return 
 
+    def full_clean_job(self):
 
-    def full_clean_job(self):     
-        
         """
-        Perform the whole cleaning of the service 
+        Perform the whole cleaning of the service
         """
-
         # if '_NC' in ____ or '_DEL' in ___:
-
-            # print that a previous usage of this was detected
-
-        
+        # print that a previous usage of this was detected
         # self.rename()
         # self.delete()
 
