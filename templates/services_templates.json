@@ -17,7 +17,7 @@
         "url": "",
         "description": ""
    },
-   "wgMLST_taranis": {
+   "wgmlst_taranis": {
         "label": "",
         "template": "",
         "order": 1,
@@ -27,7 +27,7 @@
         "description": "",
         "depends_on": "assembly_annotation_pipeline"
    },
-   "wgMLST_chewbbaca" {
+   "wgmlst_chewbbaca" {
         "label": "",
         "template": "",
         "order": 1,
