@@ -37,7 +37,7 @@ import os
 # Local imports
 
 class CleanUp:
-    def __init__(self,resolution_name):
+    def __init__(self, resolution_name):
         # access the api/the json/the whatever with the service name to obtain
 
         self.resolution_name = resolution_name
@@ -45,8 +45,7 @@ class CleanUp:
         # self.delete =
         # self.nocopy =
 
-
-    def show_removable_dirs(self, to_stdout = True):
+    def show_removable_dirs(self, to_stdout=True):
         """
         Print or return the list of objects that must be deleted in this service
 
@@ -62,7 +61,7 @@ class CleanUp:
         else:
             return self.delete
 
-    def show_nocopy_dirs(self, to_stdout = True):
+    def show_nocopy_dirs(self, to_stdout=True):
         """
         Print or return the list of objects that must be renamed in this service
 
@@ -79,7 +78,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def delete(self, sacredtexts=['lablog','logs'], verbose = True):
+    def delete(self, sacredtexts=['lablog','logs'], verbose=True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
@@ -99,18 +98,13 @@ class CleanUp:
                 for directory in dirs:
                     if directory in self.delete:
                         # generate the directory path:
-                        to_be_deleted_dir = os.path.join(root,directory)
-                        
+                        to_be_deleted_dir = os.path.join(root, directory)
                         for content in os.listdir(to_be_deleted_dir):
-
                             if content not in sacredtexts:
-                                
-                                file_to_be_deleted = os.path.join(to_be_deleted_dir,content)
+                                file_to_be_deleted = os.path.join(to_be_deleted_dir, content)
                                 os.remove(file_to_be_deleted)
-
                                 if verbose:
                                     print(f'Removed: {file_to_be_deleted}.')
-                        
                         new_name = to_be_deleted_dir + '_DEL'
                         os.replace(to_be_deleted_dir, new_name)
         return
@@ -136,7 +130,7 @@ class CleanUp:
         '''
         return
 
-    def revert_renaming(self, verbose = True):
+    def revert_renaming(self, verbose=True):
         """
         Reverts the naming (adding of the _NC tag)
         """
@@ -145,18 +139,15 @@ class CleanUp:
             if len(dirs) > 0:
                 for directory in dirs:
                     if '_NC' in directory:
-                        nc_path = os.path.join(root,directory)
-
+                        nc_path = os.path.join(root, directory)
                         reverted_name = directory - '_NC'
-                        reverted_path = os.path.join(root,reverted_name)
-                        
+                        reverted_path = os.path.join(root, reverted_name)
                         os.replace(nc_path, reverted_path)
-
                         if verbose:
                             print(f"Reverted {directory} to {reverted_name}.")
         return 
 
-    def revert_delete_renaming(self, verbose = True):
+    def revert_delete_renaming(self, verbose=True):
         """
 
         """
@@ -164,13 +155,10 @@ class CleanUp:
             if len(dirs) > 0:
                 for directory in dirs:
                     if '_DEL' in directory:
-                        del_path = os.path.join(root,directory)
-
+                        del_path = os.path.join(root, directory)
                         reverted_name = directory - '_DEL'
                         reverted_path = os.path.join(root, reverted_name)
-
                         os.replace(del_path, reverted_path)
-
                         if verbose:
                             print(f"Reverted {directory} to {reverted_name}.")
 
@@ -191,4 +179,4 @@ class CleanUp:
         # self.rename()
         # self.delete()
 
-        return 
+        return
