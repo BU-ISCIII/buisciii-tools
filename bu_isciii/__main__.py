@@ -2,6 +2,7 @@
 
 import sys
 import os
+import logging
 
 import click
 from click.types import File
