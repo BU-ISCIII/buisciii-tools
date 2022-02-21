@@ -21,22 +21,26 @@
     },
     "wgmlst_taranis": {
         "label": "",
-        "template": "",
+        "template": "taranis",
         "order": 1,
         "begin": "base",
         "end": "mag_met",
-        "url": "",
-        "description": "",
-        "depends_on": "assembly_annotation_pipeline"
+        "url": "https://github.com/BU-ISCIII/taranis",
+        "description": "Multilocus sequence typing (MLST) using Taranis",
+        "depends_on": "assembly_annotation_pipeline",
+        "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
+        "no_copy": ["RAW", "TMP", "02-kmerfinder"]
     },
     "wgmlst_chewbbaca" {
         "label": "",
-        "template": "",
+        "template": "chewbbaca",
         "order": 1,
         "begin": "base",
         "end": "mag_met",
-        "url": "",
-        "description": "",
+        "url": "https://github.com/B-UMMI/chewBBACA",
+        "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation_pipeline",
+        "clean": ["03-assembly/trimming/trimmed","01-preprocessing/"],
+        "no_copy": ["RAW", "TMP", "02-kmerfinder"]
    }
 }
