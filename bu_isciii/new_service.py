@@ -26,13 +26,14 @@ END_OF_HEADER
 ================================================================
 '''
 # Generic imports
-import sys
-import os
+#import sys
+#import os
 
 # Local imports
 
-class NewService(self):
-    def __init__(self,resolution_id,service_folder,service_label,service_id):
+class NewService:
+
+    def __init__(self, resolution_id, service_folder, service_label, service_id):
         self.resolution_id = resolution_id
         self.service_folder = service_folder
         self.service_label = service_label
