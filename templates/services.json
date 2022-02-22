@@ -57,9 +57,9 @@
         },
         "no_copy": ["RAW", "TMP"]
     },
-    "sars_viralrecon": {
+    "viralrecon": {
         "label": "",
-        "template": "sars_viralrecon",
+        "template": "viralrecon",
         "url": "https://github.com/BU-ISCIII/viralrecon",
         "order": 1,
         "begin": "",
