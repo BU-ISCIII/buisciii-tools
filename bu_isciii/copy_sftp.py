@@ -21,7 +21,7 @@ import sysrsync
 
 import argparse
 
-from drylab_api import RestServiceApi
+# from drylab_api import RestServiceApi
 
 
 def parser_args(args=None):
