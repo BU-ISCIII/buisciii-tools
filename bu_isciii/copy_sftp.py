@@ -80,7 +80,7 @@ def main(args=None):
   "protocol":"rsync",
   "options":["-rlpv","--update","-L","--inplace"],
   "exclusions":["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py"],
-  "destination":"/data/bi/sftp/Labvirusres/SRVCNM572_20220209_SARSCOV278_icasas_S", 
+  "destination":"/data/bi/sftp/Labvirusres/SRVCNM572_20220209_SARSCOV278_icasas_S",
   "source":"/data/bi/services_and_colaborations/CNM/virologia/",
   "service_number":"SRVCNM572_20220209_SARSCOV278_icasas_S"
 """
