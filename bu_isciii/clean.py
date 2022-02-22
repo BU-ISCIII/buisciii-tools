@@ -79,6 +79,15 @@ class CleanUp:
         else:
             return self.nocopy
 
+    def scan_dirs():
+        """
+        Get a dictionary containing the path as key, and the list of 
+        """
+        path_content = {}
+        for root, _, files in os.walk(self.path):
+            path_content[root] = [file for file in files]
+        return path_content
+
     def delete(self, sacredtexts=['lablog', 'logs'], verbose=True):
         """
         Remove the files that must be deleted for the delivery of the service
@@ -92,7 +101,11 @@ class CleanUp:
             sacreditems [list]: names (str) of the files that shall not be deleted.
 
         """
-
+        delete_dict = self.scan_dirs()
+        to_del_dirs = [folder for folder in path_content.keys()
+                       if os.path..basename(directory in delete)]
+        
+            
         for root, dirs, _ in os.walk():
             # if there's at least one dir
             if len(dirs) > 0:
