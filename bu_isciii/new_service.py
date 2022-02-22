@@ -67,29 +67,30 @@ class NewService:
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
-        os.chdir(self.path)
         isExist = os.path.exists(str(self.path) + str(self.service_folder))
-        if isExist is False:
-            try:
-                os.mkdir(str(self.path) + str(self.service_folder))
-                os.chdir(str(self.path) + str(self.service_folder))
-            except OSError:
-                print(
-                    "ERROR: Creation of the directory %s failed"
-                    % (str(self.path) + str(self.service_folder))
-                )
-            else:
-                print(
-                    "Successfully created the directory %s "
-                    % (str(self.path) + str(self.service_folder))
-                )
-        else:
-            print(
-                "ERROR: Directory "
+        if isExist:
+            stderr.print(
+                "[red]ERROR: Directory "
                 + str(self.path)
                 + str(self.service_folder)
-                + " exists"
+                + " exists",
+                highlight=False,
             )
+        else:
+            try:
+                os.mkdir(str(self.path) + str(self.service_folder))
+            except OSError:
+                stderr.print(
+                    "[red]ERROR: Creation of the directory %s failed"
+                    % (str(self.path) + str(self.service_folder)),
+                    highlight=False,
+                )
+            else:
+                stderr.print(
+                    "[green]Successfully created the directory %s"
+                    % (str(self.path) + str(self.service_folder)),
+                    highlight=False,
+                )
         return True
 
     def copy_template(self):
