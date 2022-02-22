@@ -14,9 +14,11 @@
 # Copy delivery to sftp (e.g: SARS service)
 # Deliver automatization
 # Copy in sftp
-# import json
+from asyncio import protocols
+import json
 import sys
 import sysrsync
+import os
 
 import argparse
 
@@ -30,7 +32,7 @@ def parser_args(args=None):
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
     parser.add_argument(
-        "-s", "--source", type=str, help="Directory containing files to transfer"
+        "-s", "--source", type=str, help="Directory containing files cd to transfer"
     )
     parser.add_argument(
         "-d",
@@ -39,7 +41,20 @@ def parser_args(args=None):
         help="Directory to which the files will be transfered",
     )
     parser.add_argument(
-        "--p", "--protocol", type=str, default=None, help="command to execute"
+        "--sn",
+        "--service_number",
+        type=str,
+        required=False,
+        default=None,
+        help="Service Number",
+    )
+    parser.add_argument(
+        "--p",
+        "--protocol",
+        type=str,
+        required=False,
+        default=None,
+        help="command to execute",
     )
     parser.add_argument(
         "--o",
@@ -60,14 +75,21 @@ def parser_args(args=None):
     return parser.parse_args(args)
 
 
+path = open("schemas/schema_sftp_copy.json")
+data = json.load(path)
+
+
+# Get the current working directory
+cwd = os.getcwd()
+
+
 def main(args=None):
     args = parser_args(args)
-
     sysrsync.run(
         source=args.source,
         destination=args.destination,
-        options=args.options,
-        exclusions=args.exclusions,
+        options=data["options"],
+        exclusions=data["exclusions"],
     )
 
 
