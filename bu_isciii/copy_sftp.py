@@ -14,7 +14,7 @@
 # Deliver automatization
 # Copy in sftp
 
-from bdb import set_trace
+# from bdb import set_trace
 import json
 import sys
 import sysrsync
@@ -88,7 +88,7 @@ def main(args=None):
     )
 
     # Change status in iskylims
-    rest_api = RestServiceApi("drylab/api/", "https://iskylims.isciiides.es/")
+    # rest_api = RestServiceApi("drylab/api/", "https://iskylims.isciiides.es/")
 
 
 # import pdb
