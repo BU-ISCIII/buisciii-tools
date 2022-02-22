@@ -14,15 +14,14 @@
 # Deliver automatization
 # Copy in sftp
 
+from bdb import set_trace
 import json
 import sys
 import sysrsync
-import os
 
 import argparse
 
-
-# from drylab_api import RestServiceApi
+from drylab_api import RestServiceApi
 
 
 def parser_args(args=None):
@@ -87,6 +86,22 @@ def main(args=None):
         exclusions=data["exclusions"],
         sync_source_contents=False,
     )
+
+    # Change status in iskylims
+    rest_api = RestServiceApi("drylab/api/", "https://iskylims.isciiides.es/")
+
+
+# import pdb
+
+# pdb.set_trace()
+
+
+# services_queue = rest_api.put_request("resolution/", "state", "Delivery")
+
+# services_queue = rest_api.get_request("serviceFullData", "service", "service_number")
+
+
+# def put_request(self, request_info, parameter, value):
 
 
 if __name__ == "__main__":
