@@ -11,7 +11,7 @@ import rich.logging
 import rich.traceback
 
 import bu_isciii
-import bu_isciii.drylab_api
+from bu_isciii.drylab_api import RestServiceApi
 import bu_isciii.utils
 import bu_isciii.new_service
 
@@ -176,10 +176,8 @@ def new_service(resolution, path, no_create_folder):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
-    resolution_info = rest_api.get_request("resolution", "resolution", resolution)
     new_ser = bu_isciii.new_service.NewService(
-        resolution, resolution_info["resolutionFullNumber"], resolution_info["availableServices"], path, no_create_folder
+        resolution, path, no_create_folder
     )
     new_ser.create_folder()
 

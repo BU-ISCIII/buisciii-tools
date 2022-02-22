@@ -35,6 +35,7 @@ import rich
 # Local imports
 import bu_isciii
 import bu_isciii.utils
+from bu_isciii.drylab_api import RestServiceApi
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -49,8 +50,6 @@ class NewService:
     def __init__(
         self,
         resolution_id=None,
-        service_folder=None,
-        services_requested=None,
         path=None,
         no_create_folder=False,
     ):
@@ -58,10 +57,13 @@ class NewService:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        self.service_folder = service_folder
-        self.services_requested = services_requested
+
         self.path = path
         self.no_create_folder = no_create_folder
+        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
+        self.resolution_info = rest_api.get_request("resolution", "resolution", self.resolution_id)
+        self.service_folder = self.resolution_info["resolutionFullNumber"]
+        self.services_requested = self.resolution_info["availableServices"]
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
