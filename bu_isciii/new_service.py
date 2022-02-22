@@ -50,16 +50,14 @@ class NewService:
         self,
         resolution_id=None,
         service_folder=None,
-        service_label=None,
-        service_id=None,
+        services_requested=None,
         path=None,
         no_create_folder=False,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         self.service_folder = service_folder
-        self.service_label = service_label
-        self.service_id = service_id
+        self.services_requested = services_requested
         self.path = path
         self.no_create_folder = no_create_folder
 
@@ -68,6 +66,7 @@ class NewService:
         return True
 
     def copy_template(self):
+        print(self.services_requested)
         return True
 
     def get_resolution_id(self):
