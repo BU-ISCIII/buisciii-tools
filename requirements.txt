@@ -6,4 +6,4 @@ packaging
 prompt_toolkit>=3.0.3
 requests
 rich>=10.0.0
-sysrsync>=1.0.1 
+sysrsync==1.0.1 
