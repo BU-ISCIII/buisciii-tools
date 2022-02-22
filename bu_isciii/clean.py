@@ -75,7 +75,6 @@ class CleanUp:
         Params:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
-
         if to_stdout:
             print(self.nocopy)
             return
@@ -110,7 +109,6 @@ class CleanUp:
 
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
-
         """
         delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in delete_dict.keys()
@@ -127,21 +125,6 @@ class CleanUp:
 
         return
 
-    def revert_delete_renaming(self, verbose=True):
-        """
-
-        """
-
-        reverse_delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_rename_back = [folder for folder in reverse_delete_dict.keys()
-                          if "_DEL" in folder]
-        for directory_to_rename in to_rename_back:
-            reverted_name = directory_to_rename.replace('_DEL', '')
-            os.replace(directory_to_rename, reverted_name)
-            if verbose:
-                print(f"Reverted {directory_to_rename} to {reverted_name}.")
-        return
-
     def rename(self, verbose=True):
         """
         Rename the files and directories with a _NC so it is not copied into the
@@ -155,7 +138,6 @@ class CleanUp:
         rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in rename_dict.keys()
                        if os.path.basename(folder) in self.nocopy]
-
         for directory_to_rename in to_del_dirs:
             newpath = directory_to_rename + '_NC'
             os.replace(directory_to_rename, newpath)
@@ -163,25 +145,19 @@ class CleanUp:
                 print(f'Renamed {directory_to_rename} to {newpath}.')
         return
 
-    def revert_renaming(self, verbose=True):
+    def revert_nocopy_renaming(self, verbose=True):
         """
         Reverts the naming (adding of the _NC tag)
         """
-        rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-
-        for root, dirs, _ in os.walk():
-            # if there's at least one dir
-            if len(dirs) > 0:
-                for directory in dirs:
-                    if '_NC' in directory:
-                        nc_path = os.path.join(root, directory)
-                        reverted_name = directory - '_NC'
-                        reverted_path = os.path.join(root, reverted_name)
-                        os.replace(nc_path, reverted_path)
-                        if verbose:
-                            print(f"Reverted {directory} to {reverted_name}.")
+        reverse_rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
+        to_rename_back = [folder for folder in reverse_rename_dict.keys()
+                          if '_DEL' in folder and '_NC']
+        for directory_to_rename in to_rename_back:
+            reverted_name = directory_to_rename.replace('_DEL', '').replace('_NC','')
+            os.replace(directory_to_rename, reverted_name)
+            if verbose:
+                print(f'Renamed {directory_to_rename} to {reverted_name}.')
         return
-
 
     def full_clean_job(self):
 
