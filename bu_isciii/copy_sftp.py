@@ -14,7 +14,7 @@
 # Copy delivery to sftp (e.g: SARS service)
 # Deliver automatization
 # Copy in sftp
-from asyncio import protocols
+# from asyncio import protocols
 import json
 import sys
 import sysrsync
