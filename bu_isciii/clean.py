@@ -112,18 +112,22 @@ class CleanUp:
 
         """
         delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_del_dirs = [folder for folder in path_content.keys()
-                       if os.path.basename(directory) in self.delete]
+        to_del_dirs = [folder for folder in delete_dict.keys()
+                       if os.path.basename(folder) in self.delete]
 
         for directory_to_delete in to_del_dirs:
             for file in delete_dict[directory_to_delete]:
                 os.remove(file)
+            if verbose:
+                print(f'Removed {file}.')
             newpath = directory_to_delete + '_DEL'
             os.replace(directory_to_delete, newpath)
+            if verbose:
+                print(f'Renamed {directory_to_delete} to {newpath}')
 
         return
 
-    def rename(self):
+    def rename(self, verbose=True):
         """
         Rename the files and directories with a _NC so it is not copied into the
         delivery system.
@@ -133,7 +137,14 @@ class CleanUp:
         Params:
 
         """
-        pass
+        rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
+        to_del_dirs = [folder for folder in rename_dict.keys()
+                       if os.path.basename(folder) in self.nocopy]
+
+        for directory_to_rename in to_del_dirs:
+            newpath = directory_to_rename + '_NC'
+            os.replace(directory_to_rename, newpath)
+        return
 
         '''
         for _, dirs, folders in os.walk():
@@ -148,6 +159,8 @@ class CleanUp:
         """
         Reverts the naming (adding of the _NC tag)
         """
+        rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
+
         for root, dirs, _ in os.walk():
             # if there's at least one dir
             if len(dirs) > 0:
