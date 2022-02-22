@@ -184,6 +184,7 @@ def new_service(resolution, folder, service_label, service_id, path, no_create_f
         resolution, folder, service_label, service_id, path, no_create_folder
     )
     new_ser.create_folder()
+    new_ser.copy_template()
 
 
 if __name__ == "__main__":
