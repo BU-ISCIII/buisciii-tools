@@ -32,6 +32,7 @@ END_OF_HEADER
 '''
 # Generic imports
 # import sys
+from hashlib import new
 import os
 
 # Local imports
@@ -127,6 +128,23 @@ class CleanUp:
 
         return
 
+    def revert_delete_renaming(self, verbose=True):
+        """
+
+        """
+        for root, dirs, _ in os.walk():
+            if len(dirs) > 0:
+                for directory in dirs:
+                    if '_DEL' in directory:
+                        del_path = os.path.join(root, directory)
+                        reverted_name = directory - '_DEL'
+                        reverted_path = os.path.join(root, reverted_name)
+                        os.replace(del_path, reverted_path)
+                        if verbose:
+                            print(f"Reverted {directory} to {reverted_name}.")
+
+        return
+
     def rename(self, verbose=True):
         """
         Rename the files and directories with a _NC so it is not copied into the
@@ -144,15 +162,8 @@ class CleanUp:
         for directory_to_rename in to_del_dirs:
             newpath = directory_to_rename + '_NC'
             os.replace(directory_to_rename, newpath)
-        return
-
-        '''
-        for _, dirs, folders in os.walk():
-
-        for old_name in self.nocopy:
-            new_name = old_name + '_NC'
-            os.rename(old_name, new_name
-        '''
+            if verbose:
+                print(f'Renamed {directory_to_rename} to {newpath}.')
         return
 
     def revert_renaming(self, verbose=True):
@@ -174,22 +185,6 @@ class CleanUp:
                             print(f"Reverted {directory} to {reverted_name}.")
         return
 
-    def revert_delete_renaming(self, verbose=True):
-        """
-
-        """
-        for root, dirs, _ in os.walk():
-            if len(dirs) > 0:
-                for directory in dirs:
-                    if '_DEL' in directory:
-                        del_path = os.path.join(root, directory)
-                        reverted_name = directory - '_DEL'
-                        reverted_path = os.path.join(root, reverted_name)
-                        os.replace(del_path, reverted_path)
-                        if verbose:
-                            print(f"Reverted {directory} to {reverted_name}.")
-
-        return
 
     def full_clean_job(self):
 
