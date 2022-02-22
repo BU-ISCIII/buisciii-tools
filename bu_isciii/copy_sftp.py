@@ -76,16 +76,13 @@ def main(args=None):
  destination='/data/bi/sftp/Labvirusres'+ service_number,
  options=["-rlpv","--update","-L","--inplace"],
  exclusions=["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py" ])
- 
-  command1 = {
-    "protocol":"rsync",
-    "options":["-rlpv","--update","-L","--inplace"],
-    "exclusions":["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py"],
-
-    "destination":"/data/bi/sftp/Labvirusres/SRVCNM572_20220209_SARSCOV278_icasas_S", 
-    "source":"/data/bi/services_and_colaborations/CNM/virologia/",
-    "service_number":"SRVCNM572_20220209_SARSCOV278_icasas_S"
-
+ command1 = {
+  "protocol":"rsync",
+  "options":["-rlpv","--update","-L","--inplace"],
+  "exclusions":["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py"],
+  "destination":"/data/bi/sftp/Labvirusres/SRVCNM572_20220209_SARSCOV278_icasas_S", 
+  "source":"/data/bi/services_and_colaborations/CNM/virologia/",
+  "service_number":"SRVCNM572_20220209_SARSCOV278_icasas_S"
 """
 
 
