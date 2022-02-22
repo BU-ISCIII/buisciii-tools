@@ -115,7 +115,6 @@ class CleanUp:
         delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in delete_dict.keys()
                        if os.path.basename(folder) in self.delete]
-
         for directory_to_delete in to_del_dirs:
             for file in delete_dict[directory_to_delete]:
                 os.remove(file)
@@ -132,17 +131,15 @@ class CleanUp:
         """
 
         """
-        for root, dirs, _ in os.walk():
-            if len(dirs) > 0:
-                for directory in dirs:
-                    if '_DEL' in directory:
-                        del_path = os.path.join(root, directory)
-                        reverted_name = directory - '_DEL'
-                        reverted_path = os.path.join(root, reverted_name)
-                        os.replace(del_path, reverted_path)
-                        if verbose:
-                            print(f"Reverted {directory} to {reverted_name}.")
 
+        reverse_delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
+        to_rename_back = [folder for folder in reverse_delete_dict.keys()
+                          if "_DEL" in folder]
+        for directory_to_rename in to_rename_back:
+            reverted_name = directory_to_rename.replace('_DEL', '')
+            os.replace(directory_to_rename, reverted_name)
+            if verbose:
+                print(f"Reverted {directory_to_rename} to {reverted_name}.")
         return
 
     def rename(self, verbose=True):
