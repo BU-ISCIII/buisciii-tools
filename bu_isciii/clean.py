@@ -46,6 +46,7 @@ class CleanUp:
         # self.delete =
         # self.nocopy =
         # self.sacredtexts =
+        return
 
     def show_removable_dirs(self, to_stdout=True):
         """
@@ -113,22 +114,13 @@ class CleanUp:
         delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in path_content.keys()
                        if os.path.basename(directory) in self.delete]
-        for directory_to_delete in path_content.items():
-            
 
-            if len(dirs) > 0:
-                for directory in dirs:
-                    if directory in self.delete:
-                        # generate the directory path:
-                        to_be_deleted_dir = os.path.join(root, directory)
-                        for content in os.listdir(to_be_deleted_dir):
-                            if content not in sacredtexts:
-                                file_to_be_deleted = os.path.join(to_be_deleted_dir, content)
-                                os.remove(file_to_be_deleted)
-                                if verbose:
-                                    print(f'Removed: {file_to_be_deleted}.')
-                        new_name = to_be_deleted_dir + '_DEL'
-                        os.replace(to_be_deleted_dir, new_name)
+        for directory_to_delete in to_del_dirs:
+            for file in delete_dict[directory_to_delete]:
+                os.remove(file)
+            newpath = directory_to_delete + '_DEL'
+            os.replace(directory_to_delete, newpath)
+
         return
 
     def rename(self):
