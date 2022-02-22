@@ -45,6 +45,7 @@ class CleanUp:
         # self.base_directory =
         # self.delete =
         # self.nocopy =
+        # self.sacredtexts =
 
     def show_removable_dirs(self, to_stdout=True):
         """
@@ -79,16 +80,24 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def scan_dirs():
+    def scan_dirs(self):
         """
-        Get a dictionary containing the path as key, and the list of 
+        Get a dictionary containing the path as key, and the files inside as values
+        If a list is given as arguments, the files will not be included in the
+        dictionary.
+
+        Usage:
+            object.scan_dirs()
+
+        Params:
         """
         path_content = {}
         for root, _, files in os.walk(self.path):
-            path_content[root] = [file for file in files]
+            path_content[root] = [file for file in files
+                                  if file not in self.sacredtexts]
         return path_content
 
-    def delete(self, sacredtexts=['lablog', 'logs'], verbose=True):
+    def delete(self, verbose=True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
@@ -98,16 +107,15 @@ class CleanUp:
             object.delete()
 
         Params:
-            sacreditems [list]: names (str) of the files that shall not be deleted.
+            sacredtexts [list]: names (str) of the files that shall not be deleted.
 
         """
-        delete_dict = self.scan_dirs()
+        delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in path_content.keys()
-                       if os.path..basename(directory in delete)]
-        
+                       if os.path.basename(directory) in self.delete]
+        for directory_to_delete in path_content.items():
             
-        for root, dirs, _ in os.walk():
-            # if there's at least one dir
+
             if len(dirs) > 0:
                 for directory in dirs:
                     if directory in self.delete:
