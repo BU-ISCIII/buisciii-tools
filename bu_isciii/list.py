@@ -4,15 +4,27 @@ import json
 import rich.table
 import rich.console
 
-def print_table():
-    """Lists available bu-isciii pipelines and versions.
+class list_services ():
+    """Lists available bu-isciii services and versions.
     """
     pass
 
-def list_pipelines():
-    """Prints out a list of all bu-isciii pipelines.
+def read_json():
+    """Read available bu-isciii services in json.
     """
     pass
+
+def list_filter():
+    """Filter available bu-isciii services
+    """
+    pass
+
+def list_sort():
+    """Sort available bu-isciii services
+    """
+    pass
+
+
 
 table = rich.table.Table()
 table.add_column("Service name", justify="right", style="cyan"),
