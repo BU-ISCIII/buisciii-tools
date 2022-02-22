@@ -57,6 +57,8 @@ class NewService:
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+        else:
+            self.resolution_id = resolution_id
         self.service_folder = service_folder
         self.service_label = service_label
         self.service_id = service_id
