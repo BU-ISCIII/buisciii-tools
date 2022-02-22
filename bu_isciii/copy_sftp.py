@@ -1,6 +1,19 @@
+"""
+ =============================================================
+ HEADER
+ =============================================================
+ INSTITUTION: BU-ISCIII
+ AUTHOR: Erika Kvalem Soto
+ ================================================================
+ END_OF_HEADER
+ ================================================================
+
+ """
+
+
 # Copy delivery to sftp (e.g: SARS service)
 # Deliver automatization
-##Copy in sftp
+# Copy in sftp
 import json
 import sys
 import sysrsync
@@ -43,32 +56,22 @@ def parser_args(args=None):
 def main(args=None):
     args = parser_args(args)
 
-    ## Create output directory if it doesn't exist
-    # destination = os.path.dirname(args.destination)
-    # make_dir(out_dir)
-
-    # protocol rsync 1
-    sysrsync.run(source=args.source, destination=args.destination, options=args.options)
-    # exclusions=args.exclusions)
-
-
-# sysrsync.run(source='/data/bi/services_and_colaborations/CNM/virologia/',
-#             destination='/data/bi/sftp/Labvirusres'+ service_number,
-#             options=["-rlpv","--update","-L","--inplace"],
-#             exclusions=["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py" ])
+    sysrsync.run(
+        source=args.source,
+        destination=args.destination,
+        options=args.options,
+        exclusions=args.exclusions,
+    )
 
 
 """
+ sysrsync.run(source='/data/bi/services_and_colaborations/CNM/virologia/',
+ destination='/data/bi/sftp/Labvirusres'+ service_number,
+ options=["-rlpv","--update","-L","--inplace"],
+ exclusions=["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py" ])
+"""
 
-  "command1":{
-    "protocol":"rsync",
-    "options":["-rlpv", "--update", "--inplace"],
-    "exclusions":["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py","RESULTS" ],
-
-    "destination":"/data/bi/sftp/Labvirusres",
-    "source":"/data/bi/services_and_colaborations/CNM/virologia/",
-    "service_number":"SRVCNM572_20220209_SARSCOV278_icasas_S"
-  },
+"""
   command1 = {
     "protocol":"rsync",
     "options":["-rlpv","--update","-L","--inplace"],
@@ -80,18 +83,6 @@ def main(args=None):
 
 """
 
-# other code. . .
-
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-# Opening JSON file
-# f = open("deliver_automatization.js")
-
-# returns JSON object as a dictionary
-# data = json.load(f)
-
-# Closing file
-# f.close()
