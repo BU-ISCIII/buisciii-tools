@@ -11,10 +11,9 @@
  """
 
 
-# Copy delivery to sftp (e.g: SARS service)
 # Deliver automatization
 # Copy in sftp
-# from asyncio import protocols
+
 import json
 import sys
 import sysrsync
@@ -27,8 +26,8 @@ import argparse
 
 
 def parser_args(args=None):
-    Description = "Copy resolution files to sftp"
-    Epilog = """Example usage: python copy_sftp.py --source /home/erika.kvalem/Documents/BU_ISCIII/pruebas_source --destination /home/erika.kvalem/Documents/BU_ISCIII/prubas_destination --options -r --exclusions "*_NC" """
+    Description = "Copy resolution FOLDER to sftp"
+    Epilog = """Example usage: python copy_sftp.py --source /home/erika.kvalem/Documents/BU_ISCIII/pruebas_source/ --destination /home/erika.kvalem/Documents/BU_ISCIII/prubas_destination --options -r --exclusions "*_NC" """
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
     parser.add_argument(
@@ -79,10 +78,6 @@ path = open("schemas/schema_sftp_copy.json")
 data = json.load(path)
 
 
-# Get the current working directory
-cwd = os.getcwd()
-
-
 def main(args=None):
     args = parser_args(args)
     sysrsync.run(
@@ -90,22 +85,8 @@ def main(args=None):
         destination=args.destination,
         options=data["options"],
         exclusions=data["exclusions"],
+        sync_source_contents=False,
     )
-
-
-"""
- sysrsync.run(source='/data/bi/services_and_colaborations/CNM/virologia/',
- destination='/data/bi/sftp/Labvirusres'+ service_number,
- options=["-rlpv","--update","-L","--inplace"],
- exclusions=["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py" ])
- command1 = {
-  "protocol":"rsync",
-  "options":["-rlpv","--update","-L","--inplace"],
-  "exclusions":["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py"],
-  "destination":"/data/bi/sftp/Labvirusres/SRVCNM572_20220209_SARSCOV278_icasas_S",
-  "source":"/data/bi/services_and_colaborations/CNM/virologia/",
-  "service_number":"SRVCNM572_20220209_SARSCOV278_icasas_S"
-"""
 
 
 if __name__ == "__main__":
