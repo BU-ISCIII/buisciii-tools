@@ -30,6 +30,7 @@ END_OF_HEADER
 import os
 import logging
 
+import shutil
 import rich
 
 # Local imports
@@ -94,6 +95,12 @@ class NewService:
         return True
 
     def copy_template(self):
+        print("I will copy the template service folders for " + self.service_folder + "!")
+        #service = bu_isciii.json_reader.Service(self.service_id)
+        #service_template = new_ser.get_template()
+        service_template = ["viralrecon"] ###TMP!!
+        if len(service_template) == 1:
+            shutil.copytree("templates/"+str(service_template[0]), str(self.path) + str(self.service_folder + "/"), dirs_exist_ok=True, ignore=shutil.ignore_patterns('README'))
         return True
 
     def get_resolution_id(self):
