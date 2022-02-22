@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import json
-import prettytable
+#import json
+#import prettytable
 
 
 def print_table():
