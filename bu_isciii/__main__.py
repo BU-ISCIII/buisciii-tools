@@ -175,9 +175,7 @@ def new_service(resolution, path, no_create_folder):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    new_ser = bu_isciii.new_service.NewService(
-        resolution, path, no_create_folder
-    )
+    new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
     new_ser.create_folder()
     new_ser.copy_template()
 

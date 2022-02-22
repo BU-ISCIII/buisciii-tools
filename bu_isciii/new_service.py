@@ -61,7 +61,9 @@ class NewService:
         self.path = path
         self.no_create_folder = no_create_folder
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
-        self.resolution_info = rest_api.get_request("resolution", "resolution", self.resolution_id)
+        self.resolution_info = rest_api.get_request(
+            "resolution", "resolution", self.resolution_id
+        )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
         self.services_requested = self.resolution_info["availableServices"]
 
