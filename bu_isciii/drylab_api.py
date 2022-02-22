@@ -3,6 +3,7 @@ import json
 import requests
 
 
+
 class RestServiceApi:
     def __init__(self, server, url):
         self.request_url = server + url
