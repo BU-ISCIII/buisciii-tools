@@ -1,6 +1,5 @@
 {
-  "$schema": "sftp_copy",
-  "$id": "",
+  "schema": "sftp_copy",
   "title": "deliver_automation",
   "type": "object",
   "properties": {
