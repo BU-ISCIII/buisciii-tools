@@ -27,7 +27,7 @@ END_OF_HEADER
 """
 # Generic imports
 # import sys
-# import os
+import os
 import logging
 
 import rich
@@ -66,7 +66,19 @@ class NewService:
         self.no_create_folder = no_create_folder
 
     def create_folder(self):
-        print("I will create the service folder!")
+        print("I will create the service folder for "+self.resolution_id+"!")
+        os.chdir(self.path)
+        isExist = os.path.exists(str(self.path)+str(self.service_folder))
+        if isExist is False:
+            try:
+                os.mkdir(str(self.path)+str(self.service_folder))
+                os.chdir(str(self.path)+str(self.service_folder))
+            except OSError:
+                print ("ERROR: Creation of the directory %s failed" % (str(self.path)+str(self.service_folder)))
+            else:
+                print ("Successfully created the directory %s " % (str(self.path)+str(self.service_folder)))
+        else:
+            print ("ERROR: Directory "+str(self.path)+str(self.service_folder)+" exists")
         return True
 
     def copy_template(self):
