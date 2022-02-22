@@ -1,8 +1,22 @@
 #!/usr/bin/env python
 
+"""
+ =============================================================
+ HEADER
+ =============================================================
+ INSTITUTION: BU-ISCIII
+ AUTHOR: Alberto Lema Blanco
+ ================================================================
+ END_OF_HEADER
+ ================================================================
+ """
+
+from importlib.resources import path
 import json
+from ossaudiodev import openmixer
 import rich.table
 import rich.console
+import os
 
 class list_services ():
     """Lists available bu-isciii services and versions.
@@ -24,16 +38,19 @@ def list_sort():
     """
     pass
 
+# get path real
+with open('/home/alberto.lema/Documents/Desarrollo/buisciii-tools/templates/services.json', 'r') as f:
+  data = json.load(f)
 
+# printing elements dict
 
 table = rich.table.Table()
-table.add_column("Service name", justify="right", style="cyan"),
-table.add_column("Version", justify="right", style="green")
+table.add_column("Service name", justify="right", style="cyan")
 
-table.add_row("viralrecon", "v2.1.0")
+print (data["assembly_annotation"]["description"])
+
+for i in data.keys():
+    table.add_row(str(i))
 
 console = rich.console.Console()
 console.print(table)
-
-
-
