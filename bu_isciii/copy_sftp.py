@@ -45,7 +45,6 @@ def main(args=None):
 #             exclusions=["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py" ])
 
 
-
 """
 
   "command1":{
