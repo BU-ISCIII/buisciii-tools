@@ -11,7 +11,6 @@ import rich.logging
 import rich.traceback
 
 import bu_isciii
-from bu_isciii.drylab_api import RestServiceApi
 import bu_isciii.utils
 import bu_isciii.new_service
 
@@ -180,6 +179,7 @@ def new_service(resolution, path, no_create_folder):
         resolution, path, no_create_folder
     )
     new_ser.create_folder()
+    new_ser.copy_template()
 
 
 if __name__ == "__main__":
