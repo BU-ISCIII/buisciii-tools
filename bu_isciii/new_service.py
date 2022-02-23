@@ -103,7 +103,7 @@ class NewService:
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
             shutil.copytree(
-                "templates/" + str(service_template[0]),
+                os.path.join(os.path.dirname(__file__),"templates", service_template[0]),
                 self.full_path,
                 dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns("README"),
