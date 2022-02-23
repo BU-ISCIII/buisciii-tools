@@ -57,14 +57,22 @@ class Deliver:
     def create_report:
 
         info =[
-            
         SERVICE_ID = services_queue["Resolutions"]["resolutionFullNumber"],
         SERVICE_NUMBER = services_queue["Service"]["serviceRequestNumber"],
-        RESOLUTION_NUMBER = services_queue["Resolutions"]["resolutionNumber"]
-        SERVICE_REQUEST_DATE = services_queue["Service"]["serviceCreatedOnDate"]
-        SERVICE_RESOLUTION_DATE = services_queue["Resolutions"]["resolutionDate"]
-        SERVICE_IN_PROGRESS_DATE = services_queue["Resolutions"]["resolutionOnInProgressDate"]
-
+        RESOLUTION_NUMBER = services_queue["Resolutions"]["resolutionNumber"],
+        SERVICE_REQUEST_DATE = services_queue["Service"]["serviceCreatedOnDate"],
+        SERVICE_RESOLUTION_DATE = services_queue["Resolutions"]["resolutionDate"],
+        SERVICE_IN_PROGRESS_DATE = services_queue["Resolutions"]["resolutionOnInProgressDate"],
+        SERVICE_ESTIMATED_DELIVERY_DATE = services_queue["Resolutions"]["resolutionEstimatedDate"],
+        SERVICE_DELIVERY_DATE = services_queue["Resolutions"]["resolutionDeliveryDate"],
+        SERVICE_ SERVICE_NOTES = services_queue["Service"]["serviceUserId"]["first_name"],
+        USER_LAST_NAME =  services_queue["Service"]["serviceUserId"]["last_name"],
+        USER_EMAIL =  services_queue["Service"]["serviceUserId"]["email"],
+        SERVICE_SEQUENCING_CENTER = services_queue["Service"]["serviceSeqCenter"],
+        # RUN_NAME,
+        # PROJECTS,
+        # SAMPLES ,
+        PROJECT_NAME = services_queue["Sample"]["sampleName"],
         ]
         
 
@@ -72,15 +80,10 @@ class Deliver:
 
         
 
+
+
+    
             """
-            
-            SERVICE.IN_PROGRESS_DATE  - resolutionOnInProgressDate
-            SERVICE.ESTIMATED_DELIVERY_DATE - resolutionEstimatedDate
-            SERVICE.DELIVERY_DATE - resolutionDeliveryDate
-            SERVICE.SERVICE_NOTES - - serviceUserId.first_name
-            USER.LAST_NAME - serviceUserId.last_name
-            USER.EMAIL - serviceUserId.email
-            SERVICE.SEQUENCING_CENTER - serviceSeqCenter
             RUN_NAME - runName
             PROJECTS - ¿lista de projects name?
             PROJECT_NAME - projectName
