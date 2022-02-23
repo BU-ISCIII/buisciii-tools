@@ -93,9 +93,25 @@ class CleanUp:
         dictionary.
 
         Usage:
-            to_rename, to_delete = object.scan_dirs(to_find=list) 
+            to_rename, to_delete = object.scan_dirs(to_find=list)
 
         Params:
+
+        UNUSED CODE:
+                to_rename = []
+        to_delete = []
+        # if must be found, add all its contents
+        for directory, contentlist in path_content.items():
+            if directory in to_find:
+                to_rename.append(directory)
+                to_delete += contentlist[0]
+                to_delete += contentlist[1]
+            else:
+                for file in to_find:
+                    if file in to_find:
+                        to_delete.append(file)
+                return path_content
+
         """
         pathlist = []
 
@@ -108,25 +124,7 @@ class CleanUp:
 
         return pathlist
 
-
-        '''
-        to_rename = []
-        to_delete = []
-        # if must be found, add all its contents
-        for directory, contentlist in path_content.items():
-            if directory in to_find:
-                to_rename.append(directory)
-                to_delete += contentlist[0]
-                to_delete += contentlist[1]
-            else:
-                for file in to_find:
-                    if file in to_find:
-                        to_delete.append(file)
-        '''
-
-        return path_content
-
-    def rename(self, dir_to_rename=self.nocopy, add="_NC",verbose=True):
+    def rename(self, dir_to_rename=self.nocopy, add="_NC", verbose=True):
         """
         Description:
             Rename the files and directories
@@ -139,7 +137,7 @@ class CleanUp:
 
         path_content = self.scan_dirs(to_find=self.nocopy)
 
-        for directory_to_rename in path_content:          
+        for directory_to_rename in path_content:
             newpath = directory_to_rename + add
             os.replace(directory_to_rename, newpath)
             if verbose:
@@ -206,7 +204,7 @@ class CleanUp:
         to_rename_back = [folder for folder in reverse_rename_dict.keys()
                           if '_DEL' in folder and '_NC']
         for directory_to_rename in to_rename_back:
-            reverted_name = directory_to_rename.replace('_DEL', '').replace('_NC','')
+            reverted_name = directory_to_rename.replace('_DEL', '').replace('_NC', '')
             os.replace(directory_to_rename, reverted_name)
             if verbose:
                 print(f'Renamed {directory_to_rename} to {reverted_name}.')
