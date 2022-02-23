@@ -113,9 +113,10 @@ def bu_isciii_cli(verbose, log_file):
     log.setLevel(logging.DEBUG)
 
     # Set up logs to the console
+
     log.addHandler(
         rich.logging.RichHandler(
-            level=logging.DEBUG if verbose else logging.INFO,
+            level=logging.DEBUG if verbose else logging.ERROR,
             console=rich.console.Console(
                 stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()
             ),
