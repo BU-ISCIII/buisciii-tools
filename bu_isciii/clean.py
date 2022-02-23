@@ -110,7 +110,7 @@ class CleanUp:
 
         return pathlist
 
-    def rename(self, to_find=to_find_list, add, verbose=True):
+    def rename(self, to_find=to_find_list, add="_NC", verbose=True):
         """
         Description:
             Rename the files and directories
@@ -133,7 +133,7 @@ class CleanUp:
     def rename_nocopy(self, verbose=True):
         """
         Description:
-            
+
         Usage:
 
         Params:
@@ -141,7 +141,6 @@ class CleanUp:
         """
         self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
         return
-
 
     def delete(self, sacredtexts=["lablog", "logs"], verbose=True):
         """
