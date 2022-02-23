@@ -7,7 +7,7 @@ INSTITUTION: BU-ISCIII
 AUTHOR: Guillermo J. Gorines Cordero
 MAIL: guillermo.gorines@urjc.es
 CREATED: 21-2-2022
-REVISED: 21-2-2022
+REVISED: 23-2-2022
 DESCRIPTION:
 OPTIONS:
 
@@ -32,7 +32,6 @@ END_OF_HEADER
 '''
 # Generic imports
 # import sys
-from hashlib import new
 import os
 
 # Local imports
@@ -81,7 +80,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def scan_dirs(self):
+    def scan_dirs(self, sacredtexts=self.sacredtexts, to_delete=[]):
         """
         Get a dictionary containing the path as key, and the files inside as values
         If a list is given as arguments, the files will not be included in the
@@ -94,9 +93,21 @@ class CleanUp:
         """
         path_content = {}
         for root, _, files in os.walk(self.path):
-            path_content[root] = [file for file in files
+            path_content[root] = [os.path.join(root,file) for file in files
                                   if file not in self.sacredtexts]
-        return path_content
+        to_rename = []
+        to_delete = []
+
+        for directory, filelist in path_content.items():
+            if directory in to_delete:
+                to_rename.append(directory)
+                to_delete += filelist
+            else:
+                for file in filelist:
+                    if file in to_delete:
+                        to_delete.append(file)
+
+        return to_rename, to_delete
 
     def delete(self, verbose=True):
         """
