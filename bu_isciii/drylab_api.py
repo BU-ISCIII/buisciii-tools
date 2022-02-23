@@ -2,6 +2,8 @@
 import json
 import requests
 
+from utils import write_in_log
+
 
 class RestServiceApi:
     def __init__(self, server, url):
@@ -23,6 +25,15 @@ class RestServiceApi:
             return True
         except requests.HTTPError:
             return False
+
+    def post_request(self, data):
+        try:
+            req = requests.post(self.request_url, data=data, headers=self.headers)
+        except requests.HTTPError:
+            if req.status > 201:
+                write_in_log("info", str(req.status_code))
+            return False
+        return True
 
 
 """ Example usage

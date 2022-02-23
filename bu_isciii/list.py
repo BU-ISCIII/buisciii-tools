@@ -23,7 +23,7 @@ class ListServices:
             "r",
         ) as f:
             data = json.load(f)
-        pass
+            print(data)
 
 
 def list_filter():
