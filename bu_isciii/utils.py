@@ -11,15 +11,14 @@ import questionary
 
 
 def write_in_log(log_type, string_text, showing_traceback):
-    """ Write actions in log
-    """
+    """ Write actions in log"""
 
     def open_log(config_file):
         """ The function creates the log object to write logging information
-            Input:
-                config_file    # path of config file
-            Return:
-                logger
+        Input:
+            config_file    # path of config file
+        Return:
+            logger
         """
 
         fileConfig(config_file)
@@ -32,13 +31,13 @@ def write_in_log(log_type, string_text, showing_traceback):
         work_dir = os.getcwd()
         config_file = os.path.join(work_dir, "test")
         logger = open_log(config_file)
-    if 'error' in log_type:
-        logger.error('-----------------    ERROR   ------------------')
+    if "error" in log_type:
+        logger.error("-----------------    ERROR   ------------------")
         logger.error(string_text)
         if showing_traceback :
-            logger.error('################################')
+            logger.error("################################")
             logger.error(traceback.format_exc())
-            logger.error('################################')
+            logger.error("################################")
         logger.error('-----------------    END ERROR   --------------')
     else:
         logger.info(string_text)
