@@ -124,7 +124,7 @@ class CleanUp:
 
         return pathlist
 
-    def rename(self, dir_to_rename=self.nocopy, add="_NC", verbose=True):
+    def rename(self, add="_NC", verbose=True):
         """
         Description:
             Rename the files and directories
@@ -182,10 +182,10 @@ class CleanUp:
         for item in deletable_items:
             try:
                 os.remove(item)
-            except:
+            except exception:
                 try:
                     os.rmdir(item)
-                except:
+                except exception:
                     pass
         return
 
