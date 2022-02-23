@@ -46,15 +46,22 @@ class ListServices:
         console.print(table)
 
     def get_find(self, service, found):
+        """
+        Colaboración de Pablo
+        """
         if found in self.json_data[service]:
             return self.json_data[service][found]
         else:
-            for key, value in self.data[service].items():
+            for key, value in self.json_data[service].items():
                 if isinstance(value, dict):
-                    if found in self.data[service][key]:
-                        return self.data[service][key]
+                    if found in self.json_data[service][key]:
+                        return self.json_data[service][key]
             return None
 
 
+"""
 prueba = ListServices("../templates/services.json")
+prueba.get_table()
+prueba.get_find()
 prueba.get_find("assembly_annotation", "clean")
+"""
