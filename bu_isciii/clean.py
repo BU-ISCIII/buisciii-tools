@@ -175,6 +175,7 @@ class CleanUp:
                 try:
                     os.rmdir(item)
 
+        '''
         # might contain both dirs and files
         for thing_to_delete in to_delete:
             os.remove(thing_to_delete)
@@ -186,7 +187,7 @@ class CleanUp:
             os.replace(thing_to_rename, newname)
             if verbose:
                 print(f'Renamed {thing_to_rename} to {newname}.')
-
+        '''
         return
 
 
