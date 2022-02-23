@@ -36,6 +36,7 @@ import rich
 # Local imports
 import bu_isciii
 import bu_isciii.utils
+from bu_isciii.service_json import ServiceJson
 from bu_isciii.drylab_api import RestServiceApi
 
 log = logging.getLogger(__name__)
@@ -70,7 +71,7 @@ class NewService:
         self.full_path = os.path.join(path, self.path, self.service_folder)
 
     def get_service_ids(self):
-        service_json = bu_isciii.ServiceJson()
+        service_json = ServiceJson()
         for request in self.availableServices:
             print(request)
 
@@ -98,7 +99,8 @@ class NewService:
         return True
 
     def copy_template(self):
-        print("I will copy the template service folders for " + self.full_path + "!")
+        stderr.print("[blue]I will copy the template service folders for %s !" % self.full_path)
+        services_ids = self.get_service_ids()
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
