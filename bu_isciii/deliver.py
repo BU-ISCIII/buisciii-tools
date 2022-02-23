@@ -16,7 +16,7 @@ import os
 
 # import argparse
 # from warnings import catch_warnings
-from distutils.log import info
+# from distutils.log import info
 import logging
 
 import sysrsync
@@ -91,7 +91,7 @@ class Deliver:
                 "[red] ERROR: Data could not be copied to the sftp folder.",
                 highlight=False,
             )
-
+    """
     def create_report(self):
 
         info = {
@@ -129,6 +129,8 @@ class Deliver:
             "PROJECT_NAME": self.services_queue["Sample"]["sampleName"],
         }
         print(info)
+    """
+    
 
         """
         RUN_NAME - runName
