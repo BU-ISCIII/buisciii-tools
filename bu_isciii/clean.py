@@ -110,7 +110,7 @@ class CleanUp:
 
         return pathlist
 
-    def rename(self, to_find=to_find_list, add="_NC", verbose=True):
+    def rename(self, to_find, add, verbose=True):
         """
         Description:
             Rename the files and directories
@@ -121,7 +121,7 @@ class CleanUp:
 
         """
 
-        path_content = self.scan_dirs(to_find=to_find_list)
+        path_content = self.scan_dirs(to_find=to_find)
 
         for directory_to_rename in path_content:
             newpath = directory_to_rename + add
