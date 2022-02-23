@@ -13,6 +13,7 @@ import rich.traceback
 import bu_isciii
 import bu_isciii.utils
 import bu_isciii.new_service
+import bu_isciii.deliver
 
 log = logging.getLogger()
 
@@ -182,7 +183,6 @@ def new_service(resolution, path, no_create_folder):
 
 @bu_isciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
-
 @click.option(
     "-s",
     "--source",
@@ -192,24 +192,18 @@ def new_service(resolution, path, no_create_folder):
 )
 @click.option(
     "-d",
-    "----destination",
+    "--destination",
     type=click.Path(),
     default=os.getcwd(),
-    help="Directory to which the files will be transfered"",
+    help="Directory to which the files will be transfered",
 )
-@click.option(
-    "--sn",
-    "--resolution_number",
-    type=str,
-    help="Resolution Id",
-)
-def deliver(source, destination, resolution):
+def deliver(resolution, source, destination):
     """
-    Create new service, it will create folder and copy template depending on selected service.
+    "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
     """
-    new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
-    new_ser.create_folder()
-    new_ser.copy_template()
+    new_del = bu_isciii.deliver.Deliver(resolution, source, destination)
+    new_del.create_report()
+
 
 if __name__ == "__main__":
     run_bu_isciii()
