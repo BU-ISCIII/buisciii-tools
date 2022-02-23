@@ -11,7 +11,7 @@
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP"]
+        "no_copy": ["RAW", "TMP", "latest"]
     },
     "mtbseq": {
         "label": "",

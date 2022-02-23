@@ -30,6 +30,7 @@ END_OF_HEADER
 import os
 import logging
 
+import shutil
 import rich
 
 # Local imports
@@ -66,37 +67,43 @@ class NewService:
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
         self.services_requested = self.resolution_info["availableServices"]
+        self.full_path = os.path.join(path, self.path, self.service_folder)
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
-        isExist = os.path.exists(str(self.path) + str(self.service_folder))
+        isExist = os.path.exists(self.full_path)
         if isExist:
             stderr.print(
-                "[red]ERROR: Directory "
-                + str(self.path)
-                + str(self.service_folder)
-                + " exists",
+                "[red]ERROR: Directory " + self.full_path + " exists",
                 highlight=False,
             )
         else:
             try:
-                os.mkdir(str(self.path) + str(self.service_folder))
+                os.mkdir(self.full_path)
             except OSError:
                 stderr.print(
-                    "[red]ERROR: Creation of the directory %s failed"
-                    % (str(self.path) + str(self.service_folder)),
+                    "[red]ERROR: Creation of the directory %s failed" % self.full_path,
                     highlight=False,
                 )
             else:
                 stderr.print(
-                    "[green]Successfully created the directory %s"
-                    % (str(self.path) + str(self.service_folder)),
+                    "[green]Successfully created the directory %s" % self.full_path,
                     highlight=False,
                 )
         return True
 
     def copy_template(self):
-        print(self.services_requested)
+        print("I will copy the template service folders for " + self.full_path + "!")
+        # service = bu_isciii.json_reader.Service(self.service_id)
+        # service_template = new_ser.get_template()
+        service_template = ["viralrecon"]  # TMP!!
+        if len(service_template) == 1:
+            shutil.copytree(
+                "templates/" + str(service_template[0]),
+                self.full_path,
+                dirs_exist_ok=True,
+                ignore=shutil.ignore_patterns("README"),
+            )
         return True
 
     def get_resolution_id(self):
