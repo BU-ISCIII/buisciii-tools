@@ -187,14 +187,14 @@ def new_service(resolution, path, no_create_folder):
     "-s",
     "--source",
     type=click.Path(),
-    default=os.getcwd(),
+    default=None,
     help="Directory containing files cd to transfer",
 )
 @click.option(
     "-d",
     "--destination",
     type=click.Path(),
-    default=os.getcwd(),
+    default=None,
     help="Directory to which the files will be transfered",
 )
 def deliver(resolution, source, destination):

@@ -39,13 +39,13 @@ def prompt_resolution_id():
     return resolution_id
 
 
-def source_path():
+def prompt_source_path():
     stderr.print("Directory containing files cd to transfer")
     source = questionary.path("Source path").ask()
     return source
 
 
-def destination_path():
+def prompt_destination_path():
     stderr.print("Directory to which the files will be transfered")
     destination = questionary.path("Destination path").ask()
     return destination

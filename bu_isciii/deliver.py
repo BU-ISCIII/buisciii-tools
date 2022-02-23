@@ -10,11 +10,12 @@
 
  """
 import json
-import sys
+
+# import sys
 import os
-import argparse
-from warnings import catch_warnings
-from bdb import set_trace
+
+# import argparse
+# from warnings import catch_warnings
 from distutils.log import info
 import logging
 
@@ -24,7 +25,7 @@ import rich
 # import requests
 import bu_isciii
 import bu_isciii.utils
-from drylab_api import RestServiceApi
+from bu_isciii.drylab_api import RestServiceApi
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -38,13 +39,14 @@ stderr = rich.console.Console(
 class Deliver:
     def __init__(
         self,
+        resolution_id=None,
         source=None,
         destination=None,
-        resolution_id=None,
     ):
 
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            print(self.resolution_id)
         else:
             self.resolution_id = resolution_id
 
@@ -60,7 +62,7 @@ class Deliver:
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.services_queue = rest_api.get_request(
-            "serviceFullData", "service", resolution_id
+            "serviceFullData", "service", self.resolution_id
         )
 
     def copy_sftp(self):
