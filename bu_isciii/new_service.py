@@ -68,8 +68,11 @@ class NewService:
         self.service_folder = self.resolution_info["resolutionFullNumber"]
         self.services_requested = self.resolution_info["availableServices"]
         self.full_path = os.path.join(path, self.path, self.service_folder)
-        self.service_info = bu_isciii.JsonReader(self.service_id)
 
+    def get_service_ids(self):
+        service_json = bu_isciii.ServiceJson()
+        for request in self.availableServices:
+            print(request)
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
@@ -112,9 +115,3 @@ class NewService:
 
     def get_service_folder(self):
         return self.service_folder
-
-    def get_service_label(self):
-        return self.service_label
-
-    def get_service_id(self):
-        return self.get_service_id
