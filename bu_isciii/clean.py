@@ -24,7 +24,6 @@ TO DO:
         -SCRIPT
         -CLASS
         -METHODS
-            -revert_delete_renaming
     -NAMING: let's be honest, those are terrible
 ================================================================
 END_OF_HEADER
@@ -82,7 +81,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def scan_dirs(self, sacredtexts=self.sacredtexts, to_delete=[]):
+    def scan_dirs(self, sacredtexts=self.sacredtexts, to_find=[]):
         """
         Description:
             Generates two lists:
@@ -94,7 +93,7 @@ class CleanUp:
         dictionary.
 
         Usage:
-            to_rename, to_delente = object.scan_dirs() 
+            to_rename, to_delente = object.scan_dirs(to_delete=list) 
 
         Params:
         """
@@ -103,13 +102,17 @@ class CleanUp:
         # key: root, values: [[files inside], [dirs inside]]
         for root, directories, files in os.walk(self.path):
             path_content[root] = [
-                [os.path.join(root, file) for file in files if file not in sacredtexts],
-                [os.path.join(root, directory) for directory in directories if directory not in sacredtexts]
+                [os.path.join(root, file) 
+                for file in files 
+                if file not in sacredtexts], 
+                [os.path.join(root, directory) 
+                for directory in directories 
+                if directory not in sacredtexts]
                 ]
-        
+
         to_rename = []
         to_delete = []
-
+        # if must be found, add all its contents
         for directory, contentlist in path_content.items():
             if directory in to_delete:
                 to_rename.append(directory)
@@ -117,7 +120,7 @@ class CleanUp:
                 to_delete += contentlist[1]
             else:
                 for file in filelist:
-                    if file in to_delete:
+                    if file in to_find:
                         to_delete.append(file)
 
         return to_rename, to_delete
@@ -135,6 +138,9 @@ class CleanUp:
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
         """
+        to_rename, to_delete = self.scan_dirs(to_find=self.delete)
+
+
         delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in delete_dict.keys()
                        if os.path.basename(folder) in self.delete]
