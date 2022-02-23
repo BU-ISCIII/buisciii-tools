@@ -13,27 +13,20 @@
 import json
 import rich.table
 import rich.console
+from bu_isciii.json_reader import JsonReader
 
 
 class ListServices:
-    def __init__(self):
+    def __init__(self, input):
         # Lists available bu-isciii services and versions.
         with open(
-            "/home/alberto.lema/Documents/Desarrollo/buisciii-tools/templates/services.json",
+            str(self.input),
             "r",
         ) as f:
             data = json.load(f)
-            print(data)
 
-
-def list_filter():
-    """Filter available bu-isciii services"""
-    pass
-
-
-def list_sort():
-    """Sort available bu-isciii services"""
-    pass
+    def list_filter():
+        """Filter available bu-isciii services"""
 
 
 # get path real
