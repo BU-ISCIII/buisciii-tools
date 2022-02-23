@@ -10,7 +10,7 @@ do
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
     echo "#module load Nextflow" >> ${FOLDER_NAME}/lablog
-    printf "#module load singularityn\n" >> ${FOLDER_NAME}/lablog
+    printf "#module load singularity\n\n" >> ${FOLDER_NAME}/lablog
     printf 'scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")\n\n' >> ${FOLDER_NAME}/lablog
     cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | while read ref
     do
@@ -46,9 +46,9 @@ do
         printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
     done
-    echo "#conda activate nf-core-viralrecon-1.2.0dev" >> ${FOLDER_NAME}/lablog
-    echo 'echo "python ./percentajeNs.py */variants/ivar/consensus/bcftools %Ns.tab"  > _02_run_percentage_Ns.sh' >> ${FOLDER_NAME}/lablog
-    printf 'echo "bash create_summary_report.sh" > _03_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
+  echo "#conda activate nf-core-viralrecon-1.2.0dev" >> ${FOLDER_NAME}/lablog
+  echo 'echo "python ./percentajeNs.py */variants/ivar/consensus/bcftools %Ns.tab"  > _02_run_percentage_Ns.sh' >> ${FOLDER_NAME}/lablog
+  printf 'echo "bash create_summary_report.sh" > _03_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
     i=$((i+1))
 done
 rm host_list.tmp
