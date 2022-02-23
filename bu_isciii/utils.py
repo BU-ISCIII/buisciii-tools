@@ -2,15 +2,9 @@
 """
 Common utility function for bu-isciii package.
 """
-
 import os
-import logging
-
 import rich
 import questionary
-
-
-log = logging.getLogger(__name__)
 
 
 def rich_force_colors():
