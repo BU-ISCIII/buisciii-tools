@@ -50,7 +50,8 @@ class CleanUp:
 
     def show_removable_dirs(self, to_stdout=True):
         """
-        Print or return the list of objects that must be deleted in this service
+        Description:
+            Print or return the list of objects that must be deleted in this service
 
         Usage:
             object.show_removable_dirs(to_stdout = [BOOL])
@@ -66,7 +67,8 @@ class CleanUp:
 
     def show_nocopy_dirs(self, to_stdout=True):
         """
-        Print or return the list of objects that must be renamed in this service
+        Description:
+            Print or return the list of objects that must be renamed in this service
 
         Usage:
             object.show_nocopy_dirs(to_stdout = [BOOL])
@@ -75,33 +77,44 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            print(self.nocopy)
+            print(self.nocopy)[]
             return
         else:
             return self.nocopy
 
     def scan_dirs(self, sacredtexts=self.sacredtexts, to_delete=[]):
         """
-        Get a dictionary containing the path as key, and the files inside as values
-        If a list is given as arguments, the files will not be included in the
+        Description:
+            Generates two lists:
+                -list with the elements to be deleted
+                -list with the elements to be renamed
+
+        If a list is given as arguments, the names included
+        (either files or directories) won't be included in the
         dictionary.
 
         Usage:
-            object.scan_dirs()
+            to_rename, to_delente = object.scan_dirs() 
 
         Params:
         """
         path_content = {}
-        for root, _, files in os.walk(self.path):
-            path_content[root] = [os.path.join(root,file) for file in files
-                                  if file not in self.sacredtexts]
+
+        # key: root, values: [[files inside], [dirs inside]]
+        for root, directories, files in os.walk(self.path):
+            path_content[root] = [
+                [os.path.join(root, file) for file in files if file not in sacredtexts],
+                [os.path.join(root, directory) for directory in directories if directory not in sacredtexts]
+                ]
+        
         to_rename = []
         to_delete = []
 
-        for directory, filelist in path_content.items():
+        for directory, contentlist in path_content.items():
             if directory in to_delete:
                 to_rename.append(directory)
-                to_delete += filelist
+                to_delete += contentlist[0]
+                to_delete += contentlist[1]
             else:
                 for file in filelist:
                     if file in to_delete:
@@ -111,9 +124,10 @@ class CleanUp:
 
     def delete(self, verbose=True):
         """
-        Remove the files that must be deleted for the delivery of the service
-        Their contains, except for the lablog file, and the logs dir, will be
-        deleted
+        Description:
+            Remove the files that must be deleted for the delivery of the service
+            Their contains, except for the lablog file, and the logs dir, will be
+            deleted
 
         Usage:
             object.delete()
@@ -138,8 +152,9 @@ class CleanUp:
 
     def rename(self, verbose=True):
         """
-        Rename the files and directories with a _NC so it is not copied into the
-        delivery system.
+        Description:
+            Rename the files and directories with a _NC so it is not copied into the
+            delivery system.
 
         Usage:
 
@@ -158,7 +173,13 @@ class CleanUp:
 
     def revert_nocopy_renaming(self, verbose=True):
         """
+        Description:
         Reverts the naming (adding of the _NC tag)
+
+        Usage:
+
+        Params:
+
         """
         reverse_rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_rename_back = [folder for folder in reverse_rename_dict.keys()
