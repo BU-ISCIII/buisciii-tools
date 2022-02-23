@@ -76,7 +76,7 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            print(self.nocopy)[]
+            print(self.nocopy)
             return
         else:
             return self.nocopy
@@ -139,24 +139,13 @@ class CleanUp:
 
         path_content = self.scan_dirs(to_find=self.nocopy)
 
-        for root in path_content:          
+        for directory_to_rename in path_content:          
             newpath = directory_to_rename + add
             os.replace(directory_to_rename, newpath)
             if verbose:
                 print(f'Renamed {directory_to_rename} to {newpath}.')
 
-
-
-
-        to_rename = self.scan_dirs(to_find=self.nocopy)
-
-        rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_del_dirs = [folder for folder in rename_dict.keys()
-                       if os.path.basename(folder) in self.nocopy]
-        for directory_to_rename in to_del_dirs:
-
         return
-
 
     def delete(self, verbose=True):
         """
@@ -171,6 +160,12 @@ class CleanUp:
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
         """
+
+        path_content = self.scan_dirs(to_find=self.delete)
+
+        for item in path_content:
+
+
         to_rename, to_delete = self.scan_dirs(to_find=self.delete)
 
         # might contain both dirs and files
