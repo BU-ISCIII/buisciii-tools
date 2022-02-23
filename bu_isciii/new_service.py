@@ -72,6 +72,7 @@ class NewService:
 
     def get_service_ids(self):
         service_json = ServiceJson()
+        print(service_json)
         for request in self.services_requested:
             print(request)
 
@@ -103,6 +104,7 @@ class NewService:
             "[blue]I will copy the template service folders for %s !" % self.full_path
         )
         services_ids = self.get_service_ids()
+        print(services_ids)
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
