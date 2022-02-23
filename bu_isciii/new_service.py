@@ -72,7 +72,7 @@ class NewService:
 
     def get_service_ids(self):
         service_json = ServiceJson()
-        for request in self.availableServices:
+        for request in self.services_requested:
             print(request)
 
     def create_folder(self):
