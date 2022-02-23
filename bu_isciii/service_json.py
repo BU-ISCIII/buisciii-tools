@@ -3,7 +3,7 @@ import json
 
 
 class ServiceJson:
-    def __init__(self, json_file):
+    def __init__(self, json_file=os.path.join(os.path.dirname(__file__), "templates")):
         fh = open(json_file)
         self.json_data = json.load(fh)
         fh.close()
