@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+import logging
 import json
 import requests
 
-from utils import write_in_log
+log = logging.getLogger(__name__)
 
 
 class RestServiceApi:
@@ -31,7 +32,7 @@ class RestServiceApi:
             req = requests.post(self.request_url, data=data, headers=self.headers)
         except requests.HTTPError:
             if req.status > 201:
-                write_in_log("info", str(req.status_code))
+                log.error(str(req.status_code))
             return False
         return True
 
