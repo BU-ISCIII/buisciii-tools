@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import json
-import prettytable
-
-def print_table ():
+# import json
+# import prettytable
 
 
-"""Lists available bu-isciii pipelines and versions."""
+def print_table():
+    """Lists available bu-isciii pipelines and versions."""
+
 
 def list_pipelines():
     """Prints out a list of all bu-isciii pipelines.

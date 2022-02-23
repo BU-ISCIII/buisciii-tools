@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 =============================================================
 HEADER
 =============================================================
@@ -29,7 +29,7 @@ TO DO:
 ================================================================
 END_OF_HEADER
 ================================================================
-'''
+"""
 # Generic imports
 # import sys
 import os
@@ -79,7 +79,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def delete(self, sacredtexts=['lablog', 'logs'], verbose=True):
+    def delete(self, sacredtexts=["lablog", "logs"], verbose=True):
         """
         Remove the files that must be deleted for the delivery of the service
         Their contains, except for the lablog file, and the logs dir, will be
@@ -102,11 +102,13 @@ class CleanUp:
                         to_be_deleted_dir = os.path.join(root, directory)
                         for content in os.listdir(to_be_deleted_dir):
                             if content not in sacredtexts:
-                                file_to_be_deleted = os.path.join(to_be_deleted_dir, content)
+                                file_to_be_deleted = os.path.join(
+                                    to_be_deleted_dir, content
+                                )
                                 os.remove(file_to_be_deleted)
                                 if verbose:
-                                    print(f'Removed: {file_to_be_deleted}.')
-                        new_name = to_be_deleted_dir + '_DEL'
+                                    print(f"Removed: {file_to_be_deleted}.")
+                        new_name = to_be_deleted_dir + "_DEL"
                         os.replace(to_be_deleted_dir, new_name)
         return
 
@@ -122,13 +124,13 @@ class CleanUp:
         """
         pass
 
-        '''
+        """
         for _, dirs, folders in os.walk():
 
         for old_name in self.nocopy:
             new_name = old_name + '_NC'
             os.rename(old_name, new_name
-        '''
+        """
         return
 
     def revert_renaming(self, verbose=True):
@@ -139,9 +141,9 @@ class CleanUp:
             # if there's at least one dir
             if len(dirs) > 0:
                 for directory in dirs:
-                    if '_NC' in directory:
+                    if "_NC" in directory:
                         nc_path = os.path.join(root, directory)
-                        reverted_name = directory - '_NC'
+                        reverted_name = directory - "_NC"
                         reverted_path = os.path.join(root, reverted_name)
                         os.replace(nc_path, reverted_path)
                         if verbose:
@@ -149,15 +151,13 @@ class CleanUp:
         return
 
     def revert_delete_renaming(self, verbose=True):
-        """
-
-        """
+        """ """
         for root, dirs, _ in os.walk():
             if len(dirs) > 0:
                 for directory in dirs:
-                    if '_DEL' in directory:
+                    if "_DEL" in directory:
                         del_path = os.path.join(root, directory)
-                        reverted_name = directory - '_DEL'
+                        reverted_name = directory - "_DEL"
                         reverted_path = os.path.join(root, reverted_name)
                         os.replace(del_path, reverted_path)
                         if verbose:
