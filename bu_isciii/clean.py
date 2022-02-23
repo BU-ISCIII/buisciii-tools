@@ -162,11 +162,18 @@ class CleanUp:
         """
 
         path_content = self.scan_dirs(to_find=self.delete)
+        deletable_items = []
 
-        for item in path_content:
+        for directory in path_content:
+            if len(os.listdir(directory)) > 0:
+                deletable_items += directory
 
-
-        to_rename, to_delete = self.scan_dirs(to_find=self.delete)
+        for item in deletable_items:
+            try:
+                os.remove(item)
+            except:
+                try:
+                    os.rmdir(item)
 
         # might contain both dirs and files
         for thing_to_delete in to_delete:
