@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 import json
+import os
 
 
-class JsonReader:
-    def __init__(self, json_file):
+class ServiceJson:
+    def __init__(
+        self,
+        json_file=os.path.join(os.path.dirname(__file__), "templates", "services.json"),
+    ):
         fh = open(json_file)
         self.json_data = json.load(fh)
         fh.close()

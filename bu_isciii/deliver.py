@@ -66,11 +66,8 @@ class Deliver:
         )
 
     def copy_sftp(self):
-
         path = open(
-            os.path.join(
-                os.path.dirname("__file__"), "schemas", "schema_sftp_copy.json"
-            )
+            os.path.join(os.path.dirname(__file__), "schemas", "schema_sftp_copy.json")
         )
         data = json.load(path)
 
@@ -86,7 +83,7 @@ class Deliver:
                 "[green] Data copied to the sftp folder successfully",
                 highlight=False,
             )
-        except Exception:
+        except OSError:
             stderr.print(
                 "[red] ERROR: Data could not be copied to the sftp folder.",
                 highlight=False,
