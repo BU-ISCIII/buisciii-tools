@@ -91,6 +91,7 @@ class Deliver:
                 "[red] ERROR: Data could not be copied to the sftp folder.",
                 highlight=False,
             )
+
     """
     def create_report(self):
 
@@ -130,11 +131,10 @@ class Deliver:
         }
         print(info)
     """
-    
 
-        """
-        RUN_NAME - runName
-        PROJECTS - ¿lista de projects name?
-        PROJECT_NAME - projectName
-        SAMPLES - sampleName
-        """
+    """
+    RUN_NAME - runName
+    PROJECTS - ¿lista de projects name?
+    PROJECT_NAME - projectName
+    SAMPLES - sampleName
+    """
