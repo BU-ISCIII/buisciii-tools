@@ -159,6 +159,20 @@ class CleanUp:
 
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
+
+
+        UNUSED CODE:
+        # might contain both dirs and files
+        for thing_to_delete in to_delete:
+            os.remove(thing_to_delete)
+            if verbose:
+                print(f'Removed {thing_to_delete}.')
+
+        for thing_to_rename in to_rename:
+            newname = thing_to_rename + '_DEL'
+            os.replace(thing_to_rename, newname)
+            if verbose:
+                print(f'Renamed {thing_to_rename} to {newname}.')
         """
 
         path_content = self.scan_dirs(to_find=self.delete)
@@ -175,19 +189,7 @@ class CleanUp:
                 try:
                     os.rmdir(item)
 
-        '''
-        # might contain both dirs and files
-        for thing_to_delete in to_delete:
-            os.remove(thing_to_delete)
-            if verbose:
-                print(f'Removed {thing_to_delete}.')
 
-        for thing_to_rename in to_rename:
-            newname = thing_to_rename + '_DEL'
-            os.replace(thing_to_rename, newname)
-            if verbose:
-                print(f'Renamed {thing_to_rename} to {newname}.')
-        '''
         return
 
 
