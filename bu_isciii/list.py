@@ -10,13 +10,9 @@
  ================================================================
 """
 
-from importlib.resources import path
 import json
-from ossaudiodev import openmixer
 import rich.table
 import rich.console
-import os
-import pdb
 
 
 class ListServices:
