@@ -67,9 +67,7 @@ class Deliver:
 
     def copy_sftp(self):
         path = open(
-            os.path.join(
-                os.path.dirname(__file__), "schemas", "schema_sftp_copy.json"
-            )
+            os.path.join(os.path.dirname(__file__), "schemas", "schema_sftp_copy.json")
         )
         data = json.load(path)
 
