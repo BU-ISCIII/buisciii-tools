@@ -74,9 +74,7 @@ class NewService:
         isExist = os.path.exists(self.full_path)
         if isExist:
             stderr.print(
-                "[red]ERROR: Directory "
-                + self.full_path
-                + " exists",
+                "[red]ERROR: Directory " + self.full_path + " exists",
                 highlight=False,
             )
         else:
@@ -84,22 +82,18 @@ class NewService:
                 os.mkdir(self.full_path)
             except OSError:
                 stderr.print(
-                    "[red]ERROR: Creation of the directory %s failed"
-                    % self.full_path,
+                    "[red]ERROR: Creation of the directory %s failed" % self.full_path,
                     highlight=False,
                 )
             else:
                 stderr.print(
-                    "[green]Successfully created the directory %s"
-                    % self.full_path,
+                    "[green]Successfully created the directory %s" % self.full_path,
                     highlight=False,
                 )
         return True
 
     def copy_template(self):
-        print(
-            "I will copy the template service folders for " + self.full_path + "!"
-        )
+        print("I will copy the template service folders for " + self.full_path + "!")
         # service = bu_isciii.json_reader.Service(self.service_id)
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
