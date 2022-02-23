@@ -187,6 +187,8 @@ class CleanUp:
             except:
                 try:
                     os.rmdir(item)
+                except:
+                    pass
         return
 
     def revert_nocopy_renaming(self, verbose=True):
