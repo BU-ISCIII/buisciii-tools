@@ -38,7 +38,7 @@ def write_in_log(log_type, string_text, showing_traceback):
             logger.error("################################")
             logger.error(traceback.format_exc())
             logger.error("################################")
-        logger.error('-----------------    END ERROR   --------------')
+        logger.error("-----------------    END ERROR   --------------")
     else:
         logger.info(string_text)
     return
