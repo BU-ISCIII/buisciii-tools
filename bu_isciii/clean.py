@@ -181,18 +181,13 @@ class CleanUp:
         for directory in path_content:
             if len(os.listdir(directory)) > 0:
                 deletable_items += directory
-
         for item in deletable_items:
             try:
                 os.remove(item)
             except:
                 try:
                     os.rmdir(item)
-
-
         return
-
-
 
     def revert_nocopy_renaming(self, verbose=True):
         """
