@@ -45,30 +45,16 @@ class ListServices:
         console = rich.console.Console()
         console.print(table)
 
+    def get_find(self, service, found):
+        if found in self.json_data[service]:
+            return self.json_data[service][found]
+        else:
+            for key, value in self.data[service].items():
+                if isinstance(value, dict):
+                    if found in self.data[service][key]:
+                        return self.data[service][key]
+            return None
 
-"""
-# get path real
-with open(
-    "/home/alberto.lema/Documents/Desarrollo/buisciii-tools/templates/services.json",
-    "r",
-) as f:
-    data = json.load(f)
 
-print(data)
-servicios = list(data.keys())
-servicios_files = data[servicios[1]]["clean"]
-print(servicios_files)
-
-# printing elements dict
-
-table = rich.table.Table()
-table.add_column("Service name", justify="right", style="cyan")
-table.add_column("Description", justify="left", style="green")
-
-for i in data.keys():
-
-    table.add_row(str(i), str(data[i]["description"]))
-
-console = rich.console.Console()
-console.print(table)
-"""
+prueba = ListServices("../templates/services.json")
+prueba.get_find("assembly_annotation", "clean")
