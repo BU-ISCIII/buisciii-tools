@@ -130,7 +130,7 @@ class CleanUp:
                 print(f"Renamed {directory_to_rename} to {newpath}.")
         return
 
-    def delete(self, sacredtexts = ["lablog","logs"], verbose=True):
+    def delete(self, sacredtexts=["lablog", "logs"], verbose=True):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -160,7 +160,7 @@ class CleanUp:
                 # add it to the filtered list if not in the sacredtext
                 if not text in item:
                     filtered_items.append(item)
-        
+
         for item in filtered_items:
             # shutil if dir, os.remove if file
             if os.path.isdir(item):
@@ -171,11 +171,11 @@ class CleanUp:
                 print(f"Removed {item}.")
         return
 
-    def delete_rename(self, verbose=True, sacredtexts = ["lablog", "logs"]):
+    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"]):
         self.delete(sacredtexts=sacredtexts, verbose=verbose)
-        self.rename(add="_DEL", to_find= , verbose=verbose)
+        self.rename(add="_DEL", to_find=self.delete, verbose=verbose)
 
-    def revert_renaming(self, verbose=True, terminations=["_DEL","_NC"]):
+    def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
         Description:
         Reverts the naming (adding of the _NC tag)
