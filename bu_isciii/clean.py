@@ -32,6 +32,7 @@ END_OF_HEADER
 # Generic imports
 # import sys
 import os
+import shutil
 
 # Local imports
 
@@ -142,10 +143,9 @@ class CleanUp:
             os.replace(directory_to_rename, newpath)
             if verbose:
                 print(f"Renamed {directory_to_rename} to {newpath}.")
-
         return
 
-    def delete(self, verbose=True):
+    def delete(self, verbose=True, sacredtexts = ["lablog","logs"]):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -174,45 +174,45 @@ class CleanUp:
         """
 
         path_content = self.scan_dirs(to_find=self.delete)
-        deletable_items = []
+        unfiltered_items = []
+        filtered_items = []
 
         for directory in path_content:
             if len(os.listdir(directory)) > 0:
-                deletable_items += directory
-        for item in deletable_items:
-            try:
+                unfiltered_items += directory
+        # take out those belonging to the sacred items
+        for item in unfiltered:
+            # coincidence might not be total so double loop
+            for text in sacredtexts:
+                if text in item:
+                    filtered_items.append(item)
+        for item in filtered_items:
+            if os.path.isdir(item):
+                shutil.rmtree(item)
+            else:
                 os.remove(item)
-            # OSError is a placeholder
-            except OSError:
-                try:
-                    os.rmdir(item)
-                except OSError:
-                    pass
+            if verbose:
+                print(f"Removed {item}.")
         return
 
-    def revert_nocopy_renaming(self, verbose=True):
+    def revert_renaming(self, verbose=True, terminations=["_DEL","_NC"]):
         """
         Description:
         Reverts the naming (adding of the _NC tag)
-
 
         Usage:
 
         Params:
 
         """
-        reverse_rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_rename_back = [
-            folder
-            for folder in reverse_rename_dict.keys()
-            if "_DEL" in folder and "_NC"
-        ]
-        for directory_to_rename in to_rename_back:
-            reverted_name = directory_to_rename.replace("_DEL", "").replace("_NC", "")
-            os.replace(directory_to_rename, reverted_name)
+        to_rename = self.scan_dirs(to_find=terminations)
+        for dir_to_rename in to_rename:
+            # remove all the terminations
+            for term in terminations:
+                newname = dir_to_rename.replace(termination, "")
+            os.replace(dir_to_rename, newname)
             if verbose:
-                print(f"Renamed {directory_to_rename} to {reverted_name}.")
-        return
+                print(f"Replaced {dir_to_rename} with {newname}.")
 
     def full_clean_job(self):
 
