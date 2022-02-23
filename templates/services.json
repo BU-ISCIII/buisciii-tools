@@ -11,7 +11,7 @@
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP"]
+        "no_copy": ["RAW", "TMP", "latest"]
     },
     "mtbseq": {
         "label": "",
@@ -57,9 +57,9 @@
         },
         "no_copy": ["RAW", "TMP"]
     },
-    "sars_viralrecon": {
+    "viralrecon": {
         "label": "",
-        "template": "sars_viralrecon",
+        "template": "viralrecon",
         "url": "https://github.com/BU-ISCIII/viralrecon",
         "order": 1,
         "begin": "",

@@ -11,26 +11,26 @@
  """
 
 
-# Copy delivery to sftp (e.g: SARS service)
 # Deliver automatization
 # Copy in sftp
-# import json
+
+# from bdb import set_trace
+import json
 import sys
 import sysrsync
 
 import argparse
 
-
 # from drylab_api import RestServiceApi
 
 
 def parser_args(args=None):
-    Description = "Copy resolution files to sftp"
-    Epilog = """Example usage: python copy_sftp.py --source /home/erika.kvalem/Documents/BU_ISCIII/pruebas_source --destination /home/erika.kvalem/Documents/BU_ISCIII/prubas_destination --options -r --exclusions "*_NC" """
+    Description = "Copy resolution FOLDER to sftp"
+    Epilog = """Example usage: python copy_sftp.py --source /home/erika.kvalem/Documents/BU_ISCIII/pruebas_source/ --destination /home/erika.kvalem/Documents/BU_ISCIII/prubas_destination --options -r --exclusions "*_NC" """
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
     parser.add_argument(
-        "-s", "--source", type=str, help="Directory containing files to transfer"
+        "-s", "--source", type=str, help="Directory containing files cd to transfer"
     )
     parser.add_argument(
         "-d",
@@ -39,7 +39,20 @@ def parser_args(args=None):
         help="Directory to which the files will be transfered",
     )
     parser.add_argument(
-        "--p", "--protocol", type=str, default=None, help="command to execute"
+        "--sn",
+        "--service_number",
+        type=str,
+        required=False,
+        default=None,
+        help="Service Number",
+    )
+    parser.add_argument(
+        "--p",
+        "--protocol",
+        type=str,
+        required=False,
+        default=None,
+        help="command to execute",
     )
     parser.add_argument(
         "--o",
@@ -60,30 +73,35 @@ def parser_args(args=None):
     return parser.parse_args(args)
 
 
+path = open("schemas/schema_sftp_copy.json")
+data = json.load(path)
+
+
 def main(args=None):
     args = parser_args(args)
-
     sysrsync.run(
         source=args.source,
         destination=args.destination,
-        options=args.options,
-        exclusions=args.exclusions,
+        options=data["options"],
+        exclusions=data["exclusions"],
+        sync_source_contents=False,
     )
 
+    # Change status in iskylims
+    # rest_api = RestServiceApi("drylab/api/", "https://iskylims.isciiides.es/")
 
-"""
- sysrsync.run(source='/data/bi/services_and_colaborations/CNM/virologia/',
- destination='/data/bi/sftp/Labvirusres'+ service_number,
- options=["-rlpv","--update","-L","--inplace"],
- exclusions=["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py" ])
- command1 = {
-  "protocol":"rsync",
-  "options":["-rlpv","--update","-L","--inplace"],
-  "exclusions":["*_NC","lablog","work","00-reads","*.sh",".nextflow*","*_DEL","*.R","*.py"],
-  "destination":"/data/bi/sftp/Labvirusres/SRVCNM572_20220209_SARSCOV278_icasas_S",
-  "source":"/data/bi/services_and_colaborations/CNM/virologia/",
-  "service_number":"SRVCNM572_20220209_SARSCOV278_icasas_S"
-"""
+
+# import pdb
+
+# pdb.set_trace()
+
+
+# services_queue = rest_api.put_request("resolution/", "state", "Delivery")
+
+# services_queue = rest_api.get_request("serviceFullData", "service", "service_number")
+
+
+# def put_request(self, request_info, parameter, value):
 
 
 if __name__ == "__main__":
