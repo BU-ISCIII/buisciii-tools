@@ -157,11 +157,6 @@ def list(keywords, sort, json, show_archived):
 
 @bu_isciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
-@click.argument("folder", required=False, default=None, metavar="<folder>")
-@click.argument(
-    "service_label", required=False, default=None, metavar="<service label>"
-)
-@click.argument("service_id", required=False, default=None, metavar="<service id>")
 @click.option(
     "-p",
     "--path",
@@ -176,13 +171,11 @@ def list(keywords, sort, json, show_archived):
     default=False,
     help="No create service folder, only resolution",
 )
-def new_service(resolution, folder, service_label, service_id, path, no_create_folder):
+def new_service(resolution, path, no_create_folder):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    new_ser = bu_isciii.new_service.NewService(
-        resolution, folder, service_label, service_id, path, no_create_folder
-    )
+    new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
     new_ser.create_folder()
     new_ser.copy_template()
 

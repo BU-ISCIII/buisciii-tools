@@ -35,4 +35,6 @@ def prompt_resolution_id():
     stderr.print(
         "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM584.1"
     )
-    questionary.text("Resolution id").ask()
+    resolution_id = questionary.text("Resolution id").ask()
+    print(resolution_id)
+    return resolution_id
