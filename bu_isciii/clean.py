@@ -141,7 +141,7 @@ class CleanUp:
             newpath = directory_to_rename + add
             os.replace(directory_to_rename, newpath)
             if verbose:
-                print(f'Renamed {directory_to_rename} to {newpath}.')
+                print(f"Renamed {directory_to_rename} to {newpath}.")
 
         return
 
@@ -202,13 +202,16 @@ class CleanUp:
 
         """
         reverse_rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_rename_back = [folder for folder in reverse_rename_dict.keys()
-                          if '_DEL' in folder and '_NC']
+        to_rename_back = [
+            folder
+            for folder in reverse_rename_dict.keys()
+            if "_DEL" in folder and "_NC"
+        ]
         for directory_to_rename in to_rename_back:
-            reverted_name = directory_to_rename.replace('_DEL', '').replace('_NC', '')
+            reverted_name = directory_to_rename.replace("_DEL", "").replace("_NC", "")
             os.replace(directory_to_rename, reverted_name)
             if verbose:
-                print(f'Renamed {directory_to_rename} to {reverted_name}.')
+                print(f"Renamed {directory_to_rename} to {reverted_name}.")
         return
 
     def full_clean_job(self):
