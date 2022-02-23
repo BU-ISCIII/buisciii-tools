@@ -85,7 +85,7 @@ class Deliver:
                 "[green] Data copied to the sftp folder successfully",
                 highlight=False,
             )
-        except Exception:
+        except OSError:
             stderr.print(
                 "[red] ERROR: Data could not be copied to the sftp folder.",
                 highlight=False,
