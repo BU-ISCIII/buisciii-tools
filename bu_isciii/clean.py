@@ -81,7 +81,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def scan_dirs(self, sacredtexts=self.sacredtexts, to_find=[]):
+    def scan_dirs(self, to_find=[]):
         """
         Description:
             Parses the directory tree, and generates two lists:
@@ -97,19 +97,19 @@ class CleanUp:
 
         Params:
         """
-        path_content = {}
+        pathlist = []
 
         # key: root, values: [[files inside], [dirs inside]]
-        for root, directories, files in os.walk(self.path):
-            path_content[root] = [
-                [os.path.join(root, file) 
-                for file in files 
-                if file not in sacredtexts], 
-                [os.path.join(root, directory) 
-                for directory in directories 
-                if directory not in sacredtexts]
-                ]
+        for root, _, _ in os.walk(self.path):
+            # coincidence might not be total so double loop
+            for item_to_be_found in to_find:
+                if item_to_be_found in root:
+                    pathlist.append(root)
 
+        return pathlist
+
+
+        '''
         to_rename = []
         to_delete = []
         # if must be found, add all its contents
@@ -122,30 +122,39 @@ class CleanUp:
                 for file in to_find:
                     if file in to_find:
                         to_delete.append(file)
+        '''
 
-        return to_rename, to_delete
+        return path_content
 
-    def rename(self, verbose=True):
+    def rename(self, dir_to_rename=self.nocopy, add="_NC",verbose=True):
         """
         Description:
-            Rename the files and directories with a _NC so it is not copied into the
-            delivery system.
+            Rename the files and directories
 
         Usage:
 
         Params:
 
         """
+
+        path_content = self.scan_dirs(to_find=self.nocopy)
+
+        for root in path_content:          
+            newpath = directory_to_rename + add
+            os.replace(directory_to_rename, newpath)
+            if verbose:
+                print(f'Renamed {directory_to_rename} to {newpath}.')
+
+
+
+
         to_rename = self.scan_dirs(to_find=self.nocopy)
 
         rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
         to_del_dirs = [folder for folder in rename_dict.keys()
                        if os.path.basename(folder) in self.nocopy]
         for directory_to_rename in to_del_dirs:
-            newpath = directory_to_rename + '_NC'
-            os.replace(directory_to_rename, newpath)
-            if verbose:
-                print(f'Renamed {directory_to_rename} to {newpath}.')
+
         return
 
 
