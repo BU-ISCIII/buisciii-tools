@@ -14,10 +14,12 @@
 # Deliver automatization
 # Copy in sftp
 
-from bdb import set_trace
+# from bdb import set_trace
 import json
 import sys
-import sysrsync
+
+# import sysrsync
+
 
 import argparse
 
@@ -93,8 +95,9 @@ def main(args=None):
 
     # Change status in iskylims
     rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
-    services_queue = rest_api.get_request("serviceFullData", "service", "SRVIIER080")
-    print(services_queue.items())
+    services_queue = rest_api.get_request("serviceFullData", "service", "SRVCNM160")
+    print(services_queue)
+
     # keys_list = list(services_queue)
     # for i in services_queue:
     #    print(i, services_queue[i])
