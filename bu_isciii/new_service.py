@@ -102,7 +102,7 @@ class NewService:
         )
         # service = bu_isciii.json_reader.Service(self.service_id)
         # service_template = new_ser.get_template()
-        service_template = ["viralrecon"]  ###TMP!!
+        service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
             shutil.copytree(
                 "templates/" + str(service_template[0]),
