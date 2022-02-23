@@ -30,5 +30,16 @@ def prompt_resolution_id():
         "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM584.1"
     )
     resolution_id = questionary.text("Resolution id").ask()
-    print(resolution_id)
     return resolution_id
+
+
+def prompt_source_path():
+    stderr.print("Directory containing files cd to transfer")
+    source = questionary.path("Source path").ask()
+    return source
+
+
+def prompt_destination_path():
+    stderr.print("Directory to which the files will be transfered")
+    destination = questionary.path("Destination path").ask()
+    return destination
