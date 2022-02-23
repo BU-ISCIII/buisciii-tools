@@ -110,7 +110,7 @@ class CleanUp:
 
         return pathlist
 
-    def rename(self, to_find=self.nocopy, add="_NC", verbose=True):
+    def rename(self, to_find=to_find_list, add, verbose=True):
         """
         Description:
             Rename the files and directories
@@ -121,7 +121,7 @@ class CleanUp:
 
         """
 
-        path_content = self.scan_dirs(to_find=to_find)
+        path_content = self.scan_dirs(to_find=to_find_list)
 
         for directory_to_rename in path_content:
             newpath = directory_to_rename + add
@@ -129,6 +129,19 @@ class CleanUp:
             if verbose:
                 print(f"Renamed {directory_to_rename} to {newpath}.")
         return
+
+    def rename_nocopy(self, verbose=True):
+        """
+        Description:
+            
+        Usage:
+
+        Params:
+
+        """
+        self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
+        return
+
 
     def delete(self, sacredtexts=["lablog", "logs"], verbose=True):
         """
@@ -154,11 +167,11 @@ class CleanUp:
             if len(os.listdir(directory)) > 0:
                 unfiltered_items += directory
         # take out those belonging to the sacred items
-        for item in unfiltered:
+        for item in unfiltered_items:
             # coincidence might not be total so double loop
             for text in sacredtexts:
                 # add it to the filtered list if not in the sacredtext
-                if not text in item:
+                if text not in item:
                     filtered_items.append(item)
 
         for item in filtered_items:
@@ -189,7 +202,7 @@ class CleanUp:
         for dir_to_rename in to_rename:
             # remove all the terminations
             for term in terminations:
-                newname = dir_to_rename.replace(termination, "")
+                newname = dir_to_rename.replace(term, "")
             os.replace(dir_to_rename, newname)
             if verbose:
                 print(f"Replaced {dir_to_rename} with {newname}.")
