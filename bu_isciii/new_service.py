@@ -99,13 +99,17 @@ class NewService:
         return True
 
     def copy_template(self):
-        stderr.print("[blue]I will copy the template service folders for %s !" % self.full_path)
+        stderr.print(
+            "[blue]I will copy the template service folders for %s !" % self.full_path
+        )
         services_ids = self.get_service_ids()
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
             shutil.copytree(
-                os.path.join(os.path.dirname(__file__),"templates", service_template[0]),
+                os.path.join(
+                    os.path.dirname(__file__), "templates", service_template[0]
+                ),
                 self.full_path,
                 dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns("README"),
