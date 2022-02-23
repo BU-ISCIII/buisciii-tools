@@ -125,6 +125,30 @@ class CleanUp:
 
         return to_rename, to_delete
 
+    def rename(self, verbose=True):
+        """
+        Description:
+            Rename the files and directories with a _NC so it is not copied into the
+            delivery system.
+
+        Usage:
+
+        Params:
+
+        """
+        to_rename = self.scan_dirs(to_find=self.nocopy)
+
+        rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
+        to_del_dirs = [folder for folder in rename_dict.keys()
+                       if os.path.basename(folder) in self.nocopy]
+        for directory_to_rename in to_del_dirs:
+            newpath = directory_to_rename + '_NC'
+            os.replace(directory_to_rename, newpath)
+            if verbose:
+                print(f'Renamed {directory_to_rename} to {newpath}.')
+        return
+
+
     def delete(self, verbose=True):
         """
         Description:
@@ -154,26 +178,7 @@ class CleanUp:
 
         return
 
-    def rename(self, verbose=True):
-        """
-        Description:
-            Rename the files and directories with a _NC so it is not copied into the
-            delivery system.
 
-        Usage:
-
-        Params:
-
-        """
-        rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_del_dirs = [folder for folder in rename_dict.keys()
-                       if os.path.basename(folder) in self.nocopy]
-        for directory_to_rename in to_del_dirs:
-            newpath = directory_to_rename + '_NC'
-            os.replace(directory_to_rename, newpath)
-            if verbose:
-                print(f'Renamed {directory_to_rename} to {newpath}.')
-        return
 
     def revert_nocopy_renaming(self, verbose=True):
         """
