@@ -180,5 +180,36 @@ def new_service(resolution, path, no_create_folder):
     new_ser.copy_template()
 
 
+@bu_isciii_cli.command(help_priority=2)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+
+@click.option(
+    "-s",
+    "--source",
+    type=click.Path(),
+    default=os.getcwd(),
+    help="Directory containing files cd to transfer",
+)
+@click.option(
+    "-d",
+    "----destination",
+    type=click.Path(),
+    default=os.getcwd(),
+    help="Directory to which the files will be transfered"",
+)
+@click.option(
+    "--sn",
+    "--resolution_number",
+    type=str,
+    help="Resolution Id",
+)
+def deliver(source, destination, resolution):
+    """
+    Create new service, it will create folder and copy template depending on selected service.
+    """
+    new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
+    new_ser.create_folder()
+    new_ser.copy_template()
+
 if __name__ == "__main__":
     run_bu_isciii()
