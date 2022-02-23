@@ -112,19 +112,6 @@ def bu_isciii_cli(verbose, log_file):
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
-    # Set up logs to the console
-
-    log.addHandler(
-        rich.logging.RichHandler(
-            level=logging.DEBUG if verbose else logging.ERROR,
-            console=rich.console.Console(
-                stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()
-            ),
-            show_time=False,
-            markup=True,
-        )
-    )
-
     # Set up logs to a file if we asked for one
     if log_file:
         log_fh = logging.FileHandler(log_file, encoding="utf-8")
