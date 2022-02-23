@@ -54,12 +54,9 @@ table.add_column("Service name", justify="right", style="cyan")
 table.add_column("Description", justify="left", style="green")
 
 for i in data.keys():
-<<<<<<< HEAD
+
+    table.add_row(str(i), str(data[i]["description"]))
     table.add_row(str(i), str(data[i]["description"]))
 
-=======
-    table.add_row(str(i), str (data[i]["description"]))
-    
->>>>>>> 3d50256a3f4791399b6cbfbf68a5e39b215d926d
 console = rich.console.Console()
 console.print(table)
