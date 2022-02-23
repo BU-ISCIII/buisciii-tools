@@ -1,19 +1,58 @@
 #!/usr/bin/env python
+"""
+ =============================================================
+ HEADER
+ =============================================================
+ INSTITUTION: BU-ISCIII
+ AUTHOR: Alberto Lema Blanco
+ ================================================================
+ END_OF_HEADER
+ ================================================================
+"""
 
-# import json
-# import prettytable
+import json
+import rich.table
+import rich.console
 
 
-def print_table():
-    """Lists available bu-isciii pipelines and versions."""
+class ListServices:
+    def __init__(self):
+        # Lists available bu-isciii services and versions.
+        with open(
+            "/home/alberto.lema/Documents/Desarrollo/buisciii-tools/templates/services.json",
+            "r",
+        ) as f:
+            data = json.load(f)
+        pass
 
 
-def list_pipelines():
-    """Prints out a list of all bu-isciii pipelines.
-    Args:
-        filter_by (list): A list of strings that can be used for filtering.
-        sort_by (str): workflows can be sorted by keywords. Keyword must be one of
-            `release` (default), `name`, `stars`.
-        as_json (boolean): Set to true, if the lists should be printed in JSON.
+def list_filter():
+    """Filter available bu-isciii services"""
+    pass
 
-    """
+
+def list_sort():
+    """Sort available bu-isciii services"""
+    pass
+
+
+# get path real
+with open(
+    "/home/alberto.lema/Documents/Desarrollo/buisciii-tools/templates/services.json",
+    "r",
+) as f:
+    data = json.load(f)
+
+# printing elements dict
+
+table = rich.table.Table()
+table.add_column("Service name", justify="right", style="cyan")
+table.add_column("Description", justify="left", style="green")
+
+for i in data.keys():
+
+    table.add_row(str(i), str(data[i]["description"]))
+    table.add_row(str(i), str(data[i]["description"]))
+
+console = rich.console.Console()
+console.print(table)
