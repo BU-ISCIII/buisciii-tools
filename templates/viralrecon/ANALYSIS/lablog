@@ -5,6 +5,7 @@ do
     FOLDER_NAME=$(echo $(date '+%Y%m%d')_ANALYSIS0${i}_AMPLICONS_${in})
     mkdir ${FOLDER_NAME}
     cp create_summary_report.sh ${FOLDER_NAME}/
+    cp percentajeNs.py ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
@@ -52,7 +53,8 @@ do
 done
 rm host_list.tmp
 mkdir $(date '+%Y%m%d')_ANALYSIS0${i}_MAG
-#rm create_summary_report.sh
-#cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
-#CURRENT_DIR=$(pwd | cut -d '/' -f1,2,3,4,5,6)
-#echo "srun --partition short_idx rsync -rlv ${CURRENT_DIR} /scratch/bi" > _01_copy_folder.sh
+rm create_summary_report.sh
+rm percentajeNs.py
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/*/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
+CURRENT_DIR=$(pwd | cut -d '/' -f1,2,3,4,5,6)
+echo "srun --partition short_idx rsync -rlv ${CURRENT_DIR} /scratch/bi" > _01_copy_folder.sh
