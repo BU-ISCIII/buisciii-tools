@@ -27,7 +27,7 @@ END_OF_HEADER
 """
 # Generic imports
 # import sys
-# import os
+import os
 import logging
 
 import rich
@@ -57,6 +57,8 @@ class NewService:
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+        else:
+            self.resolution_id = resolution_id
         self.service_folder = service_folder
         self.service_label = service_label
         self.service_id = service_id
@@ -64,7 +66,31 @@ class NewService:
         self.no_create_folder = no_create_folder
 
     def create_folder(self):
-        print("I will create the service folder!")
+        print("I will create the service folder for " + self.resolution_id + "!")
+        isExist = os.path.exists(str(self.path) + str(self.service_folder))
+        if isExist:
+            stderr.print(
+                "[red]ERROR: Directory "
+                + str(self.path)
+                + str(self.service_folder)
+                + " exists",
+                highlight=False,
+            )
+        else:
+            try:
+                os.mkdir(str(self.path) + str(self.service_folder))
+            except OSError:
+                stderr.print(
+                    "[red]ERROR: Creation of the directory %s failed"
+                    % (str(self.path) + str(self.service_folder)),
+                    highlight=False,
+                )
+            else:
+                stderr.print(
+                    "[green]Successfully created the directory %s"
+                    % (str(self.path) + str(self.service_folder)),
+                    highlight=False,
+                )
         return True
 
     def copy_template(self):

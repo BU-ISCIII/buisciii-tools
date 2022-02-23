@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
  =============================================================
  HEADER
@@ -48,6 +47,6 @@ table.add_column("Description", justify="left", style="green")
 
 for i in data.keys():
     table.add_row(str(i), str (data[i]["description"]))
-
+    
 console = rich.console.Console()
 console.print(table)
