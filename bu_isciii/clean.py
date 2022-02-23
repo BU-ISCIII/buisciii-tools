@@ -182,10 +182,11 @@ class CleanUp:
         for item in deletable_items:
             try:
                 os.remove(item)
-            except exception:
+            #OSError is a placeholder
+            except OSError as e:
                 try:
                     os.rmdir(item)
-                except exception:
+                except OSError as e:
                     pass
         return
 
