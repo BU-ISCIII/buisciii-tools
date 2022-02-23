@@ -71,8 +71,8 @@ class NewService:
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
-        isExist = os.path.exists(self.full_path)
-        if isExist:
+        if os.path.exists(self.full_path):
+            log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
             stderr.print(
                 "[red]ERROR: Directory " + self.full_path + " exists",
                 highlight=False,
@@ -93,7 +93,10 @@ class NewService:
         return True
 
     def copy_template(self):
-        print("I will copy the template service folders for " + self.full_path + "!")
+        stderr.print(
+            "[green]Copying the templates in folder  %s" % self.full_path,
+            highlight=False,
+        )
         # service = bu_isciii.json_reader.Service(self.service_id)
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
