@@ -82,7 +82,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def scan_dirs(self, to_find=[]):
+    def scan_dirs(self, to_find):
         """
         Description:
             Parses the directory tree, and generates two lists:
@@ -98,34 +98,19 @@ class CleanUp:
 
         Params:
 
-        UNUSED CODE:
-                to_rename = []
-        to_delete = []
-        # if must be found, add all its contents
-        for directory, contentlist in path_content.items():
-            if directory in to_find:
-                to_rename.append(directory)
-                to_delete += contentlist[0]
-                to_delete += contentlist[1]
-            else:
-                for file in to_find:
-                    if file in to_find:
-                        to_delete.append(file)
-                return path_content
-
         """
         pathlist = []
 
         # key: root, values: [[files inside], [dirs inside]]
         for root, _, _ in os.walk(self.path):
-            # coincidence might not be total so double loop
+            # coincidence might not be total so double loop by now
             for item_to_be_found in to_find:
                 if item_to_be_found in root:
                     pathlist.append(root)
 
         return pathlist
 
-    def rename(self, add="_NC", verbose=True):
+    def rename(self, to_find=self.nocopy, add="_NC", verbose=True):
         """
         Description:
             Rename the files and directories
@@ -136,7 +121,7 @@ class CleanUp:
 
         """
 
-        path_content = self.scan_dirs(to_find=self.nocopy)
+        path_content = self.scan_dirs(to_find=to_find)
 
         for directory_to_rename in path_content:
             newpath = directory_to_rename + add
@@ -145,7 +130,7 @@ class CleanUp:
                 print(f"Renamed {directory_to_rename} to {newpath}.")
         return
 
-    def delete(self, verbose=True, sacredtexts = ["lablog","logs"]):
+    def delete(self, sacredtexts = ["lablog","logs"], verbose=True):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -158,19 +143,6 @@ class CleanUp:
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
 
-
-        UNUSED CODE:
-        # might contain both dirs and files
-        for thing_to_delete in to_delete:
-            os.remove(thing_to_delete)
-            if verbose:
-                print(f'Removed {thing_to_delete}.')
-
-        for thing_to_rename in to_rename:
-            newname = thing_to_rename + '_DEL'
-            os.replace(thing_to_rename, newname)
-            if verbose:
-                print(f'Renamed {thing_to_rename} to {newname}.')
         """
 
         path_content = self.scan_dirs(to_find=self.delete)
@@ -178,15 +150,19 @@ class CleanUp:
         filtered_items = []
 
         for directory in path_content:
+            # if not empty add it to the content
             if len(os.listdir(directory)) > 0:
                 unfiltered_items += directory
         # take out those belonging to the sacred items
         for item in unfiltered:
             # coincidence might not be total so double loop
             for text in sacredtexts:
-                if text in item:
+                # add it to the filtered list if not in the sacredtext
+                if not text in item:
                     filtered_items.append(item)
+        
         for item in filtered_items:
+            # shutil if dir, os.remove if file
             if os.path.isdir(item):
                 shutil.rmtree(item)
             else:
@@ -194,6 +170,10 @@ class CleanUp:
             if verbose:
                 print(f"Removed {item}.")
         return
+
+    def delete_rename(self, verbose=True, sacredtexts = ["lablog", "logs"]):
+        self.delete(sacredtexts=sacredtexts, verbose=verbose)
+        self.rename(add="_DEL", to_find= , verbose=verbose)
 
     def revert_renaming(self, verbose=True, terminations=["_DEL","_NC"]):
         """
