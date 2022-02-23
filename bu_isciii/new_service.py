@@ -68,6 +68,8 @@ class NewService:
         self.service_folder = self.resolution_info["resolutionFullNumber"]
         self.services_requested = self.resolution_info["availableServices"]
         self.full_path = os.path.join(path, self.path, self.service_folder)
+        self.service_info = bu_isciii.JsonReader(self.service_id)
+
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
@@ -94,7 +96,6 @@ class NewService:
 
     def copy_template(self):
         print("I will copy the template service folders for " + self.full_path + "!")
-        # service = bu_isciii.json_reader.Service(self.service_id)
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
