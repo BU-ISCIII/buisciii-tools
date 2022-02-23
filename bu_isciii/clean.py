@@ -84,16 +84,16 @@ class CleanUp:
     def scan_dirs(self, sacredtexts=self.sacredtexts, to_find=[]):
         """
         Description:
-            Generates two lists:
-                -list with the elements to be deleted
-                -list with the elements to be renamed
+            Parses the directory tree, and generates two lists:
+                -list with the elements (dirs and files) to be deleted
+                -list with the dirs to be renamed
 
         If a list is given as arguments, the names included
         (either files or directories) won't be included in the
         dictionary.
 
         Usage:
-            to_rename, to_delente = object.scan_dirs(to_delete=list) 
+            to_rename, to_delete = object.scan_dirs(to_find=list) 
 
         Params:
         """
@@ -114,12 +114,12 @@ class CleanUp:
         to_delete = []
         # if must be found, add all its contents
         for directory, contentlist in path_content.items():
-            if directory in to_delete:
+            if directory in to_find:
                 to_rename.append(directory)
                 to_delete += contentlist[0]
                 to_delete += contentlist[1]
             else:
-                for file in filelist:
+                for file in to_find:
                     if file in to_find:
                         to_delete.append(file)
 
@@ -140,19 +140,17 @@ class CleanUp:
         """
         to_rename, to_delete = self.scan_dirs(to_find=self.delete)
 
+        # might contain both dirs and files
+        for thing_to_delete in to_delete:
+            os.remove(thing_to_delete)
+            if verbose:
+                print(f'Removed {thing_to_delete}.')
 
-        delete_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_del_dirs = [folder for folder in delete_dict.keys()
-                       if os.path.basename(folder) in self.delete]
-        for directory_to_delete in to_del_dirs:
-            for file in delete_dict[directory_to_delete]:
-                os.remove(file)
+        for thing_to_rename in to_rename:
+            newname = thing_to_rename + '_DEL'
+            os.replace(thing_to_rename, newname)
             if verbose:
-                print(f'Removed {file}.')
-            newpath = directory_to_delete + '_DEL'
-            os.replace(directory_to_delete, newpath)
-            if verbose:
-                print(f'Renamed {directory_to_delete} to {newpath}')
+                print(f'Renamed {thing_to_rename} to {newname}.')
 
         return
 
