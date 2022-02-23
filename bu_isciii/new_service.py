@@ -78,8 +78,8 @@ class NewService:
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
-        isExist = os.path.exists(self.full_path)
-        if isExist:
+        if os.path.exists(self.full_path):
+            log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
             stderr.print(
                 "[red]ERROR: Directory " + self.full_path + " exists",
                 highlight=False,
