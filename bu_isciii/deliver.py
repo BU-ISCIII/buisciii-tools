@@ -62,7 +62,7 @@ class Deliver:
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.services_queue = rest_api.get_request(
-            "serviceFullData", "service", self.resolution_id
+            "resolutionFullData", "service", self.resolution_id
         )
 
     def copy_sftp(self):
