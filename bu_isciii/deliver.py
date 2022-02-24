@@ -90,17 +90,21 @@ class Deliver:
             )
 
     def create_report(self):
-        print(self.services_queue)
-        values_view = data.values()
+
+        values_view = self.services_queue.values()
         value_iterator = iter(values_view)
+
         service = next(value_iterator)
         resolution = next(value_iterator)
         samples = next(value_iterator)
         service_id = resolution["resolutionFullNumber"]
         service_number = service["serviceRequestNumber"]
         resolution_id = resolution["resolutionNumber"]
-        service_request_date = service["serviceCreatedOnDate"]
 
+        try:
+            service_request_date = service["serviceCreatedOnDate"]
+        except:
+            print("Resolution date is not defined")
         try:
             service_resolution_date = resolution["resolutionDate"]
         except:
@@ -131,5 +135,22 @@ class Deliver:
         projects = [x["projectName"] for x in samples]
         run_name = list(dict.fromkeys(run_name))
         projects = list(dict.fromkeys(projects))
-
         samples = [x["sampleName"] for x in samples]
+
+        json_data = {
+            "id": service_id,
+            "service_number": service_number,
+            "resolution_number": resolution_id,
+            "service_request_date": service_request_date,
+            "service_resolution_date": service_resolution_date,
+            "service_in_progress_date": service_in_progress_date,
+            "service_estimated_delivery_date": service_estimated_delivery_date,
+            "service_delivery_date": service_delivery_date,
+            "service_notes": service_notes,
+            "user_first_name": user_first_name,
+            "user_last_name": user_last_name,
+            "username": username,
+            "user_email": user_email,
+            "service_sequencing_center": service_sequencing_center,
+            "run_name": run_name,
+        }
