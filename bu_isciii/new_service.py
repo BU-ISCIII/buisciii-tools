@@ -110,6 +110,7 @@ class NewService:
             return True
         else:
             stderr.print("[blue]Ok assuming folder is created! Let's move forward!")
+            return False
 
     def copy_template(self):
         stderr.print(
