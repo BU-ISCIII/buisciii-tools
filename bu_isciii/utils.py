@@ -59,5 +59,5 @@ def prompt_path():
 
 def prompt_skip_folder_creation():
     stderr.print("Do you want to skip folder creation? (Y/N)")
-    confirmation = questionary.confirm("Skip?",default=False).unsafe_ask()
+    confirmation = questionary.confirm("Skip?", default=False).unsafe_ask()
     return confirmation
