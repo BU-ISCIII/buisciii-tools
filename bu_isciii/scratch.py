@@ -21,7 +21,7 @@ END_OF_HEADER
 """
 # Generic imports
 # import sys
-# import os
+import os
 import logging
 
 #import shutil
@@ -68,11 +68,33 @@ class Scratch:
             "resolution", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
+        self.dest_path = os.path.join(destination, self.destination, self.service_folder)
 
     def copy_scratch(self):
         stderr.print(
             "[blue]I will copy the service from %s" % self.source
         )
         stderr.print(
-            "[blue]to %s" % self.destination
+            "[blue]to %s" % self.dest_path
         )
+        if self.service_folder in self.source:
+            rsync_command = "rsync -rlv "+self.source+" "+self.destination
+            try:
+                os.system(rsync_command)
+            except OSError:
+                stderr.print(
+                    "[red]ERROR: Copy of the directory %s failed" % self.source,
+                    highlight=False,
+                )
+            else:
+                stderr.print(
+                    "[green]Successfully copyed the directory to %s" % self.dest_path,
+                    highlight=False,
+                )
+        else:
+            log.error(f"Directory path not the same as service resolution. Skip folder copy '{self.source}'")
+            stderr.print(
+                "[red]ERROR: Directory " + self.source + " not the same as " + self.service_folder,
+                highlight=False,
+            )
+        return True
