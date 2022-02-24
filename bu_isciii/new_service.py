@@ -53,15 +53,24 @@ class NewService:
         self,
         resolution_id=None,
         path=None,
-        no_create_folder=False,
+        no_create_folder=None,
+        ask_path=False
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
-        self.path = path
-        self.no_create_folder = no_create_folder
+        if ask_path:
+            self.path = bu_isciii.utils.prompt_path()
+        else:
+            self.path = path
+
+        if no_create_folder is None:
+            self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
+        else:
+            self.no_create_folder = no_create_folder
+
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
