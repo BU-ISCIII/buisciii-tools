@@ -22,6 +22,7 @@ END_OF_HEADER
 # Generic imports
 # import sys
 import os
+import subprocess
 import logging
 
 #import shutil
@@ -79,8 +80,9 @@ class Scratch:
         )
         if self.service_folder in self.source:
             rsync_command = "rsync -rlv "+self.source+" "+self.destination
+            # rsync_command = "srun rsync -rlv "+self.source+" "+self.destination
             try:
-                os.system(rsync_command)
+                subprocess.run(rsync_command, shell=True, check=True)
             except OSError:
                 stderr.print(
                     "[red]ERROR: Copy of the directory %s failed" % self.source,
