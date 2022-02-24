@@ -24,9 +24,9 @@ class ListServices:
         self.service_list = service_json.get_service_list()
 
     def get_table(self):
-
-        # Creacion de la tabla
-
+        """
+        Table print for services names and description
+        """
         table = rich.table.Table()
         table.add_column("Service name", justify="right", style="cyan")
         table.add_column("Description", justify="left", style="green")
