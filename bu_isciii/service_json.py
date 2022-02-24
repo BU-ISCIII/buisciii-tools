@@ -30,7 +30,7 @@ class ServiceJson:
     def get_service_configuration(self, service):
         """
         Description:
-            Obtain the servicie configuration from json data
+            Obtain the service configuration from json data
         """
         if service in self.service_list:
             return self.json_data[service]
