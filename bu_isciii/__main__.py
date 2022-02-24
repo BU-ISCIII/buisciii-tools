@@ -15,6 +15,7 @@ import bu_isciii.utils
 import bu_isciii.new_service
 import bu_isciii.scratch
 import bu_isciii.deliver
+import bu_isciii.list
 
 log = logging.getLogger()
 
@@ -128,21 +129,12 @@ def bu_isciii_cli(verbose, log_file):
 
 # pipeline list
 @bu_isciii_cli.command(help_priority=1)
-@click.argument("keywords", required=False, nargs=-1, metavar="<filter keywords>")
-@click.option(
-    "-s",
-    "--sort",
-    type=click.Choice(["name", "date", "version"]),
-    default="release",
-    help="How to sort listed services",
-)
-@click.option("--json", is_flag=True, default=False, help="Print full output as JSON")
-def list(keywords, sort, json, show_archived):
+def list():
     """
     List available bu-isciii services.
     """
-    # EXAMPLE -> print(nf_core.list.list_workflows(keywords, sort, json, show_archived))
-    print("I will list available services")
+    show_table = bu_isciii.list.ListServices()
+    show_table.get_table()
 
 
 # CREATE NEW SERVICE
