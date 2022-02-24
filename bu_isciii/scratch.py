@@ -40,3 +40,31 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
+
+class Scratch:
+    def __init__(
+        self,
+        resolution_id=None,
+        source=None,
+        destination=None,
+    ):
+        if resolution_id is None:
+            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+        else:
+            self.resolution_id = resolution_id
+
+        if source is None:
+            self.source = bu_isciii.utils.prompt_source_path()
+        else:
+            self.source = source
+
+        if destination is None:
+            self.destination = bu_isciii.utils.prompt_destination_path()
+        else:
+            self.destination = destination
+
+        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
+        self.resolution_info = rest_api.get_request(
+            "resolution", "resolution", self.resolution_id
+        )
+        self.service_folder = self.resolution_info["resolutionFullNumber"]
