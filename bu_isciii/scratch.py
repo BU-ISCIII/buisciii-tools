@@ -45,23 +45,23 @@ class Scratch:
     def __init__(
         self,
         resolution_id=None,
-        source=None,
-        destination=None,
+        service_dir=None,
+        tmp_dir=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
-        if source is None:
-            self.source = bu_isciii.utils.prompt_source_path()
+        if service_dir is None:
+            self.service_dir = bu_isciii.utils.prompt_service_dir_path()
         else:
-            self.source = source
+            self.service_dir = service_dir
 
-        if destination is None:
-            self.destination = bu_isciii.utils.prompt_destination_path()
+        if tmp_dir is None:
+            self.tmp_dir = bu_isciii.utils.prompt_tmp_dir_path()
         else:
-            self.destination = destination
+            self.tmp_dir = tmp_dir
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
@@ -69,20 +69,20 @@ class Scratch:
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
         self.dest_path = os.path.join(
-            destination, self.destination, self.service_folder
+            tmp_dir, self.tmp_dir, self.service_folder
         )
 
     def copy_scratch(self):
-        stderr.print("[blue]I will copy the service from %s" % self.source)
+        stderr.print("[blue]I will copy the service from %s" % self.service_dir)
         stderr.print("[blue]to %s" % self.dest_path)
-        if self.service_folder in self.source:
-            rsync_command = "rsync -rlv " + self.source + " " + self.destination
-            # rsync_command = "srun rsync -rlv "+self.source+" "+self.destination
+        if self.service_folder in self.service_dir:
+            rsync_command = "rsync -rlv " + self.service_dir + " " + self.tmp_dir
+            # rsync_command = "srun rsync -rlv "+self.service_dir+" "+self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
             except OSError:
                 stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.source,
+                    "[red]ERROR: Copy of the directory %s failed" % self.service_dir,
                     highlight=False,
                 )
             else:
@@ -92,11 +92,11 @@ class Scratch:
                 )
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{self.source}'"
+                f"Directory path not the same as service resolution. Skip folder copy '{self.service_dir}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
-                + self.source
+                + self.service_dir
                 + " not the same as "
                 + self.service_folder,
                 highlight=False,
