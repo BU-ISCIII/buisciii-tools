@@ -144,6 +144,7 @@ def list(keywords, sort, json, show_archived):
     # EXAMPLE -> print(nf_core.list.list_workflows(keywords, sort, json, show_archived))
     print("I will list available services")
 
+
 # CREATE NEW SERVICE
 @bu_isciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
@@ -169,6 +170,7 @@ def new_service(resolution, path, no_create_folder):
     new_ser.create_folder()
     new_ser.copy_template()
 
+
 # COPY SERVICE FOLDER TO SCRATCHS TMP
 @bu_isciii_cli.command(help_priority=3)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
@@ -192,6 +194,7 @@ def scratch(resolution, source, destination):
     """
     scratch_copy = bu_isciii.scratch.Scratch(resolution, source, destination)
     scratch_copy.copy_scratch()
+
 
 # COPY RESULTS FOLDER TO SFTP
 @bu_isciii_cli.command(help_priority=4)
