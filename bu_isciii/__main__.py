@@ -176,6 +176,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
     new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
     new_ser.create_new_service()
 
+
 # COPY SERVICE FOLDER TO SCRATCHS TMP
 @bu_isciii_cli.command(help_priority=3)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")

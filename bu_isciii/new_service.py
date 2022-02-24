@@ -58,7 +58,9 @@ class NewService:
         self.resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"]["resolutionFullNumber"]
+        self.service_folder = self.resolution_info["Resolutions"][
+            "resolutionFullNumber"
+        ]
         self.services_requested = self.resolution_info["Resolutions"][
             "availableServices"
         ]
@@ -149,11 +151,11 @@ class NewService:
         return True
 
     def create_samples_id(self):
-        sample_list = []
         for sample in self.service_samples:
             with open(
                 os.path.join(self.full_path, "ANALYSIS", "samples_id.txt"),
-                "a", encoding="utf-8",
+                "a",
+                encoding="utf-8",
             ) as f:
                 line = sample["sampleName"] + "\n"
                 f.write(line)
