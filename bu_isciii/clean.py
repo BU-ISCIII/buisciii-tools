@@ -34,7 +34,6 @@ END_OF_HEADER
 import os
 import logging
 import shutil
-import rich
 from rich.console import Console
 
 # Local imports
@@ -43,7 +42,7 @@ import bu_isciii.utils
 from bu_isciii.drylab_api import RestServiceApi
 
 log = logging.getLogger(__name__)
-stderr = rich.console.Console(
+stderr = Console(
     stderr=True,
     style="dim",
     highlight=False,
