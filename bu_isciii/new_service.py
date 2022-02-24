@@ -131,7 +131,7 @@ class NewService:
             try:
                 shutil.copytree(
                     os.path.join(
-                        os.path.dirname(__file__), "templates", service_template[0]
+                        os.path.dirname(__file__), "templates", service_template
                     ),
                     self.full_path,
                     dirs_exist_ok=True,
