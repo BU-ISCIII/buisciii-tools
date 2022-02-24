@@ -13,6 +13,7 @@ import rich.traceback
 import bu_isciii
 import bu_isciii.utils
 import bu_isciii.new_service
+import bu_isciii.scratch
 import bu_isciii.deliver
 
 log = logging.getLogger()
@@ -144,6 +145,7 @@ def list(keywords, sort, json, show_archived):
     print("I will list available services")
 
 
+# CREATE NEW SERVICE
 @bu_isciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
@@ -157,10 +159,17 @@ def list(keywords, sort, json, show_archived):
     "-n",
     "--no_create_folder",
     is_flag=True,
+    default=None,
+    help="No create service folder, only resolution",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
     default=False,
     help="No create service folder, only resolution",
 )
-def new_service(resolution, path, no_create_folder):
+def new_service(resolution, path, no_create_folder, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
@@ -169,7 +178,33 @@ def new_service(resolution, path, no_create_folder):
     new_ser.copy_template()
 
 
-@bu_isciii_cli.command(help_priority=2)
+# COPY SERVICE FOLDER TO SCRATCHS TMP
+@bu_isciii_cli.command(help_priority=3)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-s",
+    "--source",
+    type=click.Path(),
+    default=None,
+    help="Directory containing service folder to copy to destination folder for execution",
+)
+@click.option(
+    "-d",
+    "--destination",
+    type=click.Path(),
+    default="/data/bi/scratch_tmp/bi/",
+    help="Directory to which the files will be transfered for execution. Default: /data/bi/scratch_tmp/bi/",
+)
+def scratch(resolution, source, destination):
+    """
+    "Copy service folder to scratch directory for execution."
+    """
+    scratch_copy = bu_isciii.scratch.Scratch(resolution, source, destination)
+    scratch_copy.copy_scratch()
+
+
+# COPY RESULTS FOLDER TO SFTP
+@bu_isciii_cli.command(help_priority=4)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-s",
