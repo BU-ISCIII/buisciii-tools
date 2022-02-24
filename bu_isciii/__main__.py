@@ -157,10 +157,17 @@ def list(keywords, sort, json, show_archived):
     "-n",
     "--no_create_folder",
     is_flag=True,
+    default=None,
+    help="No create service folder, only resolution",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
     default=False,
     help="No create service folder, only resolution",
 )
-def new_service(resolution, path, no_create_folder):
+def new_service(resolution, path, no_create_folder, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
