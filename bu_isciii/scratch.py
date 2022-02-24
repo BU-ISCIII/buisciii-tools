@@ -22,7 +22,7 @@ END_OF_HEADER
 # Generic imports
 # import sys
 # import os
- import logging
+import logging
 
 #import shutil
 import rich
@@ -68,3 +68,8 @@ class Scratch:
             "resolution", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
+
+    def copy_scratch(self):
+        stderr.print(
+            "[blue]I will copy the service folder for %s to scratch!" % self.resolution_id
+        )
