@@ -80,6 +80,11 @@ class Scratch:
             # rsync_command = "srun rsync -rlv "+self.service_dir+" "+self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
+                out_file = os.path.join(self.tmp_dir, self.dest_path, "DOC", "service_info.txt")
+                f = open(out_file, "a")
+                f.write("Temporal directory: "+self.tmp_dir+self.service_folder+"\n")
+                f.write("Origin service directory: "+self.service_dir+"\n")
+                f.close()
             except OSError:
                 stderr.print(
                     "[red]ERROR: Copy of the directory %s failed" % self.service_dir,
