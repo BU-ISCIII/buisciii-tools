@@ -195,12 +195,21 @@ def new_service(resolution, path, no_create_folder, ask_path):
     default="/data/bi/scratch_tmp/bi/",
     help="Directory to which the files will be transfered for execution. Default: /data/bi/scratch_tmp/bi/",
 )
-def scratch(resolution, service_dir, tmp_dir):
+
+@click.option(
+    "-d",
+    "--direction",
+    type=click.Choice(['Service_to_scratch', 'Scratch_to_service']),
+    multiple=False,
+    help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
+)
+
+def scratch(resolution, service_dir, tmp_dir, direction):
     """
     "Copy service folder to scratch directory for execution."
     """
-    scratch_copy = bu_isciii.scratch.Scratch(resolution, service_dir, tmp_dir)
-    scratch_copy.copy_scratch()
+    scratch_copy = bu_isciii.scratch.Scratch(resolution, service_dir, tmp_dir, direction)
+    scratch_copy.handle_scratch()
 
 
 # COPY RESULTS FOLDER TO SFTP
