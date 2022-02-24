@@ -59,7 +59,7 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        
+        print(self.resolution_id)
         # self.base_directory =
         # self.delete =
         # self.nocopy =
@@ -235,3 +235,7 @@ class CleanUp:
         # self.delete()
 
         return
+
+# Testing zone
+
+testing_object = CleanUp("SRVCNM552.1")
