@@ -60,7 +60,11 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        print(self.resolution_id)
+        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
+        self.resolution_info = rest_api.get_request("resolution", "resolution", self.resolution_id)
+
+        print(self.resolution_info)
+
         # self.base_directory =
         # self.delete =
         # self.nocopy =
@@ -226,7 +230,6 @@ class CleanUp:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
     def full_clean_job(self):
-
         """
         Perform the whole cleaning of the service
         """
