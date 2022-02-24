@@ -32,6 +32,7 @@ END_OF_HEADER
 # Generic imports
 # import sys
 import os
+import shutil
 
 # Local imports
 
@@ -81,7 +82,7 @@ class CleanUp:
         else:
             return self.nocopy
 
-    def scan_dirs(self, to_find=[]):
+    def scan_dirs(self, to_find):
         """
         Description:
             Parses the directory tree, and generates two lists:
@@ -97,34 +98,19 @@ class CleanUp:
 
         Params:
 
-        UNUSED CODE:
-                to_rename = []
-        to_delete = []
-        # if must be found, add all its contents
-        for directory, contentlist in path_content.items():
-            if directory in to_find:
-                to_rename.append(directory)
-                to_delete += contentlist[0]
-                to_delete += contentlist[1]
-            else:
-                for file in to_find:
-                    if file in to_find:
-                        to_delete.append(file)
-                return path_content
-
         """
         pathlist = []
 
         # key: root, values: [[files inside], [dirs inside]]
         for root, _, _ in os.walk(self.path):
-            # coincidence might not be total so double loop
+            # coincidence might not be total so double loop by now
             for item_to_be_found in to_find:
                 if item_to_be_found in root:
                     pathlist.append(root)
 
         return pathlist
 
-    def rename(self, add="_NC", verbose=True):
+    def rename(self, to_find, add, verbose=True):
         """
         Description:
             Rename the files and directories
@@ -135,17 +121,28 @@ class CleanUp:
 
         """
 
-        path_content = self.scan_dirs(to_find=self.nocopy)
+        path_content = self.scan_dirs(to_find=to_find)
 
         for directory_to_rename in path_content:
             newpath = directory_to_rename + add
             os.replace(directory_to_rename, newpath)
             if verbose:
                 print(f"Renamed {directory_to_rename} to {newpath}.")
-
         return
 
-    def delete(self, verbose=True):
+    def rename_nocopy(self, verbose=True):
+        """
+        Description:
+
+        Usage:
+
+        Params:
+
+        """
+        self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
+        return
+
+    def delete(self, sacredtexts=["lablog", "logs"], verbose=True):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -158,61 +155,56 @@ class CleanUp:
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
 
-
-        UNUSED CODE:
-        # might contain both dirs and files
-        for thing_to_delete in to_delete:
-            os.remove(thing_to_delete)
-            if verbose:
-                print(f'Removed {thing_to_delete}.')
-
-        for thing_to_rename in to_rename:
-            newname = thing_to_rename + '_DEL'
-            os.replace(thing_to_rename, newname)
-            if verbose:
-                print(f'Renamed {thing_to_rename} to {newname}.')
         """
 
         path_content = self.scan_dirs(to_find=self.delete)
-        deletable_items = []
+        unfiltered_items = []
+        filtered_items = []
 
         for directory in path_content:
+            # if not empty add it to the content
             if len(os.listdir(directory)) > 0:
-                deletable_items += directory
-        for item in deletable_items:
-            try:
+                unfiltered_items += directory
+        # take out those belonging to the sacred items
+        for item in unfiltered_items:
+            # coincidence might not be total so double loop
+            for text in sacredtexts:
+                # add it to the filtered list if not in the sacredtext
+                if text not in item:
+                    filtered_items.append(item)
+
+        for item in filtered_items:
+            # shutil if dir, os.remove if file
+            if os.path.isdir(item):
+                shutil.rmtree(item)
+            else:
                 os.remove(item)
-            # OSError is a placeholder
-            except OSError:
-                try:
-                    os.rmdir(item)
-                except OSError:
-                    pass
+            if verbose:
+                print(f"Removed {item}.")
         return
 
-    def revert_nocopy_renaming(self, verbose=True):
+    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"]):
+        self.delete(sacredtexts=sacredtexts, verbose=verbose)
+        self.rename(add="_DEL", to_find=self.delete, verbose=verbose)
+
+    def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
         Description:
         Reverts the naming (adding of the _NC tag)
-
 
         Usage:
 
         Params:
 
         """
-        reverse_rename_dict = self.scan_dirs(sacredtexts=self.sacredtexts)
-        to_rename_back = [
-            folder
-            for folder in reverse_rename_dict.keys()
-            if "_DEL" in folder and "_NC"
-        ]
-        for directory_to_rename in to_rename_back:
-            reverted_name = directory_to_rename.replace("_DEL", "").replace("_NC", "")
-            os.replace(directory_to_rename, reverted_name)
+        to_rename = self.scan_dirs(to_find=terminations)
+        for dir_to_rename in to_rename:
+            # remove all the terminations
+            for term in terminations:
+                newname = dir_to_rename.replace(term, "")
+            os.replace(dir_to_rename, newname)
             if verbose:
-                print(f"Renamed {directory_to_rename} to {reverted_name}.")
-        return
+                print(f"Replaced {dir_to_rename} with {newname}.")
 
     def full_clean_job(self):
 
