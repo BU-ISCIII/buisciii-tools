@@ -66,7 +66,9 @@ class Scratch:
             self.tmp_dir = tmp_dir
 
         if direction is None:
-            self.direction = bu_isciii.utils.prompt_direction_scratch(['Service_to_scratch', 'Scratch_to_service'])
+            self.direction = bu_isciii.utils.prompt_direction_scratch(
+                ["Service_to_scratch", "Scratch_to_service"]
+            )
         else:
             self.direction = direction
 
@@ -75,10 +77,10 @@ class Scratch:
             "resolution", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
-        self.scratch_path = os.path.join(
-            tmp_dir, self.tmp_dir, self.service_folder
+        self.scratch_path = os.path.join(tmp_dir, self.tmp_dir, self.service_folder)
+        self.out_file = os.path.join(
+            self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
         )
-        self.out_file = os.path.join(self.tmp_dir, self.scratch_path, "DOC", "service_info.txt")
 
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.service_dir)
@@ -89,8 +91,8 @@ class Scratch:
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
                 f = open(self.out_file, "a")
-                f.write("Temporal directory: "+self.scratch_path+"\n")
-                f.write("Origin service directory: "+self.service_dir+"\n")
+                f.write("Temporal directory: " + self.scratch_path + "\n")
+                f.write("Origin service directory: " + self.service_dir + "\n")
                 f.close()
             except OSError:
                 stderr.print(
@@ -99,7 +101,8 @@ class Scratch:
                 )
             else:
                 stderr.print(
-                    "[green]Successfully copyed the directory to %s" % self.scratch_path,
+                    "[green]Successfully copyed the directory to %s"
+                    % self.scratch_path,
                     highlight=False,
                 )
         else:
@@ -121,11 +124,11 @@ class Scratch:
         f = open(self.out_file, "r")
         for line in f:
             if re.search("Origin service directory:", line):
-                dest_folder="".join(line.split()[3])
-                dest_dir=os.path.normpath("/".join(dest_folder.split("/")[:-1]))
+                dest_folder = "".join(line.split()[3])
+                dest_dir = os.path.normpath("/".join(dest_folder.split("/")[:-1]))
         if self.service_dir in dest_folder:
             rsync_command = "rsync -rlv " + self.scratch_path + " " + dest_dir
-            #rsync_command = "srun rsync -rlv " + self.scratch_path + " " + dest_dir
+            # rsync_command = "srun rsync -rlv " + self.scratch_path + " " + dest_dir
             print(rsync_command)
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
