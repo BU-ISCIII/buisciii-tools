@@ -54,12 +54,11 @@ stderr = rich.console.Console(
 class CleanUp:
     def __init__(self, resolution_id=None):
         # access the api/the json/the whatever with the service name to obtain
-
         if resolution_id == None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-
+        # get the service id from the resolution_id
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.service_id = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
@@ -67,10 +66,18 @@ class CleanUp:
 
         if len(self.service_id) > 1:
             self.service_id = [item["serviceId"] for item in self.service_id]
+            self.service_id = self.service_id[0]
         else:
             self.service_id = self.service_id["serviceId"]
 
-        print(self.service_id)
+        if len(self.service_id) > 1:
+            # print(self.service_id)
+            # ask which service to find
+            pass
+        else:
+            # self.delete =
+            # self.nocopy =
+            pass
 
         # self.base_directory =
         # self.delete =
