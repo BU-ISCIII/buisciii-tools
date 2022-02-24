@@ -71,7 +71,7 @@ class NewService:
         self.full_path = os.path.join(path, self.path, self.service_folder)
 
     def get_service_ids(self):
-        label_list = []
+        service_id_list = []
         for services in self.services_requested:
             service_id_list.append(services["serviceId"])
         service_id_list.append("all")
@@ -109,7 +109,7 @@ class NewService:
         )
         services_ids = self.get_service_ids()
         print(services_ids)
-        # service_template = new_ser.get_template()
+        #services_json = ServiceJson()
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
             shutil.copytree(
