@@ -86,27 +86,30 @@ class NewService:
         return services_sel
 
     def create_folder(self):
-        print("I will create the service folder for " + self.resolution_id + "!")
-        if os.path.exists(self.full_path):
-            log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
-            stderr.print(
-                "[red]ERROR: Directory " + self.full_path + " exists",
-                highlight=False,
-            )
-        else:
-            try:
-                os.mkdir(self.full_path)
-            except OSError:
+        if not self.no_create_folder:
+            stderr.print("[blue]I will create the service folder for " + self.resolution_id + "!")
+            if os.path.exists(self.full_path):
+                log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
                 stderr.print(
-                    "[red]ERROR: Creation of the directory %s failed" % self.full_path,
+                    "[red]ERROR: Directory " + self.full_path + " exists",
                     highlight=False,
                 )
             else:
-                stderr.print(
-                    "[green]Successfully created the directory %s" % self.full_path,
-                    highlight=False,
-                )
-        return True
+                try:
+                    os.mkdir(self.full_path)
+                except OSError:
+                    stderr.print(
+                        "[red]ERROR: Creation of the directory %s failed" % self.full_path,
+                        highlight=False,
+                    )
+                else:
+                    stderr.print(
+                        "[green]Successfully created the directory %s" % self.full_path,
+                        highlight=False,
+                    )
+            return True
+        else:
+            stderr.print("[blue]Ok assuming folder is created! Let's move forward!")
 
     def copy_template(self):
         stderr.print(
