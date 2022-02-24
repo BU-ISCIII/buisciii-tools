@@ -1,0 +1,64 @@
+<p>
+    <img src="../../../../markdowns/assets/BU_ISCIII_logo.png" alt="logo" width="200" align="left" />
+</p>
+<br>
+<br>
+## Service results report from the Bioinformatics Unit (BU-ISCIII)
+
+### {{ SERVICE.ID }} service information:
+
+Here we describe the information about the service request:
+
+* Service ID: {{ SERVICE_NUMBER }}
+* Resolution: {{ RESOLUTION_NUMBER }}
+* Request date: {{ SERVICE.REQUEST_DATE }}
+* Resolution date: {{ SERVICE.RESOLUTION_DATE }}
+{% if SERVICE.IN_PROGRESS_DATE -%}
+* Analysis starting date: {{ SERVICE.IN_PROGRESS_DATE }}
+{% endif -%}
+{% if SERVICE.ESTIMATED_DELIVERY_DATE -%}
+* Estimated delivery date: {{ SERVICE.ESTIMATED_DELIVERY_DATE }}
+{% endif -%}
+* Delivery date: {{ SERVICE.DELIVERY_DATE }}
+* Service notes: {{ SERVICE.SERVICE_NOTES }}
+
+### User information:
+
+Here we describe the information about the user requesting the service.
+
+* Name and first name: {{ USER.FIRST_NAME }} {{ USER.LAST_NAME }}
+* Position: {{ USER.POSITION }}
+* E-mail: {{ USER.EMAIL }}
+* Center: {{ USER.CENTER }}
+* Unit: {{ USER.UNIT }}
+{% if USER.PHONE -%}
+* Phone extension: {{ USER.PHONE }}
+{% endif %}
+
+### Project:
+
+Here we describe information about the project associated to the service:
+
+{% if SERVICE.SEQUENCING_CENTER -%} * Sequencing center: {{ SERVICE.SEQUENCING_CENTER }} {% endif %}
+{% if SERVICE.RUN_SPECIFICATIONS -%} * Run specifications: {{ SERVICE.RUN_SPECIFICATIONS }} {% endif -%}
+{% if RUNS -%}
+{% for run in RUNS %}
+* Run name: {{ run.RUN_NAME }}
+{% if run.PROJECTS -%}
+{%- for project in run.PROJECTS -%}
+* Project name: {{ project.PROJECT_NAME }}
+{% if project.SAMPLES -%}
+* Samples:{% set comma = joiner(", ") %}{% for sample in project.SAMPLES -%}{{ comma() }}{{ sample }}
+{%- endfor -%}
+{% endif -%}
+{% if project.LIBRARY_QUIT %}
+* Library: {{ project.LIBRARY_QUIT }}
+{% endif %}
+{%- endfor -%}
+{% endif -%}
+{% endfor %}
+{% endif -%}
+{% if SAMPLES -%}
+* Samples:{% set comma = joiner(", ") %}{% for sample in SAMPLES -%}{{ comma() }}{{ sample }}
+{%- endfor -%}
+{% endif -%}
