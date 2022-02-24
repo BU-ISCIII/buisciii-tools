@@ -71,10 +71,14 @@ class NewService:
         self.full_path = os.path.join(path, self.path, self.service_folder)
 
     def get_service_ids(self):
-        service_json = ServiceJson()
-        print(service_json)
-        for request in self.services_requested:
-            print(request)
+        label_list = []
+        for services in self.services_requested:
+            service_id_list.append(services["serviceId"])
+        service_id_list.append("all")
+        services_sel = bu_isciii.utils.prompt_service_selection(service_id_list)
+        if services_sel == "all":
+            services_sel == service_id_list
+        return services_sel
 
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")

@@ -43,3 +43,9 @@ def prompt_destination_path():
     stderr.print("Directory to which the files will be transfered")
     destination = questionary.path("Destination path").unsafe_ask()
     return destination
+
+
+def prompt_service_selection(choices):
+    stderr.print("Which selected service do you want to copy the template for?")
+    selection = questionary.select("Service label:", choices=choices).unsafe_ask()
+    return selection
