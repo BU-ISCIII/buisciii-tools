@@ -26,7 +26,7 @@ import os
 import subprocess
 import logging
 
-#import shutil
+# import shutil
 import rich
 
 # Local imports
@@ -42,6 +42,7 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
+
 
 class Scratch:
     def __init__(
@@ -70,17 +71,15 @@ class Scratch:
             "resolution", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
-        self.dest_path = os.path.join(destination, self.destination, self.service_folder)
+        self.dest_path = os.path.join(
+            destination, self.destination, self.service_folder
+        )
 
     def copy_scratch(self):
-        stderr.print(
-            "[blue]I will copy the service from %s" % self.source
-        )
-        stderr.print(
-            "[blue]to %s" % self.dest_path
-        )
+        stderr.print("[blue]I will copy the service from %s" % self.source)
+        stderr.print("[blue]to %s" % self.dest_path)
         if self.service_folder in self.source:
-            rsync_command = "rsync -rlv "+self.source+" "+self.destination
+            rsync_command = "rsync -rlv " + self.source + " " + self.destination
             # rsync_command = "srun rsync -rlv "+self.source+" "+self.destination
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
@@ -95,9 +94,14 @@ class Scratch:
                     highlight=False,
                 )
         else:
-            log.error(f"Directory path not the same as service resolution. Skip folder copy '{self.source}'")
+            log.error(
+                f"Directory path not the same as service resolution. Skip folder copy '{self.source}'"
+            )
             stderr.print(
-                "[red]ERROR: Directory " + self.source + " not the same as " + self.service_folder,
+                "[red]ERROR: Directory "
+                + self.source
+                + " not the same as "
+                + self.service_folder,
                 highlight=False,
             )
         return True
