@@ -10,6 +10,8 @@
 
  """
 import json
+import jinja2
+
 
 # import sys
 import os
@@ -97,6 +99,7 @@ class Deliver:
         service = next(value_iterator)
         resolution = next(value_iterator)
         samples = next(value_iterator)
+
         service_id = resolution["resolutionFullNumber"]
         service_number = service["serviceRequestNumber"]
         resolution_id = resolution["resolutionNumber"]
@@ -113,12 +116,10 @@ class Deliver:
             service_in_progress_date = resolution["resolutionOnInProgressDate"]
         except:
             print("In pogress date is not defined")
-
         try:
             service_estimated_delivery_date = resolution["resolutionEstimatedDate"]
         except:
             print("Estimated delivery date is not defined")
-
         try:
             service_delivery_date = resolution["resolutionDeliveryDate"]
         except:
@@ -154,3 +155,15 @@ class Deliver:
             "service_sequencing_center": service_sequencing_center,
             "run_name": run_name,
         }
+
+        TEMPLATE_FILE = "templates/jinja_template.j2"
+        BASEPATH = os.path.dirname(os.path.realpath(__file__))
+        templateLoader = jinja2.FileSystemLoader(searchpath=BASEPATH)
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template(TEMPLATE_FILE)
+
+        ## Create markdown
+        outputText = template.render(json_data)
+        file = open(outputText)
+        file.write(outputText.encode("utf-8"))
+        file.close()
