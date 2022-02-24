@@ -69,10 +69,13 @@ class NewService:
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
-            "resolution", "resolution", self.resolution_id
+            "resolutionFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["resolutionFullNumber"]
-        self.services_requested = self.resolution_info["availableServices"]
+        self.service_folder = self.resolution_info["Resolution"]["resolutionFullNumber"]
+        self.services_requested = self.resolution_info["Resolution"][
+            "availableServices"
+        ]
+        self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(path, self.path, self.service_folder)
 
     def get_service_ids(self):
@@ -156,6 +159,15 @@ class NewService:
             sys.exit()
             return False
         return True
+
+    def create_samples_id(self):
+        sample_list = []
+        for sample in self.service_samples:
+            with open(
+                os.path.join(self.full_path, "ANALYSIS", "samples_id.txt"),
+                encoding="utf-8",
+            ) as f:
+                f.write(sample["sampleName"])
 
     def get_resolution_id(self):
         return self.resolution_id
