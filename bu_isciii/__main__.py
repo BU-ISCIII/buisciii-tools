@@ -183,23 +183,23 @@ def new_service(resolution, path, no_create_folder, ask_path):
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-s",
-    "--source",
+    "--service_dir",
     type=click.Path(),
-    default=None,
+    default=os.getcwd(),
     help="Directory containing service folder to copy to destination folder for execution",
 )
 @click.option(
-    "-d",
-    "--destination",
+    "-t",
+    "--tmp_dir",
     type=click.Path(),
     default="/data/bi/scratch_tmp/bi/",
     help="Directory to which the files will be transfered for execution. Default: /data/bi/scratch_tmp/bi/",
 )
-def scratch(resolution, source, destination):
+def scratch(resolution, service_dir, tmp_dir):
     """
     "Copy service folder to scratch directory for execution."
     """
-    scratch_copy = bu_isciii.scratch.Scratch(resolution, source, destination)
+    scratch_copy = bu_isciii.scratch.Scratch(resolution, service_dir, tmp_dir)
     scratch_copy.copy_scratch()
 
 
