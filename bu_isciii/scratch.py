@@ -68,21 +68,21 @@ class Scratch:
             "resolution", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
-        self.dest_path = os.path.join(
+        self.scratch_path = os.path.join(
             tmp_dir, self.tmp_dir, self.service_folder
         )
 
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.service_dir)
-        stderr.print("[blue]to %s" % self.dest_path)
+        stderr.print("[blue]to %s" % self.scratch_path)
         if self.service_folder in self.service_dir:
             rsync_command = "rsync -rlv " + self.service_dir + " " + self.tmp_dir
             # rsync_command = "srun rsync -rlv "+self.service_dir+" "+self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
-                out_file = os.path.join(self.tmp_dir, self.dest_path, "DOC", "service_info.txt")
+                out_file = os.path.join(self.tmp_dir, self.scratch_path, "DOC", "service_info.txt")
                 f = open(out_file, "a")
-                f.write("Temporal directory: "+self.tmp_dir+self.service_folder+"\n")
+                f.write("Temporal directory: "+self.scratch_path+"\n")
                 f.write("Origin service directory: "+self.service_dir+"\n")
                 f.close()
             except OSError:
@@ -92,7 +92,7 @@ class Scratch:
                 )
             else:
                 stderr.print(
-                    "[green]Successfully copyed the directory to %s" % self.dest_path,
+                    "[green]Successfully copyed the directory to %s" % self.scratch_path,
                     highlight=False,
                 )
         else:
@@ -107,3 +107,7 @@ class Scratch:
                 highlight=False,
             )
         return True
+
+    def revert_copy_scratch(self):
+        stderr.print("[blue]I will copy the service from %s" % self.scratch_path)
+        stderr.print("[blue]to %s" % self.service_dir)
