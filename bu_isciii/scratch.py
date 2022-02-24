@@ -47,6 +47,7 @@ class Scratch:
         resolution_id=None,
         service_dir=None,
         tmp_dir=None,
+        direction=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -62,6 +63,11 @@ class Scratch:
             self.tmp_dir = bu_isciii.utils.prompt_tmp_dir_path()
         else:
             self.tmp_dir = tmp_dir
+
+        if direction is None:
+            self.direction = bu_isciii.utils.prompt_direction_scratch(['Service_to_scratch', 'Scratch_to_service'])
+        else:
+            self.direction = direction
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
@@ -111,3 +117,9 @@ class Scratch:
     def revert_copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.scratch_path)
         stderr.print("[blue]to %s" % self.service_dir)
+
+    def handle_scratch(self):
+        if self.direction == "Service_to_scratch":
+            self.copy_scratch()
+        elif self.direction == "Scratch_to_service":
+            self.revert_copy_scratch()
