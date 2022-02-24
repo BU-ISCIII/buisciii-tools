@@ -71,8 +71,8 @@ class NewService:
         self.resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolution"]["resolutionFullNumber"]
-        self.services_requested = self.resolution_info["Resolution"][
+        self.service_folder = self.resolution_info["Resolutions"]["resolutionFullNumber"]
+        self.services_requested = self.resolution_info["Resolutions"][
             "availableServices"
         ]
         self.service_samples = self.resolution_info["Samples"]
@@ -168,6 +168,11 @@ class NewService:
                 encoding="utf-8",
             ) as f:
                 f.write(sample["sampleName"])
+
+    def create_new_service(self):
+        self.create_folder()
+        self.copy_template()
+        self.create_samples_id()
 
     def get_resolution_id(self):
         return self.resolution_id
