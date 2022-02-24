@@ -32,6 +32,15 @@ def prompt_resolution_id():
     resolution_id = questionary.text("Resolution id").unsafe_ask()
     return resolution_id
 
+def prompt_service_dir_path():
+    stderr.print("Service path to copy to execution temporal directory")
+    source = questionary.path("Source path").unsafe_ask()
+    return source
+
+def prompt_tmp_dir_path():
+    stderr.print("Temporal directory destination to execute sercive")
+    source = questionary.path("Source path").unsafe_ask()
+    return source
 
 def prompt_source_path():
     stderr.print("Directory containing files cd to transfer")
@@ -61,3 +70,8 @@ def prompt_skip_folder_creation():
     stderr.print("Do you want to skip folder creation? (Y/N)")
     confirmation = questionary.confirm("Skip?").unsafe_ask()
     return confirmation
+
+def prompt_direction_scratch(choices):
+    stderr.print("In which direction do you want to execute the rsync command?")
+    selection = questionary.select("Directions:", choices=choices).unsafe_ask()
+    return selection
