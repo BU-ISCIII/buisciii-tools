@@ -36,6 +36,7 @@ import rich
 # Local imports
 import bu_isciii
 import bu_isciii.utils
+from bu_isciii.service_json import ServiceJson
 from bu_isciii.drylab_api import RestServiceApi
 
 log = logging.getLogger(__name__)
@@ -69,10 +70,16 @@ class NewService:
         self.services_requested = self.resolution_info["availableServices"]
         self.full_path = os.path.join(path, self.path, self.service_folder)
 
+    def get_service_ids(self):
+        service_json = ServiceJson()
+        print(service_json)
+        for request in self.services_requested:
+            print(request)
+
     def create_folder(self):
         print("I will create the service folder for " + self.resolution_id + "!")
-        isExist = os.path.exists(self.full_path)
-        if isExist:
+        if os.path.exists(self.full_path):
+            log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
             stderr.print(
                 "[red]ERROR: Directory " + self.full_path + " exists",
                 highlight=False,
@@ -93,13 +100,18 @@ class NewService:
         return True
 
     def copy_template(self):
-        print("I will copy the template service folders for " + self.full_path + "!")
-        # service = bu_isciii.json_reader.Service(self.service_id)
+        stderr.print(
+            "[blue]I will copy the template service folders for %s !" % self.full_path
+        )
+        services_ids = self.get_service_ids()
+        print(services_ids)
         # service_template = new_ser.get_template()
         service_template = ["viralrecon"]  # TMP!!
         if len(service_template) == 1:
             shutil.copytree(
-                "templates/" + str(service_template[0]),
+                os.path.join(
+                    os.path.dirname(__file__), "templates", service_template[0]
+                ),
                 self.full_path,
                 dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns("README"),
@@ -111,9 +123,3 @@ class NewService:
 
     def get_service_folder(self):
         return self.service_folder
-
-    def get_service_label(self):
-        return self.service_label
-
-    def get_service_id(self):
-        return self.get_service_id
