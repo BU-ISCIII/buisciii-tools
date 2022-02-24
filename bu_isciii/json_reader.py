@@ -9,6 +9,9 @@ class JsonReader:
         fh.close()
         self.service_list = list(self.json_data.keys())
 
+    def get_json_data(self):
+        return self.json_data
+
     def get_service_list(self):
         return self.service_list
 
