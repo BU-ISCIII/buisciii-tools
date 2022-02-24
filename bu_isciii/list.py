@@ -18,9 +18,10 @@ from bu_isciii.service_json import ServiceJson
 
 
 class ListServices:
-    def __init__(self, json_file):
-        data_json = ServiceJson.get_json_data(json_file)
-        print(data_json)
+    def __init__(self):
+        service_json = ServiceJson()
+        service_data = service_json.get_json_data()
+        print(service_data)
 
     def get_table(self):
 
@@ -38,8 +39,6 @@ class ListServices:
 
 
 prueba = ListServices()
-
-
 prueba = ServiceJson()
 
 
