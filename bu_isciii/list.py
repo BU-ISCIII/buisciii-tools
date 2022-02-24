@@ -23,6 +23,12 @@ class ListServices:
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
 
+    def get_sort_by(self, type):
+        """
+        Filter to
+        """
+        pass
+
     def get_table(self):
         """
         Table print for services names and description
@@ -30,9 +36,10 @@ class ListServices:
         table = rich.table.Table()
         table.add_column("Service name", justify="right", style="cyan")
         table.add_column("Description", justify="left", style="green")
+        table.add_column("Github", justify="left", style="green")
 
         for i in self.service_list:
-            table.add_row(str(i), str(self.service_data[i]["description"]))
+            table.add_row(str(i), str(self.service_data[i]["description"]), str(self.service_data[i]["url"]))
 
         console = rich.console.Console()
         console.print(table)
@@ -40,6 +47,3 @@ class ListServices:
 
 prueba = ListServices()
 prueba.get_table()
-
-
-prueba.get_find("assembly_annotation", "clean")
