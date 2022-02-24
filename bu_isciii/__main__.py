@@ -13,6 +13,7 @@ import rich.traceback
 import bu_isciii
 import bu_isciii.utils
 import bu_isciii.new_service
+import bu_isciii.scratch
 import bu_isciii.deliver
 
 log = logging.getLogger()
@@ -169,31 +170,31 @@ def new_service(resolution, path, no_create_folder):
     new_ser.copy_template()
 
 # COPY SERVICE FOLDER TO SCRATCHS TMP
-@bu_isciii_cli.command(help_priority=2)
+@bu_isciii_cli.command(help_priority=3)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-s",
     "--source",
     type=click.Path(),
     default=None,
-    help="Directory containing files cd to transfer",
+    help="Directory containing service folder to copy to destination folder for execution",
 )
 @click.option(
     "-d",
     "--destination",
     type=click.Path(),
-    default=None,
-    help="Directory to which the files will be transfered",
+    default="/data/bi/scratch_tmp/bi/",
+    help="Directory to which the files will be transfered for execution. Default: /data/bi/scratch_tmp/bi/",
 )
-def deliver(resolution, source, destination):
+def scratch(resolution, source, destination):
     """
-    "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
+    "Copy service folder to scratch directory for execution."
     """
-    new_del = bu_isciii.deliver.Deliver(resolution, source, destination)
-    new_del.copy_sftp()
+    scratch_copy = bu_isciii.scratch.Scratch(resolution, source, destination)
+    scratch_copy.copy_scratch()
 
 # COPY RESULTS FOLDER TO SFTP
-@bu_isciii_cli.command(help_priority=2)
+@bu_isciii_cli.command(help_priority=4)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-s",
