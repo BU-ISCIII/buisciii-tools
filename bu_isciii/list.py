@@ -14,12 +14,12 @@
 import json
 import rich.table
 import rich.console
-from bu_isciii.json_reader import JsonReader
+from bu_isciii.service_json import ServiceJson
 
 
 class ListServices:
     def __init__(self, json_file):
-        data_json = JsonReader.get_json_data(json_file)
+        data_json = ServiceJson.get_json_data(json_file)
 
     def get_table(self):
 
