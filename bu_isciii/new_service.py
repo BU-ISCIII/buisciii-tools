@@ -75,7 +75,7 @@ class NewService:
         for services in self.services_requested:
             service_id_list.append(services["serviceId"])
         service_id_list.append("all")
-        services_sel = [ bu_isciii.utils.prompt_service_selection(service_id_list) ]
+        services_sel = [bu_isciii.utils.prompt_service_selection(service_id_list)]
         if services_sel == "all":
             services_sel == service_id_list
         return services_sel
@@ -111,12 +111,13 @@ class NewService:
         services_json = ServiceJson()
         if len(services_ids) == 1:
             try:
-                service_template = services_json.get_find(services_ids[0],"template")
+                service_template = services_json.get_find(services_ids[0], "template")
             except KeyError as e:
                 stderr.print(
-                    "[red]ERROR: Service id %s not found in services json file." % services_ids[0]
+                    "[red]ERROR: Service id %s not found in services json file."
+                    % services_ids[0]
                 )
-                #stderr.print("traceback error %s" % e)
+                # stderr.print("traceback error %s" % e)
                 sys.exit()
             try:
                 shutil.copytree(
@@ -128,10 +129,8 @@ class NewService:
                     ignore=shutil.ignore_patterns("README"),
                 )
             except OSError as e:
-                stderr.print(
-                    "[red]ERROR: Copying template failed."
-                )
-                #stderr.print("traceback error %s" % e)
+                stderr.print("[red]ERROR: Copying template failed.")
+                # stderr.print("traceback error %s" % e)
                 sys.exit()
         else:
             stderr.print(
