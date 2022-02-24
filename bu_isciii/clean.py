@@ -53,7 +53,7 @@ stderr = Console(
 class CleanUp:
     def __init__(self, resolution_id=None):
         # access the api/the json/the whatever with the service name to obtain
-        if resolution_id == None:
+        if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
