@@ -96,9 +96,10 @@ class NewService:
             if os.path.exists(self.full_path):
                 log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
                 stderr.print(
-                    "[red]ERROR: Directory " + self.full_path + " exists",
+                    "[red]ERROR: Directory " + self.full_path + " exists. Exiting.",
                     highlight=False,
                 )
+                sys.exit()
             else:
                 try:
                     os.mkdir(self.full_path)
@@ -165,9 +166,10 @@ class NewService:
         for sample in self.service_samples:
             with open(
                 os.path.join(self.full_path, "ANALYSIS", "samples_id.txt"),
-                encoding="utf-8",
+                "a", encoding="utf-8",
             ) as f:
-                f.write(sample["sampleName"])
+                line = sample["sampleName"] + "\n"
+                f.write(line)
 
     def create_new_service(self):
         self.create_folder()
