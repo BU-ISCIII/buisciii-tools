@@ -71,5 +71,8 @@ class Scratch:
 
     def copy_scratch(self):
         stderr.print(
-            "[blue]I will copy the service folder for %s to scratch!" % self.resolution_id
+            "[blue]I will copy the service from %s" % self.source
+        )
+        stderr.print(
+            "[blue]to %s" % self.destination
         )
