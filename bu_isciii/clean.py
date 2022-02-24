@@ -41,6 +41,7 @@ import bu_isciii
 import bu_isciii.utils
 from bu_isciii.drylab_api import RestServiceApi
 
+"""
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
@@ -48,7 +49,7 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
-
+"""
 
 class CleanUp:
     def __init__(self, resolution_id=None):
