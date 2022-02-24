@@ -15,6 +15,7 @@ USAGE:
 REQUIREMENTS:
 
 TO DO:
+    -copy_scratch: Change rsync to the one in the slurm hpc
 ================================================================
 END_OF_HEADER
 ================================================================
