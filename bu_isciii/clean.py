@@ -51,10 +51,15 @@ stderr = rich.console.Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_name):
+    def __init__(self, resolution_id=None):
         # access the api/the json/the whatever with the service name to obtain
 
-        self.resolution_name = resolution_name
+        if resolution_id == None:
+            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+        else:
+            self.resolution_id = resolution_id
+
+        
         # self.base_directory =
         # self.delete =
         # self.nocopy =
