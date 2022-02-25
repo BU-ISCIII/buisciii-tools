@@ -6,7 +6,6 @@ import os
 import rich
 import questionary
 
-
 def rich_force_colors():
     """
     Check if any environment variables are set to force Rich to use coloured output
@@ -61,3 +60,9 @@ def prompt_skip_folder_creation():
     stderr.print("Do you want to skip folder creation? (Y/N)")
     confirmation = questionary.confirm("Skip?").unsafe_ask()
     return confirmation
+
+def prompt_service_id_selection(choices):
+    choice_num = len(choices)
+    stderr.print(f"Found {choice_num} different service IDs.")
+    selection = questionary.select("Choose the proper one:", choices=choices).unsafe_ask()
+    return selection
