@@ -61,8 +61,8 @@ class CleanUp:
 
         Attributes:
 
-        Methods:       
-        
+        Methods:
+
         """
         # access the api with the resolution name to obtain the data
         # ask away if no input given
@@ -93,7 +93,7 @@ class CleanUp:
 
         # once chosen the service_id, find the delete and nocopy directories
         srv_json = ServiceJson()
-        
+
         # harcorded for testing
         # this line MUST be removed
         self.service_id = "assembly_annotation"
@@ -104,23 +104,23 @@ class CleanUp:
         # generate the list of items to delete
         self.delete_list = []
         clean_dict = service_id_dict["clean"]
-        
+
         for item in clean_dict.values():
             self.delete_list += item
 
         # remove empty strings
         self.delete_list = [item for item in self.delete_list if item]
-        
+
         elements = ", ".join(self.delete_list)
         stderr.print(f"The following entities will be deleted: {elements}")
         if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
             stderr.print("You got it.")
-            sys.exit()    
-        
+            sys.exit()
+
         # generate the list of items to add the "_NC" to
         self.nocopy_list = service_id_dict["no_copy"]
         elements = ", ".join(self.nocopy_list)
-        
+
         # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
         if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
@@ -131,11 +131,15 @@ class CleanUp:
         stderr.print(f"Where should I clean?")
         self.base_directory = os.path.abspath(bu_isciii.utils.prompt_path("Path"))
 
-        # if the theoretical name is not found, then
-        if self.theoretical_path in self.base_directory and self.theoretical_path not in os.listdir(self.base_directory):
-            stderr.print("Seems like finding the correct path is beneath me. I apologise.")
+        # if the theoretical name is not found, then bye
+        if (
+            self.theoretical_path not in self.base_directory
+            and self.theoretical_path not in os.listdir(self.base_directory)
+        ):
+            stderr.print(
+                "Seems like finding the correct path is beneath me. I apologise."
+            )
             sys.exit()
-    
 
         return
 
