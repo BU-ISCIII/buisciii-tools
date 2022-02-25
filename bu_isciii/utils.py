@@ -45,9 +45,8 @@ def prompt_destination_path():
     return destination
 
 
-def prompt_service_selection(choices):
-    stderr.print("Which selected service do you want to copy the template for?")
-    selection = questionary.select("Service label:", choices=choices).unsafe_ask()
+def prompt_selection(msg,choices):
+    selection = questionary.select(msg, choices=choices).unsafe_ask()
     return selection
 
 
@@ -61,12 +60,3 @@ def prompt_skip_folder_creation():
     stderr.print("Do you want to skip folder creation? (Y/N)")
     confirmation = questionary.confirm("Skip?").unsafe_ask()
     return confirmation
-
-
-def prompt_service_id_selection(choices):
-    choice_num = len(choices)
-    stderr.print(f"Found {choice_num} different service IDs.")
-    selection = questionary.select(
-        "Choose the proper one:", choices=choices
-    ).unsafe_ask()
-    return selection

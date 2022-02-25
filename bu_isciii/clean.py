@@ -65,14 +65,17 @@ class CleanUp:
         )["availableServices"]
         # from dict to list
         self.service_id = [item["serviceId"] for item in self.service_id]
-
-        if len(self.service_id) > 1:
+        choice_num = len(self.service_id)
+        if choice_num > 1:
             # ask which service id based on the resolution
-            self.service_id = bu_isciii.utils.prompt_service_id_selection(
+            self.service_id = bu_isciii.utils.prompt_selection(
+                "Choose the proper one:",
                 self.service_id
             )
         else:
             self.service_id = "".join(self.service_id)
+
+
 
         # once chosen the service_id, find the delete and nocopy directories
 

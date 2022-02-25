@@ -80,7 +80,8 @@ class NewService:
         for services in self.services_requested:
             service_id_list.append(services["serviceId"])
         service_id_list.append("all")
-        services_sel = [bu_isciii.utils.prompt_service_selection(service_id_list)]
+        stderr.print("Which selected service do you want to copy the template for?")
+        services_sel = [bu_isciii.utils.prompt_selection("Service label:", service_id_list)]
         if services_sel == "all":
             services_sel == service_id_list
         return services_sel
