@@ -27,5 +27,8 @@
     "info_doc":{
         "root_folder":["YEAR", "service_path"],
         "service_folder":["request", "resolution", "result"]
+    },
+    "scratch_copy":{
+        "command" : "rsync -rlv ",
     }
 }
