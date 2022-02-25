@@ -156,6 +156,7 @@ class Scratch:
                 highlight=False,
             )
         return True
+
     def remove_scratch(self):
         stderr.print("[blue]I will remove the folder %s" % self.scratch_path)
         try:
@@ -186,8 +187,6 @@ class Scratch:
                 highlight=False,
             )
         return True
-
-
 
     def handle_scratch(self):
         if self.direction == "Service_to_scratch":
