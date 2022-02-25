@@ -174,8 +174,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
     Create new service, it will create folder and copy template depending on selected service.
     """
     new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
-    new_ser.create_folder()
-    new_ser.copy_template()
+    new_ser.create_new_service()
 
 
 # COPY SERVICE FOLDER TO SCRATCHS TMP

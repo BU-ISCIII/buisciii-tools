@@ -8,19 +8,6 @@ AUTHOR: Sara Monzon; Sarai Varona
 MAIL: smonzon@isciii.es; s.varona@isciii.es
 CREATED: 21-02-2022
 DESCRIPTION:
-OPTIONS:
-
-USAGE:
-
-REQUIREMENTS:
-
-TO DO:
-    -INIT: where to find the needed values
-    -PATH: where to be placed
-        -BASE_DIRECTORY: where is it? How do we know where it is?
-
-
-    -NAMING: let's be honest, those are terrible
 ================================================================
 END_OF_HEADER
 ================================================================
@@ -69,10 +56,15 @@ class NewService:
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
-            "resolution", "resolution", self.resolution_id
+            "resolutionFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["resolutionFullNumber"]
-        self.services_requested = self.resolution_info["availableServices"]
+        self.service_folder = self.resolution_info["Resolutions"][
+            "resolutionFullNumber"
+        ]
+        self.services_requested = self.resolution_info["Resolutions"][
+            "availableServices"
+        ]
+        self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(path, self.path, self.service_folder)
 
     def get_service_ids(self):
@@ -86,27 +78,35 @@ class NewService:
         return services_sel
 
     def create_folder(self):
-        print("I will create the service folder for " + self.resolution_id + "!")
-        if os.path.exists(self.full_path):
-            log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
+        if not self.no_create_folder:
             stderr.print(
-                "[red]ERROR: Directory " + self.full_path + " exists",
-                highlight=False,
+                "[blue]I will create the service folder for " + self.resolution_id + "!"
             )
-        else:
-            try:
-                os.mkdir(self.full_path)
-            except OSError:
+            if os.path.exists(self.full_path):
+                log.error(f"Directory exists. Skip folder creation '{self.full_path}'")
                 stderr.print(
-                    "[red]ERROR: Creation of the directory %s failed" % self.full_path,
+                    "[red]ERROR: Directory " + self.full_path + " exists. Exiting.",
                     highlight=False,
                 )
+                sys.exit()
             else:
-                stderr.print(
-                    "[green]Successfully created the directory %s" % self.full_path,
-                    highlight=False,
-                )
-        return True
+                try:
+                    os.mkdir(self.full_path)
+                except OSError:
+                    stderr.print(
+                        "[red]ERROR: Creation of the directory %s failed"
+                        % self.full_path,
+                        highlight=False,
+                    )
+                else:
+                    stderr.print(
+                        "[green]Successfully created the directory %s" % self.full_path,
+                        highlight=False,
+                    )
+            return True
+        else:
+            stderr.print("[blue]Ok assuming folder is created! Let's move forward!")
+            return False
 
     def copy_template(self):
         stderr.print(
@@ -127,11 +127,16 @@ class NewService:
             try:
                 shutil.copytree(
                     os.path.join(
-                        os.path.dirname(__file__), "templates", service_template[0]
+                        os.path.dirname(__file__), "templates", service_template
                     ),
                     self.full_path,
                     dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("README"),
+                )
+                stderr.print(
+                    "[green]Successfully copied the template %s to the directory %s"
+                    % (service_template, self.full_path),
+                    highlight=False,
                 )
             except OSError as e:
                 stderr.print("[red]ERROR: Copying template failed.")
@@ -144,6 +149,21 @@ class NewService:
             sys.exit()
             return False
         return True
+
+    def create_samples_id(self):
+        for sample in self.service_samples:
+            with open(
+                os.path.join(self.full_path, "ANALYSIS", "samples_id.txt"),
+                "a",
+                encoding="utf-8",
+            ) as f:
+                line = sample["sampleName"] + "\n"
+                f.write(line)
+
+    def create_new_service(self):
+        self.create_folder()
+        self.copy_template()
+        self.create_samples_id()
 
     def get_resolution_id(self):
         return self.resolution_id
