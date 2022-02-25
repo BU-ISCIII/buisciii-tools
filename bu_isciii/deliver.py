@@ -106,24 +106,25 @@ class Deliver:
 
         try:
             service_request_date = service["serviceCreatedOnDate"]
-        except:
+        except service_request_date.HTTPError:
             print("Resolution date is not defined")
         try:
             service_resolution_date = resolution["resolutionDate"]
-        except:
+        except service_resolution_date.HTTPError:
             print("Resolution date is not defined")
         try:
             service_in_progress_date = resolution["resolutionOnInProgressDate"]
-        except:
+        except service_in_progress_date.HTTPError:
             print("In pogress date is not defined")
         try:
             service_estimated_delivery_date = resolution["resolutionEstimatedDate"]
-        except:
+        except service_estimated_delivery_date.HTTPError:
             print("Estimated delivery date is not defined")
         try:
             service_delivery_date = resolution["resolutionDeliveryDate"]
-        except:
+        except service_delivery_date.HTTPError:
             print("Delivery date is not defined! Make the resolution!")
+
         service_notes = service["serviceNotes"]
         service_notes = service_notes.replace("\r", "")
         service_notes = service_notes.replace("\n", " ")
@@ -162,8 +163,8 @@ class Deliver:
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template(TEMPLATE_FILE)
 
-        ## Create markdown
+        # Create markdown
         outputText = template.render(json_data)
-        file = open(outputText)
+        file = open("INFRES_" + json_data["service_number"] + ".md", "wb")
         file.write(outputText.encode("utf-8"))
         file.close()
