@@ -102,10 +102,10 @@ class Scratch:
                     highlight=False,
                 )
             except subprocess.CalledProcessError:
-                 stderr.print(
-                     "[red]ERROR: Copy of the directory %s failed" % self.origin_folder,
+                stderr.print(
+                    "[red]ERROR: Copy of the directory %s failed" % self.origin_folder,
                     highlight=False,
-                 )
+                )
         else:
             log.error(
                 f"Directory path not the same as service resolution. Skip folder copy '{self.origin_folder}'"
