@@ -9,7 +9,7 @@
  ================================================================
 
  """
-from cgitb import html
+# from cgitb import html
 import json
 import jinja2
 import markdown
@@ -174,9 +174,9 @@ class Deliver:
         file = open(md_name, "wb")
         file.write(outputText.encode("utf-8"))
         file.close()
-        return md_name, md_path
+        return md_name
 
-    def convert_markdown(self, md_name, md_path):
+    def convert_markdown(self, md_name):
         input_md = open(md_name, mode="r", encoding="utf-8").read()
         converted_md = markdown.markdown(
             "[TOC]\n" + input_md,
@@ -189,15 +189,15 @@ class Deliver:
                 "toc",
             ],
             extension_configs={
-                "pymdownx.b64": {"base_path": md_path},
+                "pymdownx.b64": {"base_path": os.path.dirname(md_name)},
                 "pymdownx.highlight": {"noclasses": True},
                 "toc": {"title": "Table of Contents"},
             },
         )
 
-        return converted_md
+        return converted_md, md_name
 
-    def wrap_html(self, converted_md):
+    def wrap_html(self, converted_md, md_name):
         header = """<!DOCTYPE html><html>
         <head>
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -244,7 +244,7 @@ class Deliver:
         </html>
         """
         html = header + converted_md + footer
-        html_name = "nombre.html"
+        html_name = "nombre_provisional"
         file = open(html_name, "w")
         file.write(html)
         file.close()
@@ -252,6 +252,6 @@ class Deliver:
         return True
 
     def create_report(self):
-        md_name, md_path = self.create_markdown()
-        converted_md = self.convert_markdown(md_name, md_path)
-        self.wrap_html(converted_md)
+        md_name = self.create_markdown()
+        converted_md = self.convert_markdown(md_name)
+        self.wrap_html(converted_md, md_name)
