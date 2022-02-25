@@ -155,6 +155,8 @@ class Deliver:
             "user_email": user_email,
             "service_sequencing_center": service_sequencing_center,
             "run_name": run_name,
+            "projects": projects,
+            "samples": samples,
         }
 
         TEMPLATE_FILE = "templates/jinja_template.j2"

@@ -1,5 +1,5 @@
 <p>
-    <img src="../../../../markdowns/assets/BU_ISCIII_logo.png" alt="logo" width="200" align="left" />
+    <img src="assets/BU_ISCIII_logo.png" alt="logo" width="200" align="left" />
 </p>
 <br>
 <br>
@@ -37,7 +37,6 @@ Here we describe information about the project associated to the service:
 
 {% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }} {% endif %}
 {% if run_name -%}
-{% for run in run_name %}
 * Run name: {{ run_name}}
 {% if run.projects -%}
 {%- for project in run.projects -%}
@@ -50,8 +49,4 @@ Here we describe information about the project associated to the service:
 {%- endfor -%}
 {% endif -%}
 {% endfor %}
-{% endif -%}
-{% if samples -%}
-* Samples:{% set comma = joiner(", ") %}{% for sample in samples -%}{{ comma() }}{{ sample }}
-{%- endfor -%}
 {% endif -%}
