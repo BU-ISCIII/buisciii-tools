@@ -25,11 +25,20 @@ class ListServices:
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
 
-    def get_filtered(self):
+    def get_filtered(self, type):
         """
         Filter the table
         """
-        pass
+        filtered_servicies = []
+        for wf in self.service_list:
+            for k in type:
+                match_servicie = k in self.service_list if self.service_list else False
+                if not match_servicie:
+                    break
+        else:
+            filtered_servicies.append(wf)
+
+        return filtered_servicies
 
     def get_table(self):
         """
