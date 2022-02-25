@@ -20,8 +20,8 @@
         ]
     },
     "api_settings":{
-        "server" : "http://iskylims.isciiides.es",
-        "api_url": "drylab/api"
+        "server" : "http://iskylims.isciiides.es/",
+        "api_url": "drylab/api/"
 
     },
     "info_doc":{
