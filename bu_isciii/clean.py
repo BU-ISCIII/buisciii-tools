@@ -32,16 +32,52 @@ END_OF_HEADER
 # Generic imports
 # import sys
 import os
+import logging
 import shutil
+from rich.console import Console
 
 # Local imports
+import bu_isciii
+import bu_isciii.utils
+from bu_isciii.drylab_api import RestServiceApi
+
+log = logging.getLogger(__name__)
+stderr = Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=bu_isciii.utils.rich_force_colors(),
+)
 
 
 class CleanUp:
-    def __init__(self, resolution_name):
+    def __init__(self, resolution_id=None):
         # access the api/the json/the whatever with the service name to obtain
+        if resolution_id is None:
+            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+        else:
+            self.resolution_id = resolution_id
+        # get the service id from the resolution_id
+        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
+        self.service_id = rest_api.get_request(
+            "resolution", "resolution", self.resolution_id
+        )["availableServices"]
 
-        self.resolution_name = resolution_name
+        if len(self.service_id) > 1:
+            self.service_id = [item["serviceId"] for item in self.service_id]
+            self.service_id = self.service_id[0]
+        else:
+            self.service_id = self.service_id["serviceId"]
+
+        if len(self.service_id) > 1:
+            # print(self.service_id)
+            # ask which service to find
+            pass
+        else:
+            # self.delete =
+            # self.nocopy =
+            pass
+
         # self.base_directory =
         # self.delete =
         # self.nocopy =
@@ -142,7 +178,7 @@ class CleanUp:
         self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
         return
 
-    def delete(self, sacredtexts=["lablog", "logs"], verbose=True):
+    def delete(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -162,8 +198,8 @@ class CleanUp:
         filtered_items = []
 
         for directory in path_content:
-            # if not empty add it to the content
-            if len(os.listdir(directory)) > 0:
+            # if not empty, and not previously DEL add it to the content
+            if not directory.endswith(add) and len(os.listdir(directory)) > 0:
                 unfiltered_items += directory
         # take out those belonging to the sacred items
         for item in unfiltered_items:
@@ -183,9 +219,9 @@ class CleanUp:
                 print(f"Removed {item}.")
         return
 
-    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"]):
-        self.delete(sacredtexts=sacredtexts, verbose=verbose)
-        self.rename(add="_DEL", to_find=self.delete, verbose=verbose)
+    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
+        self.delete(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        self.rename(add=add, to_find=self.delete, verbose=verbose)
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
@@ -207,7 +243,6 @@ class CleanUp:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
     def full_clean_job(self):
-
         """
         Perform the whole cleaning of the service
         """
@@ -217,3 +252,8 @@ class CleanUp:
         # self.delete()
 
         return
+
+
+# Testing zone
+
+testing_object = CleanUp("SRVCNM552.1")
