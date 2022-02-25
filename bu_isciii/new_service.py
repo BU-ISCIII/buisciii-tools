@@ -23,8 +23,9 @@ import rich
 # Local imports
 import bu_isciii
 import bu_isciii.utils
-from bu_isciii.service_json import ServiceJson
-from bu_isciii.drylab_api import RestServiceApi
+import bu_isciii.config_json
+import bu_isciii.service_json
+import bu_isciii.drylab_api
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -54,7 +55,13 @@ class NewService:
         else:
             self.no_create_folder = no_create_folder
 
-        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
+        self.full_path = os.path.join(path, self.path, self.service_folder)
+        # Load conf
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
+        # Obtain info from iskylims api
+        rest_api = bu_isciii.drylab_api.RestServiceApi(
+            "http://iskylims.isciiides.es/", "drylab/api/"
+        )
         self.resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
@@ -65,7 +72,57 @@ class NewService:
             "availableServices"
         ]
         self.service_samples = self.resolution_info["Samples"]
-        self.full_path = os.path.join(path, self.path, self.service_folder)
+        ###
+        ### resolutionFullData example
+        ###
+        # {
+        #    "Service": {
+        #        "pk": 1551,
+        #        "serviceRequestNumber": "SRVCNM564",
+        #        "serviceStatus": "queued",
+        #        "serviceUserId": {
+        #            "username": "smonzon",
+        #            "first_name": "Sara",
+        #            "last_name": "Monzon",
+        #            "email": "smonzon@isciii.es"
+        #        },
+        #        "serviceCreatedOnDate": "2022-02-24",
+        #        "serviceSeqCenter": "Centro Nacional de Microbiologia",
+        #        "serviceAvailableService": [
+        #            "Genomic Data Analysis",
+        #            "DNAseq: Exome sequencing (WES) / Genome sequencing (WGS) / Target (Amplicon, probes)  / Direct seq",
+        #            "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)"
+        #        ],
+        #        "serviceFileExt": null,
+        #        "serviceNotes": "this is for buisciii tools testing"
+        #    },
+        #    "Resolutions": {
+        #        "pk": 1716,
+        #        "resolutionNumber": "SRVCNM564.1",
+        #        "resolutionFullNumber": "SRVCNM564_20220224_TESTINGBUISCIIITOOLS_smonzon_S",
+        #        "resolutionServiceID": 1551,
+        #        "resolutionDate": "2022-02-24",
+        #        "resolutionEstimatedDate": "2022-02-25",
+        #        "resolutionOnQueuedDate": "2022-02-24",
+        #        "resolutionOnInProgressDate": null,
+        #        "resolutionDeliveryDate": null,
+        #        "resolutionNotes": "",
+        #        "resolutionPipelines": [],
+        #        "availableServices": [
+        #            {
+        #                "availServiceDescription": "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)",
+        #                "serviceId": "viralrecon"
+        #            }
+        #        ]
+        #    },
+        #    "Samples": [
+        #        {
+        #            "runName": "NovaSeq_GEN_032",
+        #            "projectName": "NovaSeq_GEN_032_20220209_RAbad",
+        #            "sampleName": "9793",
+        #            "samplePath": "220209_A01158_0051_AHWCJJDRXY"
+        #        }
+        #
 
     def get_service_ids(self):
         service_id_list = []
@@ -113,7 +170,7 @@ class NewService:
             "[blue]I will copy the template service folders for %s !" % self.full_path
         )
         services_ids = self.get_service_ids()
-        services_json = ServiceJson()
+        services_json = bu_isciii.service_json.ServiceJson()
         if len(services_ids) == 1:
             try:
                 service_template = services_json.get_find(services_ids[0], "template")
@@ -159,6 +216,25 @@ class NewService:
             ) as f:
                 line = sample["sampleName"] + "\n"
                 f.write(line)
+
+    def create_symbolic_links(self):
+        for sample in self.service_samples:
+            try:
+                os.symlink(
+                    os.path.join(
+                        self.conf["fastq_repo"],
+                        sample["projectName"],
+                        sample["SampleName"],
+                    ),
+                    os.path.join(self.full_path, "RAW"),
+                )
+            except OSError:
+                stderr.print(
+                    "[red]ERROR: Symbolic links creation failed for sample %s."
+                    % sample["sampleName"]
+                )
+                stderr.print("Traceback: %s" % e)
+                sys.exit()
 
     def create_new_service(self):
         self.create_folder()
