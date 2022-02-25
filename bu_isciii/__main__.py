@@ -197,7 +197,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
 @click.option(
     "-d",
     "--direction",
-    type=click.Choice(["Service_to_scratch", "Scratch_to_service"]),
+    type=click.Choice(["Service_to_scratch", "Scratch_to_service",["Remove_scratch"]]),
     multiple=False,
     help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
 )
