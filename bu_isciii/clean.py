@@ -128,7 +128,7 @@ class CleanUp:
             sys.exit()
 
         # ask where to perform (get the full path)
-        stderr.print(f"Where should I clean?")
+        stderr.print("Where should I clean?")
         self.base_directory = os.path.abspath(bu_isciii.utils.prompt_path("Path"))
 
         # if the theoretical name is not found, then bye
