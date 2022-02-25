@@ -122,37 +122,36 @@ class Scratch:
 
     def revert_copy_scratch(self):
         stderr.print("[blue]I will copy back the service from %s" % self.scratch_path)
-        f = open(self.out_file, "r")
-        for line in f:
-            if re.search("Origin service directory:", line):
-                dest_folder = "".join(line.split()[3])
-                dest_dir = os.path.normpath("/".join(dest_folder.split("/")[:-1]))
-        stderr.print("[blue]to %s" % dest_folder)
-        if self.service_folder in dest_folder:
-            rsync_command = "rsync -rlv " + self.scratch_path + " " + dest_dir
-            # rsync_command = "srun rsync -rlv " + self.scratch_path + " " + dest_dir
-            print(rsync_command)
-            try:
+        try:
+            f = open(self.out_file, "r")
+            for line in f:
+                if re.search("Origin service directory:", line):
+                    dest_folder = "".join(line.split()[3])
+                    dest_dir = os.path.normpath("/".join(dest_folder.split("/")[:-1]))
+            stderr.print("[blue]to %s" % dest_folder)
+            if self.service_folder in dest_folder:
+                rsync_command = "rsync -rlv " + self.scratch_path + " " + dest_dir
+                # rsync_command = "srun rsync -rlv " + self.scratch_path + " " + dest_dir
+                print(rsync_command)
                 subprocess.run(rsync_command, shell=True, check=True)
-            except OSError:
-                stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.service_folder,
-                    highlight=False,
-                )
-            else:
                 stderr.print(
                     "[green]Successfully copyed the directory to %s" % dest_folder,
                     highlight=False,
                 )
-        else:
-            log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{dest_folder}'"
-            )
+            else:
+                log.error(
+                    f"Directory path not the same as service resolution. Skip folder copy '{dest_folder}'"
+                )
+                stderr.print(
+                    "[red]ERROR: Directory "
+                    + dest_folder
+                    + " not the same as "
+                    + self.service_dir,
+                    highlight=False,
+                )
+        except OSError:
             stderr.print(
-                "[red]ERROR: Directory "
-                + dest_folder
-                + " not the same as "
-                + self.service_dir,
+                "[red]ERROR: %s does not exist" % self.out_file,
                 highlight=False,
             )
         return True
