@@ -49,7 +49,7 @@ class NewService:
         if ask_path:
             self.path = bu_isciii.utils.prompt_path()
         else:
-            self.path = path
+            self.path = os.getcwd()
 
         if no_create_folder is None:
             self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
