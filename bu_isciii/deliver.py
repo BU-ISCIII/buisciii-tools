@@ -9,8 +9,10 @@
  ================================================================
 
  """
+from cgitb import html
 import json
 import jinja2
+import markdown
 
 
 # import sys
@@ -91,7 +93,7 @@ class Deliver:
                 highlight=False,
             )
 
-    def create_report(self):
+    def create_markdown(self):
 
         values_view = self.services_queue.values()
         value_iterator = iter(values_view)
@@ -167,6 +169,89 @@ class Deliver:
 
         # Create markdown
         outputText = template.render(json_data)
-        file = open("INFRES_" + json_data["service_number"] + ".md", "wb")
+        md_name = "INFRES_" + json_data["service_number"] + ".md"
+        md_path = os.path.dirname(md_name)
+        file = open(md_name, "wb")
         file.write(outputText.encode("utf-8"))
         file.close()
+        return md_name, md_path
+
+    def convert_markdown(self, md_name, md_path):
+        input_md = open(md_name, mode="r", encoding="utf-8").read()
+        converted_md = markdown.markdown(
+            "[TOC]\n" + input_md,
+            extensions=[
+                "pymdownx.extra",
+                "pymdownx.b64",
+                "pymdownx.highlight",
+                "pymdownx.emoji",
+                "pymdownx.tilde",
+                "toc",
+            ],
+            extension_configs={
+                "pymdownx.b64": {"base_path": md_path},
+                "pymdownx.highlight": {"noclasses": True},
+                "toc": {"title": "Table of Contents"},
+            },
+        )
+
+        return converted_md
+
+    def wrap_html(self, converted_md):
+        header = """<!DOCTYPE html><html>
+        <head>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+            <style>
+                body {
+                font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+                padding: 3em;
+                margin-right: 350px;
+                max-width: 100%;
+                }
+                .toc {
+                position: fixed;
+                right: 20px;
+                width: 300px;
+                padding-top: 20px;
+                overflow: scroll;
+                height: calc(100% - 3em - 20px);
+                }
+                .toctitle {
+                font-size: 1.8em;
+                font-weight: bold;
+                }
+                .toc > ul {
+                padding: 0;
+                margin: 1rem 0;
+                list-style-type: none;
+                }
+                .toc > ul ul { padding-left: 20px; }
+                .toc > ul > li > a { display: none; }
+                img { max-width: 800px; }
+                pre {
+                padding: 0.6em 1em;
+                }
+                h2 {
+                }
+            </style>
+        </head>
+        <body>
+        <div class="container">
+        """
+        footer = """
+        </div>
+        </body>
+        </html>
+        """
+        html = header + converted_md + footer
+        html_name = "nombre.html"
+        file = open(html_name, "w")
+        file.write(html)
+        file.close()
+
+        return True
+
+    def create_report(self):
+        md_name, md_path = self.create_markdown()
+        converted_md = self.convert_markdown(md_name, md_path)
+        self.wrap_html(converted_md)
