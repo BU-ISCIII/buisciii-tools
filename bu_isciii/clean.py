@@ -52,7 +52,8 @@ stderr = Console(
 
 class CleanUp:
     def __init__(self, resolution_id=None):
-        # access the api/the json/the whatever with the service name to obtain
+        # access the api with the resolution name to obtain the data
+        # ask away if no input given
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
@@ -62,21 +63,21 @@ class CleanUp:
         self.service_id = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
         )["availableServices"]
+        # from dict to list
+        self.service_id = [item["serviceId"] for item in self.service_id]
 
         if len(self.service_id) > 1:
-            self.service_id = [item["serviceId"] for item in self.service_id]
-            self.service_id = self.service_id[0]
+            # ask which service id based on the resolution
+            self.service_id = bu_isciii.utils.prompt_service_id_selection(self.service_id)
         else:
-            self.service_id = self.service_id["serviceId"]
+            self.service_id = "".join(self.service_id)
 
-        if len(self.service_id) > 1:
-            # print(self.service_id)
-            # ask which service to find
-            pass
-        else:
-            # self.delete =
-            # self.nocopy =
-            pass
+        # once chosen the service_id, find the delete and nocopy directories
+
+        
+
+        # ask for the sacred texts
+
 
         # self.base_directory =
         # self.delete =
