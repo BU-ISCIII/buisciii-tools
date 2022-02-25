@@ -96,17 +96,16 @@ class Scratch:
                 f.write("Temporal directory: " + self.scratch_path + "\n")
                 f.write("Origin service directory: " + self.origin_folder + "\n")
                 f.close()
-            except OSError:
-                stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.origin_folder,
-                    highlight=False,
-                )
-            else:
                 stderr.print(
                     "[green]Successfully copyed the directory to %s"
                     % self.scratch_path,
                     highlight=False,
                 )
+            except subprocess.CalledProcessError:
+                 stderr.print(
+                     "[red]ERROR: Copy of the directory %s failed" % self.origin_folder,
+                    highlight=False,
+                 )
         else:
             log.error(
                 f"Directory path not the same as service resolution. Skip folder copy '{self.origin_folder}'"
