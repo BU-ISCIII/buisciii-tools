@@ -23,7 +23,7 @@ class ServiceJson:
     def get_service_list(self):
         """
         Description:
-            Get the servicie list
+            Get the service list
         """
         return self.service_list
 
@@ -40,7 +40,7 @@ class ServiceJson:
         """
         Owner: Pablo
         Description:
-            Obtain from servicie any forward items from json data
+            Obtain from service any forward items from json data
         """
         if found in self.json_data[service]:
             return self.json_data[service][found]
