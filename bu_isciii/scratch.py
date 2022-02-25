@@ -33,6 +33,7 @@ import shutil
 import bu_isciii
 import bu_isciii.utils
 from bu_isciii.drylab_api import RestServiceApi
+import bu_isciii.config_json
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -72,7 +73,7 @@ class Scratch:
             )
         else:
             self.direction = direction
-
+        self.rsync_command = bu_isciii.config_json.ConfigJson().get_find("scratch_copy","command")
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
@@ -84,12 +85,12 @@ class Scratch:
             self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
         )
 
+
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.origin_folder)
         stderr.print("[blue]to %s" % self.scratch_path)
         if self.service_folder in self.origin_folder:
-            rsync_command = "rsync -rlv " + self.origin_folder + " " + self.tmp_dir
-            # rsync_command = "srun rsync -rlv "+self.service_dir+" "+self.tmp_dir
+            rsync_command = self.rsync_command + self.origin_folder + " " + self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
                 f = open(self.out_file, "a")
@@ -129,9 +130,7 @@ class Scratch:
                     dest_dir = os.path.normpath("/".join(dest_folder.split("/")[:-1]))
             stderr.print("[blue]to %s" % dest_folder)
             if self.service_folder in dest_folder:
-                rsync_command = "rsync -rlv " + self.scratch_path + " " + dest_dir
-                # rsync_command = "srun rsync -rlv " + self.scratch_path + " " + dest_dir
-                print(rsync_command)
+                rsync_command = self.rsync_command + self.scratch_path + " " + dest_dir
                 subprocess.run(rsync_command, shell=True, check=True)
                 stderr.print(
                     "[green]Successfully copyed the directory to %s" % dest_folder,
