@@ -69,13 +69,10 @@ class CleanUp:
         if choice_num > 1:
             # ask which service id based on the resolution
             self.service_id = bu_isciii.utils.prompt_selection(
-                "Choose the proper one:",
-                self.service_id
+                "Choose the proper one:", self.service_id
             )
         else:
             self.service_id = "".join(self.service_id)
-
-
 
         # once chosen the service_id, find the delete and nocopy directories
 

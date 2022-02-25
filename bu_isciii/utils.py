@@ -45,7 +45,7 @@ def prompt_destination_path():
     return destination
 
 
-def prompt_selection(msg,choices):
+def prompt_selection(msg, choices):
     selection = questionary.select(msg, choices=choices).unsafe_ask()
     return selection
 
