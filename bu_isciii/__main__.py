@@ -178,7 +178,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
     "--service_dir",
     type=click.Path(),
     default=os.getcwd(),
-    help="Directory containing service folder to copy to destination folder for execution",
+    help="Directory containing service folder to copy to destination folder for execution. Default: Current directory. Example: /data/bi/service_and_collaboration/CNM/virologia/",
 )
 @click.option(
     "-t",
@@ -190,7 +190,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
 @click.option(
     "-d",
     "--direction",
-    type=click.Choice(["Service_to_scratch", "Scratch_to_service"]),
+    type=click.Choice(["Service_to_scratch", "Scratch_to_service", "Remove_scratch"]),
     multiple=False,
     help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
 )
