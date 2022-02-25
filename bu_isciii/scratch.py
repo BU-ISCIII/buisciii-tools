@@ -27,6 +27,7 @@ import logging
 import re
 
 import rich
+import shutil
 
 # Local imports
 import bu_isciii
@@ -145,7 +146,7 @@ class Scratch:
                 )
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{self.service_folder}'"
+                f"Directory path not the same as service resolution. Skip folder copy '{dest_folder}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
@@ -156,8 +157,37 @@ class Scratch:
             )
         return True
     def remove_scratch(self):
-        stderr.print("[blue]I will the the service" % self.service_dir)
-        stderr.print("[blue] from %s" % self.scratch_path)
+        stderr.print("[blue]I will remove the folder %s" % self.scratch_path)
+        try:
+            f = open(self.out_file, "r")
+            for line in f:
+                if re.search("Temporal directory:", line):
+                    scratch_folder = "".join(line.split()[2])
+            if self.service_folder in scratch_folder:
+                shutil.rmtree(scratch_folder)
+                stderr.print(
+                    "[green]Successfully removed the directory %s" % scratch_folder,
+                    highlight=False,
+                )
+            else:
+                log.error(
+                    f"Directory path not the same as service resolution. Skip folder copy '{scratch_folder}'"
+                )
+                stderr.print(
+                    "[red]ERROR: Directory "
+                    + scratch_folder
+                    + " not the same as "
+                    + self.scratch_path,
+                    highlight=False,
+                )
+        except OSError:
+            stderr.print(
+                "[red]ERROR: %s does not exist" % self.out_file,
+                highlight=False,
+            )
+        return True
+
+
 
     def handle_scratch(self):
         if self.direction == "Service_to_scratch":
