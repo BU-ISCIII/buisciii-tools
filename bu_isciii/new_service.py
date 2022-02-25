@@ -74,9 +74,9 @@ class NewService:
         ]
         self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
-        ###
-        ### resolutionFullData example
-        ###
+        #
+        # resolutionFullData example
+        #
         # {
         #    "Service": {
         #        "pk": 1551,
