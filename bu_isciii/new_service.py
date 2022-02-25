@@ -229,7 +229,7 @@ class NewService:
             sample_files = glob.glob(regex)
             if not sample_files:
                 stderr.print(
-                    "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project. Exiting.."
+                    "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project."
                     % regex
                 )
 
