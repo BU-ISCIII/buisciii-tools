@@ -170,7 +170,6 @@ class Deliver:
         # Create markdown
         outputText = template.render(json_data)
         md_name = "INFRES_" + json_data["service_number"] + ".md"
-        md_path = os.path.dirname(md_name)
         file = open(md_name, "wb")
         file.write(outputText.encode("utf-8"))
         file.close()
