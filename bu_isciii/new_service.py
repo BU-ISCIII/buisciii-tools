@@ -221,22 +221,21 @@ class NewService:
     def create_symbolic_links(self):
         for sample in self.service_samples:
             regex = os.path.join(
-                    self.conf["fastq_repo"],
-                    sample["projectName"],
-                    '{}*'
-                ).format(sample["sampleName"])
-            sample_files = glob.glob(
-                regex
-            )
+                self.conf["fastq_repo"], sample["projectName"], "{}*"
+            ).format(sample["sampleName"])
+            sample_files = glob.glob(regex)
             if not sample_files:
-                stderr.print("[red] This regex has not output any file: %s. Exiting.." % regex)
+                stderr.print(
+                    "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project. Exiting.."
+                    % regex
+                )
                 sys.exit()
 
             try:
                 for file in sample_files:
                     os.symlink(
                         file,
-                        os.path.join(self.full_path, "RAW",os.path.basename(file)),
+                        os.path.join(self.full_path, "RAW", os.path.basename(file)),
                     )
             except OSError as e:
                 stderr.print(
