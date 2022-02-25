@@ -126,7 +126,7 @@ class Scratch:
             if re.search("Origin service directory:", line):
                 dest_folder = "".join(line.split()[3])
                 dest_dir = os.path.normpath("/".join(dest_folder.split("/")[:-1]))
-        if self.service_dir in dest_folder:
+        if self.service_folder in dest_folder:
             rsync_command = "rsync -rlv " + self.scratch_path + " " + dest_dir
             # rsync_command = "srun rsync -rlv " + self.scratch_path + " " + dest_dir
             print(rsync_command)
