@@ -60,7 +60,7 @@ class NewService:
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            "http://iskylims.isciiides.es/", "drylab/api/"
+            self.conf["server"], self.conf["api_url"]
         )
         self.resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
