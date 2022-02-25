@@ -120,18 +120,23 @@ class CleanUp:
         # generate the list of items to add the "_NC" to
         self.nocopy_list = service_id_dict["no_copy"]
         elements = ", ".join(self.nocopy_list)
+        
+        # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
         if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
             stderr.print("You are the boss here.")
-            sys.exit()    
+            sys.exit()
 
+        # ask where to perform (get the full path)
+        stderr.print(f"Where should I clean?")
+        self.base_directory = os.path.abspath(bu_isciii.utils.prompt_path("Path"))
 
+        # if the theoretical name is not found, then
+        if self.theoretical_path in self.base_directory and self.theoretical_path not in os.listdir(self.base_directory):
+            stderr.print("Seems like finding the correct path is beneath me. I apologise.")
+            sys.exit()
+    
 
-        # ask for the sacred texts
-
-        # self.base_directory =
-        # self.nocopy =
-        # self.sacredtexts =
         return
 
     def show_removable_dirs(self, to_stdout=True):
@@ -146,10 +151,10 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            print(self.delete)
+            stderr.print(self.delete_list)
             return
         else:
-            return self.delete
+            return self.delete_list
 
     def show_nocopy_dirs(self, to_stdout=True):
         """
@@ -163,10 +168,10 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            print(self.nocopy)
+            stderr.print(self.nocopy_list)
             return
         else:
-            return self.nocopy
+            return self.nocopy_list
 
     def scan_dirs(self, to_find):
         """
