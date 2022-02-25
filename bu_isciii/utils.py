@@ -50,9 +50,8 @@ def prompt_selection(msg, choices):
     return selection
 
 
-def prompt_path():
-    stderr.print("Directory where you want to create the service folder.")
-    source = questionary.path("Path").unsafe_ask()
+def prompt_path(msg):
+    source = questionary.path(msg).unsafe_ask()
     return source
 
 def prompt_yn_question(msg):

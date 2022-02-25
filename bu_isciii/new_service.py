@@ -58,7 +58,8 @@ class NewService:
             self.resolution_id = resolution_id
 
         if ask_path:
-            self.path = bu_isciii.utils.prompt_path()
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
         else:
             self.path = path
 
