@@ -209,9 +209,12 @@ class NewService:
         return True
 
     def create_samples_id(self):
+        samples_id = os.path.join(self.full_path, "ANALYSIS", "samples_id.txt")
+        if os.path.exists(samples_id):
+            os.remove(samples_id)
         for sample in self.service_samples:
             with open(
-                os.path.join(self.full_path, "ANALYSIS", "samples_id.txt"),
+                samples_id,
                 "a",
                 encoding="utf-8",
             ) as f:
@@ -229,7 +232,6 @@ class NewService:
                     "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project. Exiting.."
                     % regex
                 )
-                sys.exit()
 
             try:
                 for file in sample_files:
@@ -243,7 +245,6 @@ class NewService:
                     % sample["sampleName"]
                 )
                 stderr.print("Traceback: %s" % e)
-                sys.exit()
 
     def create_new_service(self):
         self.create_folder()
