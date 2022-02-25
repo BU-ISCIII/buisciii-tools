@@ -25,20 +25,26 @@ class ListServices:
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
 
-    def get_filtered(self, type):
+    def get_filtered(self, name):
         """
         Filter the table
         """
-        filtered_servicies = []
+        filtered_services = []
         for wf in self.service_list:
-            for k in type:
-                match_servicie = k in self.service_list if self.service_list else False
-                if not match_servicie:
+            if name.lower() in wf:
+                print(wf)
+
+        """
+            for k in name:
+                print(k)
+                match_service = wf if k in wf else False
+                # print(match_service)
+
+                if not match_service:
                     break
         else:
-            filtered_servicies.append(wf)
-
-        return filtered_servicies
+            filtered_services.append(wf)
+        """
 
     def get_table(self):
         """
@@ -58,3 +64,12 @@ class ListServices:
 
         console = rich.console.Console()
         console.print(table)
+
+
+"""
+prueba = ListServices()
+
+prueba.get_filtered("prueba")
+
+print(prueba.service_list)
+"""
