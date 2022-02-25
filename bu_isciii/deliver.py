@@ -10,6 +10,8 @@
 
  """
 import json
+import jinja2
+
 
 # import sys
 import os
@@ -62,7 +64,7 @@ class Deliver:
 
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.services_queue = rest_api.get_request(
-            "serviceFullData", "service", self.resolution_id
+            "resolutionFullData", "resolution", self.resolution_id
         )
 
     def copy_sftp(self):
@@ -89,49 +91,80 @@ class Deliver:
                 highlight=False,
             )
 
-    """
     def create_report(self):
 
-        info = {
-            "SERVICE_ID": self.services_queue["Resolutions"]["resolutionFullNumber"],
-            "SERVICE_NUMBER": self.services_queue["Service"]["serviceRequestNumber"],
-            "RESOLUTION_ID": self.services_queue["Resolutions"]["resolutionNumber"],
-            "SERVICE_REQUEST_DATE": self.services_queue["Service"][
-                "serviceCreatedOnDate"
-            ],
-            "SERVICE_RESOLUTION_DATE": self.services_queue["Resolutions"][
-                "resolutionDate"
-            ],
-            "SERVICE_IN_PROGRESS_DATE": self.services_queue["Resolutions"][
-                "resolutionOnInProgressDate"
-            ],
-            "SERVICE_ESTIMATED_DELIVERY_DATE": self.services_queue["Resolutions"][
-                "resolutionEstimatedDate"
-            ],
-            "SERVICE_DELIVERY_DATE": self.services_queue["Resolutions"][
-                "resolutionDeliveryDate"
-            ],
-            "SERVICE_NOTES": self.services_queue["Service"]["serviceUserId"][
-                "first_name"
-            ],
-            "USER_LAST_NAME": self.services_queue["Service"]["serviceUserId"][
-                "last_name"
-            ],
-            "USER_EMAIL": self.services_queue["Service"]["serviceUserId"]["email"],
-            "SERVICE_SEQUENCING_CENTER": self.services_queue["Service"][
-                "serviceSeqCenter"
-            ],
-            # RUN_NAME,
-            # PROJECTS,
-            # SAMPLES ,
-            "PROJECT_NAME": self.services_queue["Sample"]["sampleName"],
-        }
-        print(info)
-    """
+        values_view = self.services_queue.values()
+        value_iterator = iter(values_view)
 
-    """
-    RUN_NAME - runName
-    PROJECTS - ¿lista de projects name?
-    PROJECT_NAME - projectName
-    SAMPLES - sampleName
-    """
+        service = next(value_iterator)
+        resolution = next(value_iterator)
+        samples = next(value_iterator)
+
+        service_id = resolution["resolutionFullNumber"]
+        service_number = service["serviceRequestNumber"]
+        resolution_id = resolution["resolutionNumber"]
+
+        try:
+            service_request_date = service["serviceCreatedOnDate"]
+        except service_request_date.HTTPError:
+            print("Resolution date is not defined")
+        try:
+            service_resolution_date = resolution["resolutionDate"]
+        except service_resolution_date.HTTPError:
+            print("Resolution date is not defined")
+        try:
+            service_in_progress_date = resolution["resolutionOnInProgressDate"]
+        except service_in_progress_date.HTTPError:
+            print("In pogress date is not defined")
+        try:
+            service_estimated_delivery_date = resolution["resolutionEstimatedDate"]
+        except service_estimated_delivery_date.HTTPError:
+            print("Estimated delivery date is not defined")
+        try:
+            service_delivery_date = resolution["resolutionDeliveryDate"]
+        except service_delivery_date.HTTPError:
+            print("Delivery date is not defined! Make the resolution!")
+
+        service_notes = service["serviceNotes"]
+        service_notes = service_notes.replace("\r", "")
+        service_notes = service_notes.replace("\n", " ")
+        username = service["serviceUserId"]["username"]
+        user_first_name = service["serviceUserId"]["first_name"]
+        user_last_name = service["serviceUserId"]["last_name"]
+        user_email = service["serviceUserId"]["email"]
+        service_sequencing_center = service["serviceSeqCenter"]
+        run_name = [x["runName"] for x in samples]
+        projects = [x["projectName"] for x in samples]
+        run_name = list(dict.fromkeys(run_name))
+        projects = list(dict.fromkeys(projects))
+        samples = [x["sampleName"] for x in samples]
+
+        json_data = {
+            "id": service_id,
+            "service_number": service_number,
+            "resolution_number": resolution_id,
+            "service_request_date": service_request_date,
+            "service_resolution_date": service_resolution_date,
+            "service_in_progress_date": service_in_progress_date,
+            "service_estimated_delivery_date": service_estimated_delivery_date,
+            "service_delivery_date": service_delivery_date,
+            "service_notes": service_notes,
+            "user_first_name": user_first_name,
+            "user_last_name": user_last_name,
+            "username": username,
+            "user_email": user_email,
+            "service_sequencing_center": service_sequencing_center,
+            "run_name": run_name,
+        }
+
+        TEMPLATE_FILE = "templates/jinja_template.j2"
+        BASEPATH = os.path.dirname(os.path.realpath(__file__))
+        templateLoader = jinja2.FileSystemLoader(searchpath=BASEPATH)
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template(TEMPLATE_FILE)
+
+        # Create markdown
+        outputText = template.render(json_data)
+        file = open("INFRES_" + json_data["service_number"] + ".md", "wb")
+        file.write(outputText.encode("utf-8"))
+        file.close()
