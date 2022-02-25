@@ -68,16 +68,15 @@ class CleanUp:
 
         if len(self.service_id) > 1:
             # ask which service id based on the resolution
-            self.service_id = bu_isciii.utils.prompt_service_id_selection(self.service_id)
+            self.service_id = bu_isciii.utils.prompt_service_id_selection(
+                self.service_id
+            )
         else:
             self.service_id = "".join(self.service_id)
 
         # once chosen the service_id, find the delete and nocopy directories
 
-        
-
         # ask for the sacred texts
-
 
         # self.base_directory =
         # self.delete =
