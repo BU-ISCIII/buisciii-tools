@@ -73,7 +73,9 @@ class Scratch:
             )
         else:
             self.direction = direction
-        self.rsync_command = bu_isciii.config_json.ConfigJson().get_find("scratch_copy","command")
+        self.rsync_command = bu_isciii.config_json.ConfigJson().get_find(
+            "scratch_copy", "command"
+        )
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
         self.resolution_info = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
@@ -84,7 +86,6 @@ class Scratch:
         self.out_file = os.path.join(
             self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
         )
-
 
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.origin_folder)
