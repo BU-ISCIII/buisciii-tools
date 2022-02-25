@@ -30,7 +30,7 @@ END_OF_HEADER
 ================================================================
 """
 # Generic imports
-# import sys
+import sys
 import os
 import logging
 import shutil
@@ -40,6 +40,7 @@ from rich.console import Console
 import bu_isciii
 import bu_isciii.utils
 from bu_isciii.drylab_api import RestServiceApi
+from bu_isciii.service_json import ServiceJson
 
 log = logging.getLogger(__name__)
 stderr = Console(
@@ -52,6 +53,17 @@ stderr = Console(
 
 class CleanUp:
     def __init__(self, resolution_id=None):
+        """
+        Description:
+            Class to perform the cleaning.
+
+        Usage:
+
+        Attributes:
+
+        Methods:       
+        
+        """
         # access the api with the resolution name to obtain the data
         # ask away if no input given
         if resolution_id is None:
@@ -60,26 +72,64 @@ class CleanUp:
             self.resolution_id = resolution_id
         # get the service id from the resolution_id
         rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
-        self.service_id = rest_api.get_request(
+        resolution_dict = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
-        )["availableServices"]
+        )
+
+        self.theoretical_path = resolution_dict["resolutionFullNumber"]
+
+        all_service_ids = resolution_dict["availableServices"]
         # from dict to list
-        self.service_id = [item["serviceId"] for item in self.service_id]
+        self.service_id = [item["serviceId"] for item in all_service_ids]
         choice_num = len(self.service_id)
         if choice_num > 1:
             # ask which service id based on the resolution
+            stderr.print(f"I found {choice_num} different service IDs.")
             self.service_id = bu_isciii.utils.prompt_selection(
-                "Choose the proper one:", self.service_id
+                "Please choose the proper one:", self.service_id
             )
         else:
             self.service_id = "".join(self.service_id)
 
         # once chosen the service_id, find the delete and nocopy directories
+        srv_json = ServiceJson()
+        
+        # harcorded for testing
+        # this line MUST be removed
+        self.service_id = "assembly_annotation"
+
+        # get the dict of that very service id
+        service_id_dict = srv_json.get_service_configuration(self.service_id)
+
+        # generate the list of items to delete
+        self.delete_list = []
+        clean_dict = service_id_dict["clean"]
+        
+        for item in clean_dict.values():
+            self.delete_list += item
+
+        # remove empty strings
+        self.delete_list = [item for item in self.delete_list if item]
+        
+        elements = ", ".join(self.delete_list)
+        stderr.print(f"The following entities will be deleted: {elements}")
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You got it.")
+            sys.exit()    
+        
+        # generate the list of items to add the "_NC" to
+        self.nocopy_list = service_id_dict["no_copy"]
+        elements = ", ".join(self.nocopy_list)
+        stderr.print(f"The following directories will be renamed: {elements}")
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You are the boss here.")
+            sys.exit()    
+
+
 
         # ask for the sacred texts
 
         # self.base_directory =
-        # self.delete =
         # self.nocopy =
         # self.sacredtexts =
         return
