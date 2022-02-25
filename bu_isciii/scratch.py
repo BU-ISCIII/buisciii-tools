@@ -67,7 +67,7 @@ class Scratch:
 
         if direction is None:
             self.direction = bu_isciii.utils.prompt_direction_scratch(
-                ["Service_to_scratch", "Scratch_to_service"]
+                ["Service_to_scratch", "Scratch_to_service","Remove_scratch"]
             )
         else:
             self.direction = direction
@@ -154,9 +154,14 @@ class Scratch:
                 highlight=False,
             )
         return True
+    def remove_scratch(self):
+        stderr.print("[blue]I will the the service" % self.service_dir)
+        stderr.print("[blue] from %s" % self.scratch_path)
 
     def handle_scratch(self):
         if self.direction == "Service_to_scratch":
             self.copy_scratch()
         elif self.direction == "Scratch_to_service":
             self.revert_copy_scratch()
+        elif self.direction == "Remove_scratch":
+            self.remove_scratch()
