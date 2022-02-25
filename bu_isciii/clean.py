@@ -314,5 +314,4 @@ class CleanUp:
 
 
 # Testing zone
-
-testing_object = CleanUp("SRVCNM552.1")
+# testing_object = CleanUp("SRVCNM552.1")
