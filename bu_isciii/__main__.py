@@ -158,13 +158,15 @@ def list():
     "--ask_path",
     is_flag=True,
     default=False,
-    help="No create service folder, only resolution",
+    help="Please ask for path, not assume pwd.",
 )
 def new_service(resolution, path, no_create_folder, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
+    new_ser = bu_isciii.new_service.NewService(
+        resolution, path, no_create_folder, ask_path
+    )
     new_ser.create_new_service()
 
 
