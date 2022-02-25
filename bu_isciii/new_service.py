@@ -16,6 +16,7 @@ END_OF_HEADER
 import sys
 import os
 import logging
+import glob
 
 import shutil
 import rich
@@ -55,7 +56,6 @@ class NewService:
         else:
             self.no_create_folder = no_create_folder
 
-        self.full_path = os.path.join(path, self.path, self.service_folder)
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
         # Obtain info from iskylims api
@@ -72,6 +72,7 @@ class NewService:
             "availableServices"
         ]
         self.service_samples = self.resolution_info["Samples"]
+        self.full_path = os.path.join(self.path, self.service_folder)
         ###
         ### resolutionFullData example
         ###
@@ -219,16 +220,25 @@ class NewService:
 
     def create_symbolic_links(self):
         for sample in self.service_samples:
+            regex = os.path.join(
+                    self.conf["fastq_repo"],
+                    sample["projectName"],
+                    '{}*'
+                ).format(sample["sampleName"])
+            sample_files = glob.glob(
+                regex
+            )
+            if not sample_files:
+                stderr.print("[red] This regex has not output any file: %s. Exiting.." % regex)
+                sys.exit()
+
             try:
-                os.symlink(
-                    os.path.join(
-                        self.conf["fastq_repo"],
-                        sample["projectName"],
-                        sample["SampleName"],
-                    ),
-                    os.path.join(self.full_path, "RAW"),
-                )
-            except OSError:
+                for file in sample_files:
+                    os.symlink(
+                        file,
+                        os.path.join(self.full_path, "RAW",os.path.basename(file)),
+                    )
+            except OSError as e:
                 stderr.print(
                     "[red]ERROR: Symbolic links creation failed for sample %s."
                     % sample["sampleName"]
@@ -240,6 +250,7 @@ class NewService:
         self.create_folder()
         self.copy_template()
         self.create_samples_id()
+        self.create_symbolic_links()
 
     def get_resolution_id(self):
         return self.resolution_id
