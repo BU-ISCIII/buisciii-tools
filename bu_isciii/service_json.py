@@ -50,3 +50,26 @@ class ServiceJson:
                     if found in self.json_data[service][key]:
                         return self.json_data[service][key][found]
             return None
+
+    def get_find_aux(self, service, found):
+        if isinstance(service, dict):
+            if found in service:
+                return service[found]
+            for key in service:
+                finder = self.get_find_aux(service[key], found)
+                if finder is not None:
+                    return finder
+        if isinstance(service, list):
+            for object in service:
+                finder = self.get_find_aux(object, found)
+                if finder is not None:
+                    return finder
+        return None
+
+    def get_find_deep(self, service, found):
+        if service in self.service_list:
+            serv_dict = self.data[service]
+            call_aux = self.get_find_aux(serv_dict, found)
+            return call_aux
+        else:
+            return "service not found"
