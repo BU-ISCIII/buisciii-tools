@@ -5,7 +5,6 @@ import os
 import logging
 
 import click
-from rich import print
 import rich.console
 import rich.logging
 import rich.traceback
