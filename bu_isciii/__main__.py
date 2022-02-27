@@ -15,6 +15,7 @@ import bu_isciii.new_service
 import bu_isciii.scratch
 import bu_isciii.deliver
 import bu_isciii.list
+import bu_isciii.bioinfo_doc
 
 log = logging.getLogger()
 
@@ -228,6 +229,22 @@ def deliver(resolution, source, destination):
     new_del = bu_isciii.deliver.Deliver(resolution, source, destination)
     # new_del.copy_sftp()
     new_del.create_report()
+
+
+# COPY RESULTS FOLDER TO SFTP
+@bu_isciii_cli.command(help_priority=5)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-l",
+    "--local_folder",
+    type=click.Path(),
+    default=None,
+    help="Directory containing the local folder which bioinfo_doc is mounted. Default: /media/bioinfo_doc/",
+)
+def bioinfo_doc(resolution, local_folder):
+    """Create the folder documentation structure in bioinfo_doc server"""
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(resolution, local_folder)
+    new_doc.create_structure()
 
 
 if __name__ == "__main__":
