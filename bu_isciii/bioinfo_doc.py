@@ -68,7 +68,6 @@ class BioinfoDoc:
         )
         log.info("Creating the resolution folder for %s", self.resolution_id)
         for folder in self.folders:
-            print('folder')
-            #os.makedirs(os.join.path(self.service_folder, folder), exist_ok=True)
+            os.makedirs(os.join.path(self.service_folder, folder), exist_ok=True)
         log.info("Resolution folders created")
         return
