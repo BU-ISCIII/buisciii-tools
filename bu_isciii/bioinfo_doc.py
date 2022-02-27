@@ -48,7 +48,9 @@ class BioinfoDoc:
         )
         if not resolution_info:
             stderr.print(
-                "[red] Unable to fetch information for resolution " + self.resolution_id + "!"
+                "[red] Unable to fetch information for resolution "
+                + self.resolution_id
+                + "!"
             )
         sys.exit(1)
         resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
