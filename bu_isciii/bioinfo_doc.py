@@ -3,6 +3,7 @@ from datetime import datetime
 import logging
 import rich.console
 import os
+import sys
 
 import bu_isciii.utils
 import bu_isciii.config_json
@@ -33,7 +34,7 @@ class BioinfoDoc:
             )
         else:
             self.local_folder = local_folder
-        if not os.path.exists(local_folder):
+        if not os.path.exists(self.local_folder):
             exit(1)
 
         conf_doc = bu_isciii.config_json.ConfigJson().get_configuration("info_doc")
@@ -41,9 +42,15 @@ class BioinfoDoc:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
+
         resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
+        if not resolution_info:
+            stderr.print(
+                "[red] Unable to fetch information for resolution " + self.resolution_id + "!"
+            )
+        sys.exit(1)
         resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
         if "YEAR" in conf_doc["root_folder"]:
             year_position = conf_doc["root_folder"].index("YEAR")
@@ -61,6 +68,7 @@ class BioinfoDoc:
         )
         log.info("Creating the resolution folder for %s", self.resolution_id)
         for folder in self.folders:
-            os.makedirs(os.join.path(self.service_folder, folder), exist_ok=True)
+            print('folder')
+            #os.makedirs(os.join.path(self.service_folder, folder), exist_ok=True)
         log.info("Resolution folders created")
         return
