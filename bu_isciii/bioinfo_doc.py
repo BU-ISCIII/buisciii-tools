@@ -2,6 +2,7 @@
 from datetime import datetime
 import logging
 import rich.console
+import re
 import os
 import sys
 
@@ -49,6 +50,12 @@ class BioinfoDoc:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
+        if type == "request":
+            self.resolution_id = re.sub("\.*", "", self.resolution_id)
+            resolution_info = rest_api.get_request(
+                "resolutionFullData", "resolution", self.resolution_id
+            )
+
         resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
