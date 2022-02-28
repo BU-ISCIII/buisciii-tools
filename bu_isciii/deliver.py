@@ -254,13 +254,14 @@ class Deliver:
         </body>
         </html>
         """
+
         try:
 
-            html = header + converted_md + footer
+            html = header + converted_md[0] + footer
         except TypeError:
             print("Type error")
             html = ""
-        html_name = md_name
+        html_name = "nombre_provisional.html"
         file = open(html_name, "w")
         file.write(html)
         file.close()
