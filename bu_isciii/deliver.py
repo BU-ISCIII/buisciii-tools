@@ -261,7 +261,8 @@ class Deliver:
         except TypeError:
             print("Type error")
             html = ""
-        html_name = "nombre_provisional.html"
+        md_name = md_name.rsplit(".", 1)[0]
+        html_name = md_name + ".html"
         file = open(html_name, "w")
         file.write(html)
         file.close()
