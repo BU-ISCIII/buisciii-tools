@@ -100,7 +100,12 @@ class Deliver:
 
         service = next(value_iterator)
         resolution = next(value_iterator)
-        samples = next(value_iterator)
+
+        try:
+            samples = next(value_iterator)
+        except StopIteration:
+            print("no samples ")
+            samples = {}
 
         service_id = resolution["resolutionFullNumber"]
         service_number = service["serviceRequestNumber"]
@@ -135,11 +140,18 @@ class Deliver:
         user_last_name = service["serviceUserId"]["last_name"]
         user_email = service["serviceUserId"]["email"]
         service_sequencing_center = service["serviceSeqCenter"]
-        run_name = [x["runName"] for x in samples]
-        projects = [x["projectName"] for x in samples]
-        run_name = list(dict.fromkeys(run_name))
-        projects = list(dict.fromkeys(projects))
-        samples = [x["sampleName"] for x in samples]
+
+        if len(samples) > 0:
+
+            run_name = [x["runName"] for x in samples]
+            projects = [x["projectName"] for x in samples]
+            run_name = list(dict.fromkeys(run_name))
+            projects = list(dict.fromkeys(projects))
+            samples = [x["sampleName"] for x in samples]
+        else:
+            run_name = []
+            projects = []
+            samples = []
 
         json_data = {
             "id": service_id,
@@ -242,8 +254,13 @@ class Deliver:
         </body>
         </html>
         """
-        html = header + converted_md + footer
-        html_name = "nombre_provisional"
+        try:
+
+            html = header + converted_md + footer
+        except TypeError:
+            print("Type error")
+            html = ""
+        html_name = md_name
         file = open(html_name, "w")
         file.write(html)
         file.close()
