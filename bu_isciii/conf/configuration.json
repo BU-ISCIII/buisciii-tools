@@ -20,18 +20,12 @@
         ]
     },
     "api_settings":{
-        "server" : "http://iskylims.isciiides.es/",
-        "api_url": "drylab/api/"
+        "server" : "http://iskylims.isciiides.es",
+        "api_url": "/drylab/api/"
 
     },
-    "info_doc":{
-        "root_folder":["YEAR", "service_path"],
+    "bioinfo_doc":{
+        "services_path": "services",
         "service_folder":["request", "resolution", "result"]
-    },
-    "new_service":{
-        "fastq_repo":"/srv/fastq_repo"
-    },
-    "scratch_copy":{
-        "command":"rsync -rlv "
-      }
+    }
 }

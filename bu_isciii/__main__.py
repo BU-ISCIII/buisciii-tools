@@ -241,9 +241,15 @@ def deliver(resolution, source, destination):
     default=None,
     help="Directory containing the local folder which bioinfo_doc is mounted. Default: /media/bioinfo_doc/",
 )
-def bioinfo_doc(resolution, local_folder):
+@click.option(
+    "-t",
+    "--type",
+    type=click.Choice(["request", "resolution", "delivery"]),
+    help="Select the documentation that will generate",
+)
+def bioinfo_doc(resolution, local_folder, type):
     """Create the folder documentation structure in bioinfo_doc server"""
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(resolution, local_folder)
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(resolution, local_folder, type)
     new_doc.create_structure()
 
 
