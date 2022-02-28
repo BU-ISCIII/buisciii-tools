@@ -22,4 +22,6 @@
         "services_path": "services",
         "service_folder": ["request", "resolution", "result"],
     },
+    "new_service": {"fastq_repo": "/srv/fastq_repo"},
+    "scratch_copy": {"command": "rsync -rlv "},
 }

@@ -84,5 +84,20 @@ class BioinfoDoc:
             log.info("Service folders created")
         return
 
-    def create_request_documentation(self):
+    def create_request_doc(self):
+        md_name = self.create_markdown()
+        converted_md = self.convert_markdown(md_name)
+        self.wrap_html(converted_md, md_name)
         return
+
+    def create_documentation(self):
+        self.create_structure()
+        if self.type == "request":
+            self.create_request_doc()
+            return
+        if self.type == "resolution":
+            self.create_resolution_doc()
+            return
+        if self.type == "delivery":
+            self.create_delivery()
+            return
