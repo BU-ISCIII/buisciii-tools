@@ -1,12 +1,7 @@
 {
     "sftp_copy": {
         "protocol": "rsync",
-        "options": [
-            "-rlpv",
-            "--update",
-            "-L",
-            "--inplace"
-        ],
+        "options": ["-rlpv", "--update", "-L", "--inplace"],
         "exclusions": [
             "'*_NC'",
             "'lablog'",
@@ -16,22 +11,17 @@
             "'.nextflow*'",
             "'*_DEL'",
             "'*.R'",
-            "'*.py'"
-        ]
+            "'*.py'",
+        ],
     },
-    "api_settings":{
-        "server" : "http://iskylims.isciiides.es/",
-        "api_url": "drylab/api/"
-
+    "api_settings": {
+        "server": "http://iskylims.isciiides.es",
+        "api_url": "/drylab/api/",
     },
-    "info_doc":{
-        "root_folder":["YEAR", "service_path"],
-        "service_folder":["request", "resolution", "result"]
+    "bioinfo_doc": {
+        "services_path": "services",
+        "service_folder": ["request", "resolution", "result"],
     },
-    "new_service":{
-        "fastq_repo":"/srv/fastq_repo"
-    },
-    "scratch_copy":{
-        "command":"rsync -rlv "
-      }
+    "new_service": {"fastq_repo": "/srv/fastq_repo"},
+    "scratch_copy": {"command": "rsync -rlv "},
 }
