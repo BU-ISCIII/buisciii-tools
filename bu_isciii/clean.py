@@ -52,7 +52,7 @@ stderr = Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_id=None):
+    def __init__(self, resolution_id=None, path=None, ask_path=False):
         """
         Description:
             Class to perform the cleaning.
@@ -70,36 +70,36 @@ class CleanUp:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        # get the service id from the resolution_id
-        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
-        resolution_dict = rest_api.get_request(
-            "resolution", "resolution", self.resolution_id
-        )
 
-        self.theoretical_path = resolution_dict["resolutionFullNumber"]
-
-        all_service_ids = resolution_dict["availableServices"]
-        # from dict to list
-        self.service_id = [item["serviceId"] for item in all_service_ids]
-        choice_num = len(self.service_id)
-        if choice_num > 1:
-            # ask which service id based on the resolution
-            stderr.print(f"I found {choice_num} different service IDs.")
-            self.service_id = bu_isciii.utils.prompt_selection(
-                "Please choose the proper one:", self.service_id
-            )
+        if ask_path:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
         else:
-            self.service_id = "".join(self.service_id)
+            self.path = os.getcwd()
 
-        # once chosen the service_id, find the delete and nocopy directories
-        srv_json = ServiceJson()
+        if no_create_folder is None:
+            self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
+        else:
+            self.no_create_folder = no_create_folder
 
-        # harcorded for testing
-        # this line MUST be removed
-        self.service_id = "assembly_annotation"
-
-        # get the dict of that very service id
-        service_id_dict = srv_json.get_service_configuration(self.service_id)
+        # Load conf
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        # Obtain info from iskylims api
+        rest_api = bu_isciii.drylab_api.RestServiceApi(
+            conf_api["server"], conf_api["api_url"]
+        )
+        self.resolution_info = rest_api.get_request(
+            "resolutionFullData", "resolution", self.resolution_id
+        )
+        self.service_folder = self.resolution_info["Resolutions"][
+            "resolutionFullNumber"
+        ]
+        self.services_requested = self.resolution_info["Resolutions"][
+            "availableServices"
+        ]
+        self.service_samples = self.resolution_info["Samples"]
+        self.full_path = os.path.join(self.path, self.service_folder)
 
         # generate the list of items to delete
         self.delete_list = []

@@ -127,7 +127,7 @@ def bu_isciii_cli(verbose, log_file):
         log.addHandler(log_fh)
 
 
-# pipeline list
+# SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
 def list():
     """
@@ -204,6 +204,31 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     )
     scratch_copy.handle_scratch()
 
+# CLEAN SERVICE
+@bu_isciii_cli.command(help_priority=2)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-p",
+    "--path",
+    type=click.Path(),
+    default=os.getcwd(),
+    help="Path to create the service folder",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for path, not assume pwd.",
+)
+def clean(resolution, path, ask_path):
+    """
+    Create new service, it will create folder and copy template depending on selected service.
+    """
+    clean = bu_isciii.clean.CleanUp(
+        resolution, path, ask_path
+    )
+    clean.clean_service()
 
 # COPY RESULTS FOLDER TO SFTP
 @bu_isciii_cli.command(help_priority=4)
@@ -231,7 +256,7 @@ def deliver(resolution, source, destination):
     new_del.create_report()
 
 
-# COPY RESULTS FOLDER TO SFTP
+# CREATE DOCS IN BIOINFO_DOC
 @bu_isciii_cli.command(help_priority=5)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
