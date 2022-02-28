@@ -36,16 +36,12 @@ class BioinfoDoc:
         else:
             self.local_folder = local_folder
         if not os.path.exists(self.local_folder):
-            stderr.print(
-                "[red] Folder does not exist. "
-                + self.local_folder
-                + "!"
-            )
+            stderr.print("[red] Folder does not exist. " + self.local_folder + "!")
             sys.exit(1)
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
-                choices=["request", "resolution", "delivery"]
+                choices=["request", "resolution", "delivery"],
             )
 
         conf_doc = bu_isciii.config_json.ConfigJson().get_configuration("bioinfo_doc")
@@ -68,7 +64,9 @@ class BioinfoDoc:
         #     year_position = conf_doc["root_folder"].index("YEAR")
         #     conf_doc["root_folder"][year_position] = str(datetime.now().year)
         year = str(datetime.now().year)
-        self.service_folder = os.path.join(self.local_folder, conf_doc["services_path"], year , resolution_folder)
+        self.service_folder = os.path.join(
+            self.local_folder, conf_doc["services_path"], year, resolution_folder
+        )
         self.folders = conf_doc["service_folder"]
         self.resolution_id = resolution_info["Resolutions"]["resolutionNumber"]
 
