@@ -141,7 +141,7 @@ class CleanUp:
         # if the folder path is not found, then bye
         if not os.path.exists(self.full_path):
             stderr.print(
-                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: {self.full_path} does not exitst. Exiting.."
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.." % self.full_path
             )
             sys.exit()
 
@@ -222,7 +222,7 @@ class CleanUp:
 
         """
         # generate the list of items to add the "_NC" to
-        elements = ", ".join(self.nocopy)
+        elements = ", ".join(to_find)
         # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
         if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
@@ -326,7 +326,7 @@ class CleanUp:
         # Delete files
         self.purge_files()
         # Rename to tag.
-        self.rename(add=add, to_find=self.delete, verbose=verbose)
+        self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
