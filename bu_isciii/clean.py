@@ -173,8 +173,7 @@ class CleanUp:
             stderr.print(f"The following files will be deleted: {files}")
             return
         else:
-            delete_list = self.delete_folders + self.delete_files
-            return self.delete_list
+            return self.delete_folders + self.delete_files
 
     def show_nocopy(self, to_stdout=True):
         """
