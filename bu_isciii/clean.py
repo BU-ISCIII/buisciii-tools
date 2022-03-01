@@ -98,9 +98,10 @@ class CleanUp:
         self.services_to_clean = bu_isciii.utils.get_service_ids(
             self.services_requested
         )
-        self.delete_folders = self.get_delete_items(self.services_to_clean, type="folders")
-        self.delete_files = self.get_delete_items(self.services_to_clean, type="files")
+        self.delete_folders = self.get_clean_items(self.services_to_clean, type="folders")
+        self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
+        self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -110,7 +111,7 @@ class CleanUp:
         else:
             self.option = option
 
-    def get_delete_items(self, services_ids, type="files"):
+    def get_clean_items(self, services_ids, type="files"):
         """
         Description:
             Get delete files list from service conf
@@ -120,7 +121,7 @@ class CleanUp:
 
         Params:
             services_ids [list]: list with services ids selected.
-            type [string]: one of these: "files" or "folders" for getting the param from service.json
+            type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
         service_conf = bu_isciii.service_json.ServiceJson()
         if len(services_ids) == 1:
@@ -158,10 +159,8 @@ class CleanUp:
         if to_stdout:
             folders = ", ".join(self.delete_folders)
             stderr.print(f"The following folders will be purge: {folders}")
-            stderr.print(self.delete_folders)
             files = ", ".join(self.delete_files)
             stderr.print(f"The following files will be deleted: {files}")
-            stderr.print(self.delete_files)
             return
         else:
             delete_list = self.delete_folders + self.delete_files
@@ -173,16 +172,16 @@ class CleanUp:
             Print or return the list of objects that must be renamed in this service
 
         Usage:
-            object.show_nocopy_dirs(to_stdout = [BOOL])
+            object.show_nocopy(to_stdout = [BOOL])
 
         Params:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.nocopy_list)
+            stderr.print(self.nocopy)
             return
         else:
-            return self.nocopy_list
+            return self.nocopy
 
     def scan_dirs(self, to_find):
         """
@@ -223,9 +222,7 @@ class CleanUp:
 
         """
         # generate the list of items to add the "_NC" to
-        self.nocopy_list = service_id_dict["no_copy"]
-        elements = ", ".join(self.nocopy_list)
-
+        elements = ", ".join(self.nocopy)
         # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
         if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
