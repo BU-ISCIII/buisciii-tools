@@ -258,6 +258,19 @@ class CleanUp:
         self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
         return
 
+    def purge_files(self):
+        """
+        Description:
+            Remove the files that must be deleted for the delivery of the service
+
+        Usage:
+            object.purge_files()
+
+        Params:
+
+        """
+        return True
+
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
         Description:
@@ -266,7 +279,7 @@ class CleanUp:
             deleted
 
         Usage:
-            object.delete()
+            object.purge_folders()
 
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
@@ -319,7 +332,7 @@ class CleanUp:
         # Purge folders
         self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
         # Delete files
-        self.delete_files()
+        self.purge_files()
         # Rename to tag.
         self.rename(add=add, to_find=self.delete, verbose=verbose)
 
