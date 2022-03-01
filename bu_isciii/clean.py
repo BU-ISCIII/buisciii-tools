@@ -100,12 +100,45 @@ class CleanUp:
         self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
-        service_conf = bu_isciii.service_json.ServiceJson()
-        self.delete_files = service_conf.get_find_deep("viralrecon","files")
-        self.delete_folders = service_conf.get_find_deep("viralrecon","folders")
+        self.services_to_clean = bu_isciii.utils.get_service_ids(self.services_requested)
+        self.delete_folders = self.get_delete_items("folders",services_to_clean)
+        self.delete_files = self.get_delete_items("files",services_to_clean)
         #self.delete_list = [item for item in self.delete_list if item]
 
-    def show_removable_dirs(self, to_stdout=True):
+    def get_delete_items(self, type = "files", services_ids):
+        """
+        Description:
+            Get delete files list from service conf
+
+        Usage:
+            object.get_delete_files(services_ids)
+
+        Params:
+            services_ids [list]: list with services ids selected.
+        """
+        service_conf = bu_isciii.service_json.ServiceJson()
+        if len(services_ids) == 1:
+            try:
+                items = service_conf.get_find_deep(services_ids[0],type)
+            except KeyError as e:
+                stderr.print(
+                    "[red]ERROR: Service id %s not found in services json file."
+                    % services_ids[0]
+                )
+                stderr.print("traceback error %s" % e)
+                sys.exit()
+
+        return items
+
+    def check_path_exists(self):
+        # if the folder path is not found, then bye
+        if (not os.path.exits(self.full_path)):
+            stderr.print(
+                "Seems like finding the correct path is beneath me. I apologise."
+            )
+            sys.exit()
+
+    def show_removable(self, to_stdout=True):
         """
         Description:
             Print or return the list of objects that must be deleted in this service
@@ -122,7 +155,7 @@ class CleanUp:
         else:
             return self.delete_list
 
-    def show_nocopy_dirs(self, to_stdout=True):
+    def show_nocopy(self, to_stdout=True):
         """
         Description:
             Print or return the list of objects that must be renamed in this service
@@ -139,13 +172,6 @@ class CleanUp:
         else:
             return self.nocopy_list
 
-    def check_path_exists(self):
-        # if the folder path is not found, then bye
-        if (not os.path.exits(self.full_path)):
-            stderr.print(
-                "Seems like finding the correct path is beneath me. I apologise."
-            )
-            sys.exit()
 
     def scan_dirs(self, to_find):
         """
@@ -164,10 +190,10 @@ class CleanUp:
         Params:
 
         """
+        self.check_path_exists()
         pathlist = []
-
         # key: root, values: [[files inside], [dirs inside]]
-        for root, _, _ in os.walk(self.path):
+        for root, _, _ in os.walk(self.full_path):
             # coincidence might not be total so double loop by now
             for item_to_be_found in to_find:
                 if item_to_be_found in root:
