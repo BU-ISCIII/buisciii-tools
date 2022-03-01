@@ -77,13 +77,6 @@ def prompt_skip_folder_creation():
     confirmation = questionary.confirm("Skip?", default=False).unsafe_ask()
     return confirmation
 
-
-def prompt_direction_scratch(choices):
-    stderr.print("In which direction do you want to execute the rsync command?")
-    selection = questionary.select("Directions:", choices=choices).unsafe_ask()
-    return selection
-
-
 def get_service_ids(services_requested):
     service_id_list = []
     for services in services_requested:

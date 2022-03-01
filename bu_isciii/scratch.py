@@ -68,11 +68,13 @@ class Scratch:
             self.tmp_dir = tmp_dir
 
         if direction is None:
-            self.direction = bu_isciii.utils.prompt_direction_scratch(
+            self.direction = bu_isciii.utils.prompt_selection(
+                "Select:",
                 ["Service_to_scratch", "Scratch_to_service", "Remove_scratch"]
             )
         else:
             self.direction = direction
+
         self.rsync_command = bu_isciii.config_json.ConfigJson().get_find(
             "scratch_copy", "command"
         )
