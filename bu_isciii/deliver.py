@@ -11,8 +11,8 @@
  """
 # from cgitb import html
 import json
-import jinja2
-import markdown
+#import jinja2
+#import markdown
 
 
 # import sys
@@ -23,7 +23,7 @@ import os
 # from distutils.log import info
 import logging
 
-from numpy import True_
+from numpy import True
 
 import sysrsync
 import rich
