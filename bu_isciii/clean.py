@@ -39,8 +39,8 @@ from rich.console import Console
 # Local imports
 import bu_isciii
 import bu_isciii.utils
-from bu_isciii.drylab_api import RestServiceApi
-from bu_isciii.service_json import ServiceJson
+import bu_isciii.drylab_api
+import bu_isciii.service_json
 
 log = logging.getLogger(__name__)
 stderr = Console(
