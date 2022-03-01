@@ -73,3 +73,19 @@ class ServiceJson:
             return call_aux
         else:
             return "service not found"
+
+    def my_recursivity(self, service, found_item):
+        def recursive(my_dict, found_item):
+            if isinstance(my_dict, dict):
+                for key, values in my_dict.items():
+                    if key == found_item:
+                        return values
+                    if isinstance(values, dict):
+                        data = recursive(values, found_item)
+                        if data:
+                            return data
+                return False
+
+        if service in self.service_list:
+            return recursive(self.json_data[service], found_item)
+        return False
