@@ -225,9 +225,8 @@ def deliver(resolution, source, destination):
     """
     "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
     """
-    new_del = bu_isciii.deliver.Deliver(resolution, source, destination)
-    # new_del.copy_sftp()
-    new_del.create_report()
+    new_del = bu_isciii.copy_sftp.CopySftp(resolution, source, destination)
+    new_del.copy_sftp()
 
 
 if __name__ == "__main__":
