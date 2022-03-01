@@ -204,6 +204,7 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     )
     scratch_copy.handle_scratch()
 
+
 # CLEAN SERVICE
 @bu_isciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
@@ -225,10 +226,9 @@ def clean(resolution, path, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    clean = bu_isciii.clean.CleanUp(
-        resolution, path, ask_path
-    )
+    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path)
     clean.clean_service()
+
 
 # COPY RESULTS FOLDER TO SFTP
 @bu_isciii_cli.command(help_priority=4)

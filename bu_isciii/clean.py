@@ -100,26 +100,29 @@ class CleanUp:
         self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
-        self.services_to_clean = bu_isciii.utils.get_service_ids(self.services_requested)
-        self.delete_folders = self.get_delete_items("folders",services_to_clean)
-        self.delete_files = self.get_delete_items("files",services_to_clean)
-        #self.delete_list = [item for item in self.delete_list if item]
+        self.services_to_clean = bu_isciii.utils.get_service_ids(
+            self.services_requested
+        )
+        self.delete_folders = self.get_delete_items(services_to_clean, type="folders")
+        self.delete_files = self.get_delete_items(services_to_clean, type="files")
+        # self.delete_list = [item for item in self.delete_list if item]
 
-    def get_delete_items(self, type = "files", services_ids):
+    def get_delete_items(self, services_ids, type="files"):
         """
         Description:
             Get delete files list from service conf
 
         Usage:
-            object.get_delete_files(services_ids)
+            object.get_delete_files(services_ids, type = "files")
 
         Params:
             services_ids [list]: list with services ids selected.
+            type [string]: one of these: "files" or "folders" for getting the param from service.json
         """
         service_conf = bu_isciii.service_json.ServiceJson()
         if len(services_ids) == 1:
             try:
-                items = service_conf.get_find_deep(services_ids[0],type)
+                items = service_conf.get_find_deep(services_ids[0], type)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
@@ -132,7 +135,7 @@ class CleanUp:
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
-        if (not os.path.exits(self.full_path)):
+        if not os.path.exits(self.full_path):
             stderr.print(
                 "Seems like finding the correct path is beneath me. I apologise."
             )
@@ -171,7 +174,6 @@ class CleanUp:
             return
         else:
             return self.nocopy_list
-
 
     def scan_dirs(self, to_find):
         """

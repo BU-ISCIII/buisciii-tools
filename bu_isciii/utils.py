@@ -83,15 +83,14 @@ def prompt_direction_scratch(choices):
     selection = questionary.select("Directions:", choices=choices).unsafe_ask()
     return selection
 
+
 def get_service_ids(services_requested):
     service_id_list = []
     for services in services_requested:
         service_id_list.append(services["serviceId"])
     service_id_list.append("all")
     stderr.print("Which selected service do you want to copy the template for?")
-    services_sel = [
-        bu_isciii.utils.prompt_selection("Service label:", service_id_list)
-    ]
+    services_sel = [bu_isciii.utils.prompt_selection("Service label:", service_id_list)]
     if services_sel == "all":
         services_sel == service_id_list
     return services_sel
