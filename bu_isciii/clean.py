@@ -82,10 +82,8 @@ class CleanUp:
         else:
             self.no_create_folder = no_create_folder
 
-        # Load conf
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
@@ -101,47 +99,11 @@ class CleanUp:
         self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
 
-        # generate the list of items to delete
-        self.delete_list = []
-        clean_dict = service_id_dict["clean"]
-
-        for item in clean_dict.values():
-            self.delete_list += item
-
-        # remove empty strings
-        self.delete_list = [item for item in self.delete_list if item]
-
-        elements = ", ".join(self.delete_list)
-        stderr.print(f"The following entities will be deleted: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
-            stderr.print("You got it.")
-            sys.exit()
-
-        # generate the list of items to add the "_NC" to
-        self.nocopy_list = service_id_dict["no_copy"]
-        elements = ", ".join(self.nocopy_list)
-
-        # ask away if thats ok
-        stderr.print(f"The following directories will be renamed: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
-            stderr.print("You are the boss here.")
-            sys.exit()
-
-        # ask where to perform (get the full path)
-        stderr.print("Where should I clean?")
-        self.base_directory = os.path.abspath(bu_isciii.utils.prompt_path("Path"))
-
-        # if the theoretical name is not found, then bye
-        if (
-            self.theoretical_path not in self.base_directory
-            and self.theoretical_path not in os.listdir(self.base_directory)
-        ):
-            stderr.print(
-                "Seems like finding the correct path is beneath me. I apologise."
-            )
-            sys.exit()
-
-        return
+        # Load service conf
+        service_conf = bu_isciii.service_json.ServiceJson()
+        self.delete_files = service_conf.get_find_deep("viralrecon","files")
+        self.delete_folders = service_conf.get_find_deep("viralrecon","folders")
+        #self.delete_list = [item for item in self.delete_list if item]
 
     def show_removable_dirs(self, to_stdout=True):
         """
@@ -176,6 +138,14 @@ class CleanUp:
             return
         else:
             return self.nocopy_list
+
+    def check_path_exists(self):
+        # if the folder path is not found, then bye
+        if (not os.path.exits(self.full_path)):
+            stderr.print(
+                "Seems like finding the correct path is beneath me. I apologise."
+            )
+            sys.exit()
 
     def scan_dirs(self, to_find):
         """
@@ -215,6 +185,15 @@ class CleanUp:
         Params:
 
         """
+        # generate the list of items to add the "_NC" to
+        self.nocopy_list = service_id_dict["no_copy"]
+        elements = ", ".join(self.nocopy_list)
+
+        # ask away if thats ok
+        stderr.print(f"The following directories will be renamed: {elements}")
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You are the boss here.")
+            sys.exit()
 
         path_content = self.scan_dirs(to_find=to_find)
 
@@ -251,6 +230,12 @@ class CleanUp:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
 
         """
+        # generate the list of items to delete
+        elements = ", ".join(self.delete_list)
+        stderr.print(f"The following entities will be deleted: {elements}")
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You got it.")
+            sys.exit()
 
         path_content = self.scan_dirs(to_find=self.delete)
         unfiltered_items = []
