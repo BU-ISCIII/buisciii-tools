@@ -222,12 +222,19 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     default=False,
     help="Please ask for path, not assume pwd.",
 )
-def clean(resolution, path, ask_path):
+@click.option(
+    "-s",
+    "--option",
+    type=click.Choice(["full_clean", "rename_nocopy", "clean", "revert_renaming", "show_removable", "show_nocopy"]),
+    multiple=False,
+    help="Select what to do inside the cleanning step: full_clean: delete files and folders to clean, rename no copy and deleted folders, rename_nocopy: just rename no copy folders, clean: delete files and folders to clean, revert_renaming: remove no_copy and delete tags, show_removable: list folders and files to remove and show_nocopy: show folders to rename with no_copy tag.",
+)
+def clean(resolution, path, ask_path, option):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path)
-    clean.clean_service()
+    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option)
+    clean.handle_clean()
 
 
 # COPY RESULTS FOLDER TO SFTP

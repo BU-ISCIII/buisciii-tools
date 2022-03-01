@@ -52,7 +52,7 @@ stderr = Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_id=None, path=None, ask_path=False):
+    def __init__(self, resolution_id=None, path=None, ask_path=False, option=None):
         """
         Description:
             Class to perform the cleaning.
@@ -106,6 +106,14 @@ class CleanUp:
         self.delete_folders = self.get_delete_items(services_to_clean, type="folders")
         self.delete_files = self.get_delete_items(services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
+
+        if option is None:
+            self.option = bu_isciii.utils.prompt_selection(
+                "Options",
+                ["full_clean", "rename_nocopy", "clean", "revert_renaming", "show_removable", "show_nocopy"]
+            )
+        else:
+            self.option = option
 
     def get_delete_items(self, services_ids, type="files"):
         """
@@ -265,7 +273,7 @@ class CleanUp:
             stderr.print("You got it.")
             sys.exit()
 
-        path_content = self.scan_dirs(to_find=self.delete)
+        path_content = self.scan_dirs(to_find=self.delete_folders)
         unfiltered_items = []
         filtered_items = []
 
@@ -314,17 +322,30 @@ class CleanUp:
             if verbose:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
-    def full_clean_job(self):
+    def full_clean():
         """
-        Perform the whole cleaning of the service
+        Perform and handle the whole cleaning of the service
         """
-        # if '_NC' in ____ or '_DEL' in ___:
-        # print that a previous usage of this was detected
-        # self.rename()
-        # self.delete()
 
-        return
+        self.delete_rename()
+        self.rename_nocopy()
 
+    def handle_clean(self):
+        """
+        Handle clean class options
+        """
+        if self.option == "show_removable":
+            self.show_removable()
+        if self.option == "show_nocopy":
+            self.show_nocopy()
+        if self.option == "full_clean":
+            self.full_clean()
+        if self.option == "rename_nocopy":
+            self.rename_nocopy()
+        if self.option == "clean":
+            self.delete_rename()
+        if self.option == "revert_renaming":
+            self.revert_renaming()
 
 # Testing zone
 # testing_object = CleanUp("SRVCNM552.1")
