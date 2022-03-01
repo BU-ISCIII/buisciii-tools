@@ -82,7 +82,7 @@ def get_service_ids(services_requested):
     for services in services_requested:
         service_id_list.append(services["serviceId"])
     service_id_list.append("all")
-    stderr.print("Which selected service do you want to copy the template for?")
+    stderr.print("Which selected service do you want to manage?")
     services_sel = [prompt_selection("Service label:", service_id_list)]
     if services_sel == "all":
         services_sel == service_id_list
