@@ -98,7 +98,9 @@ class CleanUp:
         self.services_to_clean = bu_isciii.utils.get_service_ids(
             self.services_requested
         )
-        self.delete_folders = self.get_clean_items(self.services_to_clean, type="folders")
+        self.delete_folders = self.get_clean_items(
+            self.services_to_clean, type="folders"
+        )
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
@@ -106,7 +108,14 @@ class CleanUp:
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
-                ["full_clean", "rename_nocopy", "clean", "revert_renaming", "show_removable", "show_nocopy"]
+                [
+                    "full_clean",
+                    "rename_nocopy",
+                    "clean",
+                    "revert_renaming",
+                    "show_removable",
+                    "show_nocopy",
+                ],
             )
         else:
             self.option = option
@@ -141,7 +150,8 @@ class CleanUp:
         # if the folder path is not found, then bye
         if not os.path.exists(self.full_path):
             stderr.print(
-                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.." % self.full_path
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.."
+                % self.full_path
             )
             sys.exit()
 

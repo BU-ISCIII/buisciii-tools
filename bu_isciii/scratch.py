@@ -70,7 +70,7 @@ class Scratch:
         if direction is None:
             self.direction = bu_isciii.utils.prompt_selection(
                 "Select:",
-                ["Service_to_scratch", "Scratch_to_service", "Remove_scratch"]
+                ["Service_to_scratch", "Scratch_to_service", "Remove_scratch"],
             )
         else:
             self.direction = direction

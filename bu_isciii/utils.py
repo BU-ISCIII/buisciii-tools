@@ -77,6 +77,7 @@ def prompt_skip_folder_creation():
     confirmation = questionary.confirm("Skip?", default=False).unsafe_ask()
     return confirmation
 
+
 def get_service_ids(services_requested):
     service_id_list = []
     for services in services_requested:

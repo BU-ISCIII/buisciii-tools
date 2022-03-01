@@ -127,7 +127,6 @@ class NewService:
         #        }
         #
 
-
     def create_folder(self):
         if not self.no_create_folder:
             stderr.print(
@@ -182,7 +181,7 @@ class NewService:
                     ),
                     self.full_path,
                     dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns("README","__pycache__"),
+                    ignore=shutil.ignore_patterns("README", "__pycache__"),
                 )
                 stderr.print(
                     "[green]Successfully copied the template %s to the directory %s"
