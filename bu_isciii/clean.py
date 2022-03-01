@@ -77,11 +77,6 @@ class CleanUp:
         else:
             self.path = os.getcwd()
 
-        if no_create_folder is None:
-            self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
-        else:
-            self.no_create_folder = no_create_folder
-
         # Obtain info from iskylims api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
@@ -103,8 +98,8 @@ class CleanUp:
         self.services_to_clean = bu_isciii.utils.get_service_ids(
             self.services_requested
         )
-        self.delete_folders = self.get_delete_items(services_to_clean, type="folders")
-        self.delete_files = self.get_delete_items(services_to_clean, type="files")
+        self.delete_folders = self.get_delete_items(self.services_to_clean, type="folders")
+        self.delete_files = self.get_delete_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
 
         if option is None:
@@ -143,9 +138,9 @@ class CleanUp:
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
-        if not os.path.exits(self.full_path):
+        if not os.path.exists(self.full_path):
             stderr.print(
-                "Seems like finding the correct path is beneath me. I apologise."
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: {self.full_path} does not exitst. Exiting.."
             )
             sys.exit()
 
@@ -162,10 +157,10 @@ class CleanUp:
         """
         if to_stdout:
             folders = ", ".join(self.delete_folders)
-            stderr.print(f"The following folders will be purge: {elements}")
+            stderr.print(f"The following folders will be purge: {folders}")
             stderr.print(self.delete_folders)
             files = ", ".join(self.delete_files)
-            stderr.print(f"The following files will be deleted: {elements}")
+            stderr.print(f"The following files will be deleted: {files}")
             stderr.print(self.delete_files)
             return
         else:
@@ -355,7 +350,7 @@ class CleanUp:
             if verbose:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
-    def full_clean():
+    def full_clean(self):
         """
         Perform and handle the whole cleaning of the service
         """
@@ -379,6 +374,3 @@ class CleanUp:
             self.delete_rename()
         if self.option == "revert_renaming":
             self.revert_renaming()
-
-# Testing zone
-# testing_object = CleanUp("SRVCNM552.1")

@@ -68,7 +68,7 @@ class ServiceJson:
 
     def get_find_deep(self, service, found):
         if service in self.service_list:
-            serv_dict = self.data[service]
+            serv_dict = self.json_data[service]
             call_aux = self.get_find_aux(serv_dict, found)
             return call_aux
         else:

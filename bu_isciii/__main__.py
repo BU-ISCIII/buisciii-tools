@@ -16,6 +16,7 @@ import bu_isciii.scratch
 import bu_isciii.deliver
 import bu_isciii.list
 import bu_isciii.bioinfo_doc
+import bu_isciii.clean
 
 log = logging.getLogger()
 
