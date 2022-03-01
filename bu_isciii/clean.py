@@ -161,9 +161,15 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.delete_list)
+            folders = ", ".join(self.delete_folders)
+            stderr.print(f"The following folders will be purge: {elements}")
+            stderr.print(self.delete_folders)
+            files = ", ".join(self.delete_files)
+            stderr.print(f"The following files will be deleted: {elements}")
+            stderr.print(self.delete_files)
             return
         else:
+            delete_list = self.delete_folders + self.delete_files
             return self.delete_list
 
     def show_nocopy(self, to_stdout=True):
@@ -252,7 +258,7 @@ class CleanUp:
         self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
         return
 
-    def delete(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
+    def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -266,13 +272,6 @@ class CleanUp:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
 
         """
-        # generate the list of items to delete
-        elements = ", ".join(self.delete_list)
-        stderr.print(f"The following entities will be deleted: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
-            stderr.print("You got it.")
-            sys.exit()
-
         path_content = self.scan_dirs(to_find=self.delete_folders)
         unfiltered_items = []
         filtered_items = []
@@ -300,7 +299,28 @@ class CleanUp:
         return
 
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
-        self.delete(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        """
+        Description:
+            Remove both files and purge folders defined for the service, and rename to tag.
+        Usage:
+            object.delete()
+
+        Params:
+
+        """
+        # Show removable items
+        self.show_removable()
+
+        # Ask for confirmation
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You got it.")
+            sys.exit()
+
+        # Purge folders
+        self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        # Delete files
+        self.delete_files()
+        # Rename to tag.
         self.rename(add=add, to_find=self.delete, verbose=verbose)
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
