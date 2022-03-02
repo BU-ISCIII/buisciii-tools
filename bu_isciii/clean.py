@@ -214,11 +214,16 @@ class CleanUp:
         # key: root, values: [[files inside], [dirs inside]]
         for root, _, _ in os.walk(self.full_path):
             # coincidence might not be total so double loop by now
-            for item_to_be_found in to_find:
-                if item_to_be_found in root:
-                    pathlist.append(root)
-
-        return pathlist
+            if to_find:
+                for item_to_be_found in to_find:
+                    if item_to_be_found in root:
+                        pathlist.append(root)
+                        to_find.remove(item_to_be_found)
+            else:
+                return pathlist
+        if to_find:
+            stderr.print("[orange]WARNING:Some files/dir to delete/rename have not been found")
+            return pathlist
 
     def rename(self, to_find, add, verbose=True):
         """
