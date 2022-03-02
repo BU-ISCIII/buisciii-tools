@@ -127,19 +127,6 @@ class NewService:
         #        }
         #
 
-    def get_service_ids(self):
-        service_id_list = []
-        for services in self.services_requested:
-            service_id_list.append(services["serviceId"])
-        service_id_list.append("all")
-        stderr.print("Which selected service do you want to copy the template for?")
-        services_sel = [
-            bu_isciii.utils.prompt_selection("Service label:", service_id_list)
-        ]
-        if services_sel == "all":
-            services_sel == service_id_list
-        return services_sel
-
     def create_folder(self):
         if not self.no_create_folder:
             stderr.print(
@@ -175,7 +162,7 @@ class NewService:
         stderr.print(
             "[blue]I will copy the template service folders for %s !" % self.full_path
         )
-        services_ids = self.get_service_ids()
+        services_ids = bu_isciii.utils.get_service_ids(self.services_requested)
         services_json = bu_isciii.service_json.ServiceJson()
         if len(services_ids) == 1:
             try:
@@ -194,7 +181,7 @@ class NewService:
                     ),
                     self.full_path,
                     dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns("README"),
+                    ignore=shutil.ignore_patterns("README", "__pycache__"),
                 )
                 stderr.print(
                     "[green]Successfully copied the template %s to the directory %s"

@@ -11,17 +11,21 @@
             "'.nextflow*'",
             "'*_DEL'",
             "'*.R'",
-            "'*.py'",
-        ],
+            "'*.py'"
+        ]
     },
     "api_settings": {
         "server": "http://iskylims.isciiides.es",
-        "api_url": "/drylab/api/",
+        "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
         "services_path": "services",
-        "service_folder": ["request", "resolution", "result"],
+        "service_folder": ["request", "resolution", "result"]
     },
-    "new_service": {"fastq_repo": "/srv/fastq_repo"},
-    "scratch_copy": {"command": "rsync -rlv "},
+    "new_service": {
+        "fastq_repo": "/srv/fastq_repo"
+    },
+    "scratch_copy": {
+        "command": "rsync -rlv "
+    }
 }
