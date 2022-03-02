@@ -50,8 +50,3 @@ class ListServices:
 
         console = rich.console.Console()
         console.print(table)
-
-
-prueba = ListServices()
-prueba.get_table("viral")
-prueba.get_table()
