@@ -141,7 +141,7 @@ class BioinfoDoc:
             self.service["serviceNotes"].replace("\r", "").replace("\n", " ")
         )
 
-        template_file = self.config_doc["template_path_file"]
+        template_file = self.config_doc["md_template_path_file"]
         pakage_path = os.path.dirname(os.path.realpath(__file__))
         templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
         templateEnv = jinja2.Environment(loader=templateLoader)
@@ -174,56 +174,12 @@ class BioinfoDoc:
         return html_text
 
     def wrap_html(self, html_text, file_name):
-
-        header = """<!DOCTYPE html><html>
-        <head>
-            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-            <style>
-                body {
-                font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-                padding: 3em;
-                margin-right: 350px;
-                max-width: 100%;
-                }
-                .toc {
-                position: fixed;
-                right: 20px;
-                width: 300px;
-                padding-top: 20px;
-                overflow: scroll;
-                height: calc(100% - 3em - 20px);
-                }
-                .toctitle {
-                font-size: 1.8em;
-                font-weight: bold;
-                }
-                .toc > ul {
-                padding: 0;
-                margin: 1rem 0;
-                list-style-type: none;
-                }
-                .toc > ul ul { padding-left: 20px; }
-                .toc > ul > li > a { display: none; }
-                img { max-width: 800px; }
-                pre {
-                padding: 0.6em 1em;
-                }
-                h2 {
-                }
-            </style>
-        </head>
-        <body>
-        <div class="container">
-        """
-        footer = """
-        </div>
-        </body>
-        </html>
-        """
-        html = header + html_text + footer
         file_name += ".html"
+        with open(self.config_doc["html_template_path_file"] , "r") as fh:
+            file_read = fh.read()
+        file_read = file_read.replace("{text_to add}", html_text)
         with open(file_name, "w") as fh:
-            fh.write(html)
+            fh.write(file_read)
         return True
 
     def create_service_request_doc(self):
@@ -234,6 +190,7 @@ class BioinfoDoc:
             file_name_without_ext = file_name.replace(".md", "")
             html_text = self.convert_markdown_to_html(mk_text)
             self.wrap_html(html_text, file_name_without_ext)
+            self.convert_to_pdf(file_name_without_ext)
         return
 
     def create_resolution_doc(self):
@@ -244,6 +201,7 @@ class BioinfoDoc:
         file_name_without_ext = file_name.replace(".md", "")
         html_text = self.convert_markdown_to_html(mk_text)
         self.wrap_html(html_text, file_name_without_ext)
+        self.convert_to_pdf(file_name_without_ext)
         return
 
     def create_delivery_doc(self):
