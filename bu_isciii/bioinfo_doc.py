@@ -175,7 +175,7 @@ class BioinfoDoc:
 
     def wrap_html(self, html_text, file_name):
         file_name += ".html"
-        with open(self.config_doc["html_template_path_file"] , "r") as fh:
+        with open(self.config_doc["html_template_path_file"], "r") as fh:
             file_read = fh.read()
         file_read = file_read.replace("{text_to_add}", html_text)
         with open(file_name, "w") as fh:
