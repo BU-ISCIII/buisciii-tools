@@ -14,6 +14,7 @@
 import rich.table
 import rich.console
 from bu_isciii.service_json import ServiceJson
+import re
 
 
 class ListServices:
@@ -29,22 +30,9 @@ class ListServices:
         """
         Filter the table
         """
-        filtered_services = []
-        for wf in self.service_list:
-            if name.lower() in wf:
-                print(wf)
-
-        """
-            for k in name:
-                print(k)
-                match_service = wf if k in wf else False
-                # print(match_service)
-
-                if not match_service:
-                    break
-        else:
-            filtered_services.append(wf)
-        """
+        r = re.compile(name)
+        newlist = list(filter(r.match, self.service_list))
+        print(newlist)
 
     def get_table(self):
         """
@@ -66,10 +54,8 @@ class ListServices:
         console.print(table)
 
 
-"""
 prueba = ListServices()
 
 prueba.get_filtered("prueba")
 
 print(prueba.service_list)
-"""
