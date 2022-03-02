@@ -285,13 +285,13 @@ def deliver(resolution, source, destination):
 @click.option(
     "-t",
     "--type",
-    type=click.Choice(["request", "resolution", "delivery"]),
+    type=click.Choice(["resolution", "delivery"]),
     help="Select the documentation that will generate",
 )
-def bioinfo_doc(resolution, local_folder, type):
+def bioinfo_doc(type, resolution, local_folder):
     """Create the folder documentation structure in bioinfo_doc server"""
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(resolution, local_folder, type)
-    new_doc.create_structure()
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
+    new_doc.create_documentation()
 
 
 if __name__ == "__main__":

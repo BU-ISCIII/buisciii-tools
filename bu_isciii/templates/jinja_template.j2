@@ -1,52 +1,82 @@
 <p>
-    <img src="../assets/BU_ISCIII_logo.png" alt="logo" width="200" align="left" />
+    <img src="./assets/BU_ISCIII_logo.png" alt="logo" width="200" align="left" />
 </p>
 <br>
 <br>
-
+{% if resolution %}
 ## Service results report from the Bioinformatics Unit (BU-ISCIII)
+{% else %}
+## Service requested to  Bioinformatics Unit (BU-ISCIII)
+{% endif %}
 
-### {{ id }} service information:
+### {{ service.serviceRequestNumber }} service information:
 
 Here we describe the information about the service request:
 
-* Service ID: {{ service_number }}
-* Resolution: {{ resolution_number }}
-* Request date: {{ service_request_date }}
-* Resolution date: {{ service_resolution_date }}
-{% if service_in_progress_date -%}
-* Analysis starting date: {{ service_in_progress_date }}
-{% endif -%}
-{% if service_estimated_delivery_date -%}
-* Estimated delivery date: {{ service_estimated_delivery_date }}
-{% endif -%}
-* Delivery date: {{ service_delivery_date }}
-* Service notes: {{ service_notes }}
-
+* Service ID: {{ service.serviceRequestNumber }}
+* Request date: {{ service.serviceCreatedOnDate }}
+* Center Requested service : {{service.serviceSeqCenter}}
+* Service status : {{service.serviceStatus}}
+* Requested services:
+{% for a_service in service.serviceAvailableService %}
+    {{ a_service }}
+{% endfor %}
+* Service Notes : {{service.serviceNotes}}
 ### User information:
 
 Here we describe the information about the user requesting the service.
 
-* Name and first name: {{ user_first_name }} {{ user_last_name}}
-* Username: {{ username }}
-* E-mail: {{ user_email }}
+* Name and first name: {{ user_data.first_name }} {{ user_data.last_name}}
+* Username: {{ user_data.username }}
+* E-mail: {{ user_data.email }}
+{% if resolution %}
+    ### Resolution information
+    {% if service_in_progress_date %}
+        * Analysis starting date: {{ service_in_progress_date }}
+    {% endif %}
+    {% if service.service_estimated_delivery_date %}
+        * Estimated delivery date: {{ service_estimated_delivery_date }}
+    {% endif %}
+    {% if  resolution.service_resolution_date %}
+        * Resolution: {{ resolution.resolution_number }}
+        * Resolution full name {{ resolution.resolutionFullNumber }}
+        * Resolution estimation delivery date: {{ resolution.resolutionEstimatedDate }}
+        * Resolution on Queued date: {{ resolution.resolutionOnQueuedDate }}
+        * Resolution in Progress date: {{ resolution.resolutionOnInProgressDate }}
+        {% if resolution.resolutionDeliveryDate %}
+        * Resolution on Delivery date: {{ resolution.resolutionDeliveryDate }}
+        {% endif %}
+        * Requested services handle in this resoution:
+        {% for a_service in resolution.serviceAvailableService %}
+            {{ a_service }}
+        {% endfor %}
+        * Resolution Notes: {{ resolution.resolutionNotes }}
+    {% endif %}
+{% endif %}
+{% if delivery %}
+{% if service_delivery_date %}
+* Delivery date: {{ service_delivery_date }}
+{% endif %}
+* Service notes: {{ service_notes }}
+
+{% endif %}
 
 
-### Project:
+### Samples sequenced at iSCIII:
 
 Here we describe information about the project associated to the service:
 
 {% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }} {% endif %}
 
-{% if run_name -%}
-* Run name: {{ run_name}}
-{% endif -%}
+{% for run , projects in samples.items() %}
+    * Run name: {{ run }}
+    {% for project, samples_in_project in projects.items() %}
+        * Project name: {{ project }}
+        * Samples:
+        {% set comma = joiner(", ") %}
+        {% for sample_in_project in samples_in_project %}{% if loop.last %}{{ sample_in_project }}{% else %}{{ sample_in_project }}{{ comma() }}{% endif %}{% endfor %}
+    {% endfor %}
+{% endfor %}
 
-{% if projects -%}
-* Project name: {{ projects }}
-{% endif -%}
 
-{% if samples -%}
-* Samples:{% set comma = joiner(", ") %}{% for sample in samples -%}{{ comma() }}{{ sample }}
-{%- endfor -%}
-{% endif -%}
+### External Samples
