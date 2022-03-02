@@ -213,6 +213,7 @@ class CleanUp:
         self.check_path_exists()
         pathlist = []
         # key: root, values: [[files inside], [dirs inside]]
+        print(self.full_path)
         for root, _, _ in os.walk(self.full_path):
             # coincidence might not be total so double loop by now
             if to_find:
@@ -221,9 +222,11 @@ class CleanUp:
                         pathlist.append(root)
                         to_find.remove(item_to_be_found)
             else:
+                print(pathlist)
                 return pathlist
         if to_find:
             stderr.print("[orange]WARNING:Some files/dir to delete/rename have not been found")
+            print(pathlist)
             return pathlist
 
     def rename(self, to_find, add, verbose=True):
@@ -247,7 +250,7 @@ class CleanUp:
         path_content = self.scan_dirs(to_find=to_find)
 
         for directory_to_rename in path_content:
-            if "_NC" in directory_to_rename:
+            if add in directory_to_rename:
                 stderr.print("[orange]WARNING: Directory %s already renamed" % directory_to_rename)
                 continue
             else:
@@ -310,24 +313,16 @@ class CleanUp:
 
         for directory in path_content:
             # if not empty, and not previously DEL add it to the content
-            if not directory.endswith(add) and len(os.listdir(directory)) > 0:
-                unfiltered_items += directory
-        # take out those belonging to the sacred items
-        for item in unfiltered_items:
-            # coincidence might not be total so double loop
-            for text in sacredtexts:
-                # add it to the filtered list if not in the sacredtext
-                if text not in item:
-                    filtered_items.append(item)
-
-        for item in filtered_items:
-            # shutil if dir, os.remove if file
-            if os.path.isdir(item):
-                shutil.rmtree(item)
-            else:
-                os.remove(item)
-            if verbose:
-                print(f"Removed {item}.")
+            if not directory.endswith(add):
+                for item in os.listdir(directory):
+                    if item not in sacredtexts:
+                        # shutil if dir, os.remove if file
+                        if os.path.isdir(item):
+                            shutil.rmtree(item)
+                        else:
+                            os.remove(item)
+                        if verbose:
+                            print(f"Removed {item}.")
         return
 
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
