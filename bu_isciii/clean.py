@@ -248,7 +248,7 @@ class CleanUp:
 
         for directory_to_rename in path_content:
             if "_NC" in directory_to_rename:
-                stderr.print("[orange]WARNIN: Directory %s already renamed" % directory_to_rename)
+                stderr.print("[orange]WARNING: Directory %s already renamed" % directory_to_rename)
                 continue
             else:
                 newpath = directory_to_rename + add
@@ -281,9 +281,9 @@ class CleanUp:
 
         """
         files_to_delete = []
-        for sample in self.service_samples:
+        for sample_info in self.service_samples:
            for file in self.delete_files:
-                file_to_delete = file.replace("sample_name", sample)
+                file_to_delete = file.replace("sample_name", sample_info["sampleName"])
                 files_to_delete.append(files_to_delete)
 
         path_content = self.scan_dirs(to_find=files_to_delete)
