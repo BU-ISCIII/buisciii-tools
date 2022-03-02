@@ -2,7 +2,6 @@
 from datetime import datetime
 import logging
 import rich.console
-import re
 import os
 import sys
 import jinja2
@@ -95,6 +94,10 @@ class BioinfoDoc:
 
     def create_markdown(self, file_path):
         """Create the markdown fetching the information from request api"""
+        log.info(
+            "starting proccess to create markdown for service %s", self.resolution_id
+        )
+        stderr.print("[green] Creating markdown file for " + self.resolution_id + " !")
         markdown_data = {}
         # service related information
         markdown_data["service"] = self.service
@@ -118,6 +121,20 @@ class BioinfoDoc:
         # Resolution related information
         if "request" not in file_path:
             markdown_data["resolution"] = self.resolution
+            f_name = markdown_data["resolution"]["resolutionNumber"] + ".md"
+            if "resolution" in file_path:
+                file_name = os.path.join(file_path, f_name)
+            else:
+                sub_folder = (
+                    datetime.today().strftime("%Y%m%d")
+                    + "_"
+                    + markdown_data["service"]["serviceRequestNumber"]
+                )
+                file_name = os.path.join(file_path, sub_folder, f_name)
+        else:
+            file_name = os.path.join(
+                file_path, markdown_data["service"]["serviceRequestNumber"] + ".md"
+            )
         # Delivery related information
 
         markdown_data["service_notes"] = (
@@ -130,41 +147,34 @@ class BioinfoDoc:
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template(template_file)
         # Create markdown
+        mk_text = template.render(markdown_data)
 
-        outputText = template.render(markdown_data)
-        import pdb
+        with open(file_name, "wb") as fh:
+            fh.write(mk_text.encode("utf-8"))
 
-        pdb.set_trace()
-        """
-        md_name = "INFRES_" + json_data["service_number"] + ".md"
-        file = open(md_name, "wb")
-        file.write(outputText.encode("utf-8"))
-        file.close()
-        """
-        return
+        return str(mk_text), file_name
 
-    def convert_markdown(self, md_name):
-        input_md = open(md_name, mode="r", encoding="utf-8").read()
-        converted_md = markdown.markdown(
-            "[TOC]\n" + input_md,
+    def convert_markdown_to_html(self, mk_text):
+        html_text = markdown.markdown(
+            mk_text,
             extensions=[
                 "pymdownx.extra",
                 "pymdownx.b64",
                 "pymdownx.highlight",
                 "pymdownx.emoji",
                 "pymdownx.tilde",
-                "toc",
             ],
             extension_configs={
-                "pymdownx.b64": {"base_path": os.path.dirname(md_name)},
+                "pymdownx.b64": {
+                    "base_path": os.path.dirname(os.path.realpath(__file__))
+                },
                 "pymdownx.highlight": {"noclasses": True},
-                "toc": {"title": "Table of Contents"},
             },
         )
+        return html_text
 
-        return converted_md, md_name
+    def wrap_html(self, html_text, file_name):
 
-    def wrap_html(self, converted_md, md_name):
         header = """<!DOCTYPE html><html>
         <head>
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -210,24 +220,36 @@ class BioinfoDoc:
         </body>
         </html>
         """
-
-        html = header + converted_md[0] + footer
-        html_name = "nombre_provisional.html"
-        file = open(html_name, "w")
-        file.write(html)
-        file.close()
-
+        html = header + html_text + footer
+        file_name += ".html"
+        with open(file_name, "w") as fh:
+            fh.write(html)
         return True
+
+    def create_service_request_doc(self):
+        if not os.listdir(os.path.join(self.service_folder, "request")):
+            # Create the requested service documents
+            file_path = os.path.join(self.service_folder, "request")
+            mk_text, file_name = self.create_markdown(file_path)
+            file_name_without_ext = file_name.replace(".md", "")
+            html_text = self.convert_markdown_to_html(mk_text)
+            self.wrap_html(html_text, file_name_without_ext)
+        return
 
     def create_resolution_doc(self):
         # check if request service documentation was created
-        if not os.listdir(os.path.join(self.service_folder, "request")):
-            file_path = os.path.join(self.service_folder, "request")
-            # self.create_resolution_doc(file_path)
-            md_name = self.create_markdown(file_path)
-        converted_md = self.convert_markdown(md_name)
-        self.wrap_html(converted_md, md_name)
+        self.create_service_request_doc()
+        file_path = os.path.join(self.service_folder, "resolution")
+        mk_text, file_name = self.create_markdown(file_path)
+        file_name_without_ext = file_name.replace(".md", "")
+        html_text = self.convert_markdown_to_html(mk_text)
+        self.wrap_html(html_text, file_name_without_ext)
         return
+
+    def create_delivery_doc(self):
+        # check if request service documentation was created
+        self.create_service_request_doc()
+        # md_name = "INFRES_" + json_data["service_number"] + ".md"
 
     def create_documentation(self):
         self.create_structure()
