@@ -25,19 +25,23 @@ class ListServices:
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
 
-    def get_table(self, name):
+    def get_table(self, name=None):
         """
         Table print for services names and description
         """
-        busqueda = re.compile(name)
-        nueva_lista = list(filter(busqueda.match, self.service_list))
+
+        if name:
+            search = re.compile(name)
+            subset_services = list(filter(search.match, self.service_list))
+        else:
+            subset_services = self.service_list
 
         table = rich.table.Table()
         table.add_column("Service name", justify="right", style="cyan")
         table.add_column("Description", justify="left", style="green")
         table.add_column("Github", justify="left", style="green")
 
-        for i in nueva_lista:
+        for i in subset_services:
             table.add_row(
                 str(i),
                 str(self.service_data[i]["description"]),
@@ -48,10 +52,6 @@ class ListServices:
         console.print(table)
 
 
-"""
-
 prueba = ListServices()
 prueba.get_table("viral")
 prueba.get_table()
-
-"""
