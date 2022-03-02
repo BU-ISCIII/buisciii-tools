@@ -48,6 +48,10 @@ class ListServices:
         console.print(table)
 
 
-prueba = ListServices()
+"""
 
+prueba = ListServices()
+prueba.get_table("viral")
 prueba.get_table()
+
+"""
