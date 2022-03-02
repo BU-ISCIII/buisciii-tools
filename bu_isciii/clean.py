@@ -247,10 +247,14 @@ class CleanUp:
         path_content = self.scan_dirs(to_find=to_find)
 
         for directory_to_rename in path_content:
-            newpath = directory_to_rename + add
-            os.replace(directory_to_rename, newpath)
-            if verbose:
-                print(f"Renamed {directory_to_rename} to {newpath}.")
+            if "_NC" in directory_to_rename:
+                stderr.print("[orange]WARNIN: Directory %s already renamed" % directory_to_rename)
+                continue
+            else:
+                newpath = directory_to_rename + add
+                os.replace(directory_to_rename, newpath)
+                if verbose:
+                    print(f"Renamed {directory_to_rename} to {newpath}.")
         return
 
     def rename_nocopy(self, verbose=True):
