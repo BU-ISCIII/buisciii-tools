@@ -217,6 +217,7 @@ class CleanUp:
         for root, _, _ in os.walk(self.full_path):
             # coincidence might not be total so double loop by now
             if to_find:
+                print(to_find)
                 for item_to_be_found in to_find:
                     if item_to_be_found in root:
                         pathlist.append(root)
