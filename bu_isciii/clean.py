@@ -284,12 +284,10 @@ class CleanUp:
         for sample_info in self.service_samples:
            for file in self.delete_files:
                 file_to_delete = file.replace("sample_name", sample_info["sampleName"])
-                files_to_delete.append(files_to_delete)
-
+                files_to_delete.append(file_to_delete)
         path_content = self.scan_dirs(to_find=files_to_delete)
-        print(path_content)
-        #for file in path_content:
-        #    os.remove(file)
+        for file in path_content:
+            os.remove(file)
         return
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
