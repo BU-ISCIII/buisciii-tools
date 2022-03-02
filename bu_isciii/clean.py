@@ -39,8 +39,8 @@ from rich.console import Console
 # Local imports
 import bu_isciii
 import bu_isciii.utils
-from bu_isciii.drylab_api import RestServiceApi
-from bu_isciii.service_json import ServiceJson
+import bu_isciii.drylab_api
+import bu_isciii.service_json
 
 log = logging.getLogger(__name__)
 stderr = Console(
@@ -52,7 +52,7 @@ stderr = Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_id=None):
+    def __init__(self, resolution_id=None, path=None, ask_path=False, option=None):
         """
         Description:
             Class to perform the cleaning.
@@ -70,80 +70,92 @@ class CleanUp:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        # get the service id from the resolution_id
-        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
-        resolution_dict = rest_api.get_request(
-            "resolution", "resolution", self.resolution_id
+
+        if ask_path:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        else:
+            self.path = os.getcwd()
+
+        # Obtain info from iskylims api
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        rest_api = bu_isciii.drylab_api.RestServiceApi(
+            conf_api["server"], conf_api["api_url"]
         )
+        self.resolution_info = rest_api.get_request(
+            "resolutionFullData", "resolution", self.resolution_id
+        )
+        self.service_folder = self.resolution_info["Resolutions"][
+            "resolutionFullNumber"
+        ]
+        self.services_requested = self.resolution_info["Resolutions"][
+            "availableServices"
+        ]
+        self.service_samples = self.resolution_info["Samples"]
+        self.full_path = os.path.join(self.path, self.service_folder)
 
-        self.theoretical_path = resolution_dict["resolutionFullNumber"]
+        # Load service conf
+        self.services_to_clean = bu_isciii.utils.get_service_ids(
+            self.services_requested
+        )
+        self.delete_folders = self.get_clean_items(
+            self.services_to_clean, type="folders"
+        )
+        self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
+        # self.delete_list = [item for item in self.delete_list if item]
+        self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
 
-        all_service_ids = resolution_dict["availableServices"]
-        # from dict to list
-        self.service_id = [item["serviceId"] for item in all_service_ids]
-        choice_num = len(self.service_id)
-        if choice_num > 1:
-            # ask which service id based on the resolution
-            stderr.print(f"I found {choice_num} different service IDs.")
-            self.service_id = bu_isciii.utils.prompt_selection(
-                "Please choose the proper one:", self.service_id
+        if option is None:
+            self.option = bu_isciii.utils.prompt_selection(
+                "Options",
+                [
+                    "full_clean",
+                    "rename_nocopy",
+                    "clean",
+                    "revert_renaming",
+                    "show_removable",
+                    "show_nocopy",
+                ],
             )
         else:
-            self.service_id = "".join(self.service_id)
+            self.option = option
 
-        # once chosen the service_id, find the delete and nocopy directories
-        srv_json = ServiceJson()
+    def get_clean_items(self, services_ids, type="files"):
+        """
+        Description:
+            Get delete files list from service conf
 
-        # harcorded for testing
-        # this line MUST be removed
-        self.service_id = "assembly_annotation"
+        Usage:
+            object.get_delete_files(services_ids, type = "files")
 
-        # get the dict of that very service id
-        service_id_dict = srv_json.get_service_configuration(self.service_id)
+        Params:
+            services_ids [list]: list with services ids selected.
+            type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
+        """
+        service_conf = bu_isciii.service_json.ServiceJson()
+        if len(services_ids) == 1:
+            try:
+                items = service_conf.get_find_deep(services_ids[0], type)
+            except KeyError as e:
+                stderr.print(
+                    "[red]ERROR: Service id %s not found in services json file."
+                    % services_ids[0]
+                )
+                stderr.print("traceback error %s" % e)
+                sys.exit()
 
-        # generate the list of items to delete
-        self.delete_list = []
-        clean_dict = service_id_dict["clean"]
+        return items
 
-        for item in clean_dict.values():
-            self.delete_list += item
-
-        # remove empty strings
-        self.delete_list = [item for item in self.delete_list if item]
-
-        elements = ", ".join(self.delete_list)
-        stderr.print(f"The following entities will be deleted: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
-            stderr.print("You got it.")
-            sys.exit()
-
-        # generate the list of items to add the "_NC" to
-        self.nocopy_list = service_id_dict["no_copy"]
-        elements = ", ".join(self.nocopy_list)
-
-        # ask away if thats ok
-        stderr.print(f"The following directories will be renamed: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
-            stderr.print("You are the boss here.")
-            sys.exit()
-
-        # ask where to perform (get the full path)
-        stderr.print("Where should I clean?")
-        self.base_directory = os.path.abspath(bu_isciii.utils.prompt_path("Path"))
-
-        # if the theoretical name is not found, then bye
-        if (
-            self.theoretical_path not in self.base_directory
-            and self.theoretical_path not in os.listdir(self.base_directory)
-        ):
+    def check_path_exists(self):
+        # if the folder path is not found, then bye
+        if not os.path.exists(self.full_path):
             stderr.print(
-                "Seems like finding the correct path is beneath me. I apologise."
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.."
+                % self.full_path
             )
             sys.exit()
 
-        return
-
-    def show_removable_dirs(self, to_stdout=True):
+    def show_removable(self, to_stdout=True):
         """
         Description:
             Print or return the list of objects that must be deleted in this service
@@ -155,27 +167,30 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.delete_list)
+            folders = ", ".join(self.delete_folders)
+            stderr.print(f"The following folders will be purge: {folders}")
+            files = ", ".join(self.delete_files)
+            stderr.print(f"The following files will be deleted: {files}")
             return
         else:
-            return self.delete_list
+            return self.delete_folders + self.delete_files
 
-    def show_nocopy_dirs(self, to_stdout=True):
+    def show_nocopy(self, to_stdout=True):
         """
         Description:
             Print or return the list of objects that must be renamed in this service
 
         Usage:
-            object.show_nocopy_dirs(to_stdout = [BOOL])
+            object.show_nocopy(to_stdout = [BOOL])
 
         Params:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.nocopy_list)
+            stderr.print(self.nocopy)
             return
         else:
-            return self.nocopy_list
+            return self.nocopy
 
     def scan_dirs(self, to_find):
         """
@@ -194,10 +209,10 @@ class CleanUp:
         Params:
 
         """
+        self.check_path_exists()
         pathlist = []
-
         # key: root, values: [[files inside], [dirs inside]]
-        for root, _, _ in os.walk(self.path):
+        for root, _, _ in os.walk(self.full_path):
             # coincidence might not be total so double loop by now
             for item_to_be_found in to_find:
                 if item_to_be_found in root:
@@ -215,6 +230,13 @@ class CleanUp:
         Params:
 
         """
+        # generate the list of items to add the "_NC" to
+        elements = ", ".join(to_find)
+        # ask away if thats ok
+        stderr.print(f"The following directories will be renamed: {elements}")
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You are the boss here.")
+            sys.exit()
 
         path_content = self.scan_dirs(to_find=to_find)
 
@@ -237,7 +259,20 @@ class CleanUp:
         self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
         return
 
-    def delete(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
+    def purge_files(self):
+        """
+        Description:
+            Remove the files that must be deleted for the delivery of the service
+
+        Usage:
+            object.purge_files()
+
+        Params:
+
+        """
+        return True
+
+    def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
         Description:
             Remove the files that must be deleted for the delivery of the service
@@ -245,14 +280,13 @@ class CleanUp:
             deleted
 
         Usage:
-            object.delete()
+            object.purge_folders()
 
         Params:
             sacredtexts [list]: names (str) of the files that shall not be deleted.
 
         """
-
-        path_content = self.scan_dirs(to_find=self.delete)
+        path_content = self.scan_dirs(to_find=self.delete_folders)
         unfiltered_items = []
         filtered_items = []
 
@@ -279,8 +313,29 @@ class CleanUp:
         return
 
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
-        self.delete(sacredtexts=sacredtexts, add=add, verbose=verbose)
-        self.rename(add=add, to_find=self.delete, verbose=verbose)
+        """
+        Description:
+            Remove both files and purge folders defined for the service, and rename to tag.
+        Usage:
+            object.delete()
+
+        Params:
+
+        """
+        # Show removable items
+        self.show_removable()
+
+        # Ask for confirmation
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+            stderr.print("You got it.")
+            sys.exit()
+
+        # Purge folders
+        self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        # Delete files
+        self.purge_files()
+        # Rename to tag.
+        self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
@@ -301,17 +356,27 @@ class CleanUp:
             if verbose:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
-    def full_clean_job(self):
+    def full_clean(self):
         """
-        Perform the whole cleaning of the service
+        Perform and handle the whole cleaning of the service
         """
-        # if '_NC' in ____ or '_DEL' in ___:
-        # print that a previous usage of this was detected
-        # self.rename()
-        # self.delete()
 
-        return
+        self.delete_rename()
+        self.rename_nocopy()
 
-
-# Testing zone
-# testing_object = CleanUp("SRVCNM552.1")
+    def handle_clean(self):
+        """
+        Handle clean class options
+        """
+        if self.option == "show_removable":
+            self.show_removable()
+        if self.option == "show_nocopy":
+            self.show_nocopy()
+        if self.option == "full_clean":
+            self.full_clean()
+        if self.option == "rename_nocopy":
+            self.rename_nocopy()
+        if self.option == "clean":
+            self.delete_rename()
+        if self.option == "revert_renaming":
+            self.revert_renaming()

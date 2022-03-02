@@ -16,6 +16,7 @@ import bu_isciii.scratch
 import bu_isciii.deliver
 import bu_isciii.list
 import bu_isciii.bioinfo_doc
+import bu_isciii.clean
 
 log = logging.getLogger()
 
@@ -127,7 +128,7 @@ def bu_isciii_cli(verbose, log_file):
         log.addHandler(log_fh)
 
 
-# pipeline list
+# SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
 def list():
     """
@@ -205,6 +206,47 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     scratch_copy.handle_scratch()
 
 
+# CLEAN SERVICE
+@bu_isciii_cli.command(help_priority=2)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-p",
+    "--path",
+    type=click.Path(),
+    default=os.getcwd(),
+    help="Path to create the service folder",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for path, not assume pwd.",
+)
+@click.option(
+    "-s",
+    "--option",
+    type=click.Choice(
+        [
+            "full_clean",
+            "rename_nocopy",
+            "clean",
+            "revert_renaming",
+            "show_removable",
+            "show_nocopy",
+        ]
+    ),
+    multiple=False,
+    help="Select what to do inside the cleanning step: full_clean: delete files and folders to clean, rename no copy and deleted folders, rename_nocopy: just rename no copy folders, clean: delete files and folders to clean, revert_renaming: remove no_copy and delete tags, show_removable: list folders and files to remove and show_nocopy: show folders to rename with no_copy tag.",
+)
+def clean(resolution, path, ask_path, option):
+    """
+    Create new service, it will create folder and copy template depending on selected service.
+    """
+    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option)
+    clean.handle_clean()
+
+
 # COPY RESULTS FOLDER TO SFTP
 @bu_isciii_cli.command(help_priority=4)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
@@ -226,12 +268,11 @@ def deliver(resolution, source, destination):
     """
     "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
     """
-    new_del = bu_isciii.deliver.Deliver(resolution, source, destination)
-    # new_del.copy_sftp()
-    new_del.create_report()
+    new_del = bu_isciii.copy_sftp.CopySftp(resolution, source, destination)
+    new_del.copy_sftp()
 
 
-# COPY RESULTS FOLDER TO SFTP
+# CREATE DOCS IN BIOINFO_DOC
 @bu_isciii_cli.command(help_priority=5)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(

@@ -23,6 +23,10 @@
         "service_folder": ["request", "resolution", "result"],
         "template_path_file" : "templates/jinja_template.j2"
     },
-    "new_service": {"fastq_repo": "/srv/fastq_repo"},
-    "scratch_copy": {"command": "rsync -rlv "}
+    "new_service": {
+        "fastq_repo": "/srv/fastq_repo"
+    },
+    "scratch_copy": {
+        "command": "rsync -rlv "
+    }
 }
