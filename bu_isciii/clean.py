@@ -104,6 +104,7 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
+        self.service_samples = self.resolution_info["Samples"]
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -275,7 +276,17 @@ class CleanUp:
         Params:
 
         """
-        return True
+        files_to_delete = []
+        for sample in self.service_samples:
+           for file in self.delete_files:
+                file_to_delete = file.replace("sample_name", sample)
+                files_to_delete.append(files_to_delete)
+
+        path_content = self.scan_dirs(to_find=files_to_delete)
+        print(path_content)
+        #for file in path_content:
+        #    os.remove(file)
+        return
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
