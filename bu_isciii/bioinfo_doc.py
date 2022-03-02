@@ -177,7 +177,7 @@ class BioinfoDoc:
         file_name += ".html"
         with open(self.config_doc["html_template_path_file"] , "r") as fh:
             file_read = fh.read()
-        file_read = file_read.replace("{text_to add}", html_text)
+        file_read = file_read.replace("{text_to_add}", html_text)
         with open(file_name, "w") as fh:
             fh.write(file_read)
         return True
