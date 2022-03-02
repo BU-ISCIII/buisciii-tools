@@ -32,7 +32,9 @@ import rich
 # import requests
 import bu_isciii
 import bu_isciii.utils
-from bu_isciii.drylab_api import RestServiceApi
+
+# from bu_isciii.drylab_api import RestServiceApi
+import bu_isciii.drylab_api
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
