@@ -316,11 +316,12 @@ class CleanUp:
             if not directory.endswith(add):
                 for item in os.listdir(directory):
                     if item not in sacredtexts:
+                        item_path = os.path.join(directory,item)
                         # shutil if dir, os.remove if file
-                        if os.path.isdir(item):
-                            shutil.rmtree(item)
+                        if os.path.isdir(item_path):
+                            shutil.rmtree(item_path)
                         else:
-                            os.remove(item)
+                            os.remove(item_path)
                         if verbose:
                             print(f"Removed {item}.")
         return
