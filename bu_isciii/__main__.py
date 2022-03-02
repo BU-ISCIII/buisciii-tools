@@ -15,6 +15,7 @@ import bu_isciii.new_service
 import bu_isciii.scratch
 import bu_isciii.deliver
 import bu_isciii.list
+import bu_isciii.bioinfo_doc
 
 log = logging.getLogger()
 
@@ -158,15 +159,16 @@ def list():
     "--ask_path",
     is_flag=True,
     default=False,
-    help="No create service folder, only resolution",
+    help="Please ask for path, not assume pwd.",
 )
 def new_service(resolution, path, no_create_folder, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    new_ser = bu_isciii.new_service.NewService(resolution, path, no_create_folder)
-    new_ser.create_folder()
-    new_ser.copy_template()
+    new_ser = bu_isciii.new_service.NewService(
+        resolution, path, no_create_folder, ask_path
+    )
+    new_ser.create_new_service()
 
 
 # COPY SERVICE FOLDER TO SCRATCHS TMP
@@ -174,24 +176,33 @@ def new_service(resolution, path, no_create_folder, ask_path):
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-s",
-    "--source",
+    "--service_dir",
     type=click.Path(),
-    default=None,
-    help="Directory containing service folder to copy to destination folder for execution",
+    default=os.getcwd(),
+    help="Directory containing service folder to copy to destination folder for execution. Default: Current directory. Example: /data/bi/service_and_collaboration/CNM/virologia/",
 )
 @click.option(
-    "-d",
-    "--destination",
+    "-t",
+    "--tmp_dir",
     type=click.Path(),
     default="/data/bi/scratch_tmp/bi/",
     help="Directory to which the files will be transfered for execution. Default: /data/bi/scratch_tmp/bi/",
 )
-def scratch(resolution, source, destination):
+@click.option(
+    "-d",
+    "--direction",
+    type=click.Choice(["Service_to_scratch", "Scratch_to_service", "Remove_scratch"]),
+    multiple=False,
+    help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
+)
+def scratch(resolution, service_dir, tmp_dir, direction):
     """
     "Copy service folder to scratch directory for execution."
     """
-    scratch_copy = bu_isciii.scratch.Scratch(resolution, source, destination)
-    scratch_copy.copy_scratch()
+    scratch_copy = bu_isciii.scratch.Scratch(
+        resolution, service_dir, tmp_dir, direction
+    )
+    scratch_copy.handle_scratch()
 
 
 # COPY RESULTS FOLDER TO SFTP
@@ -216,7 +227,30 @@ def deliver(resolution, source, destination):
     "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
     """
     new_del = bu_isciii.deliver.Deliver(resolution, source, destination)
-    new_del.copy_sftp()
+    # new_del.copy_sftp()
+    new_del.create_report()
+
+
+# COPY RESULTS FOLDER TO SFTP
+@bu_isciii_cli.command(help_priority=5)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-l",
+    "--local_folder",
+    type=click.Path(),
+    default=None,
+    help="Directory containing the local folder which bioinfo_doc is mounted. Default: /media/bioinfo_doc/",
+)
+@click.option(
+    "-t",
+    "--type",
+    type=click.Choice(["request", "resolution", "delivery"]),
+    help="Select the documentation that will generate",
+)
+def bioinfo_doc(resolution, local_folder, type):
+    """Create the folder documentation structure in bioinfo_doc server"""
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(resolution, local_folder, type)
+    new_doc.create_structure()
 
 
 if __name__ == "__main__":

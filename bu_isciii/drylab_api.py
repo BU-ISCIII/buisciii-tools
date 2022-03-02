@@ -15,8 +15,11 @@ class RestServiceApi:
         url_http = str(self.request_url + request_info + "?" + parameter + "=" + value)
         try:
             req = requests.get(url_http, headers=self.headers)
+            if req.status_code > 201:
+                return False
             return json.loads(req.text)
-        except requests.HTTPError:
+        except requests.ConnectionError:
+            log.error("Unable to open connection towards iSkyLIMS")
             return False
 
     def put_request(self, request_info, parameter, value):
@@ -24,16 +27,18 @@ class RestServiceApi:
         try:
             requests.get(url_http, headers=self.headers)
             return True
-        except requests.HTTPError:
+        except requests.ConnectionError:
+            log.error("Unable to open connection towards iSkyLIMS")
             return False
 
     def post_request(self, data):
         try:
             req = requests.post(self.request_url, data=data, headers=self.headers)
-        except requests.HTTPError:
-            if req.status > 201:
+            if req.status_code > 201:
                 log.error(str(req.status_code))
-            return False
+                return False
+        except requests.ConnectionError:
+            log.error("Unable to open connection towards iSkyLIMS")
         return True
 
 
