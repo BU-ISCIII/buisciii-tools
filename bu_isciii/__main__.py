@@ -13,7 +13,6 @@ import bu_isciii
 import bu_isciii.utils
 import bu_isciii.new_service
 import bu_isciii.scratch
-import bu_isciii.deliver
 import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean

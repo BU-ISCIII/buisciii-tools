@@ -213,23 +213,24 @@ class CleanUp:
         self.check_path_exists()
         pathlist = []
         # key: root, values: [[files inside], [dirs inside]]
+        found = []
         for root, dirs, files in os.walk(self.full_path):
-            for file in files:
-                if to_find:
-                    for item_to_be_found in to_find:
+            if not found == to_find:
+                for item_to_be_found in to_find:
+                    if root.endswith(item_to_be_found):
+                        pathlist.append(root)
+                        found.append(item_to_be_found)
+                        continue
+                    for file in files:
                         path = os.path.join(root,file)
-                        if root.endswith(item_to_be_found):
-                            pathlist.append(root)
-                            to_find.remove(item_to_be_found)
-                            continue
                         if path.endswith(item_to_be_found):
                             pathlist.append(path)
-                            to_find.remove(item_to_be_found)
+                            found.append(item_to_be_found)
                             continue
-                else:
-                    return pathlist
+            else:
+                return pathlist
 
-        if to_find:
+        if not found == to_find:
             stderr.print("[orange]WARNING:Some files/dir to delete/rename have not been found")
             return pathlist
         else:
