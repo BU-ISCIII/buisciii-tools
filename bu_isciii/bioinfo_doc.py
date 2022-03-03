@@ -6,6 +6,7 @@ import os
 import sys
 import jinja2
 import markdown
+from xhtml2pdf import pisa
 
 import bu_isciii.utils
 import bu_isciii.config_json
@@ -180,28 +181,54 @@ class BioinfoDoc:
         file_read = file_read.replace("{text_to_add}", html_text)
         with open(file_name, "w") as fh:
             fh.write(file_read)
-        return True
+        return file_name
 
-    def create_service_request_doc(self):
-        if not os.listdir(os.path.join(self.service_folder, "request")):
-            # Create the requested service documents
-            file_path = os.path.join(self.service_folder, "request")
-            mk_text, file_name = self.create_markdown(file_path)
-            file_name_without_ext = file_name.replace(".md", "")
-            html_text = self.convert_markdown_to_html(mk_text)
-            self.wrap_html(html_text, file_name_without_ext)
-            self.convert_to_pdf(file_name_without_ext)
+    def convert_to_pdf(html_file):
+        pdf_file = html + ".pdf"
+        html_file += ".html"
+        fh_in = open(html_file, "r")
+        html_lines = fh_in.readlines()
+        fh_in.close()
+        fh_out = open(pdf_file, "w+b")
+        pisa_status = pisa.CreatePDF(html_lines, dest=fh_out)
+        if pisa_status.err:
+            stderr.print("[green] Successfully creation of pdf file")
+        else:
+            stderr.print("[red] Unable to create the pdf file")
+        fh_out.close()
+        return
+
+    def generate_documentation_files(self, type):
+        if type == "request":
+            if not os.listdir(os.path.join(self.service_folder, "request")):
+                # Create the requested service documents
+                file_path = os.path.join(self.service_folder, "request")
+        elif type == "resolution":
+            file_path = os.path.join(self.service_folder, "resolution")
+        elif type == "delivery":
+            file_path = os.path.join(self.service_folder, "result")
+        else:
+            stderr.print("[red] invalid option")
+            log.error("Unable to generate files because invalid option %s" % type)
+            sys.exit(1)
+        mk_text, file_name = self.create_markdown(file_path)
+        file_name_without_ext = file_name.replace(".md", "")
+        html_text = self.convert_markdown_to_html(mk_text)
+        html_file_name = self.wrap_html(html_text, file_name_without_ext)
+        self.convert_to_pdf(html_file_name)
         return
 
     def create_resolution_doc(self):
         # check if request service documentation was created
-        self.create_service_request_doc()
+        self.generate_documentation_files('request')
+        """
         file_path = os.path.join(self.service_folder, "resolution")
         mk_text, file_name = self.create_markdown(file_path)
         file_name_without_ext = file_name.replace(".md", "")
         html_text = self.convert_markdown_to_html(mk_text)
-        self.wrap_html(html_text, file_name_without_ext)
-        self.convert_to_pdf(file_name_without_ext)
+        html_file_name = self.wrap_html(html_text, file_name_without_ext)
+        self.convert_to_pdf(html_file_name)
+        """
         return
 
     def create_delivery_doc(self):
