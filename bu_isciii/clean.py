@@ -213,21 +213,26 @@ class CleanUp:
         self.check_path_exists()
         pathlist = []
         # key: root, values: [[files inside], [dirs inside]]
-        print(self.full_path)
-        for root, _, _ in os.walk(self.full_path):
-            # coincidence might not be total so double loop by now
-            if to_find:
-                print(to_find)
-                for item_to_be_found in to_find:
-                    if item_to_be_found in root:
-                        pathlist.append(root)
-                        to_find.remove(item_to_be_found)
-            else:
-                print(pathlist)
-                return pathlist
+        for root, dirs, files in os.walk(self.full_path):
+            for file in files:
+                if to_find:
+                    for item_to_be_found in to_find:
+                        path = os.path.join(root,file)
+                        if root.endswith(item_to_be_found):
+                            pathlist.append(root)
+                            to_find.remove(item_to_be_found)
+                            continue
+                        if path.endswith(item_to_be_found):
+                            pathlist.append(path)
+                            to_find.remove(item_to_be_found)
+                            continue
+                else:
+                    return pathlist
+
         if to_find:
             stderr.print("[orange]WARNING:Some files/dir to delete/rename have not been found")
-            print(pathlist)
+            return pathlist
+        else:
             return pathlist
 
     def rename(self, to_find, add, verbose=True):
@@ -292,6 +297,7 @@ class CleanUp:
         path_content = self.scan_dirs(to_find=files_to_delete)
         for file in path_content:
             os.remove(file)
+            stderr.print("[green]Successfully removed " + file)
         return
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
