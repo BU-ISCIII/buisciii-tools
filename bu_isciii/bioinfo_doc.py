@@ -231,10 +231,10 @@ class BioinfoDoc:
     def create_documentation(self):
         self.create_structure()
         if self.type == "resolution":
-            self.generate_documentation_files('request')
-            self.generate_documentation_files('resolution')
+            self.generate_documentation_files("request")
+            self.generate_documentation_files("resolution")
             return
         if self.type == "delivery":
-            pdf_file = self.generate_documentation_files('delivery')
-            join_pdf_files(pdf_file, '')
+            pdf_file = self.generate_documentation_files("delivery")
+            self.join_pdf_files(pdf_file, "")
             return
