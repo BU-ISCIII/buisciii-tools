@@ -184,7 +184,7 @@ class BioinfoDoc:
         return file_name
 
     def convert_to_pdf(html_file):
-        pdf_file = html + ".pdf"
+        pdf_file = html_file + ".pdf"
         html_file += ".html"
         fh_in = open(html_file, "r")
         html_lines = fh_in.readlines()
@@ -196,7 +196,7 @@ class BioinfoDoc:
         else:
             stderr.print("[red] Unable to create the pdf file")
         fh_out.close()
-        return
+        return pdf_file
 
     def generate_documentation_files(self, type):
         if type == "request":
@@ -215,20 +215,12 @@ class BioinfoDoc:
         file_name_without_ext = file_name.replace(".md", "")
         html_text = self.convert_markdown_to_html(mk_text)
         html_file_name = self.wrap_html(html_text, file_name_without_ext)
-        self.convert_to_pdf(html_file_name)
-        return
+        pdf_file = self.convert_to_pdf(html_file_name)
+        return pdf_file
 
-    def create_resolution_doc(self):
-        # check if request service documentation was created
-        self.generate_documentation_files('request')
-        """
-        file_path = os.path.join(self.service_folder, "resolution")
-        mk_text, file_name = self.create_markdown(file_path)
-        file_name_without_ext = file_name.replace(".md", "")
-        html_text = self.convert_markdown_to_html(mk_text)
-        html_file_name = self.wrap_html(html_text, file_name_without_ext)
-        self.convert_to_pdf(html_file_name)
-        """
+    def join_pdf_files(servvice_pdf, result_template):
+        pass
+        # conf_api = bu_isciii.service_json.ServiceJson().get_configuration("api_settings")
         return
 
     def create_delivery_doc(self):
@@ -238,11 +230,11 @@ class BioinfoDoc:
 
     def create_documentation(self):
         self.create_structure()
-        # file_folder = os.path.join(self.service_folder, self.type)
-        # file_name = os.path.join(file_folder)
         if self.type == "resolution":
-            self.create_resolution_doc()
+            self.generate_documentation_files('request')
+            self.generate_documentation_files('resolution')
             return
         if self.type == "delivery":
-            self.create_delivery()
+            pdf_file = self.generate_documentation_files('delivery')
+            join_pdf_files(pdf_file, '')
             return
