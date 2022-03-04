@@ -24,15 +24,15 @@ stderr = rich.console.Console(
 
 
 class Archive:
-    def __init__(
-        self, resolution_id=None, type=None, year=None
-    ):
+    def __init__(self, resolution_id=None, type=None, year=None):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
-        self.path = bu_isciii.config_json.ConfigJson().get_configuration("archive")["archived_path"]
+        self.path = bu_isciii.config_json.ConfigJson().get_configuration("archive")[
+            "archived_path"
+        ]
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
