@@ -22,7 +22,8 @@
         "services_path": "services",
         "service_folder": ["request", "resolution", "result"],
         "md_template_path_file" : "templates/jinja_template.j2",
-        "html_template_path_file" : "templates/html_service_template.html"
+        "html_template_path_file" : "templates/html_service_template.html",
+        "path_to_css" : "assets/css"
     },
     "new_service": {
         "fastq_repo": "/srv/fastq_repo"
