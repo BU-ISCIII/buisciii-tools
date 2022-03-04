@@ -30,6 +30,12 @@ def prompt_resolution_id():
     return resolution_id
 
 
+def prompt_year():
+    stderr.print("Specify the year for which you want to archive services.")
+    year = questionary.text("Year").unsafe_ask()
+    return year
+
+
 def prompt_service_dir_path():
     stderr.print("Service path to copy to execution temporal directory")
     source = questionary.path("Source path").unsafe_ask()
