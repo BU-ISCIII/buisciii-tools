@@ -322,8 +322,6 @@ class CleanUp:
 
         """
         path_content = self.scan_dirs(to_find=self.delete_folders)
-        unfiltered_items = []
-        filtered_items = []
 
         for directory in path_content:
             # if not empty, and not previously DEL add it to the content
