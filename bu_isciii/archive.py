@@ -70,8 +70,8 @@ class Archive:
         """
         Archive services in selected year
         """
-        for services in self.services_to_archive:
-            print(services)
+        for service in self.services_to_archive:
+            print(service["serviceRequestNumber"])
         return
 
     def retrieve_from_archive(self):
