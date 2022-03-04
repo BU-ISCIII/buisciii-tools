@@ -6,6 +6,7 @@ import os
 import sys
 import jinja2
 import markdown
+import pdfkit
 
 import bu_isciii.utils
 import bu_isciii.config_json
@@ -46,6 +47,9 @@ class BioinfoDoc:
         else:
             self.resolution_id = resolution_id
         self.config_doc = bu_isciii.config_json.ConfigJson().get_configuration(
+            "bioinfo_doc"
+        )
+        self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
             "bioinfo_doc"
         )
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
@@ -98,6 +102,7 @@ class BioinfoDoc:
             "starting proccess to create markdown for service %s", self.resolution_id
         )
         stderr.print("[green] Creating markdown file for " + self.resolution_id + " !")
+        log.info("Start creating the markdown file")
         markdown_data = {}
         # service related information
         markdown_data["service"] = self.service
@@ -151,7 +156,7 @@ class BioinfoDoc:
 
         with open(file_name, "wb") as fh:
             fh.write(mk_text.encode("utf-8"))
-
+        log.info("Creation the markdown file is completed")
         return str(mk_text), file_name
 
     def convert_markdown_to_html(self, mk_text):
@@ -175,33 +180,60 @@ class BioinfoDoc:
 
     def wrap_html(self, html_text, file_name):
         file_name += ".html"
-        with open(self.config_doc["html_template_path_file"], "r") as fh:
+        template_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            self.doc_conf["html_template_path_file"],
+        )
+        css_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), self.doc_conf["path_to_css"]
+        )
+        with open(template_file, "r") as fh:
             file_read = fh.read()
         file_read = file_read.replace("{text_to_add}", html_text)
+        file_read = file_read.replace("{path_to_css}", css_path)
         with open(file_name, "w") as fh:
             fh.write(file_read)
-        return True
+        return file_name
 
-    def create_service_request_doc(self):
-        if not os.listdir(os.path.join(self.service_folder, "request")):
-            # Create the requested service documents
-            file_path = os.path.join(self.service_folder, "request")
-            mk_text, file_name = self.create_markdown(file_path)
-            file_name_without_ext = file_name.replace(".md", "")
-            html_text = self.convert_markdown_to_html(mk_text)
-            self.wrap_html(html_text, file_name_without_ext)
-            self.convert_to_pdf(file_name_without_ext)
+    def convert_to_pdf(self, html_file):
+        pdf_file = html_file.replace(".html", ".pdf")
+        try:
+            pdfkit.from_file(html_file, pdf_file)
+        except OSError as e:
+            stderr.print("[red] Unable to convert to PDF")
+            log.exception("Unable to create pdf.", exc_info=e)
         return
 
-    def create_resolution_doc(self):
-        # check if request service documentation was created
-        self.create_service_request_doc()
-        file_path = os.path.join(self.service_folder, "resolution")
+    def generate_documentation_files(self, type):
+        if type == "request":
+            if not os.listdir(os.path.join(self.service_folder, "request")):
+                # Create the requested service documents
+                file_path = os.path.join(self.service_folder, "request")
+            else:
+                stderr.print("[green] Skiping documentation on request folder")
+                log.info(
+                    "Documenttion already created on request folder. Skiping this step"
+                )
+                return
+        elif type == "resolution":
+            file_path = os.path.join(self.service_folder, "resolution")
+        elif type == "delivery":
+            file_path = os.path.join(self.service_folder, "result")
+        else:
+            stderr.print("[red] invalid option")
+            log.error("Unable to generate files because invalid option %s", type)
+            sys.exit(1)
+
         mk_text, file_name = self.create_markdown(file_path)
         file_name_without_ext = file_name.replace(".md", "")
         html_text = self.convert_markdown_to_html(mk_text)
-        self.wrap_html(html_text, file_name_without_ext)
-        self.convert_to_pdf(file_name_without_ext)
+        html_file_name = self.wrap_html(html_text, file_name_without_ext)
+        pdf_file = self.convert_to_pdf(html_file_name)
+        return pdf_file
+
+    def join_pdf_files(servvice_pdf, result_template):
+        pass
+        # conf_api = bu_isciii.service_json.ServiceJson().get_configuration("api_settings")
         return
 
     def create_delivery_doc(self):
@@ -211,11 +243,11 @@ class BioinfoDoc:
 
     def create_documentation(self):
         self.create_structure()
-        # file_folder = os.path.join(self.service_folder, self.type)
-        # file_name = os.path.join(file_folder)
         if self.type == "resolution":
-            self.create_resolution_doc()
+            self.generate_documentation_files("request")
+            self.generate_documentation_files("resolution")
             return
         if self.type == "delivery":
-            self.create_delivery()
+            pdf_file = self.generate_documentation_files("delivery")
+            self.join_pdf_files(pdf_file, "")
             return
