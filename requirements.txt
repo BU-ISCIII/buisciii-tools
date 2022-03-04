@@ -9,4 +9,4 @@ sysrsync==1.0.1
 requests==2.27.1
 markdown==3.3.6
 pymdown-extensions
-xhtml2pdf
+pdfkit
