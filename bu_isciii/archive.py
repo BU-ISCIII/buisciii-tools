@@ -24,7 +24,7 @@ stderr = rich.console.Console(
 )
 
 class Archive:
-    def __init__(self, resolution_id=None, type=None, year=None):
+    def __init__(self, resolution_id=None, type=None, year=None, option=None):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
@@ -46,6 +46,25 @@ class Archive:
         self.services_to_archive = rest_api.get_request(
             "services", "state", "delivered", "date", self.year
         )
+
+        if type is None:
+            self.option = bu_isciii.utils.prompt_selection(
+                "Type",
+                [
+                    "services_and_colaborations",
+                    "research"
+                ],
+            )
+
+        if option is None:
+            self.option = bu_isciii.utils.prompt_selection(
+                "Options",
+                [
+                    "archive",
+                    "retrieve_from_archive"
+                ],
+            )
+
 
     def archive(self):
         """

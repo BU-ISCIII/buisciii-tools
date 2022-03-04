@@ -308,9 +308,15 @@ def bioinfo_doc(type, resolution, local_folder):
     type=click.Choice(["services_and_colaborations", "research"]),
     help="Select which folder you want to archive.",
 )
-def archive(resolution, year, type):
+@click.option(
+    "-s",
+    "--option",
+    type=click.Choice(["archive", "retrieve_from_archive"]),
+    help="Select either you want to archive services or retrieve a service from archive.",
+)
+def archive(resolution, type, year, option):
     """Archive services or retrieve services from archive"""
-    archive_ser = bu_isciii.archive.Archive(resolution, year, type)
+    archive_ser = bu_isciii.archive.Archive(resolution, year, type, option)
     archive_ser.handle_archive()
 
 if __name__ == "__main__":
