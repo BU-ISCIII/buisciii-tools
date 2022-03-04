@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-Common utility function for bu-isciii package.
-"""
 import os
 import rich
 import questionary
