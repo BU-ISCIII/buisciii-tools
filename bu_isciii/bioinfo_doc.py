@@ -197,7 +197,11 @@ class BioinfoDoc:
 
     def convert_to_pdf(self, html_file):
         pdf_file = html_file.replace(".html", ".pdf")
-        pdfkit.from_file(html_file, pdf_file)
+        try:
+            pdfkit.from_file(html_file, pdf_file)
+        except OSError as e:
+            stderr.print("[red] Unable to convert to PDF")
+            log.exception("Unable to create pdf.", exc_info=e)
         return
 
     def generate_documentation_files(self, type):
@@ -217,7 +221,7 @@ class BioinfoDoc:
             file_path = os.path.join(self.service_folder, "result")
         else:
             stderr.print("[red] invalid option")
-            log.error("Unable to generate files because invalid option %s" % type)
+            log.error("Unable to generate files because invalid option %s", type)
             sys.exit(1)
 
         mk_text, file_name = self.create_markdown(file_path)
