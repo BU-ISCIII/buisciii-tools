@@ -222,14 +222,16 @@ class CleanUp:
                     pathlist.append(root)
                     found.append(item_to_be_found)
                 for file in files:
-                    path = os.path.join(root,file)
+                    path = os.path.join(root, file)
                     if path.endswith(item_to_be_found):
                         pathlist.append(path)
                         found.append(item_to_be_found)
 
         # Check found list without duplicates
         if not list(dict.fromkeys(found)).sort() == to_find.sort():
-            stderr.print("[orange]WARNING:Some files/dir to delete/rename have not been found")
+            stderr.print(
+                "[orange]WARNING:Some files/dir to delete/rename have not been found"
+            )
             for item in to_find:
                 if item not in found:
                     stderr.print("[orange] %s" % item)
@@ -259,7 +261,10 @@ class CleanUp:
 
         for directory_to_rename in path_content:
             if add in directory_to_rename:
-                stderr.print("[orange]WARNING: Directory %s already renamed" % directory_to_rename)
+                stderr.print(
+                    "[orange]WARNING: Directory %s already renamed"
+                    % directory_to_rename
+                )
                 continue
             else:
                 newpath = directory_to_rename + add
@@ -293,7 +298,7 @@ class CleanUp:
         """
         files_to_delete = []
         for sample_info in self.service_samples:
-           for file in self.delete_files:
+            for file in self.delete_files:
                 file_to_delete = file.replace("sample_name", sample_info["sampleName"])
                 files_to_delete.append(file_to_delete)
         path_content = self.scan_dirs(to_find=files_to_delete)
@@ -325,7 +330,7 @@ class CleanUp:
             if not directory.endswith(add):
                 for item in os.listdir(directory):
                     if item not in sacredtexts:
-                        item_path = os.path.join(directory,item)
+                        item_path = os.path.join(directory, item)
                         # shutil if dir, os.remove if file
                         if os.path.isdir(item_path):
                             shutil.rmtree(item_path)
