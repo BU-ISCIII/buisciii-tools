@@ -263,7 +263,7 @@ def clean(resolution, path, ask_path, option):
     default=None,
     help="Directory to which the files will be transfered",
 )
-def deliver(resolution, source, destination):
+def copy_sftp(resolution, source, destination):
     """
     "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
     """
@@ -292,6 +292,25 @@ def bioinfo_doc(type, resolution, local_folder):
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
     new_doc.create_documentation()
 
+# ARCHIVE SERVICES
+@bu_isciii_cli.command(help_priority=5)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-y",
+    "--year",
+    default=None,
+    help="Year for which you want to archive services.",
+)
+@click.option(
+    "-t",
+    "--type",
+    type=click.Choice(["services_and_colaborations", "research"]),
+    help="Select which folder you want to archive.",
+)
+def archive(resolution, year, type):
+    """Archive services or retrieve services from archive"""
+    archive_ser = bu_isciii.archive.Archive(resolution, year, type)
+    archive_ser.handle_archive()
 
 if __name__ == "__main__":
     run_bu_isciii()

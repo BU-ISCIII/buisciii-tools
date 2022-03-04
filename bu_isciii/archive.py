@@ -48,7 +48,25 @@ class Archive:
         )
 
     def archive(self):
+        """
+        Archive services in selected year
+        """
+        for services in self.services_to_archive:
+            print(services)
         return
 
     def retrieve_from_archive(self):
+        """
+        Copy a service back from archive
+        """
+        return
+
+    def handle_archive(self):
+        """
+        Handle archive class options
+        """
+        if self.option == "archive":
+            self.archive()
+        if self.option == "retrieve_from_archive":
+            self.retrieve_from_archive()
         return
