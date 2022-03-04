@@ -214,24 +214,26 @@ class CleanUp:
         pathlist = []
         # key: root, values: [[files inside], [dirs inside]]
         found = []
+        # TODO: This has to be revisite if it takes to long.
+        # I've tried to continue if found, but I guess there could be several work folders in the project.. Let's see how it goes
         for root, dirs, files in os.walk(self.full_path):
-            if not found == to_find:
-                for item_to_be_found in to_find:
-                    if root.endswith(item_to_be_found):
-                        pathlist.append(root)
+            for item_to_be_found in to_find:
+                print(item_to_be_found)
+                if root.endswith(item_to_be_found):
+                    pathlist.append(root)
+                    found.append(item_to_be_found)
+                for file in files:
+                    path = os.path.join(root,file)
+                    if path.endswith(item_to_be_found):
+                        pathlist.append(path)
                         found.append(item_to_be_found)
-                        continue
-                    for file in files:
-                        path = os.path.join(root,file)
-                        if path.endswith(item_to_be_found):
-                            pathlist.append(path)
-                            found.append(item_to_be_found)
-                            continue
-            else:
-                return pathlist
 
-        if not found == to_find:
+        # Check found list without duplicates
+        if not list(dict.fromkeys(found)) == to_find:
             stderr.print("[orange]WARNING:Some files/dir to delete/rename have not been found")
+            for item in to_find:
+                if item not in found:
+                    print(item)
             return pathlist
         else:
             return pathlist
@@ -370,11 +372,15 @@ class CleanUp:
 
         """
         to_rename = self.scan_dirs(to_find=terminations)
+        if not to_rename:
+            stderr.print("[orange] WARNING: I have nothing to revert renaming.")
+            return
         for dir_to_rename in to_rename:
             # remove all the terminations
             for term in terminations:
-                newname = dir_to_rename.replace(term, "")
-            os.replace(dir_to_rename, newname)
+                if dir_to_rename.endswith(term):
+                    newname = dir_to_rename.replace(term, "")
+                    os.replace(dir_to_rename, newname)
             if verbose:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
