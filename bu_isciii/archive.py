@@ -4,6 +4,7 @@
 import sys
 import os
 import logging
+import glob
 
 import shutil
 import rich
@@ -22,13 +23,17 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
-
 class Archive:
     def __init__(self, resolution_id=None, type=None, year=None):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
+
+        if year is None:
+            self.year = bu_isciii.utils.prompt_year()
+        else:
+            self.year = year
 
         self.path = bu_isciii.config_json.ConfigJson().get_configuration("archive")[
             "archived_path"
@@ -38,6 +43,12 @@ class Archive:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
-        self.resolution_info = rest_api.get_request(
-            "services", "resolution", self.resolution_id
+        self.services_to_archive = rest_api.get_request(
+            "services", "state", "delivered", "date", self.year
         )
+
+    def archive(self):
+        return
+
+    def retrieve_from_archive(self):
+        return
