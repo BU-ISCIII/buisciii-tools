@@ -15,13 +15,9 @@ import rich.table
 import rich.console
 from bu_isciii.service_json import ServiceJson
 import logging
-
 import bu_isciii
 import bu_isciii.utils
-
 from rich.console import Console
-
-import sys
 
 log = logging.getLogger(__name__)
 stderr = Console(
@@ -67,3 +63,9 @@ class ListServices:
         console = rich.console.Console()
         console.print(table)
         return
+
+
+"""
+prueba = ListServices()
+prueba.get_table("viral")
+"""
