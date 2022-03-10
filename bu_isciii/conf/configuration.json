@@ -32,6 +32,9 @@
         "command": "rsync -rlv "
     },
     "archive": {
-        "archived_path": "/archived/bi"
+        "data_path": "/data/bi",
+        "archived_path": "/archived/bi",
+        "protocol": "rsync",
+        "options": ["-rv"]
     }
 }
