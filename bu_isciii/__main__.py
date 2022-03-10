@@ -129,10 +129,10 @@ def bu_isciii_cli(verbose, log_file):
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
-@click.argument("resolution", required=False, default=None, metavar="<search term>")
+@click.argument("search_term", required=False, default=None, metavar="<search term>")
 @click.option(
-    "-t",
-    "--type",
+    "-s",
+    "--search_term",
     type=click.Path(),
     default=None,
     help="Show all services, or find services by name",
