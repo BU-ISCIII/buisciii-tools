@@ -14,6 +14,7 @@
 import rich.table
 import rich.console
 from bu_isciii.service_json import ServiceJson
+import logging
 
 import bu_isciii
 import bu_isciii.utils
