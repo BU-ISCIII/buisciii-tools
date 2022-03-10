@@ -4,9 +4,8 @@
 import sys
 import os
 import logging
-import glob
 
-import shutil
+import sysrsync
 import rich
 
 # Local imports
@@ -35,9 +34,7 @@ class Archive:
         else:
             self.year = year
 
-        self.path = bu_isciii.config_json.ConfigJson().get_configuration("archive")[
-            "archived_path"
-        ]
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
@@ -71,7 +68,26 @@ class Archive:
         Archive services in selected year
         """
         for service in self.services_to_archive:
-            print(service["serviceRequestNumber"])
+            print(service["servicFolderName"])
+            source = os.path.join(self.conf["data_path"],self.type,service["serviceUserId"]["Center"],service["serviceUserId"]["Area"], service["ServiceFolderName"])
+            dest = os.path.join(self.conf["archive_path"], self.type,service["serviceUserId"]["Center"],service["serviceUserId"]["Area"])
+
+            try:
+                sysrsync.run(
+                    source=self.source,
+                    destination=self.destination,
+                    options=data["options"],
+                    sync_source_contents=False,
+                )
+                stderr.print(
+                    "[green] Data copied to the sftp folder successfully",
+                    highlight=False,
+                )
+            except OSError:
+                stderr.print(
+                    "[red] ERROR: Data could not be copied to the sftp folder.",
+                    highlight=False,
+                )
         return
 
     def retrieve_from_archive(self):
