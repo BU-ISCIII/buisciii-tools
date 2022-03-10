@@ -29,10 +29,8 @@ class ListServices:
         """
         Table print for services names and description
         """
-
         if name:
-            search = re.compile(name)
-            subset_services = list(filter(search.match, self.service_list))
+            subset_services = [item for item in self.service_list if name in item]
         else:
             subset_services = self.service_list
 
