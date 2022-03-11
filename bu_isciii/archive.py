@@ -22,6 +22,7 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
+
 class Archive:
     def __init__(self, resolution_id=None, type=None, year=None, option=None):
         if resolution_id is None:
@@ -47,21 +48,14 @@ class Archive:
         if type is None:
             self.option = bu_isciii.utils.prompt_selection(
                 "Type",
-                [
-                    "services_and_colaborations",
-                    "research"
-                ],
+                ["services_and_colaborations", "research"],
             )
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
-                [
-                    "archive",
-                    "retrieve_from_archive"
-                ],
+                ["archive", "retrieve_from_archive"],
             )
-
 
     def archive(self):
         """
@@ -69,8 +63,19 @@ class Archive:
         """
         for service in self.services_to_archive:
             print(service["servicFolderName"])
-            source = os.path.join(self.conf["data_path"],self.type,service["serviceUserId"]["Center"],service["serviceUserId"]["Area"], service["ServiceFolderName"])
-            dest = os.path.join(self.conf["archive_path"], self.type,service["serviceUserId"]["Center"],service["serviceUserId"]["Area"])
+            source = os.path.join(
+                self.conf["data_path"],
+                self.type,
+                service["serviceUserId"]["Center"],
+                service["serviceUserId"]["Area"],
+                service["ServiceFolderName"],
+            )
+            dest = os.path.join(
+                self.conf["archive_path"],
+                self.type,
+                service["serviceUserId"]["Center"],
+                service["serviceUserId"]["Area"],
+            )
 
             try:
                 sysrsync.run(

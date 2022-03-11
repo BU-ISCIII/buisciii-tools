@@ -293,6 +293,7 @@ def bioinfo_doc(type, resolution, local_folder):
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
     new_doc.create_documentation()
 
+
 # ARCHIVE SERVICES
 @bu_isciii_cli.command(help_priority=5)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
@@ -318,6 +319,7 @@ def archive(resolution, type, year, option):
     """Archive services or retrieve services from archive"""
     archive_ser = bu_isciii.archive.Archive(resolution, year, type, option)
     archive_ser.handle_archive()
+
 
 if __name__ == "__main__":
     run_bu_isciii()
