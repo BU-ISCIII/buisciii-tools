@@ -13,7 +13,6 @@ import bu_isciii
 import bu_isciii.utils
 import bu_isciii.new_service
 import bu_isciii.scratch
-# import bu_isciii.deliver
 import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean
@@ -135,8 +134,8 @@ def list(service):
     """
     List available bu-isciii services.
     """
-    show_table = bu_isciii.list.ListServices()
-    show_table.get_table(service)
+    service_list = bu_isciii.list.ListServices()
+    service_list.print_table(service)
 
 
 # CREATE NEW SERVICE

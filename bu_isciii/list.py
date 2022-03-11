@@ -25,13 +25,13 @@ class ListServices:
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
 
-    def get_table(self, name=None):
+    def print_table(self, service=None):
         """
         Table print for services names and description
         """
 
-        if name:
-            search = re.compile(name)
+        if service:
+            search = re.compile(service)
             subset_services = list(filter(search.match, self.service_list))
         else:
             subset_services = self.service_list

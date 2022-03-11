@@ -104,6 +104,7 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
+        self.service_samples = self.resolution_info["Samples"]
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -212,13 +213,31 @@ class CleanUp:
         self.check_path_exists()
         pathlist = []
         # key: root, values: [[files inside], [dirs inside]]
-        for root, _, _ in os.walk(self.full_path):
-            # coincidence might not be total so double loop by now
+        found = []
+        # TODO: This has to be revisite if it takes to long.
+        # I've tried to continue if found, but I guess there could be several work folders in the project.. Let's see how it goes
+        for root, dirs, files in os.walk(self.full_path):
             for item_to_be_found in to_find:
-                if item_to_be_found in root:
+                if root.endswith(item_to_be_found):
                     pathlist.append(root)
+                    found.append(item_to_be_found)
+                for file in files:
+                    path = os.path.join(root, file)
+                    if path.endswith(item_to_be_found):
+                        pathlist.append(path)
+                        found.append(item_to_be_found)
 
-        return pathlist
+        # Check found list without duplicates
+        if not list(dict.fromkeys(found)).sort() == to_find.sort():
+            stderr.print(
+                "[orange]WARNING:Some files/dir to delete/rename have not been found"
+            )
+            for item in to_find:
+                if item not in found:
+                    stderr.print("[orange] %s" % item)
+            return pathlist
+        else:
+            return pathlist
 
     def rename(self, to_find, add, verbose=True):
         """
@@ -241,10 +260,17 @@ class CleanUp:
         path_content = self.scan_dirs(to_find=to_find)
 
         for directory_to_rename in path_content:
-            newpath = directory_to_rename + add
-            os.replace(directory_to_rename, newpath)
-            if verbose:
-                print(f"Renamed {directory_to_rename} to {newpath}.")
+            if add in directory_to_rename:
+                stderr.print(
+                    "[orange]WARNING: Directory %s already renamed"
+                    % directory_to_rename
+                )
+                continue
+            else:
+                newpath = directory_to_rename + add
+                os.replace(directory_to_rename, newpath)
+                if verbose:
+                    print(f"Renamed {directory_to_rename} to {newpath}.")
         return
 
     def rename_nocopy(self, verbose=True):
@@ -270,7 +296,16 @@ class CleanUp:
         Params:
 
         """
-        return True
+        files_to_delete = []
+        for sample_info in self.service_samples:
+            for file in self.delete_files:
+                file_to_delete = file.replace("sample_name", sample_info["sampleName"])
+                files_to_delete.append(file_to_delete)
+        path_content = self.scan_dirs(to_find=files_to_delete)
+        for file in path_content:
+            os.remove(file)
+            stderr.print("[green]Successfully removed " + file)
+        return
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
@@ -287,29 +322,20 @@ class CleanUp:
 
         """
         path_content = self.scan_dirs(to_find=self.delete_folders)
-        unfiltered_items = []
-        filtered_items = []
 
         for directory in path_content:
             # if not empty, and not previously DEL add it to the content
-            if not directory.endswith(add) and len(os.listdir(directory)) > 0:
-                unfiltered_items += directory
-        # take out those belonging to the sacred items
-        for item in unfiltered_items:
-            # coincidence might not be total so double loop
-            for text in sacredtexts:
-                # add it to the filtered list if not in the sacredtext
-                if text not in item:
-                    filtered_items.append(item)
-
-        for item in filtered_items:
-            # shutil if dir, os.remove if file
-            if os.path.isdir(item):
-                shutil.rmtree(item)
-            else:
-                os.remove(item)
-            if verbose:
-                print(f"Removed {item}.")
+            if not directory.endswith(add):
+                for item in os.listdir(directory):
+                    if item not in sacredtexts:
+                        item_path = os.path.join(directory, item)
+                        # shutil if dir, os.remove if file
+                        if os.path.isdir(item_path):
+                            shutil.rmtree(item_path)
+                        else:
+                            os.remove(item_path)
+                        if verbose:
+                            print(f"Removed {item}.")
         return
 
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
@@ -348,11 +374,15 @@ class CleanUp:
 
         """
         to_rename = self.scan_dirs(to_find=terminations)
+        if not to_rename:
+            stderr.print("[orange] WARNING: I have nothing to revert renaming.")
+            return
         for dir_to_rename in to_rename:
             # remove all the terminations
             for term in terminations:
-                newname = dir_to_rename.replace(term, "")
-            os.replace(dir_to_rename, newname)
+                if dir_to_rename.endswith(term):
+                    newname = dir_to_rename.replace(term, "")
+                    os.replace(dir_to_rename, newname)
             if verbose:
                 print(f"Replaced {dir_to_rename} with {newname}.")
 
