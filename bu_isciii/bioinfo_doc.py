@@ -231,6 +231,10 @@ class BioinfoDoc:
         pdf_file = self.convert_to_pdf(html_file_name)
         return pdf_file
 
+    def generate_service_reports(self):
+        
+        pass
+
     def join_pdf_files(servvice_pdf, result_template):
         pass
         # conf_api = bu_isciii.service_json.ServiceJson().get_configuration("api_settings")
@@ -248,6 +252,7 @@ class BioinfoDoc:
             self.generate_documentation_files("resolution")
             return
         if self.type == "delivery":
-            pdf_file = self.generate_documentation_files("delivery")
-            self.join_pdf_files(pdf_file, "")
+            pdf_resolution = self.generate_documentation_files("delivery")
+            pdf_services_reqquest = self.generate_service_reports()
+            self.join_pdf_files(pdf_resolution, pdf_services_reqquest)
             return

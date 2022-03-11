@@ -13,7 +13,7 @@ import bu_isciii
 import bu_isciii.utils
 import bu_isciii.new_service
 import bu_isciii.scratch
-import bu_isciii.deliver
+# import bu_isciii.deliver
 import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean
@@ -130,12 +130,13 @@ def bu_isciii_cli(verbose, log_file):
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
-def list():
+@click.argument("service", required=False, default=None, metavar="<service>")
+def list(service):
     """
     List available bu-isciii services.
     """
     show_table = bu_isciii.list.ListServices()
-    show_table.get_table()
+    show_table.get_table(service)
 
 
 # CREATE NEW SERVICE

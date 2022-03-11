@@ -19,7 +19,7 @@ import re
 
 class ListServices:
     def __init__(
-        self,
+        self
     ):
         service_json = ServiceJson()
         self.service_data = service_json.get_json_data()
