@@ -14,7 +14,18 @@
 import rich.table
 import rich.console
 from bu_isciii.service_json import ServiceJson
-import re
+import logging
+import bu_isciii
+import bu_isciii.utils
+from rich.console import Console
+
+log = logging.getLogger(__name__)
+stderr = Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=bu_isciii.utils.rich_force_colors(),
+)
 
 
 class ListServices:
@@ -29,12 +40,13 @@ class ListServices:
         """
         Table print for services names and description
         """
-
         if name:
-            search = re.compile(name)
-            subset_services = list(filter(search.match, self.service_list))
+            subset_services = [item for item in self.service_list if name in item]
         else:
             subset_services = self.service_list
+        if len(subset_services) == 0:
+            stderr.print(f"No services with name {name} found.")
+            return
 
         table = rich.table.Table()
         table.add_column("Service name", justify="right", style="cyan")
@@ -50,3 +62,10 @@ class ListServices:
 
         console = rich.console.Console()
         console.print(table)
+        return
+
+
+"""
+prueba = ListServices()
+prueba.get_table("viral")
+"""
