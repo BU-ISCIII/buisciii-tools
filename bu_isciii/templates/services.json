@@ -11,7 +11,9 @@
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP", "latest"]
+        "no_copy": ["RAW", "TMP", "latest"],
+        "delivery_md": "",
+        "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf"
     },
     "mtbseq": {
         "label": "",
@@ -25,7 +27,9 @@
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP"]
+        "no_copy": ["RAW", "TMP"],
+        "delivery_md": "",
+        "delivery_pdf": ""
     },
     "wgmlst_taranis": {
         "label": "",
@@ -40,7 +44,9 @@
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP"]
+        "no_copy": ["RAW", "TMP"],
+        "delivery_md": "",
+        "delivery_pdf": ""
     },
     "wgmlst_chewbbaca": {
         "label": "",
@@ -55,7 +61,9 @@
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}", "work"],
           "files":[""]
         },
-        "no_copy": ["RAW", "TMP"]
+        "no_copy": ["RAW", "TMP"],
+        "delivery_md": "",
+        "delivery_pdf": ""
     },
     "viralrecon": {
         "label": "",
@@ -69,6 +77,8 @@
           "folders":["work"],
           "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
         },
-        "no_copy": ["RAW", "TMP"]
+        "no_copy": ["RAW", "TMP"],
+        "delivery_md": "",
+        "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf"
     }
 }
