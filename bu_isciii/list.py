@@ -18,9 +18,7 @@ import re
 
 
 class ListServices:
-    def __init__(
-        self
-    ):
+    def __init__(self):
         service_json = ServiceJson()
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
