@@ -75,7 +75,7 @@ class Archive:
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
-                ["archive", "retrieve_from_archive"],
+                ["archive", "retrieve"],
             )
 
     def archive(self):
@@ -109,10 +109,14 @@ class Archive:
                     "[green] Data copied successfully to its destiny archive folder",
                     highlight=False,
                 )
-            except OSError:
+            except OSError as e:
                 stderr.print(
                     "[red] ERROR: Data could not be copied to its destiny archive folder.",
                     highlight=False,
+                )
+                log.error(
+                    f"Directory {self.source} could not be archived to {self.dest}.\
+                        Reason: {e}"
                 )
         return
 
@@ -122,14 +126,14 @@ class Archive:
         """
         for service in self.services_to_move:
             #stderr.print(service["servicFolderName"])
-            self.source = os.path.join(
+            source = os.path.join(
                 self.conf["archive_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
             )
 
-            self.dest = os.path.join(
+            dest = os.path.join(
                 self.conf["archive_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
@@ -138,8 +142,8 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source=self.source,
-                    destination=self.dest,
+                    source=source,
+                    destination=dest,
                     options=self.conf["options"],
                     sync_source_contents=False,
                 )
@@ -147,13 +151,43 @@ class Archive:
                     "[green] Data retrieved successfully from its archive folder.",
                     highlight=False,
                 )
-            except OSError:
+            except OSError as e:
                 stderr.print(
                     "[red] ERROR: Data could not be retrieved from its archive folder.",
                     highlight=False,
                 )
+                log.error(
+                    f"Directory {self.source} could not be archived to {self.dest}.\
+                        Reason: {e}"
+                )
         
 
+        return
+
+
+    def compare_origin_destiny(self):
+        """
+        Compares the origin and the destiny to check if they are equal
+        """
+
+        for service in self.services_to_move:
+            if self.option == "":
+            source = os.path.join(
+                self.conf["archive_path"],
+                self.type,
+                service["serviceUserId"]["Center"],
+                service["serviceUserId"]["Area"],
+            )
+
+            dest = os.path.join(
+                self.conf["archive_path"],
+                self.type,
+                service["serviceUserId"]["Center"],
+                service["serviceUserId"]["Area"],
+            )
+
+
+        pass
         return
 
     def delete_origin(self):
@@ -169,6 +203,6 @@ class Archive:
         """
         if self.option == "archive":
             self.archive()
-        if self.option == "retrieve_from_archive":
+        if self.option == "retrieve":
             self.retrieve_from_archive()
         return
