@@ -1,34 +1,5 @@
 #!/usr/bin/env python
-"""
-=============================================================
-HEADER
-=============================================================
-INSTITUTION: BU-ISCIII
-AUTHOR: Guillermo J. Gorines Cordero
-MAIL: guillermo.gorines@urjc.es
-CREATED: 21-2-2022
-REVISED: 23-2-2022
-DESCRIPTION:
-OPTIONS:
 
-USAGE:
-
-REQUIREMENTS:
-
-TO DO:
-    -INIT: where to find the needed values
-    -PATH: where to be placed
-        -BASE_DIRECTORY: where is it? How do we know where it is?
-
-    -DESCRIPTION
-        -SCRIPT
-        -CLASS
-        -METHODS
-    -NAMING: let's be honest, those are terrible
-================================================================
-END_OF_HEADER
-================================================================
-"""
 # Generic imports
 import sys
 import os

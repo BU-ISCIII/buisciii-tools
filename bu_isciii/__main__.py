@@ -16,6 +16,7 @@ import bu_isciii.scratch
 import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean
+import bu_isciii.archive
 
 log = logging.getLogger()
 
@@ -53,7 +54,7 @@ def run_bu_isciii():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "0.0.1"
+    __version__ = "1.0.0"
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
@@ -264,7 +265,7 @@ def clean(resolution, path, ask_path, option):
     default=None,
     help="Directory to which the files will be transfered",
 )
-def deliver(resolution, source, destination):
+def copy_sftp(resolution, source, destination):
     """
     "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
     """
@@ -292,6 +293,33 @@ def bioinfo_doc(type, resolution, local_folder):
     """Create the folder documentation structure in bioinfo_doc server"""
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
     new_doc.create_documentation()
+
+
+# ARCHIVE SERVICES
+@bu_isciii_cli.command(help_priority=5)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-y",
+    "--year",
+    default=None,
+    help="Year for which you want to archive services.",
+)
+@click.option(
+    "-t",
+    "--type",
+    type=click.Choice(["services_and_colaborations", "research"]),
+    help="Select which folder you want to archive.",
+)
+@click.option(
+    "-s",
+    "--option",
+    type=click.Choice(["archive", "retrieve_from_archive"]),
+    help="Select either you want to archive services or retrieve a service from archive.",
+)
+def archive(resolution, type, year, option):
+    """Archive services or retrieve services from archive"""
+    archive_ser = bu_isciii.archive.Archive(resolution, year, type, option)
+    archive_ser.handle_archive()
 
 
 if __name__ == "__main__":

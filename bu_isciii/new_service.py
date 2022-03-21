@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""
-=============================================================
-HEADER
-=============================================================
-INSTITUTION: BU-ISCIII
-AUTHOR: Sara Monzon; Sarai Varona
-MAIL: smonzon@isciii.es; s.varona@isciii.es
-CREATED: 21-02-2022
-DESCRIPTION:
-================================================================
-END_OF_HEADER
-================================================================
-"""
+
 # Generic imports
 import sys
 import os
