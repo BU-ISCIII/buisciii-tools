@@ -5,6 +5,7 @@ import sys
 import os
 import logging
 import filecmp # Not sure if generic
+import shutil
 
 import sysrsync
 import rich
@@ -190,8 +191,8 @@ class Archive:
                     highlight=False,
                 )
                 log.error(
-                    f"Directory {self.source} could not be archived to {self.dest}.\
-                        Reason: {e}"
+                    f"[red] ERROR: Directory {self.source} could not be archived to {self.dest}.\
+                    Reason: {e}"
                 )
         
         return
@@ -207,7 +208,11 @@ class Archive:
                source, dest = get_service_paths(self.conf, self.type, service)
 
             if not dir_comparison(source, dest):
-
+                err_msg = f"[red]ERROR: Cannot delete {source} because it does not match {dest}"
+                stderr.print(err_msg)
+                log.error(err_msg)
+            else:
+                shutil.rmtree(source)
             
         return
 
