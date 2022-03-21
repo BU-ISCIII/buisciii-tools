@@ -23,6 +23,23 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
+# function to compare directories (archived and non-archived)
+def dir_comparison(dir1, dir2):
+    """
+    Generates a filecmp.dircmp comparison object
+    RECURSIVELY, checks each of the dirs to check if 
+    they are the same.
+
+    Heavily based on:
+    https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
+    """
+    comparison = filecmp.dircmp(dir1, dir2)
+    if comparison.left_only or comparison.right_only or comparison.diff_files or comparison.funny_files:
+        return False
+    for subdir in comparison.common_dirs:
+        if not dir_comparison(os.path.join(dir1, subdir), os.path.join(dir2,subdir)):
+            return False
+    return True
 
 class Archive:
     """
@@ -135,7 +152,7 @@ class Archive:
             )
 
             dest = os.path.join(
-                self.conf["archive_path"],
+                self.conf["data_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
@@ -173,20 +190,21 @@ class Archive:
 
         for service in self.services_to_move:
 
-            archived_path = os.path.join(
+            # Path in archive
+            archived = os.path.join(
                 self.conf["archive_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
             )
 
-            non_archived_path = os.path.join(
-                self.conf["archive_path"],
+            # Path out of archive
+            non_archived = os.path.join(
+                self.conf["data_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
             )
-
 
 
 
