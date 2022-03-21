@@ -29,6 +29,26 @@ class Archive:
     of a service
     """
     def __init__(self, resolution_id=None, type=None, year=None, option=None):
+        
+        # resolution_id = Nombre de la resolución
+        # type = services_and_colaborations // research
+        # year = año
+        # option = archive/retrieve
+
+        self.quantity = "Batch" if self.resolution_id is None and self.year is not None else None
+        self.quantity = "Single service" if self.year is None and self.resolution_id is not None else None 
+
+        if self.quantity is None:
+            self.quantity = bu_isciii.utils.prompt_selection(
+                "Working with a batch, or single service?",
+                ["Batch", "Single service"],
+            )
+
+        if self.quantity == "Batch" and self.year is None:
+        
+
+        elif self.quantity == "Single service" and 
+
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
