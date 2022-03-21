@@ -196,17 +196,6 @@ class Archive:
         
         return
 
-    def compare_origin_destiny(self):
-        """
-        Compares the origin and the destiny to check if they are equal
-        """
-        for service in self.services_to_move:
-            archived, non_archived = get_service_paths(self.conf, self.type, service)
-            if not dir_comparison(archived, non_archived):
-                return False
-        
-        return True
-
     def delete_origin(self):
         """
         Delete the origin of the previous archive or retrieval
@@ -216,9 +205,10 @@ class Archive:
                 dest, source = get_service_paths(self.conf, self.type, service)
             elif self.option == "retrieve":
                source, dest = get_service_paths(self.conf, self.type, service)
-            
 
-        
+            if not dir_comparison(source, dest):
+
+            
         return
 
     def handle_archive(self):
