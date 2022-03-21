@@ -4,6 +4,7 @@
 import sys
 import os
 import logging
+import filecmp # Not sure if generic
 
 import sysrsync
 import rich
@@ -171,21 +172,33 @@ class Archive:
         """
 
         for service in self.services_to_move:
-            if self.option == "":
-            source = os.path.join(
+
+            archived_path = os.path.join(
                 self.conf["archive_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
             )
 
-            dest = os.path.join(
+            non_archived_path = os.path.join(
                 self.conf["archive_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
             )
 
+
+
+
+            """
+            It doesnt matter if it is retrieve or archive mode
+            if self.option == "retrieve":
+                source = archived_path
+                dest = non_archived_path
+            elif self.option == "archive":
+                source = non_archived_path
+                dest = non_archived_path
+            """
 
         pass
         return
