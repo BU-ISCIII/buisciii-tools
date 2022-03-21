@@ -140,7 +140,7 @@ class Archive:
                 sysrsync.run(
                     source=self.source,
                     destination=self.dest,
-                    options=data["options"],
+                    options=self.conf["options"],
                     sync_source_contents=False,
                 )
                 stderr.print(
@@ -154,6 +154,13 @@ class Archive:
                 )
         
 
+        return
+
+    def delete_origin(self):
+        """
+        Delete the origin of the previous archive or retrieval
+        """
+        pass
         return
 
     def handle_archive(self):
