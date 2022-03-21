@@ -233,10 +233,6 @@ class BioinfoDoc:
         pdf_file = self.convert_to_pdf(html_file_name)
         return pdf_file
 
-    def generate_service_reports(self):
-        service_conf = bu_isciii.service_json.ServiceJson()
-        return service_conf
-
     def join_pdf_files(service_pdf, result_template, out_file):
         mergeFile = PyPDF2.PdfFileMerger()
         mergeFile.append(PyPDF2.PdfFileReader(service_pdf, "rb"))
@@ -245,9 +241,16 @@ class BioinfoDoc:
         return
 
     def create_delivery_doc(self):
-        # check if request service documentation was created
-        self.create_service_request_doc()
-        # md_name = "INFRES_" + json_data["service_number"] + ".md"
+        """Get the service pdf file from the requested service"""
+        servicerequested = self.resolution["availableServices"]["serviceId"]
+        services_json = bu_isciii.service_json.ServiceJson()
+        services_docs = services_json.get_list_of_delivery_doc()
+        if servicerequested in services_docs:
+            return os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                services_docs[servicerequested],
+            )
+        return None
 
     def create_documentation(self):
         self.create_structure()
@@ -257,6 +260,6 @@ class BioinfoDoc:
             return
         if self.type == "delivery":
             pdf_resolution = self.generate_documentation_files("delivery")
-            pdf_services_request = self.generate_service_reports()
+            pdf_services_request = self.create_delivery_doc()
             self.join_pdf_files(pdf_resolution, pdf_services_request, "delivery.pdf")
             return

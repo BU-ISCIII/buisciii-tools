@@ -89,3 +89,9 @@ class ServiceJson:
         if service in self.service_list:
             return recursive(self.json_data[service], found_item)
         return False
+
+    def get_list_of_delivery_doc(self):
+        docs = {}
+        for service in self.service_list:
+            docs[service] = self.json_data[service]["delivery_pdf"]
+        return docs
