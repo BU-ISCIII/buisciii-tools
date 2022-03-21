@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 # Generic imports
-import sys
+# import sys
 import os
 import logging
-import filecmp  # Not sure if generic
+import filecmp
 import shutil
 
 import sysrsync
@@ -23,6 +23,7 @@ stderr = rich.console.Console(
     highlight=False,
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
+
 
 # function to compare directories (archived and non-archived)
 def dir_comparison(dir1, dir2):
@@ -124,7 +125,6 @@ class Archive:
         self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", self.year
         )
-
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
