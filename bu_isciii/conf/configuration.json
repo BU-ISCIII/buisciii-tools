@@ -30,5 +30,11 @@
     },
     "scratch_copy": {
         "command": "rsync -rlv "
+    },
+    "archive": {
+        "data_path": "/data/bi",
+        "archived_path": "/archived/bi",
+        "protocol": "rsync",
+        "options": ["-rv"]
     }
 }

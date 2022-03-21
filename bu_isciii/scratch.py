@@ -1,25 +1,5 @@
 #!/usr/bin/env python
-"""
-=============================================================
-HEADER
-=============================================================
-INSTITUTION: BU-ISCIII
-AUTHOR: Sara Monzon; Sarai Varona
-MAIL: smonzon@isciii.es; s.varona@isciii.es
-CREATED: 24-02-2022
-DESCRIPTION:
-OPTIONS:
 
-USAGE:
-
-REQUIREMENTS:
-
-TO DO:
-    -copy_scratch: Change rsync to the one in the slurm hpc
-================================================================
-END_OF_HEADER
-================================================================
-"""
 # Generic imports
 import os
 import subprocess
