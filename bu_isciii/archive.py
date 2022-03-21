@@ -79,18 +79,19 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source=self.source,
-                    destination=self.destination,
-                    options=data["options"],
+                    source=source,
+                    destination=destination,
+                    options=self.conf["options"],
                     sync_source_contents=False,
                 )
                 stderr.print(
-                    "[green] Data copied to the sftp folder successfully",
+                    "[green] Service %s archived correctly on %s" % (source, dest),
                     highlight=False,
                 )
+                log.info("Service %s archived correctly on %s" % (source, dest))
             except OSError:
                 stderr.print(
-                    "[red] ERROR: Data could not be copied to the sftp folder.",
+                    "[red] ERROR: Service %s could not be copied to archive folder." % (source),
                     highlight=False,
                 )
         return
