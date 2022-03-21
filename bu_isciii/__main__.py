@@ -130,20 +130,13 @@ def bu_isciii_cli(verbose, log_file):
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
-@click.argument("search_term", required=False, default=None, metavar="<search term>")
-@click.option(
-    "-s",
-    "--search_term",
-    type=click.Path(),
-    default=None,
-    help="Show all services, or find services by name",
-)
-def list(search_term):
+@click.argument("service", required=False, default=None, metavar="<service>")
+def list(service):
     """
     List available bu-isciii services.
     """
-    show_table = bu_isciii.list.ListServices()
-    show_table.get_table(search_term)
+    service_list = bu_isciii.list.ListServices()
+    service_list.print_table(service)
 
 
 # CREATE NEW SERVICE

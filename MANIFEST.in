@@ -5,3 +5,4 @@ graft bu_isciii/schemas
 graft bu_isciii/conf
 graft bu_isciii/assets
 include requirements.txt
+include environment.yml

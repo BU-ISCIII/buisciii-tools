@@ -18,6 +18,7 @@ import logging
 import bu_isciii
 import bu_isciii.utils
 from rich.console import Console
+import re
 
 log = logging.getLogger(__name__)
 stderr = Console(
@@ -29,23 +30,23 @@ stderr = Console(
 
 
 class ListServices:
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         service_json = ServiceJson()
         self.service_data = service_json.get_json_data()
         self.service_list = service_json.get_service_list()
 
-    def get_table(self, name=None):
+    def print_table(self, service=None):
         """
         Table print for services names and description
         """
-        if name:
-            subset_services = [item for item in self.service_list if name in item]
+
+        if service:
+            search = re.compile(service)
+            subset_services = list(filter(search.match, self.service_list))
         else:
             subset_services = self.service_list
         if len(subset_services) == 0:
-            stderr.print(f"No services with name {name} found.")
+            stderr.print(f"No services with name {service} found.")
             return
 
         table = rich.table.Table()

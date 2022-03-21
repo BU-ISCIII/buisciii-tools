@@ -7,10 +7,11 @@ import sys
 import jinja2
 import markdown
 import pdfkit
-
+import PyPDF2
 import bu_isciii.utils
 import bu_isciii.config_json
 import bu_isciii.drylab_api
+import bu_isciii.service_json
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -76,6 +77,7 @@ class BioinfoDoc:
         self.samples = resolution_info["Samples"]
         self.user_data = resolution_info["Service"]["serviceUserId"]
         self.service = resolution_info["Service"]
+        self.handled_services = None
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -231,9 +233,15 @@ class BioinfoDoc:
         pdf_file = self.convert_to_pdf(html_file_name)
         return pdf_file
 
-    def join_pdf_files(servvice_pdf, result_template):
-        pass
-        # conf_api = bu_isciii.service_json.ServiceJson().get_configuration("api_settings")
+    def generate_service_reports(self):
+        service_conf = bu_isciii.service_json.ServiceJson()
+        return service_conf
+
+    def join_pdf_files(service_pdf, result_template, out_file):
+        mergeFile = PyPDF2.PdfFileMerger()
+        mergeFile.append(PyPDF2.PdfFileReader(service_pdf, "rb"))
+        mergeFile.append(PyPDF2.PdfFileReader(result_template, "rb"))
+        mergeFile.write(out_file)
         return
 
     def create_delivery_doc(self):
@@ -248,6 +256,7 @@ class BioinfoDoc:
             self.generate_documentation_files("resolution")
             return
         if self.type == "delivery":
-            pdf_file = self.generate_documentation_files("delivery")
-            self.join_pdf_files(pdf_file, "")
+            pdf_resolution = self.generate_documentation_files("delivery")
+            pdf_services_request = self.generate_service_reports()
+            self.join_pdf_files(pdf_resolution, pdf_services_request, "delivery.pdf")
             return
