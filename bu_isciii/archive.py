@@ -24,6 +24,10 @@ stderr = rich.console.Console(
 
 
 class Archive:
+    """
+    Class to perform the archivation and retrieval
+    of a service
+    """
     def __init__(self, resolution_id=None, type=None, year=None, option=None):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -41,12 +45,12 @@ class Archive:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
-        self.services_to_archive = rest_api.get_request(
+        self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", self.year
         )
 
         if type is None:
-            self.option = bu_isciii.utils.prompt_selection(
+            self.type = bu_isciii.utils.prompt_selection(
                 "Type",
                 ["services_and_colaborations", "research"],
             )
@@ -61,16 +65,16 @@ class Archive:
         """
         Archive services in selected year
         """
-        for service in self.services_to_archive:
-            print(service["servicFolderName"])
-            source = os.path.join(
+        for service in self.services_to_move:
+            #stderr.print(service["servicFolderName"])
+            self.source = os.path.join(
                 self.conf["data_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
                 service["ServiceFolderName"],
             )
-            dest = os.path.join(
+            self.dest = os.path.join(
                 self.conf["archive_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
@@ -79,19 +83,18 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source=source,
-                    destination=destination,
-                    options=self.conf["options"],
+                    source=self.source,
+                    destination=self.dest,
+                    options=data["options"],
                     sync_source_contents=False,
                 )
                 stderr.print(
-                    "[green] Service %s archived correctly on %s" % (source, dest),
+                    "[green] Data copied successfully to its destiny archive folder",
                     highlight=False,
                 )
-                log.info("Service %s archived correctly on %s" % (source, dest))
             except OSError:
                 stderr.print(
-                    "[red] ERROR: Service %s could not be copied to archive folder." % (source),
+                    "[red] ERROR: Data could not be copied to its destiny archive folder.",
                     highlight=False,
                 )
         return
@@ -100,6 +103,40 @@ class Archive:
         """
         Copy a service back from archive
         """
+        for service in self.services_to_move:
+            #stderr.print(service["servicFolderName"])
+            self.source = os.path.join(
+                self.conf["archive_path"],
+                self.type,
+                service["serviceUserId"]["Center"],
+                service["serviceUserId"]["Area"],
+            )
+
+            self.dest = os.path.join(
+                self.conf["archive_path"],
+                self.type,
+                service["serviceUserId"]["Center"],
+                service["serviceUserId"]["Area"],
+            )
+
+            try:
+                sysrsync.run(
+                    source=self.source,
+                    destination=self.dest,
+                    options=data["options"],
+                    sync_source_contents=False,
+                )
+                stderr.print(
+                    "[green] Data retrieved successfully from its archive folder.",
+                    highlight=False,
+                )
+            except OSError:
+                stderr.print(
+                    "[red] ERROR: Data could not be retrieved from its archive folder.",
+                    highlight=False,
+                )
+        
+
         return
 
     def handle_archive(self):
