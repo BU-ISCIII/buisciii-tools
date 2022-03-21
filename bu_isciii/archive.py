@@ -4,7 +4,7 @@
 import sys
 import os
 import logging
-import filecmp # Not sure if generic
+import filecmp  # Not sure if generic
 import shutil
 
 import sysrsync
@@ -28,25 +28,31 @@ stderr = rich.console.Console(
 def dir_comparison(dir1, dir2):
     """
     Generates a filecmp.dircmp comparison object
-    RECURSIVELY, checks each of the dirs to check if 
+    RECURSIVELY, checks each of the dirs to check if
     they are the same.
 
     Heavily based on:
     https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
-    
+
     """
     comparison = filecmp.dircmp(dir1, dir2)
-    if comparison.left_only or comparison.right_only or comparison.diff_files or comparison.funny_files:
+    if (
+        comparison.left_only
+        or comparison.right_only
+        or comparison.diff_files
+        or comparison.funny_files
+    ):
         return False
     for subdir in comparison.common_dirs:
-        if not dir_comparison(os.path.join(dir1, subdir), os.path.join(dir2,subdir)):
+        if not dir_comparison(os.path.join(dir1, subdir), os.path.join(dir2, subdir)):
             return False
     return True
 
+
 def get_service_paths(conf, type, service):
     """
-    Given a service, a conf and a type, 
-    get the path it would have in the 
+    Given a service, a conf and a type,
+    get the path it would have in the
     archive, and outside of it
     """
 
@@ -68,22 +74,30 @@ def get_service_paths(conf, type, service):
 
     return archived, non_archived
 
+
 class Archive:
     """
     Class to perform the archivation and retrieval
     of a service
     """
+
     def __init__(self, resolution_id=None, type=None, year=None, option=None):
-        
+
         # resolution_id = Nombre de la resolución
         # type = services_and_colaborations // research
         # year = año
         # option = archive/retrieve
 
         # assumption: year and no resolution_id >>> Batch management
-        self.quantity = "Batch" if self.year is not None and self.resolution_id is None else None
+        self.quantity = (
+            "Batch" if self.year is not None and self.resolution_id is None else None
+        )
         # assumption: resolution_id and no year >>> Single service management
-        self.quantity = "Single service" if self.resolution_id is not None and self.year is None else None 
+        self.quantity = (
+            "Single service"
+            if self.resolution_id is not None and self.year is None
+            else None
+        )
 
         if self.quantity is None:
             self.quantity = bu_isciii.utils.prompt_selection(
@@ -102,7 +116,7 @@ class Archive:
 
         # get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
-        
+
         # Obtain info from iskylims api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
@@ -128,7 +142,7 @@ class Archive:
         Archive services in selected year
         """
         for service in self.services_to_move:
-            #stderr.print(service["servicFolderName"])
+            # stderr.print(service["servicFolderName"])
 
             dest, source = get_service_paths(self.conf, self.type, service)
 
@@ -159,7 +173,7 @@ class Archive:
         Copy a service back from archive
         """
         for service in self.services_to_move:
-            #stderr.print(service["servicFolderName"])
+            # stderr.print(service["servicFolderName"])
             source = os.path.join(
                 self.conf["archive_path"],
                 self.type,
@@ -194,7 +208,7 @@ class Archive:
                     f"[red] ERROR: Directory {self.source} could not be archived to {self.dest}.\
                     Reason: {e}"
                 )
-        
+
         return
 
     def delete_origin(self):
@@ -205,7 +219,7 @@ class Archive:
             if self.option == "archive":
                 dest, source = get_service_paths(self.conf, self.type, service)
             elif self.option == "retrieve":
-               source, dest = get_service_paths(self.conf, self.type, service)
+                source, dest = get_service_paths(self.conf, self.type, service)
 
             if not dir_comparison(source, dest):
                 err_msg = f"[red]ERROR: Cannot delete {source} because it does not match {dest}"
@@ -213,7 +227,7 @@ class Archive:
                 log.error(err_msg)
             else:
                 shutil.rmtree(source)
-            
+
         return
 
     def handle_archive(self):
