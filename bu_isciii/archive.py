@@ -32,6 +32,7 @@ def dir_comparison(dir1, dir2):
 
     Heavily based on:
     https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
+    
     """
     comparison = filecmp.dircmp(dir1, dir2)
     if comparison.left_only or comparison.right_only or comparison.diff_files or comparison.funny_files:
@@ -40,6 +41,31 @@ def dir_comparison(dir1, dir2):
         if not dir_comparison(os.path.join(dir1, subdir), os.path.join(dir2,subdir)):
             return False
     return True
+
+def get_service_paths(conf, type, service):
+    """
+    Given a service, a conf and a type, 
+    get the path it would have in the 
+    archive, and outside of it
+    """
+
+    # Path in archive
+    archived = os.path.join(
+        conf["archive_path"],
+        type,
+        service["serviceUserId"]["Center"],
+        service["serviceUserId"]["Area"],
+    )
+
+    # Path out of archive
+    non_archived = os.path.join(
+        conf["data_path"],
+        type,
+        service["serviceUserId"]["Center"],
+        service["serviceUserId"]["Area"],
+    )
+
+    return archived, non_archived
 
 class Archive:
     """
@@ -102,24 +128,13 @@ class Archive:
         """
         for service in self.services_to_move:
             #stderr.print(service["servicFolderName"])
-            self.source = os.path.join(
-                self.conf["data_path"],
-                self.type,
-                service["serviceUserId"]["Center"],
-                service["serviceUserId"]["Area"],
-                service["ServiceFolderName"],
-            )
-            self.dest = os.path.join(
-                self.conf["archive_path"],
-                self.type,
-                service["serviceUserId"]["Center"],
-                service["serviceUserId"]["Area"],
-            )
+
+            dest, source = get_service_paths(self.conf, self.type, service)
 
             try:
                 sysrsync.run(
-                    source=self.source,
-                    destination=self.dest,
+                    source=source,
+                    destination=dest,
                     options=self.conf["options"],
                     sync_source_contents=False,
                 )
@@ -179,53 +194,31 @@ class Archive:
                         Reason: {e}"
                 )
         
-
         return
-
 
     def compare_origin_destiny(self):
         """
         Compares the origin and the destiny to check if they are equal
         """
-
         for service in self.services_to_move:
-
-            # Path in archive
-            archived = os.path.join(
-                self.conf["archive_path"],
-                self.type,
-                service["serviceUserId"]["Center"],
-                service["serviceUserId"]["Area"],
-            )
-
-            # Path out of archive
-            non_archived = os.path.join(
-                self.conf["data_path"],
-                self.type,
-                service["serviceUserId"]["Center"],
-                service["serviceUserId"]["Area"],
-            )
-
-
-
-            """
-            It doesnt matter if it is retrieve or archive mode
-            if self.option == "retrieve":
-                source = archived_path
-                dest = non_archived_path
-            elif self.option == "archive":
-                source = non_archived_path
-                dest = non_archived_path
-            """
-
-        pass
-        return
+            archived, non_archived = get_service_paths(self.conf, self.type, service)
+            if not dir_comparison(archived, non_archived):
+                return False
+        
+        return True
 
     def delete_origin(self):
         """
         Delete the origin of the previous archive or retrieval
         """
-        pass
+        for service in self.services_to_move:
+            if self.option == "archive":
+                dest, source = get_service_paths(self.conf, self.type, service)
+            elif self.option == "retrieve":
+               source, dest = get_service_paths(self.conf, self.type, service)
+            
+
+        
         return
 
     def handle_archive(self):
