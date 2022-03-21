@@ -35,33 +35,30 @@ class Archive:
         # year = año
         # option = archive/retrieve
 
-        self.quantity = "Batch" if self.resolution_id is None and self.year is not None else None
-        self.quantity = "Single service" if self.year is None and self.resolution_id is not None else None 
+        # assumption: year and no resolution_id >>> Batch management
+        self.quantity = "Batch" if self.year is not None and self.resolution_id is None else None
+        # assumption: resolution_id and no year >>> Single service management
+        self.quantity = "Single service" if self.resolution_id is not None and self.year is None else None 
 
         if self.quantity is None:
             self.quantity = bu_isciii.utils.prompt_selection(
-                "Working with a batch, or single service?",
+                "Working with a batch, or a single resolution?",
                 ["Batch", "Single service"],
             )
 
         if self.quantity == "Batch" and self.year is None:
-        
-
-        elif self.quantity == "Single service" and 
-
-        if resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
-        else:
-            self.resolution_id = resolution_id
-
-        if year is None:
             self.year = bu_isciii.utils.prompt_year()
-        else:
-            self.year = year
 
+        elif self.quantity == "Single service" and self.resolution_id is None:
+            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+
+        # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
+
+        # get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
-        # Obtain info from iskylims api
+        
+        # Obtain info from iskylims api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
@@ -105,7 +102,7 @@ class Archive:
                 sysrsync.run(
                     source=self.source,
                     destination=self.dest,
-                    options=data["options"],
+                    options=self.conf["options"],
                     sync_source_contents=False,
                 )
                 stderr.print(
