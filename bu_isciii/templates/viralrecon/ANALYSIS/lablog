@@ -31,20 +31,20 @@ do
         echo "#SBATCH --output ${ref}_$(date '+%Y%m%d')_viralrecon.log" >> ${FOLDER_NAME}/lablog
         printf "#SBATCH --chdir \$scratch_dir\n\n" >> ${FOLDER_NAME}/lablog
         printf 'export NXF_OPTS="-Xms500M -Xmx4G"\n\n' >> ${FOLDER_NAME}/lablog
-        echo "nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.3/workflow/main.nf \\" >> ${FOLDER_NAME}/lablog
-        echo "          -c /data/bi/pipelines/config_files/hpc_slurm.config \\" >> ${FOLDER_NAME}/lablog
-        echo "          --input samplesheet_${ref}.csv \\" >> ${FOLDER_NAME}/lablog
-        echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\" >> ${FOLDER_NAME}/lablog
-        echo "          --platform illumina \\" >> ${FOLDER_NAME}/lablog
-        echo "          --protocol amplicon \\" >> ${FOLDER_NAME}/lablog
-        echo "          --variant_caller ivar \\" >> ${FOLDER_NAME}/lablog
-        echo "          --consensus_caller bcftools \\" >> ${FOLDER_NAME}/lablog
-        echo "          --fasta '../../REFERENCES/${ref}.fasta' \\" >> ${FOLDER_NAME}/lablog
-        echo "          --gff '../../REFERENCES/${ref}.gff' \\" >> ${FOLDER_NAME}/lablog
+        echo "nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.4.1/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -c ../../DOC/hpc_slurm.config \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --input samplesheet_${ref}.csv \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --platform illumina \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --protocol amplicon \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --variant_caller ivar \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --consensus_caller bcftools \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --gff ${REF_GFF} \\\\" >> ${FOLDER_NAME}/lablog
         echo '          --primer_bed "/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4/nCoV-2019.artic.V4.scheme.bed" \\' >> ${FOLDER_NAME}/lablog
         echo '          --kraken2_db "/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz" \\' >> ${FOLDER_NAME}/lablog
-        echo "          --skip_assembly \\" >> ${FOLDER_NAME}/lablog
-        echo "          --skip_nextclade" >> ${FOLDER_NAME}/lablog
+        echo "          --skip_assembly \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -resume" >> ${FOLDER_NAME}/lablog
         printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
     done
