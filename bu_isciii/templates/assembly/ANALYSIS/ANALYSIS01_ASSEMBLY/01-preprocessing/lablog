@@ -1,4 +1,8 @@
-cat ../samples_id.txt | while read in; do echo "mkdir $in;qsub -V -b y -j y -cwd -N TRIMMOMATIC.$in -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix14,all.q@obelix13,all.q@obelix15,all.q@obelix16 -pe openmp 10 java -jar -Djava.io.tmpdir=../../TMP/ /opt/Trimmomatic-0.33/trimmomatic-0.33.jar PE -threads 10 -phred33 ../00-reads/"$in"_R1.fastq.gz ../00-reads/"$in"_R2.fastq.gz $in/"$in"_R1_filtered.fastq $in/"$in"_R1_unpaired.fastq $in/"$in"_R2_filtered.fastq $in/"$in"_R2_unpaired.fastq ILLUMINACLIP:/opt/Trimmomatic/adapters/NexteraPE-PE.fa:2:30:10 SLIDINGWINDOW:4:20 MINLEN:50"; done >> _01_preprocess.sh
+mkdir logs
+#module load Trimmomatic
 
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-echo 'find . -name "*.fastq" -exec qsub -V -b y -j y -cwd -N PGZIP -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix14,all.q@obelix13,all.q@obelix15,all.q@obelix16 -pe openmp 5 pigz -p 5 {} \;' > _02_pgzip.sh
+cat ../samples_id.txt | while read in; do echo "mkdir $in; srun --partition short_idx --chdir $scratch_dir --output logs/TRIMMOMATIC.${in}.%j.log  java -jar -Djava.io.tmpdir=../../../TMP/ \$EBROOTTRIMMOMATIC/trimmomatic-0.39.jar PE -threads 10 -phred33 ../00-reads/"$in"_R1.fastq.gz ../00-reads/"$in"_R2.fastq.gz $in/"$in"_R1_filtered.fastq $in/"$in"_R1_unpaired.fastq $in/"$in"_R2_filtered.fastq $in/"$in"_R2_unpaired.fastq ILLUMINACLIP:\$EBROOTTRIMMOMATIC/adapters/NexteraPE-PE.fa:2:30:10 SLIDINGWINDOW:4:20 MINLEN:50 &"; done >> _01_preprocess.sh
+
+echo "find . -name '*.fastq' | while read in; do echo \"srun --partition short_idx --chdir ${scratch_dir} --output logs/PGZIP.%j.log pigz -p 5 \${in} &\" | bash;done" > _02_pgzip.sh
