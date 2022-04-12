@@ -14,6 +14,8 @@ for f in os.listdir(args.input_dir):
         ffpath = os.path.join(args.input_dir, f)
         for record in SeqIO.parse(ffpath, "fasta"):
             n_count = record.seq.count("N") + record.seq.count("n")
-            out_handle.write("%s\t%0.2f\n" % (record.description, n_count * 100.0 / len(record)))
+            out_handle.write(
+                "%s\t%0.2f\n" % (record.description, n_count * 100.0 / len(record))
+            )
 
 out_handle.close()
