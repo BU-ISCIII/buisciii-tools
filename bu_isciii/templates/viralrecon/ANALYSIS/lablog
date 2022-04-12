@@ -1,3 +1,4 @@
+test_ref=$(cut -f2 samples_ref.txt | head -n1); if [ "$test_ref" == "NC_045512.2" ]; then rm create_summary_report_metagenomic.sh; mv create_summary_report_sars.sh create_summary_report.sh; else rm create_summary_report_sars.sh; mv create_summary_report_metagenomic.sh create_summary_report.sh; fi
 mkdir -p 00-reads
 cat samples_ref.txt | cut -f3 | sort -u | while read in; do echo ${in^^}; done > host_list.tmp
 i=1; cat host_list.tmp | while read in
