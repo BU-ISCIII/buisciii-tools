@@ -13,7 +13,7 @@ cat <<EOF > mag.sbatch
 #SBATCH --mem 4G
 #SBATCH --time 2:00:00
 #SBATCH --partition middle_idx
-#SBATCH --output $(date '+%Y%m%d')_mag.log
+#SBATCH --output $(date '+%Y%m%d')_mag01.log
 #SBATCH --chdir $scratch_dir
 
 export NXF_OPTS="-Xms500M -Xmx4G"
