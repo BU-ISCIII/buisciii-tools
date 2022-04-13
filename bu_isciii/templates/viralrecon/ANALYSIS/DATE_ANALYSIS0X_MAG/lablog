@@ -19,7 +19,7 @@ cat <<EOF > mag.sbatch
 export NXF_OPTS="-Xms500M -Xmx4G"
 
 nextflow run /data/bi/pipelines/mag/main.nf \\
-          -c /data/bi/pipelines/config_files/hpc_slurm_mag.config \\
+          -c ../../DOC/viralrecon_metagenomic.config \\
           --reads '00-reads/*_R{1,2}.fastq.gz' \\
           --outdir $(date '+%Y%m%d')_mag \\
           --kraken2_db /data/bi/references/kraken/minikraken_8GB_20200312.tgz \\
