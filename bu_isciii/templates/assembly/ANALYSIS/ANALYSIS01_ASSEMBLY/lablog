@@ -1,9 +1,30 @@
 ln -s ../00-reads .
 ln -s ../samples_id.txt .
-mkdir 01-preprocessing
-mkdir 02-kmerfinder
-mkdir 99-stats
 ln -s /data/bi/pipelines/bacterial_qc .
-#conda activate nextflow
-echo 'nextflow run /data/bi/pipelines/bacterial_assembly-nf/main.nf -bg -resume --reads "00-reads/*_R{1,2}.fastq.gz" --fasta ../../REFERENCES/@@@@@_genomic.fna --gtf ../../REFERENCES/@@@@@_genomic.gff --outdir 03-assembly -profile hpc_isciii' > _01_nf_assembly.sh
-#nohup bash _01_nf_assembly.sh &> $(date '+%Y%m%d')_assembly01.log &
+
+#module load Nextflow singularity
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > assembly.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 4:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_assembly01.log
+#SBATCH --chdir $scratch_dir
+
+export NXF_OPTS="-Xms500M -Xmx4G"
+
+nextflow run /scratch/bi/pipelines/bacterial_assembly-nf/main.nf \\
+          -c ../../DOC/hpc_slurm_assembly.config \\
+          --reads '00-reads/*_R{1,2}.fastq.gz' \\
+          --fasta ../../REFERENCES/@@@@@_genomic.fna \\
+          --gtf ../../REFERENCES/@@@@_genomic.gff \\
+          --outdir 03-assembly \\
+          -resume
+EOF
+
+echo "sbatch assembly.sbatch" > _01_nf_assembly.sh
