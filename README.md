@@ -37,6 +37,20 @@ pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov
 
 ### Command-line
 
+#### list
+
+#### new-service
+
+#### scratch
+
+#### clean
+
+#### copy_sftp
+
+#### archive
+
+#### bioinfo_doc
+
 
 ## Acknowledgements
 Python package idea and design is really inspired in [nf-core/tools](https://github.com/nf-core/tools).
