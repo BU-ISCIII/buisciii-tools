@@ -1,0 +1,17 @@
+#conda activate nf-core-sarek-2.7.1
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+mkdir logs
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTSNPS.${in}.%j.log --job-name SELECTSNPS gatk SelectVariants -V ../01-sarek/VariantCalling/${in}/HaplotypeCaller/HaplotypeCaller_${in}.vcf.gz -select-type SNP -O ${in}_snps.vcf.gz &"; done > _01_select_snps.sh
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTINDELS.${in}.%j.log --job-name SELECTINDELS gatk SelectVariants -V ../01-sarek/VariantCalling/${in}/HaplotypeCaller/HaplotypeCaller_${in}.vcf.gz -select-type INDEL -O ${in}_indels.vcf.gz &"; done > _02_select_indels.sh
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILSNP.${in}.%j.log --job-name FILSNP gatk VariantFiltration -V ${in}_snps.vcf.gz -filter 'QD < 2.0' --filter-name 'QD2' -filter 'QUAL < 30.0' --filter-name 'QUAL30' -filter 'SOR > 3.0' --filter-name 'SOR3' -filter 'FS > 60.0' --filter-name 'FS60' -filter 'MQ < 40.0' --filter-name 'MQ40' -filter 'MQRankSum < -12.5' --filter-name 'MQRankSum-12.5' -filter 'ReadPosRankSum < -8.0' --filter-name 'ReadPosRankSum-8' -O ${in}_snps_filtered.vcf.gz &"; done > _03_snps_filtration.sh
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILINDEL.${in}.%j.log --job-name FILINDEL gatk VariantFiltration -V ${in}_indels.vcf.gz -filter 'QD < 2.0' --filter-name 'QD2' -filter 'QUAL < 30.0' --filter-name 'QUAL30' -filter 'FS > 200.0' --filter-name 'FS200' -filter 'ReadPosRankSum < -20.0' --filter-name 'ReadPosRankSum-20' -O ${in}_indels_filtered.vcf.gz &"; done > _04_indels_filtration.sh
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEVCF.${in}.%j.log --job-name MERGEVCF gatk MergeVcfs -I ./${in}_snps_filtered.vcf.gz -I ./${in}_indels_filtered.vcf.gz -O ${in}_variants_fil.vcf.gz &"; done > _05_merge_vcfs.sh
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/GZIP.${in}.%j.log --job-name GZIP gzip -d ${in}_variants_fil.vcf.gz &"; done > _06_gzip.sh
