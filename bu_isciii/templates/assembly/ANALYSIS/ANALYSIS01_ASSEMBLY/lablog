@@ -21,7 +21,7 @@ export NXF_OPTS="-Xms500M -Xmx4G"
 nextflow run /scratch/bi/pipelines/bacterial_assembly-nf/main.nf \\
           -c ../../DOC/hpc_slurm_assembly.config \\
           --reads '00-reads/*_R{1,2}.fastq.gz' \\
-          --fasta ../../REFERENCES/@@@@@_genomic.fna \\
+          --fasta ../../REFERENCES/@@@@_genomic.fna \\
           --gtf ../../REFERENCES/@@@@_genomic.gff \\
           --outdir 03-assembly \\
           -resume
