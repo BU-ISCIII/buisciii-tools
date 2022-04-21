@@ -30,7 +30,7 @@ If you want to install the latest code in the repository:
 
 ```
 conda create -n buisciii_dev pip
-pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/relecov-tools.git@develop
+pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/buisciii-tools.git@develop
 ```
 
 ## Usage
