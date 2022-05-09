@@ -24,7 +24,7 @@ stderr = rich.console.Console(
 
 def prompt_resolution_id():
     stderr.print(
-        "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM584.1"
+        "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
     )
     resolution_id = questionary.text("Resolution id").unsafe_ask()
     return resolution_id
