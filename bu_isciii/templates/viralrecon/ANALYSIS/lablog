@@ -51,13 +51,14 @@ do
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
     done
   echo "#conda activate nf-core-viralrecon-1.2.0dev" >> ${FOLDER_NAME}/lablog
-  echo 'echo "python ./percentajeNs.py */variants/ivar/consensus/bcftools %Ns.tab"  > _02_run_percentage_Ns.sh' >> ${FOLDER_NAME}/lablog
-  printf 'echo "bash create_summary_report.sh" > _03_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
+  cp _02_create_run_percentage_Ns.sh ${FOLDER_NAME}/
+  printf 'echo "bash create_summary_report.sh" > _04_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
     i=$((i+1))
 done
 rm host_list.tmp
 rm create_summary_report.sh
 rm percentajeNs.py
+rm _02_create_run_percentage_Ns.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
 CURRENT_DIR=$(pwd | cut -d '/' -f1,2,3,4,5,6,7)
 echo "srun --partition short_idx rsync -rlv ${CURRENT_DIR} /scratch/bi" > _01_copy_folder.sh
