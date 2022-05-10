@@ -2,6 +2,7 @@
 import logging
 import json
 import requests
+import sys
 
 log = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ class RestServiceApi:
 
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
     def get_request(
-        self, request_info, parameter1, value1, parameter2=None, value2=None
+        self, request_info, parameter1, value1, parameter2=None, value2=None, safe=True
     ):
         if parameter2 is None:
             url_http = str(
@@ -35,7 +36,13 @@ class RestServiceApi:
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
-                return False
+                if safe:
+                    log.info(
+                        "Resolution id does not exist. Status code: " + req.status_code
+                    )
+                    sys.exit()
+                else:
+                    return req.status_code
             return json.loads(req.text)
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS")
