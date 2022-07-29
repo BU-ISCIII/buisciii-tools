@@ -1,0 +1,2 @@
+ln -s ../samples_id.txt .
+ln -s ../00-reads .
