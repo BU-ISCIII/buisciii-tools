@@ -37,11 +37,11 @@ cat ../../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --time 2
 echo 'grep -P "(HIGH|MODERATE)" ./vep/variants_annot_all.tab > ./vep/variants_annot_highModerate.tab ' > _08_conseq_filtering.sh
 
 # 9. Running exomiser
-#module load Java/jdk-1.8.0.144
+#module load Java/1.8.0_281
 cp /data/bi/pipelines/exomiser/exomiser-cli-12.1.0/exomiser_configfile_template.yml exomiser_configfile.yml
 OUTPUTPATH=$(cat ../samples_id.txt | xargs -I % echo "${scratch_dir}/exomiser/%_exomiser")
 VCFPATH=$(find ${scratch_dir}/../02-postprocessing -name "*_variants_fil.vcf")
 echo "sed -i \"s|##OUTPUTPATH##|${OUTPUTPATH}|g\" ./exomiser_configfile.yml" | bash
 echo "sed -i \"s|##VCF_PATH##|${VCFPATH}|g\" ./exomiser_configfile.yml" | bash
 
-echo "srun --partition short_idx --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-12.1.0 --output logs/EXOMISER.$THIS_SRV.%j.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-12.1.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _09_exomiser_exome.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-12.1.0 --output logs/EXOMISER.%j.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-12.1.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _09_exomiser_exome.sh
