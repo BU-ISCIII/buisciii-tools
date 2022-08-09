@@ -1,1 +1,0 @@
-python3 ../bacterial_qc/parse_kmerfinder.py --path ../02-kmerfinder --output_bn kmerfinder.bn --output_csv kmerfinder.csv
