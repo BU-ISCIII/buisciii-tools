@@ -51,6 +51,7 @@ do
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
     done
   echo "#conda activate nf-core-viralrecon-1.2.0dev" >> ${FOLDER_NAME}/lablog
+
   cp _02_create_run_percentage_Ns.sh ${FOLDER_NAME}/
   printf 'echo "bash create_summary_report.sh" > _04_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
     i=$((i+1))
