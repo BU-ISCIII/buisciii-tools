@@ -114,6 +114,9 @@ for (i in 1:nrow(samples_ref)) {
 df_final <- as.data.frame(do.call("rbind", list_assembly))
 colnames(df_final) <- name_columns
 
-# Write table
+# Write table csv
 write.table(df_final, "assembly_stats_p.csv", row.names = F, col.names = T, sep = "\t", quote = F)
-write_xlsx2(df_final, "assembly_stats_p.xlsx", sheetName = "Sheet1", col.names = TRUE)
+
+# Write table xlsx
+df_final[is.na(df_final)] <- "-"
+write_xlsx(df_final, "assembly_stats_p.xlsx", col.names = TRUE)
