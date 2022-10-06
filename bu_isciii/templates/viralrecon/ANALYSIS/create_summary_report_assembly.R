@@ -9,7 +9,6 @@
 library(plyr, quietly = TRUE, warn.conflicts = FALSE)
 library(dplyr, quietly = TRUE, warn.conflicts = FALSE)
 library(tidyr, quietly = TRUE, warn.conflicts = FALSE)
-library(readxl, quietly = TRUE, warn.conflicts = FALSE)
 library(stringr, quietly = TRUE, warn.conflicts = FALSE)
 library(jsonlite, quietly = TRUE, warn.conflicts = FALSE)
 library(writexl, quietly = TRUE, warn.conflicts = FALSE)
@@ -78,7 +77,7 @@ for (i in 1:nrow(samples_ref)) {
     value_percnonhostreads <- round((value_readhost * 100) / value_totalreads, 2)
 
     # Contigs
-    table_quast <- read.csv2(paste0(workdir, "/assembly/spades/rnaviral/quast/transposed_report.tsv"), skip = 0, header = T)
+    table_quast <- read.delim(paste0(workdir, "/assembly/spades/rnaviral/quast/transposed_report.tsv"), skip = 0, header = T, sep = "\t")
 
     # no quast error
     if (exists("table_quast") == FALSE) {
@@ -116,4 +115,5 @@ df_final <- as.data.frame(do.call("rbind", list_assembly))
 colnames(df_final) <- name_columns
 
 # Write table
-write.table(df_final, "assembly_stats.csv", row.names = F, col.names = T, sep = "\t", quote = F)
+write.table(df_final, "assembly_stats_p.csv", row.names = F, col.names = T, sep = "\t", quote = F)
+write_xlsx2(df_final, "assembly_stats_p.xlsx", sheetName = "Sheet1", col.names = TRUE)
