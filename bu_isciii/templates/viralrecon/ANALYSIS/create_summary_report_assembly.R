@@ -78,7 +78,7 @@ for (i in 1:nrow(samples_ref)) {
     value_percnonhostreads <- round((value_readhost * 100) / value_totalreads, 2)
 
     # Contigs
-    table_quast <- read.csv2(paste0(workdir, "/assembly/spades/rnaviral/quast/transposed_report.tsv"), skip = 0, sep = "\t", header = T)
+    table_quast <- read.csv2(paste0(workdir, "/assembly/spades/rnaviral/quast/transposed_report.tsv"), skip = 0, header = T)
 
     # no quast error
     if (exists("table_quast") == FALSE) {
