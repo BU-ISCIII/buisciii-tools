@@ -23,7 +23,7 @@ nextflow run /data/bi/pipelines/sarek/main.nf \\
           --input 'samples.tsv' \\
           --outdir 01-sarek \\
           --genome GRCh37 \\
-          --target_bed '/data/bi/references/eukaria/homo_sapiens/hg19/Illumine_Exome_CEX_TargetedRegions/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37.bed' \\
+          --target_bed '../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37.bed' \\
           --tools 'HaplotypeCaller' \\
           --save_reference \\
           --skip_qc bamQC \\
