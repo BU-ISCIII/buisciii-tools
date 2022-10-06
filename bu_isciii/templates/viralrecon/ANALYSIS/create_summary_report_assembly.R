@@ -13,7 +13,6 @@ library(readxl, quietly = TRUE, warn.conflicts = FALSE)
 library(stringr, quietly = TRUE, warn.conflicts = FALSE)
 library(jsonlite, quietly = TRUE, warn.conflicts = FALSE)
 library(writexl, quietly = TRUE, warn.conflicts = FALSE)
-library(writexl, quietly = TRUE, warn.conflicts = FALSE)
 
 ################################################
 ################################################
