@@ -123,7 +123,7 @@ columnas_nu <- as.vector(6:length(colnames(df_final)))
 df_final[, columnas_nu] <- apply(df_final[, columnas_nu], 2, function(x) as.numeric(as.character(x)))
 
 # Write table csv
-write.table(df_final, "assembly_stats_p.csv", row.names = F, col.names = T, sep = "\t", quote = F)
+write.table(df_final, "assembly_stats.csv", row.names = F, col.names = T, sep = "\t", quote = F)
 
 # Write table xlsx
-write_xlsx(df_final, "assembly_stats_p.xlsx", format_headers = F)
+write_xlsx(df_final, "assembly_stats.xlsx", format_headers = F)
