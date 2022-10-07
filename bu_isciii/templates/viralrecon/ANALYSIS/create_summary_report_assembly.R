@@ -114,6 +114,14 @@ for (i in 1:nrow(samples_ref)) {
 df_final <- as.data.frame(do.call("rbind", list_assembly))
 colnames(df_final) <- name_columns
 
+# characters
+columnas_ch <- as.vector(1:5)
+df_final[, columnas_ch] <- apply(df_final[, columnas_ch], 2, function(x) as.character(x))
+
+# numeric
+columnas_nu <- as.vector(6:length(colnames(df_final)))
+df_final[, columnas_ch] <- apply(df_final[, columnas_ch], 2, function(x) as.character(x))
+
 # Write table csv
 write.table(df_final, "assembly_stats_p.csv", row.names = F, col.names = T, sep = "\t", quote = F)
 
