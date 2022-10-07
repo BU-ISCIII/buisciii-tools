@@ -126,5 +126,4 @@ df_final[, columnas_nu] <- apply(df_final[, columnas_nu], 2, function(x) as.nume
 write.table(df_final, "assembly_stats_p.csv", row.names = F, col.names = T, sep = "\t", quote = F)
 
 # Write table xlsx
-df_final[is.na(df_final)] <- "-"
 write_xlsx(df_final, "assembly_stats_p.xlsx", format_headers = F)
