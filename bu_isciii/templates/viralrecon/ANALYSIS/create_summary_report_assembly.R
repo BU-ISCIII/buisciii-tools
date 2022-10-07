@@ -120,11 +120,11 @@ df_final[, columnas_ch] <- apply(df_final[, columnas_ch], 2, function(x) as.char
 
 # numeric
 columnas_nu <- as.vector(6:length(colnames(df_final)))
-df_final[, columnas_ch] <- apply(df_final[, columnas_ch], 2, function(x) as.character(x))
+df_final[, columnas_nu] <- apply(df_final[, columnas_nu], 2, function(x) as.numeric(as.character(x)))
 
 # Write table csv
 write.table(df_final, "assembly_stats_p.csv", row.names = F, col.names = T, sep = "\t", quote = F)
 
 # Write table xlsx
 df_final[is.na(df_final)] <- "-"
-write_xlsx(df_final, "assembly_stats_p.xlsx", col.names = TRUE)
+write_xlsx(df_final, "assembly_stats_p.xlsx", format_headers = F)
