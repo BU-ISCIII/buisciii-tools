@@ -6,7 +6,7 @@ mkdir fragment_fasta
 
 #Create symbolic links depending on the analysis
 #Individual files
-ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
+ln -s ../../ANALYSIS/*_MET/99-stats/multiqc_report.html ./krona_results.html
 ln -s ../../ANALYSIS/*FLU_IRMA/04-irma/all_samples_completo.txt .
 
 #Folders
