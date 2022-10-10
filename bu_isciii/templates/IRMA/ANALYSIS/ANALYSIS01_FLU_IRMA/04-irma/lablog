@@ -5,7 +5,7 @@ mkdir logs
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 5 --mem 37000M --chdir $scratch_dir --output logs/IRMA.${in}.%j.log /scratch/bi/pipelines/flu-amd/IRMA FLU_AD ../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz ${in} &"; done > _01_irma.sh
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 5 --mem 35000M --chdir $scratch_dir --time 01:00:00 --output logs/IRMA.${in}.%j.log /scratch/bi/pipelines/flu-amd/IRMA FLU_AD ../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz ${in} &"; done > _01_irma.sh
 
 echo "ls */*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | cut -d '_' -f1,2 | sort -u > fragment_list.txt" > _02_post_processing.sh
 echo 'cat fragment_list.txt | while read in; do cat ../samples_id.txt | while read sample; do if test -f $sample/${in}*.fasta; then cat $sample/${in}*.fasta |sed "s/^>/\>${sample}_/g" | sed 's/_H1//g' | sed 's/_H3//g' | sed 's/_N1//g' | sed 's/_N2//g'; fi; done > ${in}.txt; done' >> _02_post_processing.sh
