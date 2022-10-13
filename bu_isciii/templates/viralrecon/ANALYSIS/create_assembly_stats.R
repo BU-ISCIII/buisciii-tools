@@ -43,13 +43,12 @@ for (i in 1:nrow(samples_ref)) {
 
     # Run, user, host and sequence
     name_run <- str_split(path_run, "/", simplify = T)[, 4]
-    name_user <- str_split(path, "_", simplify = T)[, 6]
-    name_host <- tolower(str_split(path, "_", simplify = T)[, 10])
-    date_service_1 <- str_split(path, "_", simplify = T)[, 7]
-    date_service <- str_split(date_service_1, "/", simplify = T)[, 3]
+    name_user <- str_split(path, "_", simplify = T)[, 5]
+    name_host <- tolower(str_split(path, "_", simplify = T)[, 9])
+    date_service <- str_split(str_split(path, "_", simplify = T)[, 6], "/", simplify = T)[, 3]
 
-    name_sequence <- samples_ref$ref[i]
-    name_id <- samples_ref$id[i]
+    name_sequence <- as.character(samples_ref$ref[i])
+    name_id <- as.character(samples_ref$id[i])
 
     # path outputfolder
     directorios <- list.dirs()
@@ -62,20 +61,21 @@ for (i in 1:nrow(samples_ref)) {
 
     # readshostR1
     table_kraken <- read.table(paste0(workdir, "/kraken2/", name_id, ".kraken2.report.txt"), sep = "\t")
-    value_readhostr1 <- table_kraken$V2[table_kraken$V5 == 1]
+    unclassified_reads <- as.numeric(subset(x = table_kraken, subset = V6 == "unclassified")[2])
+    value_readhostr1 <- sum(table_kraken$V3)-unclassified_reads
 
     # readshosh
     value_readhost <- value_readhostr1 * 2
 
     # readshost
-    value_percreadhost <- table_kraken$V1[table_kraken$V5 == 1]
+    value_percreadhost <- round((value_readhost * 100) / value_totalreads, 2)
 
     # non host reads
     value_nonhostreads <- value_totalreads - value_readhost
 
     # % non host
-    value_percnonhostreads <- round((value_readhost * 100) / value_totalreads, 2)
-
+    value_percnonhostreads <- round((value_nonhostreads * 100) / value_totalreads, 2)
+    
     # Contigs
     table_quast <- read.delim(paste0(workdir, "/assembly/spades/rnaviral/quast/transposed_report.tsv"), skip = 0, header = T, sep = "\t")
 
@@ -85,13 +85,12 @@ for (i in 1:nrow(samples_ref)) {
         value_lcontig <- NA
         value_genomef <- NA
     } else {
-        table_quast$id <- str_split(table_quast$Assembly, ".scaffolds", simplify = T)[, 1]
-        table_ref_quast <- join(table_quast, samples_ref, by = "id")
 
-        value_contigs <- suppressWarnings(as.numeric(table_ref_quast$X..contigs[table_ref_quast$id == name_id & table_ref_quast$ref == name_sequence]))
-        value_lcontig <- suppressWarnings(as.numeric(table_ref_quast$Largest.contig[table_ref_quast$id == name_id & table_ref_quast$ref == name_sequence]))
-        value_genomef <- suppressWarnings(as.numeric(table_ref_quast$Genome.fraction....[table_ref_quast$id == name_id & table_ref_quast$ref == name_sequence]))
-
+        sample_data <- subset(table_quast, Assembly == paste(name_id, "scaffolds", sep = "."))
+        value_contigs <- as.numeric(sample_data$X..contigs)
+        value_lcontig <- as.numeric(sample_data$Largest.contig)
+        value_genomef <- as.numeric(as.character(sample_data$Genome.fraction....))
+        
         # empty values
         # empty values
         if (length(value_contigs) == 0) {
