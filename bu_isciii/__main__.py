@@ -199,7 +199,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
 )
 def scratch(resolution, service_dir, tmp_dir, direction):
     """
-    "Copy service folder to scratch directory for execution."
+    Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
         resolution, service_dir, tmp_dir, direction
@@ -215,7 +215,7 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     "--path",
     type=click.Path(),
     default=os.getcwd(),
-    help="Path to create the service folder",
+    help="Path to the service folder to clean",
 )
 @click.option(
     "-a",
@@ -242,7 +242,7 @@ def scratch(resolution, service_dir, tmp_dir, direction):
 )
 def clean(resolution, path, ask_path, option):
     """
-    Create new service, it will create folder and copy template depending on selected service.
+    Service cleaning. It will either remove big files, rename folders before copy, revert this renaming, show removable files or show folders for no copy.
     """
     clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option)
     clean.handle_clean()
@@ -267,7 +267,7 @@ def clean(resolution, path, ask_path, option):
 )
 def copy_sftp(resolution, source, destination):
     """
-    "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
+    Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
     new_del = bu_isciii.copy_sftp.CopySftp(resolution, source, destination)
     new_del.copy_sftp()
