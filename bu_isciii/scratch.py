@@ -61,9 +61,7 @@ class Scratch:
         # Load conf
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
-        rest_api = RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
-        )
+        rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"])
         self.resolution_info = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
         )
