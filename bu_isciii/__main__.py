@@ -256,7 +256,7 @@ def clean(resolution, path, ask_path, option):
     "--source",
     type=click.Path(),
     default=None,
-    help="Directory containing files cd to transfer",
+    help="Directory containing files to transfer",
 )
 @click.option(
     "-d",
@@ -281,7 +281,7 @@ def copy_sftp(resolution, source, destination):
     "--local_folder",
     type=click.Path(),
     default=None,
-    help="Directory containing the local folder which bioinfo_doc is mounted. Default: /media/bioinfo_doc/",
+    help="Directory containing the local folder which bioinfo_doc is mounted.",
 )
 @click.option(
     "-t",
@@ -290,7 +290,9 @@ def copy_sftp(resolution, source, destination):
     help="Select the documentation that will generate",
 )
 def bioinfo_doc(type, resolution, local_folder):
-    """Create the folder documentation structure in bioinfo_doc server"""
+    """
+    Create the folder documentation structure in bioinfo_doc server
+    """
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
     new_doc.create_documentation()
 
