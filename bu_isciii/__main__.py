@@ -199,7 +199,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
 )
 def scratch(resolution, service_dir, tmp_dir, direction):
     """
-    "Copy service folder to scratch directory for execution."
+    Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
         resolution, service_dir, tmp_dir, direction
@@ -215,7 +215,7 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     "--path",
     type=click.Path(),
     default=os.getcwd(),
-    help="Path to create the service folder",
+    help="Path to the service folder to clean",
 )
 @click.option(
     "-a",
@@ -242,7 +242,7 @@ def scratch(resolution, service_dir, tmp_dir, direction):
 )
 def clean(resolution, path, ask_path, option):
     """
-    Create new service, it will create folder and copy template depending on selected service.
+    Service cleaning. It will either remove big files, rename folders before copy, revert this renaming, show removable files or show folders for no copy.
     """
     clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option)
     clean.handle_clean()
@@ -256,7 +256,7 @@ def clean(resolution, path, ask_path, option):
     "--source",
     type=click.Path(),
     default=None,
-    help="Directory containing files cd to transfer",
+    help="Directory containing files to transfer",
 )
 @click.option(
     "-d",
@@ -267,7 +267,7 @@ def clean(resolution, path, ask_path, option):
 )
 def copy_sftp(resolution, source, destination):
     """
-    "Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html"
+    Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
     new_del = bu_isciii.copy_sftp.CopySftp(resolution, source, destination)
     new_del.copy_sftp()
@@ -281,7 +281,7 @@ def copy_sftp(resolution, source, destination):
     "--local_folder",
     type=click.Path(),
     default=None,
-    help="Directory containing the local folder which bioinfo_doc is mounted. Default: /media/bioinfo_doc/",
+    help="Directory containing the local folder which bioinfo_doc is mounted.",
 )
 @click.option(
     "-t",
@@ -290,7 +290,9 @@ def copy_sftp(resolution, source, destination):
     help="Select the documentation that will generate",
 )
 def bioinfo_doc(type, resolution, local_folder):
-    """Create the folder documentation structure in bioinfo_doc server"""
+    """
+    Create the folder documentation structure in bioinfo_doc server
+    """
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
     new_doc.create_documentation()
 

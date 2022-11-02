@@ -58,27 +58,29 @@ class Scratch:
         self.rsync_command = bu_isciii.config_json.ConfigJson().get_find(
             "scratch_copy", "command"
         )
-        rest_api = RestServiceApi("http://iskylims.isciiides.es/", "drylab/api/")
+        # Load conf
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        # Obtain info from iskylims api
+        rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"])
         self.resolution_info = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutionFullNumber"]
-        self.origin_folder = os.path.join(self.service_dir, self.service_folder)
         self.scratch_path = os.path.join(self.tmp_dir, self.service_folder)
         self.out_file = os.path.join(
             self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
         )
 
     def copy_scratch(self):
-        stderr.print("[blue]I will copy the service from %s" % self.origin_folder)
+        stderr.print("[blue]I will copy the service from %s" % self.service_dir)
         stderr.print("[blue]to %s" % self.scratch_path)
-        if self.service_folder in self.origin_folder:
-            rsync_command = self.rsync_command + self.origin_folder + " " + self.tmp_dir
+        if self.service_folder in self.service_dir:
+            rsync_command = self.rsync_command + self.service_dir + " " + self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
                 f = open(self.out_file, "a")
                 f.write("Temporal directory: " + self.scratch_path + "\n")
-                f.write("Origin service directory: " + self.origin_folder + "\n")
+                f.write("Origin service directory: " + self.service_dir + "\n")
                 f.close()
                 stderr.print(
                     "[green]Successfully copyed the directory to %s"
@@ -87,16 +89,16 @@ class Scratch:
                 )
             except subprocess.CalledProcessError:
                 stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.origin_folder,
+                    "[red]ERROR: Copy of the directory %s failed" % self.service_dir,
                     highlight=False,
                 )
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{self.origin_folder}'"
+                f"Directory path not the same as service resolution. Skip folder copy '{self.service_dir}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
-                + self.origin_folder
+                + self.service_dir
                 + " not the same as "
                 + self.service_folder,
                 highlight=False,
@@ -144,26 +146,28 @@ class Scratch:
             for line in f:
                 if re.search("Temporal directory:", line):
                     scratch_folder = "".join(line.split()[2])
-            if self.service_folder in scratch_folder:
-                shutil.rmtree(scratch_folder)
-                stderr.print(
-                    "[green]Successfully removed the directory %s" % scratch_folder,
-                    highlight=False,
-                )
-            else:
-                log.error(
-                    f"Directory path not the same as service resolution. Skip folder copy '{scratch_folder}'"
-                )
-                stderr.print(
-                    "[red]ERROR: Directory "
-                    + scratch_folder
-                    + " not the same as "
-                    + self.scratch_path,
-                    highlight=False,
-                )
+            f.close()
+
         except OSError:
             stderr.print(
                 "[red]ERROR: %s does not exist" % self.out_file,
+                highlight=False,
+            )
+        if self.service_folder in scratch_folder:
+            shutil.rmtree(scratch_folder)
+            stderr.print(
+                "[green]Successfully removed the directory %s" % scratch_folder,
+                highlight=False,
+            )
+        else:
+            log.error(
+                f"Directory path not the same as service resolution. Skip folder copy '{scratch_folder}'"
+            )
+            stderr.print(
+                "[red]ERROR: Directory "
+                + scratch_folder
+                + " not the same as "
+                + self.scratch_path,
                 highlight=False,
             )
         return True
