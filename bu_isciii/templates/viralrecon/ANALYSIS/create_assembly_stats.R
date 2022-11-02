@@ -77,7 +77,8 @@ for (i in 1:nrow(samples_ref)) {
     value_percnonhostreads <- round((value_nonhostreads * 100) / value_totalreads, 2)
     
     # Contigs
-    table_quast <- read.delim(paste0(workdir, "/assembly/spades/rnaviral/quast/transposed_report.tsv"), skip = 0, header = T, sep = "\t")
+    quast_report_path <- paste("/",list.files(pattern = "transposed_report.tsv", recursive = TRUE, path = workdir), sep = "")
+    table_quast <- read.delim(paste0(workdir, quast_report_path), skip = 0, header = T, sep = "\t")
 
     # no quast error
     if (exists("table_quast") == FALSE) {
