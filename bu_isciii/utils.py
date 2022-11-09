@@ -84,7 +84,8 @@ def prompt_skip_folder_creation():
 def get_service_ids(services_requested):
     service_id_list = []
     for services in services_requested:
-        service_id_list.append(services["serviceId"])
+        if services["serviceId"] is not None:
+            service_id_list.append(services["serviceId"])
     service_id_list.append("all")
     stderr.print("Which selected service do you want to manage?")
     services_sel = [prompt_selection("Service label:", service_id_list)]
