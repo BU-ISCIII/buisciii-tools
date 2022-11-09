@@ -8,7 +8,7 @@
         "end": "",
         "description": "Nextflow assembly pipeline to assemble bacterial genomes",
         "clean": {
-          "folders":["work"],
+          "folders":["01-preprocessing/trimmed_sequences", "work"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP", "latest"],
