@@ -31,6 +31,22 @@
         "delivery_md": "",
         "delivery_pdf": ""
     },
+    "plasmidID_assembly": {
+      "label": "",
+      "template": "PlasmidID_assembly",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/BU-ISCIII/plasmidID",
+      "description": "Plasmid",
+      "clean": {
+        "folders":["01-preprocessing/trimmed_sequences", "work"],
+        "files":[""]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+  },
     "wgmlst_taranis": {
         "label": "",
         "template": "taranis",
