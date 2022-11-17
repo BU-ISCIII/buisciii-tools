@@ -65,17 +65,32 @@ class CleanUp:
         self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
 
+        print("Service samples")
+        print(self.service_samples)
+        print("Full path")
+        print(self.full_path)
+
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
             self.services_requested
         )
+        print("Services to clean")
+        print(self.services_to_clean)
         self.delete_folders = self.get_clean_items(
             self.services_to_clean, type="folders"
         )
+        print("Delete folders")
+        print(self.delete_folders)
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
+        print("Delete files")
+        print(self.delete_files)
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
+        print("No copy")
+        print(self.nocopy)
         self.service_samples = self.resolution_info["Samples"]
+        print("Service Samples")
+        print(self.service_samples)
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -159,7 +174,8 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.nocopy)
+            no_copy = ", ".join(self.nocopy)
+            stderr.print(f"The following files will be renamed with _NC: {no_copy}")
             return
         else:
             return self.nocopy
