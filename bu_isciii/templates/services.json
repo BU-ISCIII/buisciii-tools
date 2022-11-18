@@ -8,7 +8,7 @@
         "end": "",
         "description": "Nextflow assembly pipeline to assemble bacterial genomes",
         "clean": {
-          "folders":["01-preprocessing/trimmed_sequences", "work"],
+          "folders":["01-preprocessing/trimmed_sequences"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP", "latest"],
@@ -24,7 +24,7 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
@@ -41,7 +41,7 @@
         "description": "Multilocus sequence typing (MLST) using Taranis",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
@@ -58,7 +58,7 @@
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}", "work"],
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
@@ -74,7 +74,7 @@
         "end": "mag_met",
         "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
         "clean": {
-          "folders":["work"],
+          "folders":[],
           "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
         },
         "no_copy": ["RAW", "TMP"],

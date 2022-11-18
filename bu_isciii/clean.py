@@ -159,7 +159,8 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.nocopy)
+            no_copy = ", ".join(self.nocopy)
+            stderr.print(f"The following files will be renamed with _NC: {no_copy}")
             return
         else:
             return self.nocopy
@@ -209,6 +210,27 @@ class CleanUp:
             return pathlist
         else:
             return pathlist
+
+    def find_work(self):
+        """
+        Description:
+            Parses the directory tree to find work folder
+
+        Usage:
+            to_delete = object.find_work()
+
+        Params:
+
+        """
+        self.check_path_exists()
+        workdir = []
+        # key: root, values: [[files inside], [dirs inside]]
+        for root, dirs, files in os.walk(self.full_path):
+            for name in dirs:
+                if name == "work":
+                    if os.path.exists(os.path.join(root, name)):
+                        workdir = os.path.join(root, name)
+        return workdir
 
     def rename(self, to_find, add, verbose=True):
         """
@@ -309,6 +331,23 @@ class CleanUp:
                             print(f"Removed {item}.")
         return
 
+    def delete_work(self):
+        """
+        Description:
+            Removes full work folder
+
+        Usage:
+            object.delete_work()
+
+        Params:
+
+        """
+        work_dir = self.find_work()
+        if work_dir:
+            shutil.rmtree(work_dir)
+        else:
+            stderr.print("There is no work folder here")
+
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
@@ -328,11 +367,19 @@ class CleanUp:
             sys.exit()
 
         # Purge folders
-        self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        if self.delete_folders != [""]:
+            self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+            # Rename to tag.
+            self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
+        else:
+            stderr.print("No folders to remove or rename")
+        # Purge work
+        self.delete_work()
         # Delete files
-        self.purge_files()
-        # Rename to tag.
-        self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
+        if self.delete_files != [""]:
+            self.purge_files()
+        else:
+            stderr.print("No files to remove")
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
