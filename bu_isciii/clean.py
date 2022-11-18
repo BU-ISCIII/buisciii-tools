@@ -65,32 +65,17 @@ class CleanUp:
         self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
 
-        print("Service samples")
-        print(self.service_samples)
-        print("Full path")
-        print(self.full_path)
-
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
             self.services_requested
         )
-        print("Services to clean")
-        print(self.services_to_clean)
         self.delete_folders = self.get_clean_items(
             self.services_to_clean, type="folders"
         )
-        print("Delete folders")
-        print(self.delete_folders)
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
-        print("Delete files")
-        print(self.delete_files)
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
-        print("No copy")
-        print(self.nocopy)
         self.service_samples = self.resolution_info["Samples"]
-        print("Service Samples")
-        print(self.service_samples)
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -226,6 +211,27 @@ class CleanUp:
         else:
             return pathlist
 
+    def find_work(self):
+        """
+        Description:
+            Parses the directory tree to find work folder
+
+        Usage:
+            to_delete = object.find_work()
+
+        Params:
+
+        """
+        self.check_path_exists()
+        workdir = []
+        # key: root, values: [[files inside], [dirs inside]]
+        for root, dirs, files in os.walk(self.full_path):
+            for name in dirs:
+                if name == 'work':
+                    if os.path.exists(os.path.join(root, name)):
+                        workdir = os.path.join(root, name)
+        return workdir
+
     def rename(self, to_find, add, verbose=True):
         """
         Description:
@@ -325,6 +331,23 @@ class CleanUp:
                             print(f"Removed {item}.")
         return
 
+    def delete_work(self):
+        """
+        Description:
+            Removes full work folder
+
+        Usage:
+            object.delete_work()
+
+        Params:
+
+        """
+        work_dir = self.find_work()
+        if work_dir:
+            shutil.rmtree(work_dir)
+        else:
+            stderr.print("There is no work folder here")
+
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
@@ -344,11 +367,19 @@ class CleanUp:
             sys.exit()
 
         # Purge folders
-        self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        if self.delete_folders != ['']:
+            self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+            # Rename to tag.
+            self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
+        else:
+            stderr.print("No folders to remove or rename")
+        # Purge work
+        self.delete_work()
         # Delete files
-        self.purge_files()
-        # Rename to tag.
-        self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
+        if self.delete_files != ['']:
+            self.purge_files()
+        else:
+            stderr.print("No files to remove")
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
