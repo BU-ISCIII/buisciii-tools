@@ -24,23 +24,23 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing"],
+          "folders":["01-preprocessing/trimmed_sequences"],
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
         "delivery_md": "",
         "delivery_pdf": ""
     },
-    "plasmidID_assembly": {
+    "plasmidid_assembly": {
       "label": "",
-      "template": "PlasmidID_assembly",
+      "template": "plasmidid_assembly",
       "order": 1,
       "begin": "base",
       "end": "",
       "url": "https://github.com/BU-ISCIII/plasmidID",
       "description": "Plasmid identification tool based on mapping and assisted by assembly",
       "clean": {
-        "folders":["01-preprocessing/trimmed_sequences", "work"],
+        "folders":["01-preprocessing/trimmed_sequences"],
         "files":[""]
       },
       "no_copy": ["RAW", "TMP"],
