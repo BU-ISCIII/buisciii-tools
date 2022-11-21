@@ -17,6 +17,7 @@ import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean
 import bu_isciii.archive
+import bu_isciii.copy_sftp
 
 log = logging.getLogger()
 
@@ -256,14 +257,14 @@ def clean(resolution, path, ask_path, option):
     "--source",
     type=click.Path(),
     default=None,
-    help="Directory containing files to transfer",
+    help="Absolute path to directory containing files to transfer",
 )
 @click.option(
     "-d",
     "--destination",
     type=click.Path(),
     default=None,
-    help="Directory to which the files will be transfered",
+    help="Absolute path to directory to which the files will be transfered",
 )
 def copy_sftp(resolution, source, destination):
     """
