@@ -126,15 +126,6 @@ class CopySftp:
         return last_folders_list
 
     def copy_sftp(self):
-         print("Service folder")
-         print(self.service_folder)
-         print("Service requested")
-         print(self.services_requested)
-         print("services to copy")
-         print(self.services_to_copy)
-         print("Last folders")
-         print(self.last_folders)
-         print(len(self.last_folders))
          if self.service_folder in self.source:
              today_date = datetime.today().strftime("%Y%m%d")
              log_command = "--log-file="+self.source + '/DOC/rsync_' + today_date + '.log'
