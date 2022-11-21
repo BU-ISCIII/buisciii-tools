@@ -12,6 +12,7 @@
           "files":[""]
         },
         "no_copy": ["RAW", "TMP", "latest"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf"
     },
@@ -28,6 +29,7 @@
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     },
@@ -45,6 +47,7 @@
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     },
@@ -62,6 +65,7 @@
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     },
@@ -78,6 +82,7 @@
           "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
         "delivery_md": "",
         "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf"
     },
@@ -94,6 +99,7 @@
           "files":[""]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
         "delivery_md": "",
         "delivery_pdf": ""
     }
