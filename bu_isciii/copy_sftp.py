@@ -27,6 +27,7 @@ import bu_isciii.utils
 import bu_isciii.drylab_api
 import bu_isciii.service_json
 
+log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
     style="dim",
@@ -132,7 +133,7 @@ class CopySftp:
             )
             self.sftp_options.append(log_command)
             try:
-                log = sysrsync.run(
+                sysrsync.run(
                     source=self.source,
                     destination=self.destination,
                     options=self.sftp_options,
