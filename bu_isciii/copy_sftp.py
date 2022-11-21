@@ -17,7 +17,6 @@ import os
 import sys
 import logging
 from rich.console import Console
-import json
 import sysrsync
 from sysrsync.exceptions import RsyncError
 from datetime import datetime
@@ -28,7 +27,6 @@ import bu_isciii.utils
 import bu_isciii.drylab_api
 import bu_isciii.service_json
 
-log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
     style="dim",
