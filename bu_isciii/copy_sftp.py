@@ -36,6 +36,7 @@ stderr = Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
+
 class CopySftp:
     def __init__(self, resolution_id=None, source=None, destination=None):
 
@@ -91,11 +92,11 @@ class CopySftp:
         self.sftp_exclusions = bu_isciii.config_json.ConfigJson().get_find(
             "sftp_copy", "exclusions"
         )
-        self.services_to_copy = bu_isciii.utils.get_service_ids(
-            self.services_requested
-        )
+        self.services_to_copy = bu_isciii.utils.get_service_ids(self.services_requested)
 
-        self.last_folders = self.get_last_folders(self.services_to_copy, type="last_folder")
+        self.last_folders = self.get_last_folders(
+            self.services_to_copy, type="last_folder"
+        )
 
     def get_last_folders(self, services_ids, type="last_folder"):
         """
@@ -126,11 +127,13 @@ class CopySftp:
         return last_folders_list
 
     def copy_sftp(self):
-         if self.service_folder in self.source:
-             today_date = datetime.today().strftime("%Y%m%d")
-             log_command = "--log-file="+self.source + '/DOC/rsync_' + today_date + '.log'
-             self.sftp_options.append(log_command)
-             try:
+        if self.service_folder in self.source:
+            today_date = datetime.today().strftime("%Y%m%d")
+            log_command = (
+                "--log-file=" + self.source + "/DOC/rsync_" + today_date + ".log"
+            )
+            self.sftp_options.append(log_command)
+            try:
                 log = sysrsync.run(
                     source=self.source,
                     destination=self.destination,
@@ -142,21 +145,25 @@ class CopySftp:
                     "[green] Data copied to the sftp folder successfully",
                     highlight=False,
                 )
-             except RsyncError as e:
+            except RsyncError as e:
                 stderr.print(e)
                 stderr.print(
                     "[yellow] Data copied to the sftp with errors.",
                     highlight=False,
                 )
-             finally:
-                 for folders_list in self.last_folders:
-                     final_folder = os.path.join(self.destination, self.service_folder, folders_list)
-                     stderr.print("Listing the content of the final folder %s" % folders_list)
-                     print(os.system("ls "+final_folder))
-         else:
-             stderr.print(
-             "[red]ERROR: Service number %s not in the source path %s"
-             % (self.service_folder, self.source)
-             )
-             sys.exit()
-         return True
+            finally:
+                for folders_list in self.last_folders:
+                    final_folder = os.path.join(
+                        self.destination, self.service_folder, folders_list
+                    )
+                    stderr.print(
+                        "Listing the content of the final folder %s" % folders_list
+                    )
+                    print(os.system("ls " + final_folder))
+        else:
+            stderr.print(
+                "[red]ERROR: Service number %s not in the source path %s"
+                % (self.service_folder, self.source)
+            )
+            sys.exit()
+        return True
