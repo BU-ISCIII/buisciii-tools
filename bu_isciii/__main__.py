@@ -17,6 +17,7 @@ import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean
 import bu_isciii.archive
+import bu_isciii.copy_sftp
 
 log = logging.getLogger()
 
