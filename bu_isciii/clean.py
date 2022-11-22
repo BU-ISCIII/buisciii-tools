@@ -379,7 +379,7 @@ class CleanUp:
             sys.exit()
 
         # Purge folders
-        if self.delete_folders != [""]:
+        if self.delete_folders != "":
             self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
             # Rename to tag.
             self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
@@ -388,7 +388,7 @@ class CleanUp:
         # Purge work
         self.delete_work()
         # Delete files
-        if self.delete_files != [""]:
+        if self.delete_files != "":
             self.purge_files()
         else:
             stderr.print("No files to remove")

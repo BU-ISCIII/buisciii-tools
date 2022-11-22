@@ -9,7 +9,7 @@
         "description": "Nextflow assembly pipeline to assemble bacterial genomes",
         "clean": {
           "folders":["01-preprocessing/trimmed_sequences"],
-          "files":[""]
+          "files":[]
         },
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
@@ -78,7 +78,7 @@
         "end": "mag_met",
         "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
         "clean": {
-          "folders":[""],
+          "folders":[],
           "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
         },
         "no_copy": ["RAW", "TMP"],
@@ -95,8 +95,8 @@
         "end": "mag_met",
         "description": "RNA-seq analysis",
         "clean": {
-          "folders":[""],
-          "files":[""]
+          "folders":[],
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
