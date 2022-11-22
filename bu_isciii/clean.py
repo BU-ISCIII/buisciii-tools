@@ -42,11 +42,14 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        if ask_path:
-            stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        if path is None:
+            if ask_path:
+                stderr.print("Directory where you want to create the service folder.")
+                self.path = bu_isciii.utils.prompt_path(msg="Path")
+            else:
+                self.path = os.getcwd()
         else:
-            self.path = os.getcwd()
+            self.path = path
 
         # Obtain info from iskylims api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
