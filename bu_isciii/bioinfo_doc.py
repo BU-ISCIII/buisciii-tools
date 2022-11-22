@@ -168,7 +168,7 @@ class BioinfoDoc:
             self.service["serviceNotes"].replace("\r", "").replace("\n", " ")
         )
 
-        template_file = self.config_doc["md_template_path_file"]
+        template_file = self.doc_conf["md_template_path_file"]
         pakage_path = os.path.dirname(os.path.realpath(__file__))
         templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
         templateEnv = jinja2.Environment(loader=templateLoader)
