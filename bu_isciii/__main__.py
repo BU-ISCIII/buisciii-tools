@@ -319,16 +319,23 @@ def finish(resolution, path, ask_path, destination):
     help="Directory containing the local folder which bioinfo_doc is mounted.",
 )
 @click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for path, not assume /data/bioinfo_doc/.",
+)
+@click.option(
     "-t",
     "--type",
     type=click.Choice(["resolution", "delivery"]),
     help="Select the documentation that will generate",
 )
-def bioinfo_doc(type, resolution, local_folder):
+def bioinfo_doc(type, resolution, local_folder, ask_path):
     """
     Create the folder documentation structure in bioinfo_doc server
     """
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder)
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder, ask_path)
     new_doc.create_documentation()
 
 
