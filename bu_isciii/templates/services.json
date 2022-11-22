@@ -26,7 +26,7 @@
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
           "folders":["01-preprocessing/trimmed_sequences"],
-          "files":[""]
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
@@ -43,7 +43,7 @@
       "description": "Plasmid identification tool based on mapping and assisted by assembly",
       "clean": {
         "folders":["01-preprocessing/trimmed_sequences"],
-        "files":[""]
+        "files":[]
       },
       "no_copy": ["RAW", "TMP"],
       "delivery_md": "",
@@ -60,7 +60,7 @@
         "depends_on": "assembly_annotation",
         "clean": {
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing"],
-          "files":[""]
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
@@ -78,7 +78,7 @@
         "depends_on": "assembly_annotation",
         "clean": {
           "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}"],
-          "files":[""]
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
