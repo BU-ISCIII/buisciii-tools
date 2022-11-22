@@ -111,18 +111,24 @@ class CleanUp:
             type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
         service_conf = bu_isciii.service_json.ServiceJson()
-        if len(services_ids) == 1:
+        clean_items_list = []
+        for service in services_ids:
             try:
-                items = service_conf.get_find_deep(services_ids[0], type)
+                items = service_conf.get_find_deep(service, type)
+                if len(clean_items_list) == 0 and len(items) > 0:
+                    clean_items_list = items
+                elif len(items) > 0:
+                    clean_items_list.append(items)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
+                    % service
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-
-        return items
+        if len(clean_items_list) == 0:
+            clean_items_list = ""
+        return clean_items_list
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
