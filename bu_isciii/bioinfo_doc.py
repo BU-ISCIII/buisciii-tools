@@ -58,13 +58,7 @@ class BioinfoDoc:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        self.config_doc = bu_isciii.config_json.ConfigJson().get_configuration(
-            "bioinfo_doc"
-        )
-        self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
-            "bioinfo_doc"
-        )
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("local_api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
@@ -81,7 +75,7 @@ class BioinfoDoc:
         resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
         year = str(datetime.now().year)
         self.service_folder = os.path.join(
-            self.local_folder, self.config_doc["services_path"], year, resolution_folder
+            self.local_folder, self.doc_conf["services_path"], year, resolution_folder
         )
         self.resolution = resolution_info["Resolutions"]
         self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
