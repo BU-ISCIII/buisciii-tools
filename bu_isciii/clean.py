@@ -66,7 +66,10 @@ class CleanUp:
             "availableServices"
         ]
         self.service_samples = self.resolution_info["Samples"]
-        self.full_path = os.path.join(self.path, self.service_folder)
+        if self.service_folder in self.path:
+            self.full_path = self.path
+        else:
+            self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
