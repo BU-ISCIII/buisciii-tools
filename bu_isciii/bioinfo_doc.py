@@ -32,16 +32,23 @@ class BioinfoDoc:
         type=None,
         resolution_id=None,
         local_folder=None,
+        ask_path=False,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
                 choices=["resolution", "delivery"],
             )
+        self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
+            "bioinfo_doc"
+        )
         if local_folder is None:
-            self.local_folder = bu_isciii.utils.prompt_path(
-                msg="Path where bioinfo folder is mounted"
-            )
+            if ask_path:
+                self.local_folder = bu_isciii.utils.prompt_path(
+                    msg="Path where bioinfo_doc folder is mounted in your local WS."
+                )
+            else:
+                self.local_folder = os.path.normpath(self.doc_conf["bioinfodoc_path"])
         else:
             self.local_folder = local_folder
         if not os.path.exists(self.local_folder):
