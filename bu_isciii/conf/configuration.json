@@ -18,6 +18,10 @@
         "server": "http://iskylimsapi.isciii.es",
         "api_url": "/drylab/api/"
     },
+    "local_api_settings": {
+        "server": "http://iskylims.isciii.es",
+        "api_url": "/drylab/api/"
+    },
     "bioinfo_doc": {
         "services_path": "services",
         "service_folder": ["request", "resolution", "result"],
