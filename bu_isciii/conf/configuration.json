@@ -23,6 +23,7 @@
         "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
+        "bioinfodoc_path": "/data/bi",
         "services_path": "services",
         "service_folder": ["request", "resolution", "result"],
         "md_template_path_file" : "templates/jinja_template.j2",
