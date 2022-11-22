@@ -90,15 +90,30 @@ class BioinfoDoc:
             stderr.print(
                 "[green] Skiping folder creation for service "
                 + self.resolution_id
-                + "!"
+                + ". Trying with subfolders"
             )
-            return
+            for folder in self.doc_conf["service_folder"]:
+                if os.path.exists(os.path.join(self.service_folder, folder)):
+                    log.info("Already creted the service subfolders for %s", self.resolution_id)
+                    stderr.print(
+                        "[green] Skiping folder creation for service "
+                        + self.resolution_id
+                        + '/'
+                        + folder
+                    )
+                else:
+                    log.info("Creating service subfolder %s", folder)
+                    stderr.print(
+                        "[blue] Creating the service subfolderfolder " + folder + " for " + self.resolution_id + "!"
+                    )
+                    os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
+                    log.info("Service folders created")
         else:
             log.info("Creating service folder for %s", self.resolution_id)
             stderr.print(
                 "[blue] Creating the service folder for " + self.resolution_id + "!"
             )
-            for folder in self.config_doc["service_folder"]:
+            for folder in self.doc_conf["service_folder"]:
                 os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
             log.info("Service folders created")
         return
