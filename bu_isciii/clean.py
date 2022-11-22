@@ -42,11 +42,14 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        if ask_path:
-            stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        if path is None:
+            if ask_path:
+                stderr.print("Directory where you want to create the service folder.")
+                self.path = bu_isciii.utils.prompt_path(msg="Path")
+            else:
+                self.path = os.getcwd()
         else:
-            self.path = os.getcwd()
+            self.path = path
 
         # Obtain info from iskylims api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
@@ -63,7 +66,10 @@ class CleanUp:
             "availableServices"
         ]
         self.service_samples = self.resolution_info["Samples"]
-        self.full_path = os.path.join(self.path, self.service_folder)
+        if self.service_folder in self.path:
+            self.full_path = self.path
+        else:
+            self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
@@ -105,18 +111,24 @@ class CleanUp:
             type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
         service_conf = bu_isciii.service_json.ServiceJson()
-        if len(services_ids) == 1:
+        clean_items_list = []
+        for service in services_ids:
             try:
-                items = service_conf.get_find_deep(services_ids[0], type)
+                items = service_conf.get_find_deep(service, type)
+                if len(clean_items_list) == 0 and len(items) > 0:
+                    clean_items_list = items
+                elif len(items) > 0:
+                    clean_items_list.append(items)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
+                    % service
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-
-        return items
+        if len(clean_items_list) == 0:
+            clean_items_list = ""
+        return clean_items_list
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
@@ -367,7 +379,7 @@ class CleanUp:
             sys.exit()
 
         # Purge folders
-        if self.delete_folders != [""]:
+        if self.delete_folders != "":
             self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
             # Rename to tag.
             self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
@@ -376,7 +388,7 @@ class CleanUp:
         # Purge work
         self.delete_work()
         # Delete files
-        if self.delete_files != [""]:
+        if self.delete_files != "":
             self.purge_files()
         else:
             stderr.print("No files to remove")

@@ -118,12 +118,17 @@ class CopySftp:
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
+                    % service
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
 
         return last_folders_list
+
+    def listdirs(self, final_path):
+        for path, subdirs, files in os.walk(final_path):
+            for name in files:
+                print(os.path.join(path, name))
 
     def copy_sftp(self):
         if self.service_folder in self.source:
@@ -158,7 +163,7 @@ class CopySftp:
                     stderr.print(
                         "Listing the content of the final folder %s" % folders_list
                     )
-                    print(os.system("ls " + final_folder))
+                    self.listdirs(final_folder)
         else:
             stderr.print(
                 "[red]ERROR: Service number %s not in the source path %s"
