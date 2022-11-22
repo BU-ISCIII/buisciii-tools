@@ -307,6 +307,7 @@ def finish(resolution, path, ask_path, destination):
     copy = bu_isciii.copy_sftp.CopySftp(resolution, path, destination)
     copy.copy_sftp()
 
+
 # CREATE DOCS IN BIOINFO_DOC
 @bu_isciii_cli.command(help_priority=6)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
