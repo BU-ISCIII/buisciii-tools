@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+# Generic imports
 from datetime import datetime
 import logging
 import rich.console
@@ -8,6 +10,8 @@ import jinja2
 import markdown
 import pdfkit
 import PyPDF2
+
+# Local imports
 import bu_isciii.utils
 import bu_isciii.config_json
 import bu_isciii.drylab_api
