@@ -65,14 +65,12 @@ Here we describe the information about the user requesting the service.
 ### Samples sequenced at iSCIII:
 
 Here we describe information about the project associated to the service:
-
-{% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }} {% endif %}
-
+{% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }}{% endif %}
 {% for run , projects in samples.items() %}
-    * Run name: {{ run }}
+* Run name: {{ run }}
     {% for project, samples_in_project in projects.items() %}
-        * Project name: {{ project }}
-        * Samples:
+    * Project name: {{ project }}
+    * Samples:
         {% set comma = joiner(", ") %}
         {% for sample_in_project in samples_in_project %}{% if loop.last %}{{ sample_in_project }}{% else %}{{ sample_in_project }}{{ comma() }}{% endif %}{% endfor %}
     {% endfor %}
