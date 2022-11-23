@@ -28,7 +28,8 @@
         "service_folder": ["request", "resolution", "result"],
         "md_template_path_file" : "templates/jinja_template.j2",
         "html_template_path_file" : "templates/html_service_template.html",
-        "path_to_css" : "assets/css"
+        "path_to_css" : "assets/css",
+        "wkhtmltopdf_path" : "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf"
     },
     "new_service": {
         "fastq_repo": "/srv/fastq_repo"
