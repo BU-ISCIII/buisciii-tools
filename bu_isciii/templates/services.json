@@ -118,6 +118,22 @@
         "last_folder":"RESULTS",
         "delivery_md": "",
         "delivery_pdf": ""
+    },
+    "lowfreq_panel": {
+        "label": "",
+        "template": "lowfreq_panel",
+        "url": "",
+        "order": 1,
+        "begin": "",
+        "end": "",
+        "description": "Low frequency variant calling from enrichment panel.",
+        "clean": {
+          "folders":["01-preprocessing", "05-samtools"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
+        "delivery_md": "",
+        "delivery_pdf": ""
     }
-
 }

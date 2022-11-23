@@ -1,0 +1,37 @@
+scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+mkdir logs
+
+echo "Use bash lablog ../samples_id.txt"
+samples_file=$1
+cat <<EOF > bcftools_query.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 16384
+#SBATCH --time 8:00:00
+#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
+#SBATCH --partition middle_idx
+#SBATCH --output logs/bcftools_query_%A_%a.log
+#SBATCH --chdir $scratch_dir
+
+module load BCFtools/1.12-GCC-10.2.0
+
+SAMPLE_LIST=(\$(<$samples_file))
+SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
+
+mkdir \$SAMPLE
+bcftools query -H ../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
+EOF
+
+echo "sbatch bcftools_query.sbatch" > _01_bcftools_query.sh
+
+
+# module load Java/1.8.0_281 R/4.1.0-foss-2021a
+cat ../samples_id.txt | xargs -I @@ echo "mkdir @@;srun --chdir ${scratch_dir} --output logs/KGGSEQ.@@.%j.log --job-name KGGSEQ --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 java -jar -Xmx8g /data/bi/pipelines/kggseqhg38/kggseq.jar --no-web --buildver hg38 --vcf-file ../06-VarScan/@@/@@.vcf.gz --db-gene refgene --db-score dbnsfp --genome-annot --db-filter ESP5400,dbsnp141,1kg201305,exac --rare-allele-freq 1 --mendel-causing-predict best --omim-annot --out @@/@@_annot.txt &" > _02_kggseq.sh
+cat ../samples_id.txt | xargs -I % echo "gunzip %/%_annot.txt.flt.txt.gz" > _03_final_table.sh
+cat ../samples_id.txt | xargs -I % echo 'cp header %/%_header.table && tail -n +2 %/%.table >> %/%_header.table'  >> _03_final_table.sh
+cat ../samples_id.txt | xargs -I % echo "Rscript merge_parse.R %" >> _03_final_table.sh
+
+cat ../samples_id.txt | xargs -I % echo "grep -P '\"RB1\"' ./%_all_annotated.tab > %_rb1_annotated.tab" > _04_filter_final_table.sh
+
+echo "Done"
