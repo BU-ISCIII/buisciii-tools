@@ -17,6 +17,7 @@ import bu_isciii.list
 import bu_isciii.bioinfo_doc
 import bu_isciii.clean
 import bu_isciii.archive
+import bu_isciii.copy_sftp
 
 log = logging.getLogger()
 
@@ -256,14 +257,14 @@ def clean(resolution, path, ask_path, option):
     "--source",
     type=click.Path(),
     default=None,
-    help="Directory containing files to transfer",
+    help="Absolute path to directory containing files to transfer",
 )
 @click.option(
     "-d",
     "--destination",
     type=click.Path(),
     default=None,
-    help="Directory to which the files will be transfered",
+    help="Absolute path to directory to which the files will be transfered",
 )
 def copy_sftp(resolution, source, destination):
     """
@@ -273,8 +274,42 @@ def copy_sftp(resolution, source, destination):
     new_del.copy_sftp()
 
 
-# CREATE DOCS IN BIOINFO_DOC
+# CLEAN SERVICE AND COPY RESULTS FOLDER TO SFTP
 @bu_isciii_cli.command(help_priority=5)
+@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option(
+    "-p",
+    "--path",
+    type=click.Path(),
+    default=os.getcwd(),
+    help="Absolute path to the service folder to clean and copy",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for path, not assume pwd.",
+)
+@click.option(
+    "-d",
+    "--destination",
+    type=click.Path(),
+    default=None,
+    help="Absolute path to directory to which the files will be transfered",
+)
+def finish(resolution, path, ask_path, destination):
+    """
+    Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
+    """
+    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, "full_clean")
+    clean.handle_clean()
+    copy = bu_isciii.copy_sftp.CopySftp(resolution, path, destination)
+    copy.copy_sftp()
+
+
+# CREATE DOCS IN BIOINFO_DOC
+@bu_isciii_cli.command(help_priority=6)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-l",
@@ -298,7 +333,7 @@ def bioinfo_doc(type, resolution, local_folder):
 
 
 # ARCHIVE SERVICES
-@bu_isciii_cli.command(help_priority=5)
+@bu_isciii_cli.command(help_priority=7)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-y",

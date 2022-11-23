@@ -42,11 +42,14 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        if ask_path:
-            stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        if path is None:
+            if ask_path:
+                stderr.print("Directory where you want to create the service folder.")
+                self.path = bu_isciii.utils.prompt_path(msg="Path")
+            else:
+                self.path = os.getcwd()
         else:
-            self.path = os.getcwd()
+            self.path = path
 
         # Obtain info from iskylims api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
@@ -63,7 +66,10 @@ class CleanUp:
             "availableServices"
         ]
         self.service_samples = self.resolution_info["Samples"]
-        self.full_path = os.path.join(self.path, self.service_folder)
+        if self.service_folder in self.path:
+            self.full_path = self.path
+        else:
+            self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
@@ -105,18 +111,24 @@ class CleanUp:
             type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
         service_conf = bu_isciii.service_json.ServiceJson()
-        if len(services_ids) == 1:
+        clean_items_list = []
+        for service in services_ids:
             try:
-                items = service_conf.get_find_deep(services_ids[0], type)
+                items = service_conf.get_find_deep(service, type)
+                if len(clean_items_list) == 0 and len(items) > 0:
+                    clean_items_list = items
+                elif len(items) > 0:
+                    clean_items_list.append(items)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
+                    % service
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-
-        return items
+        if len(clean_items_list) == 0:
+            clean_items_list = ""
+        return clean_items_list
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
@@ -159,7 +171,8 @@ class CleanUp:
             to_stdout [BOOL]: if True, print the list. If False, return the list.
         """
         if to_stdout:
-            stderr.print(self.nocopy)
+            no_copy = ", ".join(self.nocopy)
+            stderr.print(f"The following files will be renamed with _NC: {no_copy}")
             return
         else:
             return self.nocopy
@@ -209,6 +222,27 @@ class CleanUp:
             return pathlist
         else:
             return pathlist
+
+    def find_work(self):
+        """
+        Description:
+            Parses the directory tree to find work folder
+
+        Usage:
+            to_delete = object.find_work()
+
+        Params:
+
+        """
+        self.check_path_exists()
+        workdir = []
+        # key: root, values: [[files inside], [dirs inside]]
+        for root, dirs, files in os.walk(self.full_path):
+            for name in dirs:
+                if name == "work":
+                    if os.path.exists(os.path.join(root, name)):
+                        workdir = os.path.join(root, name)
+        return workdir
 
     def rename(self, to_find, add, verbose=True):
         """
@@ -309,6 +343,23 @@ class CleanUp:
                             print(f"Removed {item}.")
         return
 
+    def delete_work(self):
+        """
+        Description:
+            Removes full work folder
+
+        Usage:
+            object.delete_work()
+
+        Params:
+
+        """
+        work_dir = self.find_work()
+        if work_dir:
+            shutil.rmtree(work_dir)
+        else:
+            stderr.print("There is no work folder here")
+
     def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
@@ -328,11 +379,19 @@ class CleanUp:
             sys.exit()
 
         # Purge folders
-        self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+        if self.delete_folders != "":
+            self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+            # Rename to tag.
+            self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
+        else:
+            stderr.print("No folders to remove or rename")
+        # Purge work
+        self.delete_work()
         # Delete files
-        self.purge_files()
-        # Rename to tag.
-        self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
+        if self.delete_files != "":
+            self.purge_files()
+        else:
+            stderr.print("No files to remove")
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """

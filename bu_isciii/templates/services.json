@@ -8,10 +8,11 @@
         "end": "",
         "description": "Nextflow assembly pipeline to assemble bacterial genomes",
         "clean": {
-          "folders":["01-preprocessing/trimmed_sequences", "work"],
-          "files":[""]
+          "folders":["01-preprocessing/trimmed_sequences"],
+          "files":[]
         },
         "no_copy": ["RAW", "TMP", "latest"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf"
     },
@@ -24,13 +25,30 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
-          "files":[""]
+          "folders":["01-preprocessing/trimmed_sequences"],
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     },
+    "plasmidid_assembly": {
+      "label": "",
+      "template": "plasmidid_assembly",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/BU-ISCIII/plasmidID",
+      "description": "Plasmid identification tool based on mapping and assisted by assembly",
+      "clean": {
+        "folders":["01-preprocessing/trimmed_sequences"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+  },
     "wgmlst_taranis": {
         "label": "",
         "template": "taranis",
@@ -41,10 +59,11 @@
         "description": "Multilocus sequence typing (MLST) using Taranis",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing", "work"],
-          "files":[""]
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing"],
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     },
@@ -58,10 +77,11 @@
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}", "work"],
-          "files":[""]
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}"],
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     },
@@ -74,11 +94,30 @@
         "end": "mag_met",
         "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
         "clean": {
-          "folders":["work"],
+          "folders":[],
           "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
         },
         "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
         "delivery_md": "",
         "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf"
+    },
+    "rnaseq": {
+        "label": "",
+        "template": "rnaseq",
+        "url": "https://github.com/nf-core/rnaseq",
+        "order": 1,
+        "begin": "",
+        "end": "mag_met",
+        "description": "RNA-seq analysis",
+        "clean": {
+          "folders":[],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
+        "delivery_md": "",
+        "delivery_pdf": ""
     }
+
 }
