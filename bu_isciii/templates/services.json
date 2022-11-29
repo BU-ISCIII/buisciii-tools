@@ -128,11 +128,11 @@
         "end": "",
         "description": "Low frequency variant calling from enrichment panel.",
         "clean": {
-          "folders":["01-preprocessing", "05-samtools"],
+          "folders":["02-preprocessing", "05-samtools"],
           "files":[]
         },
-        "no_copy": ["RAW", "TMP"],
-        "last_folder":"RESULTS",
+        "no_copy": ["RAW", "TMP", "00-reads"],
+        "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
     }
