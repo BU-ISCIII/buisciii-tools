@@ -1,5 +1,5 @@
+# module load Trimmomatic
 mkdir logs
-#module load Trimmomatic
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 

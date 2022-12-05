@@ -1,4 +1,5 @@
 # conda activate mtbseq
+
 # srun parameters
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g" )
 
