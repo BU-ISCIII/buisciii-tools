@@ -1,4 +1,5 @@
-#conda activate iqtree
+# conda activate iqtree
+
 scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
 mkdir logs
 #echo "srun --chdir ${scratch_dir} --output logs/IQTREEMFP.%j.log --job-name IQTREEMFP --cpus-per-task 20 --mem 5G --partition short_idx --time 00:30:00 iqtree -s ../1-snippy/phylo.aln -m MFP &" > _00_iqtreemfp.sh

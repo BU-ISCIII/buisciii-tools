@@ -1,4 +1,4 @@
-#conda activate snippy_v4.6.0
+# conda activate snippy_v4.6.0
 
 scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
 

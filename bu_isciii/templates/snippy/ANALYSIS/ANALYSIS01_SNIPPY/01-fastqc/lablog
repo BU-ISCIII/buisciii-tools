@@ -1,4 +1,4 @@
-#module load FastQC
+# module load FastQC
 
 mkdir logs
 
