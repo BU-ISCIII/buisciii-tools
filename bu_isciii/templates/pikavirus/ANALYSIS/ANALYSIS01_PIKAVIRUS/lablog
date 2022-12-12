@@ -1,10 +1,38 @@
-# module load Nextflow/21.10.6
-mkdir -p 00-reads
-mkdir -p $(date '+%Y%m%d')_ANALYSIS01_PIKAVIRUS
-ls ../RAW/*.gz | cut -d "/" -f3 | cut -d "_" -f1 | sort -u > samples_id.txt
-cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cd -
-cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
-CURRENT_DIR=$(pwd | cut -d '/' -f1,2,3,4,5,6,7)
-echo "srun --partition short_idx rsync -rlv ${CURRENT_DIR} /scratch/bi" > _01_copy_folder.sh
-SERVICE_ID=$(pwd | cut -d '/' -f7)
-echo "srun --partition short_idx rsync -rlv /scratch/bi/${SERVICE_ID}/* ${CURRENT_DIR}/" > _02_copy_back.sh
+# module load Nextflow/21.10.6 singularity
+
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+echo "sample,fastq_1,fastq_2" > samplesheet.csv
+cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz"; done >> samplesheet.csv
+
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > pikavirus.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 4:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_pikavirus01.log
+#SBATCH --chdir $scratch_dir
+
+export NXF_OPTS="-Xms500M -Xmx4G"
+
+nextflow run /scratch/bi/pipelines/PikaVirus/main.nf \\
+          -c ../../DOC/hpc_slurm_pikavirus.config \\
+          --input samplesheet.csv \\
+          --kraken_scouting false \\
+          --virus true \\
+          --bacteria false \\
+          --fungi false \\
+          --kaiju false \\
+          --mash_winner_strategy true \\
+          --mash_identitity_threshold 0.9 \\
+          --mash_shared_hashes_threshold 0.01 \\
+          --mash_pvalue_threshold 0.05 \\
+          -resume
+EOF
+
+echo "sbatch pikavirus.sbatch" > _01_nf_pikavirus.sh
