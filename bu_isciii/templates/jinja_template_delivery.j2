@@ -1,0 +1,77 @@
+<p>
+    <img src="./assets/BU_ISCIII_logo.png" alt="logo" width="200" align="left" />
+</p>
+<br>
+<br>
+## Service results report from the Bioinformatics Unit (BU-ISCIII)
+
+### {{ service.serviceRequestNumber }} service information:
+
+Here we describe the information about the service request:
+
+* Service ID: {{ service.serviceRequestNumber }}
+* Request date: {{ service.serviceCreatedOnDate }}
+* Center Requested service : {{service.serviceSeqCenter}}
+* Service status : {{service.serviceStatus}}
+* Requested services:
+{% for a_service in service.serviceAvailableService %}
+{{ a_service }}
+{% endfor %}
+* Service Notes : {{service_notes}}
+
+### User information:
+
+Here we describe the information about the user requesting the service.
+
+* Name and first name: {{ user_data.first_name }} {{ user_data.last_name}}
+* Username: {{ user_data.username }}
+* E-mail: {{ user_data.email }}
+
+### Resolution information
+
+Here we describe information about the requested resolution.
+
+* Resolution: {{ resolution.resolutionNumber }}
+* Resolution full name: {{ resolution.resolutionFullNumber }}
+* Resolution date: {{ resolution.resolutionDate }}
+{% if resolution.resolutionEstimatedDate -%}
+* Resolution estimated delivery date: {{ resolution.resolutionEstimatedDate }}
+{%- endif %}
+* Resolution on Queued date: {{ resolution.resolutionOnQueuedDate }}
+{% if resolution.resolutionOnInProgressDate -%}
+* Resolution in Progress date: {{ resolution.resolutionOnInProgressDate }}
+{%- endif %}
+* Requested services handle in this resoution:
+{% for a_service in resolution.availableServices %}
+    {{ a_service }}
+{% endfor %}
+* Resolution Notes: {{ resolution.resolutionNotes }}
+
+### Delivery information
+
+Here we describe information about the resolution delivery.
+
+{% if resolution.resolutionDeliveryDate %}
+* Resolution Delivery date: {{ resolution.resolutionDeliveryDate }}
+{% endif %}
+{% if resolution.resolutionDeliveryNotes %}
+* Resolution Delivery notes: {{ resolution.resolutionDeliveryNotes }}
+{% endif %}
+
+### Samples sequenced at iSCIII:
+
+Here we describe information about the project associated to the service:
+{% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }}{% endif %}
+{% for run , projects in samples.items() %}
+* Run name: {{ run }}
+    {% for project, samples_in_project in projects.items() %}
+    * Project name: {{ project }}
+    * Samples:
+        {% set comma = joiner(", ") %}{% for samples_in_project in samples_in_project %}{{ comma() }}{{ samples_in_project }}{% endfor %}
+    {% endfor %}
+{% endfor %}
+
+<!---
+### TODO
+### External Samples
+-->
