@@ -1,27 +1,10 @@
-#conda activate snippy
+mkdir 01-fastqc
+mkdir 02-preprocessing
+mkdir 03-preprocQC
+mkdir 04-snippy
+mkdir 05-iqtree
+mkdir 99-stats
 
-scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+ln -s ../samples_id.txt .
+ln -s ../00-reads .
 
-mkdir logs
-mkdir sequences
-
-cd sequences; cat ../../samples_id.txt | while read in; do ln -s ../../*MTBSEQ*/01-preprocessing/trimmed_sequences/${in}_1.trim.fastq.gz ./${in}_1.fastq.gz; ln -s ../../*MTBSEQ*/01-preprocessing/trimmed_sequences/${in}_2.trim.fastq.gz ./${in}_2.fastq.gz; done; cd -
-
-cd sequences; ls ../../../REFERENCES | grep *.fasta | while read in; do ln -s ../../../REFERENCES/${in} .; done; cd -
-
-ls ../../../REFERENCES | grep *.fasta | while read in; do echo -e "AncMTB\t${scratch_dir}/sequences/AncMTB.fasta"; done > input.tab
-
-cat ../samples_id.txt | while read in; do echo -e "${in}\t${scratch_dir}/sequences/${in}_1.fastq.gz\t${scratch_dir}/sequences/${in}_2.fastq.gz"; done >> input.tab
-
-snippy-multi input.tab --ref ${scratch_dir}/sequences/*.fasta --cpus 5 > commands.out
-
-sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" commands.out | awk '{print $0" &"}' > _00_snippy.sh
-
-# Execute core genome SNIPPY
-tail -n 1 _00_snippy.sh > _01_snippy_core.sh
-
-#Comment las line from _00_snippy.sh
-
-echo "snp-sites -b -c -o phylo.aln core.full.aln" > _02_phylo_aln.sh
-
-#awk 'BEGIN{FS="[> ]"} /^>/{val=$2;next}  {print val,length($0)}' phylo.aln

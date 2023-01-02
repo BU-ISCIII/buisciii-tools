@@ -1,0 +1,8 @@
+# module load FastQC
+
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat ../samples_id.txt | while read in; do echo "mkdir $in; srun --partition short_idx --chdir $scratch_dir --output logs/FASTQC.${in}.%j.log fastqc -o $in --nogroup -t 8 -k 8 ../00-reads/"$in"_R1.fastq.gz ../00-reads/"$in"_R2.fastq.gz &"; done > _01_rawfastqc.sh
+

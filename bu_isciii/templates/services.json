@@ -33,6 +33,25 @@
         "delivery_md": "",
         "delivery_pdf": ""
     },
+    "pikavirus": {
+      "label": "",
+      "template": "pikavirus",
+      "order": 1,
+      "begin": "base",
+      "end": "mag_met",
+      "url": "https://github.com/BU-ISCIII/PikaVirus",
+      "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus.",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+  },
+
+
     "plasmidid_assembly": {
       "label": "",
       "template": "plasmidid_assembly",
@@ -135,5 +154,22 @@
         "last_folder":"REFERENCES",
         "delivery_md": "",
         "delivery_pdf": ""
+    },
+    "snippy": {
+      "label": "",
+      "template": "snippy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/tseemann/snippy",
+      "description": "Rapid haploid variant calling and core genome alignment",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
     }
 }
