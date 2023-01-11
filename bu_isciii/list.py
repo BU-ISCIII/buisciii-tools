@@ -44,7 +44,7 @@ def generate_table(service_list):
     table.add_column("Description" , justify="left", style="green")
     table.add_column("Github"      , justify="left", style="green")
     
-    for service in subset_services:
+    for service in service_list:
         table.add_row(
             str(service),
             str(self.service_data[service]["description"]),
