@@ -33,7 +33,7 @@ stderr = Console(
 )
 
 
-def generate_table(service_list):
+def generate_table(service_list, data_dictionary):
     """
     Given a list of services,
     generate a rich table with it
@@ -47,8 +47,8 @@ def generate_table(service_list):
     for service in service_list:
         table.add_row(
             str(service),
-            str(self.service_data[service]["description"]),
-            str(self.service_data[service]["url"]),
+            str(data_dictionary[service]["description"]),
+            str(data_dictionary[service]["url"]),
         )
 
     return table
@@ -79,7 +79,7 @@ class ListServices:
                 ["Yes", "No"],
                 )
 
-        table = generate_table(sorted(subset_services)) if sort_dataframe == "Yes" else generate_table(subset_services)
+        table = generate_table(sorted(subset_services), self.service_data) if sort_dataframe == "Yes" else generate_table(subset_services, self.service_data)
 
         console = rich.console.Console()
         console.print(table)
