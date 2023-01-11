@@ -41,9 +41,9 @@ def generate_table(service_list, data_dictionary):
 
     table = rich.table.Table()
     table.add_column("Service name", justify="right", style="cyan")
-    table.add_column("Description" , justify="left", style="green")
-    table.add_column("Github"      , justify="left", style="green")
-    
+    table.add_column("Description", justify="left", style="green")
+    table.add_column("Github", justify="left", style="green")
+
     for service in service_list:
         table.add_row(
             str(service),
@@ -53,6 +53,7 @@ def generate_table(service_list, data_dictionary):
 
     return table
 
+
 class ListServices:
     def __init__(self):
         service_json = ServiceJson()
@@ -61,7 +62,7 @@ class ListServices:
 
     def print_table(self, service=None):
         """
-        Print table for service 
+        Print table for service
         names and description
         """
 
@@ -75,11 +76,15 @@ class ListServices:
             return
 
         sort_dataframe = bu_isciii.utils.prompt_selection(
-                "Would you like to print a sorted list?",
-                ["Yes", "No"],
-                )
+            "Would you like to print a sorted list?",
+            ["Yes", "No"],
+        )
 
-        table = generate_table(sorted(subset_services), self.service_data) if sort_dataframe == "Yes" else generate_table(subset_services, self.service_data)
+        table = (
+            generate_table(sorted(subset_services), self.service_data)
+            if sort_dataframe == "Yes"
+            else generate_table(subset_services, self.service_data)
+        )
 
         console = rich.console.Console()
         console.print(table)
