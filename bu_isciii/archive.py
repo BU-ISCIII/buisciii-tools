@@ -78,7 +78,7 @@ def get_service_paths(conf, type, service):
 
 class Archive:
     """
-    Class to perform the archivation and retrieval
+    Class to perform the storage and retrieval
     of a service
     """
 
@@ -115,10 +115,10 @@ class Archive:
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
 
-        # get data to connect to the api
+        # Get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
 
-        # Obtain info from iskylims api with the conf_api info
+        # Obtain info from iSKYlims api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
