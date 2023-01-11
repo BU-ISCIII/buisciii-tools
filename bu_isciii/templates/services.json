@@ -25,7 +25,7 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["01-preprocessing/trimmed_sequences"],
+          "folders":["01-preprocessing", "Bam", "Mpileup"],
           "files":[]
         },
         "no_copy": ["RAW", "TMP"],
