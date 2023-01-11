@@ -1,10 +1,10 @@
 # conda activate mtbseq
-
 # srun parameters
-scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g" )
+mkdir logs
+scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
 
-cat ../samples_id.txt | xargs -I % echo "mkdir %; ln -s ../../01-preprocessing/trimmed_sequences/%_1.trim.fastq.gz %/%_lib1_R1.fastq.gz" > _00_prepareRaw.sh
-cat ../samples_id.txt | xargs -I % echo "ln -s ../../01-preprocessing/trimmed_sequences/%_2.trim.fastq.gz %/%_lib1_R2.fastq.gz" >> _00_prepareRaw.sh
+cat ../samples_id.txt | xargs -I % echo "mkdir %; cd %; ln -s ../../*ASSEMBLY/01-preprocessing/trimmed_sequences/%_1.trim.fastq.gz %_lib1_R1.fastq.gz; cd -" > _00_prepareRaw.sh
+cat ../samples_id.txt | xargs -I % echo "cd %; ln -s ../../*ASSEMBLY/01-preprocessing/trimmed_sequences/%_2.trim.fastq.gz %_lib1_R2.fastq.gz; cd -" >> _00_prepareRaw.sh
 cat ../samples_id.txt | xargs -I % echo "cd %;ls *.fastq.gz | tr '_' '\t' | cut -f 1,2 | sort -u > samples.txt;cd -" > _01_preparesamples.sh
 
 cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_obx --mem 48G --chdir ${scratch_dir}/@@ --cpus-per-task 10 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _02_mtbseq.sh
