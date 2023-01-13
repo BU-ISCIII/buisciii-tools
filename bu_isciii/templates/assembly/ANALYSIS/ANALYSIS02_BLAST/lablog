@@ -32,16 +32,16 @@ ls ../*ASSEMBLY/03-assembly/unicycler/*.fasta | xargs -I @@ echo "readlink -e @@
 # looks like copying is the only way to avoid the "cant access" error 
 cat BLAST_list.txt | while read in;
 do
-  	samplename=$(basename ${in} .fasta)
-        mkdir ${samplename}
-        cp ${in} ${samplename}/${samplename}.fasta
-        echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_thr$
+      samplename=$(basename ${in} .fasta)
+      mkdir ${samplename}
+      cp ${in} ${samplename}/${samplename}.fasta
+      echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025/nt -query ${samplename}/${samplename}.fasta -out ${samplename}/${samplename}_blast.tab -outfmt '6 qseqid stitle std slen qlen qcovs' &" >> _01_blast.sh
 done
 
 cat BLAST_list.txt | while read in;
 do
   	samplename=$(basename ${in} .fasta)
-        echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk -v \"samplename=$samplename\" 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.$
+      echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk -v \"samplename=$samplename\" 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.$
 done
 
 echo -e "echo \"samplename\tcontigname\tstitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" >$
