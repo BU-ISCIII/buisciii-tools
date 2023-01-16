@@ -1,24 +1,28 @@
 #!/usr/bin/env python
 
 """
- =============================================================
+=============================================================
  HEADER
- =============================================================
+=============================================================
  INSTITUTION: BU-ISCIII
  AUTHOR: Alberto Lema Blanco
- ================================================================
+ EDITOR: Guillermo Jorge Gorines Cordero
+================================================================
  END_OF_HEADER
- ================================================================
+================================================================
 """
 
+# Generic imports
+import re
+import logging
 import rich.table
 import rich.console
-from bu_isciii.service_json import ServiceJson
-import logging
+from rich.console import Console
+
+# Local imports
 import bu_isciii
 import bu_isciii.utils
-from rich.console import Console
-import re
+from bu_isciii.service_json import ServiceJson
 
 log = logging.getLogger(__name__)
 stderr = Console(
@@ -29,6 +33,27 @@ stderr = Console(
 )
 
 
+def generate_table(service_list, data_dictionary):
+    """
+    Given a list of services,
+    generate a rich table with it
+    """
+
+    table = rich.table.Table()
+    table.add_column("Service name", justify="right", style="cyan")
+    table.add_column("Description", justify="left", style="green")
+    table.add_column("Github", justify="left", style="green")
+
+    for service in service_list:
+        table.add_row(
+            str(service),
+            str(data_dictionary[service]["description"]),
+            str(data_dictionary[service]["url"]),
+        )
+
+    return table
+
+
 class ListServices:
     def __init__(self):
         service_json = ServiceJson()
@@ -37,7 +62,8 @@ class ListServices:
 
     def print_table(self, service=None):
         """
-        Table print for services names and description
+        Print table for service
+        names and description
         """
 
         if service:
@@ -49,24 +75,17 @@ class ListServices:
             stderr.print(f"No services with name {service} found.")
             return
 
-        table = rich.table.Table()
-        table.add_column("Service name", justify="right", style="cyan")
-        table.add_column("Description", justify="left", style="green")
-        table.add_column("Github", justify="left", style="green")
+        sort_dataframe = bu_isciii.utils.prompt_selection(
+            "Would you like to print a sorted list?",
+            ["Yes", "No"],
+        )
 
-        for i in subset_services:
-            table.add_row(
-                str(i),
-                str(self.service_data[i]["description"]),
-                str(self.service_data[i]["url"]),
-            )
+        table = (
+            generate_table(sorted(subset_services), self.service_data)
+            if sort_dataframe == "Yes"
+            else generate_table(subset_services, self.service_data)
+        )
 
         console = rich.console.Console()
         console.print(table)
         return
-
-
-"""
-prueba = ListServices()
-prueba.get_table("viral")
-"""
