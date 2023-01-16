@@ -118,7 +118,7 @@ class Archive:
         # Get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
 
-        # Obtain info from iSKYlims api with the conf_api info
+        # Obtain info from iSkyLIMS api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
