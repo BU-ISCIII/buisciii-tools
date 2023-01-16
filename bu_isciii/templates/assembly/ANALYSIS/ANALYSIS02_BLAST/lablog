@@ -2,6 +2,7 @@
 
 # NOTE: THIS LABLOG HAS A SERIES OF (MAYBE) FLAWS THAT NEED 
 # TO BE CHECKED IN ORDER TO OPTMIZE SOFTWARE USAGE:
+# Check if it is necessary to copy the assembly, or its okay with a remote access or a symlink
 # 
 
 
