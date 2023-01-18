@@ -6,7 +6,7 @@ import os
 import logging
 import filecmp
 import shutil
-
+import calendar
 import sysrsync
 import rich
 
@@ -49,7 +49,6 @@ def dir_comparison(dir1, dir2):
             return False
     return True
 
-
 def get_service_paths(conf, type, service):
     """
     Given a service, a conf and a type,
@@ -75,24 +74,23 @@ def get_service_paths(conf, type, service):
 
     return archived, non_archived
 
+def get_dir_size(dir):
+    # note: is it really necessary if there is already 
+    # os.path.getsize()
+    pass
+
+    return
 
 class Archive:
     """
     Class to perform the storage and retrieval
     of a service
     """
-
-    def __init__(
-        self,
-        resolution_id=None,
-        type=None,
-        year=None,
-        option=None,
-        api_token=None,
-    ):
+    def __init__(self, resolution_id=None, type=None, year=None, option=None, month=None, api_token=None):
         # resolution_id = Nombre de la resolución
         # type = services_and_colaborations // research
         # year = año
+        # month = mes
         # option = archive/retrieve
 
         # assumption: year and no resolution_id >>> Batch management
@@ -113,8 +111,23 @@ class Archive:
             )
 
         if self.quantity == "Batch" and self.year is None:
+            
             self.year = bu_isciii.utils.prompt_year()
 
+            if self.month is None:
+
+                # if "Yes", ask which month
+                if (bu_isciii.utils.prompt_selection(
+                    "You chose to archive services until year {self.year}, would you like to specify a month?",
+                    ["Yes", "No"])) == "Yes":
+                    
+                    # Maybe a little complex, I went the extra mile to avoid saving the month list as a variable
+                    self.month = list(calendar.month_name).index(bu_isciii.utils.prompt_selection(
+                        "Until what month of year {self.year} would you like to archive services?",
+                        calendar.month_name[1:],
+                        )
+                    )
+                    
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
 
