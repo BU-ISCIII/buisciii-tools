@@ -121,12 +121,13 @@ class Archive:
                     "You chose to archive services until year {self.year}, would you like to specify a month?",
                     ["Yes", "No"])) == "Yes":
                     
-                    # Maybe a little complex, I went the extra mile to avoid saving the month list as a variable
-                    self.month = list(calendar.month_name).index(bu_isciii.utils.prompt_selection(
-                        "Until what month of year {self.year} would you like to archive services?",
-                        calendar.month_name[1:],
+                    # This is way too complex for the dumb thing it is
+                    self.month = int(
+                            bu_isciii.utils.prompt_selection(
+                                "Until what month of year {self.year} would you like to archive services?",
+                                [f"{num:02d}-{month}" for num, month in enumerate(calendar.month_name)][1:],
+                            ).split("-")[0]
                         )
-                    )
                     
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
