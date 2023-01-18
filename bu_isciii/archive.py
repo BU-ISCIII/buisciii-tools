@@ -157,9 +157,10 @@ class Archive:
             "services", "state", "delivered", "date", self.year
         )
         # This would be a good place for the month filter
-        # gotta test this
+        # api will return "Jan. 25, 2023".
+        
         if self.month is not None:
-            self.services_to_move = [ service for service in self.services_to_move if int(service["date"].split("-")[1]) <= self.month]
+            self.services_to_move = [ service for service in self.services_to_move if list(calendar.month_abbr).index(service["date"].split(".")[0]) <= self.month ]
 
         
         # Calculate size of the directories (already in GB)
