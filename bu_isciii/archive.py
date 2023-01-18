@@ -9,6 +9,7 @@ import shutil
 import calendar
 import sysrsync
 import rich
+from math import pow
 
 # Local imports
 import bu_isciii
@@ -74,19 +75,25 @@ def get_service_paths(conf, type, service):
 
     return archived, non_archived
 
-def get_dir_size(dir):
-    # note: is it really necessary if there is already 
-    # os.path.getsize()
-    pass
+def get_dir_size(path):
+    """
+    Get the size of a given directory
+    """
+    size = 0
 
-    return
+    for path, dirs, files in os.walk(path):
+        for f in files:
+            size += os.path.getsize(os.path.join(path, file))
+
+    return size
 
 class Archive:
     """
     Class to perform the storage and retrieval
     of a service
     """
-    def __init__(self, resolution_id=None, type=None, year=None, option=None, month=None, api_token=None):
+
+    def __init__(self, resolution_id=None, type=None, year=None, option=None, month=None, api_token=None, total_size=None):
         # resolution_id = Nombre de la resolución
         # type = services_and_colaborations // research
         # year = año
@@ -116,10 +123,11 @@ class Archive:
 
             if self.month is None:
 
-                # if "Yes", ask which month
+                # if "Specify a limit month", ask which month
+                # I dont really like the "limit month" concept, I need to find a nicer one
                 if (bu_isciii.utils.prompt_selection(
-                    "You chose to archive services until year {self.year}, would you like to specify a month?",
-                    ["Yes", "No"])) == "Yes":
+                    "You chose to archive services until year {self.year}, would you like to choose a limit month?",
+                    ["Specify a limit month", "Whole {self.year} year"])) == "Specify a limit month":
                     
                     # This is way too complex for the dumb thing it is
                     self.month = int(
@@ -144,9 +152,23 @@ class Archive:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_token
         )
+
         self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", self.year
         )
+        # This would be a good place for the month filter
+        # gotta test this
+        if self.month is not None:
+            self.services_to_move = [ service for service in self.services_to_move if int(service["date"].split("-")[1]) <= self.month]
+
+        
+        # Calculate size of the directories (already in GB)
+        stderr.print(
+            "Calculating total size of the directories to be filed.",
+            highlight=False,
+        )
+        self.total_size = sum([get_dir_size(directory) for directory in self.services_to_move]) * 9.31 * pow(10,-9)
+
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
@@ -161,39 +183,45 @@ class Archive:
 
     def archive(self):
         """
-        Archive services in selected year
-        """
-        for service in self.services_to_move:
-            # stderr.print(service["servicFolderName"])
+        Archive services in selected year and month
+        """      
 
-            dest, source = get_service_paths(self.conf, self.type, service)
+        if (bu_isciii.utils.prompt_selection(
+            f"The selection you want to file consists of {len(services_to_move)} services, with a total size of {self.total_size:.2f} GB. Continue?",
+            ["Yes, continue", "Hold up"])) == "Yes, continue":
 
-            try:
-                sysrsync.run(
-                    source=source,
-                    destination=dest,
-                    options=self.conf["options"],
-                    sync_source_contents=False,
-                )
-                stderr.print(
-                    "[green] Data copied successfully to its destiny archive folder",
-                    highlight=False,
-                )
-            except OSError as e:
-                stderr.print(
-                    "[red] ERROR: Data could not be copied to its destiny archive folder.",
-                    highlight=False,
-                )
-                log.error(
-                    f"Directory {self.source} could not be archived to {self.dest}.\
-                        Reason: {e}"
-                )
-        return
+            for service in self.services_to_move:
+                # stderr.print(service["servicFolderName"])
+
+                dest, source = get_service_paths(self.conf, self.type, service)
+
+                try:
+                    sysrsync.run(
+                        source=source,
+                        destination=dest,
+                        options=self.conf["options"],
+                        sync_source_contents=False,
+                    )
+                    stderr.print(
+                        "[green] Data copied successfully to its destiny archive folder",
+                        highlight=False,
+                    )
+                except OSError as e:
+                    stderr.print(
+                        "[red] ERROR: Data could not be copied to its destiny archive folder.",
+                        highlight=False,
+                    )
+                    log.error(
+                        f"Directory {self.source} could not be archived to {self.dest}.\
+                            Reason: {e}"
+                    )
+            return
 
     def retrieve_from_archive(self):
         """
         Copy a service back from archive
         """
+
         for service in self.services_to_move:
             # stderr.print(service["servicFolderName"])
             source = os.path.join(
