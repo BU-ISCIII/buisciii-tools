@@ -146,7 +146,7 @@ class Archive:
                 ["Specify a limit month", f"Whole {self.year} year"])) == "Specify a limit month":
                 
                 # This is way too complex for the dumb thing it is
-                month_list = [num, month for num, month in  enumerate(calendar.month_name)[1:]] if self.year < datetime.date.today().year else [num, month for num, month in enumerate(calendar.month_name)[1:datetime.date.today()]]
+                month_list = [[num, month] for num, month in  enumerate(calendar.month_name)][1:] if self.year < datetime.date.today().year else [num, month for num, month in enumerate(calendar.month_name)][1:datetime.date.today()]
 
                 self.month = int(
                         bu_isciii.utils.prompt_selection(
@@ -174,7 +174,7 @@ class Archive:
         )
 
         self.services_to_move = rest_api.get_request(
-            "services", "state", "delivered", "date", self.year
+            "services", "state", "delivered", "date", str(self.year)
         )
 
         print(self.services_to_move)
