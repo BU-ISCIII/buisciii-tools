@@ -93,16 +93,22 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, type=None, year=None, option=None, month=None, api_token=None, total_size=None):
+    def __init__(self, resolution_id=None, ser_type=None, year=None, api_token=None, option=None):
         # resolution_id = Nombre de la resolución
-        # type = services_and_colaborations // research
+        # ser_type = services_and_colaborations // research
         # year = año
-        # month = mes
         # option = archive/retrieve
+
+        self.resolution_id = resolution_id
+        self.type = ser_type
+        self.year = year
+        self.option = option
 
         # assumption: year and no resolution_id >>> Batch management
         self.quantity = (
-            "Batch" if self.year is not None and self.resolution_id is None else None
+            "Batch" 
+            if self.year is not None and self.resolution_id is None 
+            else None
         )
         # assumption: resolution_id and no year >>> Single service management
         self.quantity = (
@@ -121,22 +127,22 @@ class Archive:
             
             self.year = bu_isciii.utils.prompt_year()
 
-            if self.month is None:
+            # if "Specify a limit month", ask which month
+            # I dont really like the "limit month" concept, I need to find a nicer one
+            if (bu_isciii.utils.prompt_selection(
+                "You chose to archive services until year {self.year}, would you like to choose a limit month?",
+                ["Specify a limit month", "Whole {self.year} year"])) == "Specify a limit month":
+                
+                # This is way too complex for the dumb thing it is
+                self.month = int(
+                        bu_isciii.utils.prompt_selection(
+                            "Until what month of year {self.year} would you like to archive services?",
+                            [f"{num:02d}-{month}" for num, month in enumerate(calendar.month_name)][1:],
+                        ).split("-")[0]
+                    )
+            else:
+                self.month = None
 
-                # if "Specify a limit month", ask which month
-                # I dont really like the "limit month" concept, I need to find a nicer one
-                if (bu_isciii.utils.prompt_selection(
-                    "You chose to archive services until year {self.year}, would you like to choose a limit month?",
-                    ["Specify a limit month", "Whole {self.year} year"])) == "Specify a limit month":
-                    
-                    # This is way too complex for the dumb thing it is
-                    self.month = int(
-                            bu_isciii.utils.prompt_selection(
-                                "Until what month of year {self.year} would you like to archive services?",
-                                [f"{num:02d}-{month}" for num, month in enumerate(calendar.month_name)][1:],
-                            ).split("-")[0]
-                        )
-                    
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
 
@@ -156,9 +162,13 @@ class Archive:
         self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", self.year
         )
+
+        print(self.services_to_move)
         # This would be a good place for the month filter
-        # api will return "Jan. 25, 2023".
+        # api will return "Jan. 25, 2023" ???.
         
+
+
         if self.month is not None:
             self.services_to_move = [ service for service in self.services_to_move if list(calendar.month_abbr).index(service["date"].split(".")[0]) <= self.month ]
 
