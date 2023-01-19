@@ -146,10 +146,12 @@ class Archive:
                 ["Specify a limit month", f"Whole {self.year} year"])) == "Specify a limit month":
                 
                 # This is way too complex for the dumb thing it is
+                month_list = [num, month for num, month in  enumerate(calendar.month_name)[1:]] if self.year < datetime.date.today().year else [num, month for num, month in enumerate(calendar.month_name)[1:datetime.date.today()]]
+
                 self.month = int(
                         bu_isciii.utils.prompt_selection(
-                            "Until what month of year {self.year} would you like to archive services?",
-                            [f"{num:02d}-{month}" for num, month in enumerate(calendar.month_name)][1:],
+                            f"Until what month of year {self.year} would you like to archive services?",
+                            [f"{num:02d}-{month}" for num, month in month_list],
                         ).split("-")[0]
                     )
             else:
