@@ -156,9 +156,9 @@ class Archive:
                     )
             else:
                 if self.year == date.today().year:
-                    self.month = month_name[date.today().month]
+                    self.month = date.today().month
                     stderr.print(
-                        f"You chose the current year ({self.year}), so only services until {} will be chosen",
+                        f"You chose the current year ({self.year}), so only services until {month_name[self.month]} will be chosen",
                         highlight=False,
                     )
                     
