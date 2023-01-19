@@ -37,7 +37,15 @@ def prompt_resolution_id():
 def prompt_year():
     stderr.print("Specify the year for which you want to archive services.")
     year = questionary.text("Year").unsafe_ask()
-    return year
+    
+    try:
+        year = int(year)
+
+    except valueError:
+        stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
+        year = questionary.text("Year").unsafe_ask()
+
+    return int(year)
 
 
 def prompt_service_dir_path():
