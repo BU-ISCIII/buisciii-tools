@@ -131,9 +131,10 @@ class Archive:
             while self.year < 2010 or self.year > datetime.date.today().year:
 
                 adjective = "vintage" if self.year < 2010 else "futuristic"
+                pun = "the oldest record we have is from the year 2010!" if self.year < 2010 else "time travel has not been released (yet)."
 
                 stderr.print(
-                    f"Thats pretty optimistic of you but the oldest record we have is from the year 2010! '{self.year}' is maybe too... {adjective}. Please, try again!",
+                    f"Thats pretty optimistic of you, but {pun} Year '{self.year}' is maybe too... {adjective}. Please, try again!",
                     highlight=False,
                 )
                 self.year = bu_isciii.utils.prompt_year()
