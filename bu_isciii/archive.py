@@ -6,11 +6,11 @@ import os
 import logging
 import filecmp
 import shutil
-import datetime
-import calendar
 import sysrsync
 import rich
 from math import pow
+from calendar import month_name
+import datetime import date
 
 # Local imports
 import bu_isciii
@@ -128,7 +128,7 @@ class Archive:
             
             self.year = bu_isciii.utils.prompt_year()
             
-            while self.year < 2010 or self.year > datetime.date.today().year:
+            while self.year < 2010 or self.year > date.today().year:
 
                 adjective = "vintage" if self.year < 2010 else "futuristic"
                 pun = "the oldest record we have is from the year 2010!" if self.year < 2010 else "time travel has not been released (yet)."
@@ -145,8 +145,8 @@ class Archive:
                 f"You chose to archive services until year {self.year}, would you like to choose a limit month?",
                 ["Specify a limit month", f"Whole {self.year} year"])) == "Specify a limit month":
                 
-                # This is way too complex for the dumb thing it is
-                month_list = [[num, month] for num, month in  enumerate(calendar.month_name)][1:] if self.year < datetime.date.today().year else [[num, month] for num, month in enumerate(calendar.month_name)][1:datetime.date.today()]
+                # Month list (if current year, show only months until current one)
+                month_list = [[num, month] for num, month in  enumerate(month_name)][1:] if self.year < date.today().year else [[num, month] for num, month in enumerate(month_name)][1:date.today().month]
 
                 self.month = int(
                         bu_isciii.utils.prompt_selection(
@@ -155,7 +155,15 @@ class Archive:
                         ).split("-")[0]
                     )
             else:
-                self.month = None
+                if self.year == date.today().year:
+                    self.month = month_name[date.today().month]
+                    stderr.print(
+                        f"You chose the current year ({self.year}), so only services until {} will be chosen",
+                        highlight=False,
+                    )
+                    
+                else:
+                    self.month = None
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -182,10 +190,10 @@ class Archive:
         # api will return "Jan. 25, 2023" ???.
         
 
-
+        """    
         if self.month is not None:
-            self.services_to_move = [ service for service in self.services_to_move if list(calendar.month_abbr).index(service["date"].split(".")[0]) <= self.month ]
-
+            self.services_to_move = [ service for service in self.services_to_move if list(month_abbr).index(service["date"].split(".")[0]) <= self.month ]
+        """
         
         # Calculate size of the directories (already in GB)
         stderr.print(
