@@ -6,6 +6,7 @@ import os
 import logging
 import filecmp
 import shutil
+import datetime
 import calendar
 import sysrsync
 import rich
@@ -126,12 +127,30 @@ class Archive:
         if self.quantity == "Batch" and self.year is None:
             
             self.year = bu_isciii.utils.prompt_year()
+            
+            while type(self.year) != int or self.year < 2010 or self.year > datetime.date.today().year:
+
+                if type(self.year) != int:
+                    stderr.print(
+                        f"Seems like the chosen option for year, '{self.year}', is not valid. Please, try again!",
+                        highlight=False,
+                    )
+                    self.year = bu_isciii.utils.prompt_year()
+                else:
+
+                    adjective = "vintage" if self.year < 2010 else "futuristic"
+
+                    stderr.print(
+                        f"Thats pretty optimistic of you but the oldest record we have is from the year 2010! '{self.year}' is maybe too... {adjective}. Please, try again!",
+                        highlight=False,
+                    )
+                    self.year = bu_isciii.utils.prompt_year()
 
             # if "Specify a limit month", ask which month
             # I dont really like the "limit month" concept, I need to find a nicer one
             if (bu_isciii.utils.prompt_selection(
-                "You chose to archive services until year {self.year}, would you like to choose a limit month?",
-                ["Specify a limit month", "Whole {self.year} year"])) == "Specify a limit month":
+                f"You chose to archive services until year {self.year}, would you like to choose a limit month?",
+                ["Specify a limit month", f"Whole {self.year} year"])) == "Specify a limit month":
                 
                 # This is way too complex for the dumb thing it is
                 self.month = int(
