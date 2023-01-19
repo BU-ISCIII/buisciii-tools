@@ -40,7 +40,9 @@ def prompt_year():
     
     while True:
         try:
-            return int(year)
+            # test if it is an int
+            int(year)
+            return year
         
         except ValueError:
             stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
