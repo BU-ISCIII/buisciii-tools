@@ -38,14 +38,18 @@ def prompt_year():
     stderr.print("Specify the year for which you want to archive services.")
     year = questionary.text("Year").unsafe_ask()
     
-    try:
-        year = int(year)
+    while True:
+        try:
+            return int(year)
+        
+        except ValueError:
+            stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
+            year = questionary.text("Year").unsafe_ask()
+    
+    return
+        
 
-    except ValueError:
-        stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
-        year = questionary.text("Year").unsafe_ask()
-
-    return int(year)
+    
 
 
 def prompt_service_dir_path():
