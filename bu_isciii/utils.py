@@ -41,7 +41,7 @@ def prompt_year():
     try:
         year = int(year)
 
-    except valueError:
+    except ValueError:
         stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
         year = questionary.text("Year").unsafe_ask()
 
