@@ -139,29 +139,44 @@ class Archive:
                 )
                 self.year = bu_isciii.utils.prompt_year()
 
+
+            stderr.print(
+                f"You chose to archive services until year: {self.year}.",
+                highlight=False,
+            )
+
+
             # if "Specify a limit month", ask which month
             # I dont really like the "limit month" concept, I need to find a nicer one
+
             if (bu_isciii.utils.prompt_selection(
-                f"You chose to archive services until year {self.year}, would you like to choose a limit month?",
+                "Would you like to choose a limit month?",
                 ["Specify a limit month", f"Whole {self.year} year"])) == "Specify a limit month":
                 
                 # Month list (if current year, show only months until current one)
-                month_list = [[num, month] for num, month in  enumerate(month_name)][1:] if self.year < date.today().year else [[num, month] for num, month in enumerate(month_name)][1:date.today().month]
+                if self.year < date.today().year:
+                    month_list = [[num, month] for num, month in enumerate(month_name)][1:]
+                else:
+                    month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month]
+                
+                # Last part can be done in a (long) one-liner:
+                # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if self.year < date.today().year else [[num, month] for num, month in enumerate(month_name)][1:date.today().month]
+                # I found it cleaner to do it separately
 
                 self.month = int(
                         bu_isciii.utils.prompt_selection(
                             f"Until what month of year {self.year} would you like to archive services?",
-                            [f"{num:02d}-{month}" for num, month in month_list],
-                        ).split("-")[0]
+                            [f"month {num:02d}: {month}" for num, month in month_list],
+                        ).split(":")[0].split(" ")[1]
                     )
             else:
+                # If "whole year" for current year, choose only until current month
                 if self.year == date.today().year:
                     self.month = date.today().month
                     stderr.print(
-                        f"You chose the current year ({self.year}), so only services until {month_name[self.month]} will be chosen",
+                        f"You chose the current year ({self.year}), so only services until the current month ({month_name[self.month]}) will be chosen",
                         highlight=False,
                     )
-                    
                 else:
                     self.month = None
 
