@@ -10,7 +10,7 @@ import sysrsync
 import rich
 from math import pow
 from calendar import month_name
-import datetime import date
+from datetime import date
 
 # Local imports
 import bu_isciii
