@@ -25,8 +25,9 @@
     "bioinfo_doc": {
         "bioinfodoc_path": "/data/bioinfo_doc/",
         "services_path": "services",
-        "service_folder": ["request", "resolution", "result"],
-        "md_template_path_file" : "templates/jinja_template.j2",
+        "service_folder": ["service_info", "result"],
+        "service_info_template_path_file" : "templates/jinja_template_service_info.j2",
+        "delivery_template_path_file" : "templates/jinja_template_delivery.j2",
         "html_template_path_file" : "templates/html_service_template.html",
         "path_to_css" : "assets/css",
         "wkhtmltopdf_path" : "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf"
