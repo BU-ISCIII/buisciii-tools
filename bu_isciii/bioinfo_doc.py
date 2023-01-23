@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+# Generic imports
 from datetime import datetime
 import logging
 import rich.console
@@ -8,6 +10,8 @@ import jinja2
 import markdown
 import pdfkit
 import PyPDF2
+
+# Local imports
 import bu_isciii.utils
 import bu_isciii.config_json
 import bu_isciii.drylab_api
@@ -28,16 +32,23 @@ class BioinfoDoc:
         type=None,
         resolution_id=None,
         local_folder=None,
+        ask_path=False,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
-                choices=["resolution", "delivery"],
+                choices=["service_info", "delivery"],
             )
+        self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
+            "bioinfo_doc"
+        )
         if local_folder is None:
-            self.local_folder = bu_isciii.utils.prompt_path(
-                msg="Path where bioinfo folder is mounted"
-            )
+            if ask_path:
+                self.local_folder = bu_isciii.utils.prompt_path(
+                    msg="Path where bioinfo_doc folder is mounted in your local WS."
+                )
+            else:
+                self.local_folder = os.path.normpath(self.doc_conf["bioinfodoc_path"])
         else:
             self.local_folder = local_folder
         if not os.path.exists(self.local_folder):
@@ -47,19 +58,17 @@ class BioinfoDoc:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        self.config_doc = bu_isciii.config_json.ConfigJson().get_configuration(
-            "bioinfo_doc"
-        )
-        self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
-            "bioinfo_doc"
-        )
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("local_api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
         resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
+        #TODO: When delivery info can be downloaded from iSkyLIMS
+        #resolution_info = rest_api.get_request(
+        #    "resolutionFullData", "delivery", self.resolution_id
+        #)
         if not resolution_info:
             stderr.print(
                 "[red] Unable to fetch information for resolution "
@@ -68,16 +77,29 @@ class BioinfoDoc:
             )
             sys.exit(1)
         resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
-        year = str(datetime.now().year)
-        self.service_folder = os.path.join(
-            self.local_folder, self.config_doc["services_path"], year, resolution_folder
-        )
         self.resolution = resolution_info["Resolutions"]
         self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
+        self.resolution_number = resolution_info["Resolutions"]["resolutionNumber"]
+        self.delivery_number = self.resolution_number.partition('.')[2]
+        resolution_date = self.resolution.get("resolutionDate")
+        self.resolution_datetime = datetime.strptime(resolution_date,'%Y-%m-%d')
+        year = datetime.strftime(self.resolution_datetime,'%Y')
+        self.service_folder = os.path.join(
+            self.local_folder, self.doc_conf["services_path"], year, resolution_folder
+        )
         self.samples = resolution_info["Samples"]
         self.user_data = resolution_info["Service"]["serviceUserId"]
         self.service = resolution_info["Service"]
         self.handled_services = None
+        path_to_wkhtmltopdf = os.path.normpath(self.doc_conf["wkhtmltopdf_path"])
+        self.config_pdfkit = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+        if self.type == "service_info":
+            self.template_file = self.doc_conf["service_info_template_path_file"]
+        else:
+            self.template_file = self.doc_conf["delivery_template_path_file"]
+        self.services_requested = resolution_info["Resolutions"][
+            "availableServices"
+        ]
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -85,15 +107,42 @@ class BioinfoDoc:
             stderr.print(
                 "[green] Skiping folder creation for service "
                 + self.resolution_id
-                + "!"
+                + ". Trying with subfolders"
             )
-            return
+            for folder in self.doc_conf["service_folder"]:
+                if os.path.exists(os.path.join(self.service_folder, folder)):
+                    log.info("Already creted the service subfolders for %s", self.resolution_id)
+                    stderr.print(
+                        "[green] Skiping folder creation for service "
+                        + self.resolution_id
+                        + '/'
+                        + folder
+                    )
+                else:
+                    log.info("Creating service subfolder %s", folder)
+                    stderr.print(
+                        "[blue] Creating the service subfolderfolder " + folder + " for " + self.resolution_id + "!"
+                    )
+                    os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
+                    log.info("Service folders created")
+                if self.type == "delivery":
+                    file_path = os.path.join(self.service_folder, "result")
+                    delivery_date = self.resolution.get("resolutionDeliveryDate")
+                    delivery_datetime = datetime.strptime(delivery_date,'%Y-%m-%d')
+                    delivery_date_folder = datetime.strftime(delivery_datetime,'%Y%m%d')
+                    self.delivery_sub_folder = (
+                        str(delivery_date_folder)
+                        + "_entrega"
+                        + self.delivery_number.zfill(2)
+                    )
+                    os.makedirs(os.path.join(file_path, self.delivery_sub_folder), exist_ok=True)
+
         else:
             log.info("Creating service folder for %s", self.resolution_id)
             stderr.print(
                 "[blue] Creating the service folder for " + self.resolution_id + "!"
             )
-            for folder in self.config_doc["service_folder"]:
+            for folder in self.doc_conf["service_folder"]:
                 os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
             log.info("Service folders created")
         return
@@ -126,33 +175,20 @@ class BioinfoDoc:
         markdown_data["samples"] = samples_in_service
 
         # Resolution related information
-        if "request" not in file_path:
-            markdown_data["resolution"] = self.resolution
-            f_name = markdown_data["resolution"]["resolutionNumber"] + ".md"
-            if "resolution" in file_path:
-                file_name = os.path.join(file_path, f_name)
-            else:
-                sub_folder = (
-                    datetime.today().strftime("%Y%m%d")
-                    + "_"
-                    + markdown_data["service"]["serviceRequestNumber"]
-                )
-                file_name = os.path.join(file_path, sub_folder, f_name)
-        else:
-            file_name = os.path.join(
-                file_path, markdown_data["service"]["serviceRequestNumber"] + ".md"
-            )
-        # Delivery related information
+        markdown_data["resolution"] = self.resolution
+        f_name = self.resolution_number + ".md"
+        file_name = os.path.join(file_path, f_name)
+        file_name = os.path.join(file_path, f_name)
 
+        # Delivery related information
         markdown_data["service_notes"] = (
             self.service["serviceNotes"].replace("\r", "").replace("\n", " ")
         )
 
-        template_file = self.config_doc["md_template_path_file"]
         pakage_path = os.path.dirname(os.path.realpath(__file__))
         templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
         templateEnv = jinja2.Environment(loader=templateLoader)
-        template = templateEnv.get_template(template_file)
+        template = templateEnv.get_template(self.template_file)
         # Create markdown
         mk_text = template.render(markdown_data)
 
@@ -182,14 +218,14 @@ class BioinfoDoc:
 
     def wrap_html(self, html_text, file_name):
         file_name += ".html"
-        template_file = os.path.join(
+        html_template_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             self.doc_conf["html_template_path_file"],
         )
         css_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), self.doc_conf["path_to_css"]
         )
-        with open(template_file, "r") as fh:
+        with open(html_template_file, "r") as fh:
             file_read = fh.read()
         file_read = file_read.replace("{text_to_add}", html_text)
         file_read = file_read.replace("{path_to_css}", css_path)
@@ -200,27 +236,17 @@ class BioinfoDoc:
     def convert_to_pdf(self, html_file):
         pdf_file = html_file.replace(".html", ".pdf")
         try:
-            pdfkit.from_file(html_file, pdf_file)
+            pdfkit.from_file(html_file, output_path=pdf_file, configuration=self.config_pdfkit)
         except OSError as e:
             stderr.print("[red] Unable to convert to PDF")
             log.exception("Unable to create pdf.", exc_info=e)
         return
 
     def generate_documentation_files(self, type):
-        if type == "request":
-            if not os.listdir(os.path.join(self.service_folder, "request")):
-                # Create the requested service documents
-                file_path = os.path.join(self.service_folder, "request")
-            else:
-                stderr.print("[green] Skiping documentation on request folder")
-                log.info(
-                    "Documenttion already created on request folder. Skiping this step"
-                )
-                return
-        elif type == "resolution":
-            file_path = os.path.join(self.service_folder, "resolution")
+        if type == "service_info":
+            file_path = os.path.join(self.service_folder, "service_info")
         elif type == "delivery":
-            file_path = os.path.join(self.service_folder, "result")
+            file_path = os.path.join(self.service_folder, "result", self.delivery_sub_folder)
         else:
             stderr.print("[red] invalid option")
             log.error("Unable to generate files because invalid option %s", type)
@@ -230,36 +256,65 @@ class BioinfoDoc:
         file_name_without_ext = file_name.replace(".md", "")
         html_text = self.convert_markdown_to_html(mk_text)
         html_file_name = self.wrap_html(html_text, file_name_without_ext)
-        pdf_file = self.convert_to_pdf(html_file_name)
+        self.convert_to_pdf(html_file_name)
+        pdf_file = html_file_name.replace(".html", ".pdf")
         return pdf_file
 
-    def join_pdf_files(service_pdf, result_template, out_file):
+    def join_pdf_files(self, service_pdf, result_template, out_file):
         mergeFile = PyPDF2.PdfFileMerger()
         mergeFile.append(PyPDF2.PdfFileReader(service_pdf, "rb"))
         mergeFile.append(PyPDF2.PdfFileReader(result_template, "rb"))
         mergeFile.write(out_file)
         return
 
-    def create_delivery_doc(self):
+    def create_delivery_doc(self, resolution_pdf):
         """Get the service pdf file from the requested service"""
-        servicerequested = self.resolution["availableServices"]["serviceId"]
+        services_ids = bu_isciii.utils.get_service_ids(self.services_requested)
         services_json = bu_isciii.service_json.ServiceJson()
-        services_docs = services_json.get_list_of_delivery_doc()
-        if servicerequested in services_docs:
-            return os.path.join(
-                os.path.dirname(os.path.realpath(__file__)),
-                services_docs[servicerequested],
+
+        if len(services_ids) == 1:
+            try:
+                service_pdf = services_json.get_find(services_ids[0], "delivery_pdf")
+            except KeyError as e:
+                stderr.print(
+                    "[red]ERROR: Service id %s not found in services json file."
+                    % services_ids[0]
+                )
+                stderr.print("traceback error %s" % e)
+                sys.exit()
+            try:
+                real_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),service_pdf)
+                delivery_pdf_name = self.resolution_number+'_'+self.delivery_sub_folder+".pdf"
+                delivery_pdf_file = os.path.join(self.service_folder, "result", self.delivery_sub_folder, delivery_pdf_name)
+                self.join_pdf_files(resolution_pdf, real_path, delivery_pdf_file)
+                stderr.print(
+                    "[green]Successfully merged the PDFs %s and %s to the directory %s"
+                    % (resolution_pdf, service_pdf, os.path.join(self.service_folder, "result", self.delivery_sub_folder, "delivery.pdf")),
+                    highlight=False,
+                )
+
+            except OSError as e:
+                stderr.print("[red]ERROR: Merging PDFs failed.")
+                stderr.print("traceback error %s" % e)
+                sys.exit()
+        else:
+            stderr.print(
+                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry! Please re-run and select one of the service ids."
             )
+            sys.exit()
+            return False
         return None
 
     def create_documentation(self):
         self.create_structure()
-        if self.type == "resolution":
-            self.generate_documentation_files("request")
-            self.generate_documentation_files("resolution")
+        if self.type == "service_info":
+            self.generate_documentation_files("service_info")
             return
-        if self.type == "delivery":
+        elif self.type == "delivery":
             pdf_resolution = self.generate_documentation_files("delivery")
-            pdf_services_request = self.create_delivery_doc()
-            self.join_pdf_files(pdf_resolution, pdf_services_request, "delivery.pdf")
+            self.create_delivery_doc(pdf_resolution)
             return
+        else:
+            stderr.print("[red] invalid option")
+            log.error("Unable to proceed because invalid option %s", type)
+            sys.exit(1)
