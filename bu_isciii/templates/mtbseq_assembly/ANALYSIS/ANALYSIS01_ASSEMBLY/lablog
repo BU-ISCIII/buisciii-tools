@@ -1,3 +1,5 @@
+# module load Nextflow/21.10.6 singularity
+
 ln -s ../00-reads .
 ln -s ../samples_id.txt .
 

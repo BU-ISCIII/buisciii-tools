@@ -1,0 +1,31 @@
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+echo "Use bash lablog ../samples_id.txt"
+
+samples_file=$1
+cat <<EOF > varscan.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 16384
+#SBATCH --time 8:00:00
+#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
+#SBATCH --partition middle_idx
+#SBATCH --output logs/varscan_%A_%a.log
+#SBATCH --chdir $scratch_dir
+
+module load VarScan/2.4.4-Java-1.8 BCFtools/1.12-GCC-10.2.0
+
+SAMPLE_LIST=(\$(<$samples_file))
+SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
+
+mkdir \$SAMPLE
+java -Xmx10g -jar \$EBROOTVARSCAN/VarScan.v2.4.4.jar mpileup2cns ../05-samtools/\${SAMPLE}/\${SAMPLE}.pileup --min-var-freq 0.05 --p-value 0.99 --variants --output-vcf 1 > \${SAMPLE}/\${SAMPLE}.vcf
+bgzip \${SAMPLE}/\${SAMPLE}.vcf
+tabix \${SAMPLE}/\${SAMPLE}.vcf.gz
+EOF
+
+echo "sbatch varscan.sbatch" > _01_varscan.sh
+echo "Done"
