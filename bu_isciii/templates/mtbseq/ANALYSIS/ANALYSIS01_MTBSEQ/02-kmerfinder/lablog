@@ -1,4 +1,4 @@
-#module load singularity
+# module load singularity
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 

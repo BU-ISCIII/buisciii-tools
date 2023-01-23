@@ -1,0 +1,51 @@
+# module load BLAST+/2.11.0-gompi-2020b
+
+# NOTE: THIS LABLOG HAS A SERIES OF (MAYBE) FLAWS THAT NEED 
+# TO BE CHECKED IN ORDER TO OPTMIZE SOFTWARE USAGE:
+# Check if it is necessary to copy the assembly, or its okay with a remote access or a symlink
+# 
+
+
+# header:
+#  1: stitle
+#  2: qaccver
+#  3: saccver
+#  4: pident
+#  5: length
+#  6: ismatch
+#  7: gapopen
+#  8: qstart
+#  9: qend
+# 10: sstart
+# 11: send
+# 12: evalue
+# 13: bitscore
+# 14: slen
+# 15: qlen
+# 16: qcovs
+# 17: %cgAligned
+# 18: %refCovered
+# MORE INFO: https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+mkdir logs
+ls ../*ASSEMBLY/03-assembly/unicycler/*.fasta | xargs -I @@ echo "readlink -e @@" | bash > BLAST_list.txt
+
+# looks like copying is the only way to avoid the "cant access" error 
+cat BLAST_list.txt | while read in;
+do
+      samplename=$(basename ${in} .fasta)
+      mkdir ${samplename}
+      cp ${in} ${samplename}/${samplename}.fasta
+      echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025/nt -query ${samplename}/${samplename}.fasta -out ${samplename}/${samplename}_blast.tab -outfmt '6 qseqid stitle std slen qlen qcovs' &"
+done > _01_blast.sh
+
+cat BLAST_list.txt | while read in;
+do
+  	samplename=$(basename ${in} .fasta)
+      echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk -v \"samplename=$samplename\" 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print samplename,\$0}' > ${samplename}/${samplename}_blast_filt.tab"
+done > _02_filter_blast.sh
+
+echo -e "echo \"samplename\tcontigname\tstitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" >$
+echo "cat header */*blast_filt.tab > all_samples_filtered_BLAST_results.tab" >> _03_gather_results.sh
+echo "rm */*.fasta" >> _03_gather_results.sh
