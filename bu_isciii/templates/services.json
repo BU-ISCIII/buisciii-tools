@@ -153,7 +153,7 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "assets/reports/pdf/rnaseq.pdf"
     },
     "lowfreq_panel": {
         "label": "",
