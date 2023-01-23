@@ -328,7 +328,7 @@ def finish(resolution, path, ask_path, destination):
 @click.option(
     "-t",
     "--type",
-    type=click.Choice(["resolution", "delivery"]),
+    type=click.Choice(["service_info", "delivery"]),
     help="Select the documentation that will generate",
 )
 def bioinfo_doc(type, resolution, local_folder, ask_path):

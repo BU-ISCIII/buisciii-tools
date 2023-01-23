@@ -37,7 +37,7 @@ class BioinfoDoc:
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
-                choices=["resolution", "delivery"],
+                choices=["service_info", "delivery"],
             )
         self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
             "bioinfo_doc"
@@ -274,11 +274,10 @@ class BioinfoDoc:
 
     def create_documentation(self):
         self.create_structure()
-        if self.type == "resolution":
-            self.generate_documentation_files("request")
-            self.generate_documentation_files("resolution")
+        if self.type == "service_info":
+            self.generate_documentation_files("service_info")
             return
-        if self.type == "delivery":
+        elif self.type == "delivery":
             pdf_resolution = self.generate_documentation_files("delivery")
             pdf_services_request = self.create_delivery_doc()
             self.join_pdf_files(pdf_resolution, pdf_services_request, "delivery.pdf")
