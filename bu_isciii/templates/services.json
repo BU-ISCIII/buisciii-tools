@@ -118,6 +118,39 @@
         "last_folder":"RESULTS",
         "delivery_md": "",
         "delivery_pdf": "assets/reports/pdf/rnaseq.pdf"
+    },
+    "lowfreq_panel": {
+        "label": "",
+        "template": "lowfreq_panel",
+        "url": "",
+        "order": 1,
+        "begin": "",
+        "end": "",
+        "description": "Low frequency variant calling from enrichment panel.",
+        "clean": {
+          "folders":["02-preprocessing", "05-samtools"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP", "00-reads"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": ""
+    },
+    "snippy": {
+      "label": "",
+      "template": "snippy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/tseemann/snippy",
+      "description": "Rapid haploid variant calling and core genome alignment",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
     }
-
 }
