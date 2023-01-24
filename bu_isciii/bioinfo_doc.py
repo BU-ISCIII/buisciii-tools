@@ -58,17 +58,19 @@ class BioinfoDoc:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("local_api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "local_api_settings"
+        )
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
         resolution_info = rest_api.get_request(
             "resolutionFullData", "resolution", self.resolution_id
         )
-        #TODO: When delivery info can be downloaded from iSkyLIMS
-        #resolution_info = rest_api.get_request(
+        # TODO: When delivery info can be downloaded from iSkyLIMS
+        # resolution_info = rest_api.get_request(
         #    "resolutionFullData", "delivery", self.resolution_id
-        #)
+        # )
         if not resolution_info:
             stderr.print(
                 "[red] Unable to fetch information for resolution "
@@ -80,10 +82,10 @@ class BioinfoDoc:
         self.resolution = resolution_info["Resolutions"]
         self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
         self.resolution_number = resolution_info["Resolutions"]["resolutionNumber"]
-        self.delivery_number = self.resolution_number.partition('.')[2]
+        self.delivery_number = self.resolution_number.partition(".")[2]
         resolution_date = self.resolution.get("resolutionDate")
-        self.resolution_datetime = datetime.strptime(resolution_date,'%Y-%m-%d')
-        year = datetime.strftime(self.resolution_datetime,'%Y')
+        self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
+        year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
             self.local_folder, self.doc_conf["services_path"], year, resolution_folder
         )
@@ -97,9 +99,7 @@ class BioinfoDoc:
             self.template_file = self.doc_conf["service_info_template_path_file"]
         else:
             self.template_file = self.doc_conf["delivery_template_path_file"]
-        self.services_requested = resolution_info["Resolutions"][
-            "availableServices"
-        ]
+        self.services_requested = resolution_info["Resolutions"]["availableServices"]
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -111,31 +111,44 @@ class BioinfoDoc:
             )
             for folder in self.doc_conf["service_folder"]:
                 if os.path.exists(os.path.join(self.service_folder, folder)):
-                    log.info("Already creted the service subfolders for %s", self.resolution_id)
+                    log.info(
+                        "Already creted the service subfolders for %s",
+                        self.resolution_id,
+                    )
                     stderr.print(
                         "[green] Skiping folder creation for service "
                         + self.resolution_id
-                        + '/'
+                        + "/"
                         + folder
                     )
                 else:
                     log.info("Creating service subfolder %s", folder)
                     stderr.print(
-                        "[blue] Creating the service subfolderfolder " + folder + " for " + self.resolution_id + "!"
+                        "[blue] Creating the service subfolderfolder "
+                        + folder
+                        + " for "
+                        + self.resolution_id
+                        + "!"
                     )
-                    os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
+                    os.makedirs(
+                        os.path.join(self.service_folder, folder), exist_ok=True
+                    )
                     log.info("Service folders created")
                 if self.type == "delivery":
                     file_path = os.path.join(self.service_folder, "result")
                     delivery_date = self.resolution.get("resolutionDeliveryDate")
-                    delivery_datetime = datetime.strptime(delivery_date,'%Y-%m-%d')
-                    delivery_date_folder = datetime.strftime(delivery_datetime,'%Y%m%d')
+                    delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
+                    delivery_date_folder = datetime.strftime(
+                        delivery_datetime, "%Y%m%d"
+                    )
                     self.delivery_sub_folder = (
                         str(delivery_date_folder)
                         + "_entrega"
                         + self.delivery_number.zfill(2)
                     )
-                    os.makedirs(os.path.join(file_path, self.delivery_sub_folder), exist_ok=True)
+                    os.makedirs(
+                        os.path.join(file_path, self.delivery_sub_folder), exist_ok=True
+                    )
 
         else:
             log.info("Creating service folder for %s", self.resolution_id)
@@ -236,7 +249,9 @@ class BioinfoDoc:
     def convert_to_pdf(self, html_file):
         pdf_file = html_file.replace(".html", ".pdf")
         try:
-            pdfkit.from_file(html_file, output_path=pdf_file, configuration=self.config_pdfkit)
+            pdfkit.from_file(
+                html_file, output_path=pdf_file, configuration=self.config_pdfkit
+            )
         except OSError as e:
             stderr.print("[red] Unable to convert to PDF")
             log.exception("Unable to create pdf.", exc_info=e)
@@ -246,7 +261,9 @@ class BioinfoDoc:
         if type == "service_info":
             file_path = os.path.join(self.service_folder, "service_info")
         elif type == "delivery":
-            file_path = os.path.join(self.service_folder, "result", self.delivery_sub_folder)
+            file_path = os.path.join(
+                self.service_folder, "result", self.delivery_sub_folder
+            )
         else:
             stderr.print("[red] invalid option")
             log.error("Unable to generate files because invalid option %s", type)
@@ -283,13 +300,31 @@ class BioinfoDoc:
                 stderr.print("traceback error %s" % e)
                 sys.exit()
             try:
-                real_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),service_pdf)
-                delivery_pdf_name = self.resolution_number+'_'+self.delivery_sub_folder+".pdf"
-                delivery_pdf_file = os.path.join(self.service_folder, "result", self.delivery_sub_folder, delivery_pdf_name)
+                real_path = os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)), service_pdf
+                )
+                delivery_pdf_name = (
+                    self.resolution_number + "_" + self.delivery_sub_folder + ".pdf"
+                )
+                delivery_pdf_file = os.path.join(
+                    self.service_folder,
+                    "result",
+                    self.delivery_sub_folder,
+                    delivery_pdf_name,
+                )
                 self.join_pdf_files(resolution_pdf, real_path, delivery_pdf_file)
                 stderr.print(
                     "[green]Successfully merged the PDFs %s and %s to the directory %s"
-                    % (resolution_pdf, service_pdf, os.path.join(self.service_folder, "result", self.delivery_sub_folder, "delivery.pdf")),
+                    % (
+                        resolution_pdf,
+                        service_pdf,
+                        os.path.join(
+                            self.service_folder,
+                            "result",
+                            self.delivery_sub_folder,
+                            "delivery.pdf",
+                        ),
+                    ),
                     highlight=False,
                 )
 
