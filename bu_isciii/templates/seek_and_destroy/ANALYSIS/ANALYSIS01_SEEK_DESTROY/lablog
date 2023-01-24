@@ -1,0 +1,32 @@
+# module load Nextflow singularity
+# ANALYSISXX-SEEK_DESTROY
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+
+echo "sample,fastq_1,fastq_2" > samplesheet.csv
+cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz"; done >> samplesheet.csv
+
+scratch_dir=$(echo $(pwd) | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > Seek_destroy.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 12:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_seek_destroy.log
+#SBATCH --chdir $scratch_dir
+
+export NXF_OPTS="-Xms500M -Xmx4G"
+
+nextflow run /scratch/bi/pipelines/Seek-Destroy/main.nf  \\
+          -c ../../DOC/seek_destroy.config \\
+          --input samplesheet.csv \\
+	  --scout_database /data/bi/references/kraken/minikraken_8GB_20200312.tgz \\
+          --host_database  /data/bi/references/kraken/cul_phleb_monke \\
+          --outdir seek_destroy_results \\
+          -resume
+EOF
+
+echo "sbatch Seek_destroy.sbatch"> _01_seek_destroy.sh

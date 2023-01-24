@@ -188,5 +188,22 @@
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "delivery_pdf": ""
+    },
+    "seek_and_destroy": {
+      "label": "",
+      "template": "seek_and_destroy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/GuilleGorines/Seek-Destroy",
+      "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
     }
 }
