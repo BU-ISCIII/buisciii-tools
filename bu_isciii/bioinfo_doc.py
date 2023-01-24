@@ -35,6 +35,7 @@ class BioinfoDoc:
         path=None,
         ask_path=False,
         sftp_folder=False,
+        report_pdf=False,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
@@ -60,6 +61,14 @@ class BioinfoDoc:
             self.sftp_folder = bu_isciii.utils.prompt_path(
                 msg="Absolute path to sftp folfer containing service folder"
             )
+        if report_pdf is not None:
+            if os.path.exists(report_pdf):
+                self.report_pdf = os.path.normpath(report_pdf)
+            else:
+                stderr.print(
+                    "[red] ERROR: PDF file " + report_pdf + " does not exist."
+                )
+                sys.exit()
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
@@ -298,15 +307,18 @@ class BioinfoDoc:
         services_json = bu_isciii.service_json.ServiceJson()
 
         if len(services_ids) == 1:
-            try:
-                service_pdf = services_json.get_find(services_ids[0], "delivery_pdf")
-            except KeyError as e:
-                stderr.print(
-                    "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
-                )
-                stderr.print("traceback error %s" % e)
-                sys.exit()
+            if self.report_pdf is not None:
+                service_pdf = self.report_pdf
+            else:
+                try:
+                    service_pdf = services_json.get_find(services_ids[0], "delivery_pdf")
+                except KeyError as e:
+                    stderr.print(
+                        "[red]ERROR: Service id %s not found in services json file."
+                        % services_ids[0]
+                    )
+                    stderr.print("traceback error %s" % e)
+                    sys.exit()
             try:
                 real_path = os.path.join(
                     os.path.dirname(os.path.realpath(__file__)), service_pdf
