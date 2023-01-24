@@ -100,6 +100,8 @@ class BioinfoDoc:
         else:
             self.template_file = self.doc_conf["delivery_template_path_file"]
         self.services_requested = resolution_info["Resolutions"]["availableServices"]
+        self.service_info_folder = self.doc_conf["service_folder"][0]
+        self.service_result_folder = self.doc_conf["service_folder"][1]
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -259,10 +261,10 @@ class BioinfoDoc:
 
     def generate_documentation_files(self, type):
         if type == "service_info":
-            file_path = os.path.join(self.service_folder, "service_info")
+            file_path = os.path.join(self.service_folder, self.service_info_folder)
         elif type == "delivery":
             file_path = os.path.join(
-                self.service_folder, "result", self.delivery_sub_folder
+                self.service_folder, self.service_result_folder, self.delivery_sub_folder
             )
         else:
             stderr.print("[red] invalid option")
