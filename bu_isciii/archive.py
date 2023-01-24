@@ -193,15 +193,6 @@ class Archive:
         self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", str(self.year)
         )
-
-        # This would be a good place for the month filter
-        # api will return "Jan. 25, 2023" ???.
-        
-
-        """    
-        if self.month is not None:
-            self.services_to_move = [ service for service in self.services_to_move if list(month_abbr).index(service["date"].split(".")[0]) <= self.month ]
-        """
         
         # Calculate size of the directories (already in GB)
         stderr.print(
