@@ -331,11 +331,11 @@ def finish(resolution, path, ask_path, destination):
     type=click.Choice(["service_info", "delivery"]),
     help="Select the documentation that will generate",
 )
-def bioinfo_doc(type, resolution, local_folder, ask_path):
+def bioinfo_doc(type, resolution, path, ask_path):
     """
     Create the folder documentation structure in bioinfo_doc server
     """
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder, ask_path)
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, path, ask_path)
     new_doc.create_documentation()
 
 
