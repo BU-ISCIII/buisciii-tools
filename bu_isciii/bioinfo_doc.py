@@ -10,6 +10,7 @@ import jinja2
 import markdown
 import pdfkit
 import PyPDF2
+import subprocess
 
 # Local imports
 import bu_isciii.utils
@@ -33,6 +34,7 @@ class BioinfoDoc:
         resolution_id=None,
         path=None,
         ask_path=False,
+        sftp_folder=False,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
@@ -54,6 +56,10 @@ class BioinfoDoc:
         if not os.path.exists(self.path):
             stderr.print("[red] Folder does not exist. " + self.path + "!")
             sys.exit(1)
+        if self.type == "delivery" and sftp_folder is None:
+            self.sftp_folder = bu_isciii.utils.prompt_path(
+                msg="Absolute path to sftp folfer containing service folder"
+            )
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
@@ -78,7 +84,7 @@ class BioinfoDoc:
                 + "!"
             )
             sys.exit(1)
-        resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
+        self.resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
         self.resolution = resolution_info["Resolutions"]
         self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
         self.resolution_number = resolution_info["Resolutions"]["resolutionNumber"]
@@ -87,7 +93,7 @@ class BioinfoDoc:
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
         year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
-            self.path, self.doc_conf["services_path"], year, resolution_folder
+            self.path, self.doc_conf["services_path"], year, self.resolution_folder
         )
         self.samples = resolution_info["Samples"]
         self.user_data = resolution_info["Service"]["serviceUserId"]
@@ -342,6 +348,37 @@ class BioinfoDoc:
             return False
         return None
 
+    def sftp_tree(self):
+        sftp_path = os.path.join(self.sftp_folder, self.resolution_folder)
+        try:
+            tree_result = subprocess.run(["tree", sftp_path], capture_output=True, text=True, check = True)
+            tree_file_name = (
+                self.resolution_number + "_" + self.delivery_sub_folder + ".tree"
+            )
+            tree_file_path = os.path.join(
+                self.service_folder,
+                self.service_result_folder,
+                self.delivery_sub_folder,
+                tree_file_name,
+            )
+            f = open(tree_file_path, "w")
+            f.write(tree_result.stdout)
+            f.close()
+            stderr.print(
+                "[green]Successfully created tree file from %s in %s"
+                % (sftp_path,tree_file_path),
+                highlight=False,
+                )
+
+        except subprocess.CalledProcessError as e:
+            stderr.print("[red]ERROR: Failed to create tree from SFTP")
+            stderr.print("traceback error %s" % e)
+            sys.exit()
+        except IOError as e:
+            stderr.print("[red]ERROR: Failed to create tree file")
+            stderr.print("traceback error %s" % e)
+            sys.exit()
+
     def create_documentation(self):
         self.create_structure()
         if self.type == "service_info":
@@ -350,6 +387,7 @@ class BioinfoDoc:
         elif self.type == "delivery":
             pdf_resolution = self.generate_documentation_files("delivery")
             self.create_delivery_doc(pdf_resolution)
+            self.sftp_tree()
             return
         else:
             stderr.print("[red] invalid option")
