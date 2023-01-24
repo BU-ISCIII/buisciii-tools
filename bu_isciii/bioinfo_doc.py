@@ -10,6 +10,7 @@ import jinja2
 import markdown
 import pdfkit
 import PyPDF2
+import subprocess
 
 # Local imports
 import bu_isciii.utils
@@ -31,8 +32,10 @@ class BioinfoDoc:
         self,
         type=None,
         resolution_id=None,
-        local_folder=None,
+        path=None,
         ask_path=False,
+        sftp_folder=False,
+        report_pdf=False,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
@@ -42,18 +45,29 @@ class BioinfoDoc:
         self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
             "bioinfo_doc"
         )
-        if local_folder is None:
+        if path is None:
             if ask_path:
-                self.local_folder = bu_isciii.utils.prompt_path(
+                self.path = bu_isciii.utils.prompt_path(
                     msg="Path where bioinfo_doc folder is mounted in your local WS."
                 )
             else:
-                self.local_folder = os.path.normpath(self.doc_conf["bioinfodoc_path"])
+                self.path = os.path.normpath(self.doc_conf["bioinfodoc_path"])
         else:
-            self.local_folder = local_folder
-        if not os.path.exists(self.local_folder):
-            stderr.print("[red] Folder does not exist. " + self.local_folder + "!")
+            self.path = path
+        if not os.path.exists(self.path):
+            stderr.print("[red] Folder does not exist. " + self.path + "!")
             sys.exit(1)
+        if self.type == "delivery" and sftp_folder is None:
+            self.sftp_folder = bu_isciii.utils.prompt_path(
+                msg="Absolute path to sftp folfer containing service folder"
+            )
+        self.report_pdf = report_pdf
+        if self.report_pdf is not None:
+            if os.path.exists(report_pdf):
+                self.report_pdf = os.path.normpath(report_pdf)
+            else:
+                stderr.print("[red] ERROR: PDF file " + report_pdf + " does not exist.")
+                sys.exit()
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
@@ -78,7 +92,7 @@ class BioinfoDoc:
                 + "!"
             )
             sys.exit(1)
-        resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
+        self.resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
         self.resolution = resolution_info["Resolutions"]
         self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
         self.resolution_number = resolution_info["Resolutions"]["resolutionNumber"]
@@ -87,7 +101,7 @@ class BioinfoDoc:
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
         year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
-            self.local_folder, self.doc_conf["services_path"], year, resolution_folder
+            self.path, self.doc_conf["services_path"], year, self.resolution_folder
         )
         self.samples = resolution_info["Samples"]
         self.user_data = resolution_info["Service"]["serviceUserId"]
@@ -100,6 +114,8 @@ class BioinfoDoc:
         else:
             self.template_file = self.doc_conf["delivery_template_path_file"]
         self.services_requested = resolution_info["Resolutions"]["availableServices"]
+        self.service_info_folder = self.doc_conf["service_folder"][0]
+        self.service_result_folder = self.doc_conf["service_folder"][1]
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -135,7 +151,9 @@ class BioinfoDoc:
                     )
                     log.info("Service folders created")
                 if self.type == "delivery":
-                    file_path = os.path.join(self.service_folder, "result")
+                    file_path = os.path.join(
+                        self.service_folder, self.service_result_folder
+                    )
                     delivery_date = self.resolution.get("resolutionDeliveryDate")
                     delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
                     delivery_date_folder = datetime.strftime(
@@ -259,10 +277,12 @@ class BioinfoDoc:
 
     def generate_documentation_files(self, type):
         if type == "service_info":
-            file_path = os.path.join(self.service_folder, "service_info")
+            file_path = os.path.join(self.service_folder, self.service_info_folder)
         elif type == "delivery":
             file_path = os.path.join(
-                self.service_folder, "result", self.delivery_sub_folder
+                self.service_folder,
+                self.service_result_folder,
+                self.delivery_sub_folder,
             )
         else:
             stderr.print("[red] invalid option")
@@ -290,15 +310,20 @@ class BioinfoDoc:
         services_json = bu_isciii.service_json.ServiceJson()
 
         if len(services_ids) == 1:
-            try:
-                service_pdf = services_json.get_find(services_ids[0], "delivery_pdf")
-            except KeyError as e:
-                stderr.print(
-                    "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
-                )
-                stderr.print("traceback error %s" % e)
-                sys.exit()
+            if self.report_pdf:
+                service_pdf = self.report_pdf
+            else:
+                try:
+                    service_pdf = services_json.get_find(
+                        services_ids[0], "delivery_pdf"
+                    )
+                except KeyError as e:
+                    stderr.print(
+                        "[red]ERROR: Service id %s not found in services json file."
+                        % services_ids[0]
+                    )
+                    stderr.print("traceback error %s" % e)
+                    sys.exit()
             try:
                 real_path = os.path.join(
                     os.path.dirname(os.path.realpath(__file__)), service_pdf
@@ -308,7 +333,7 @@ class BioinfoDoc:
                 )
                 delivery_pdf_file = os.path.join(
                     self.service_folder,
-                    "result",
+                    self.service_result_folder,
                     self.delivery_sub_folder,
                     delivery_pdf_name,
                 )
@@ -320,7 +345,7 @@ class BioinfoDoc:
                         service_pdf,
                         os.path.join(
                             self.service_folder,
-                            "result",
+                            self.service_result_folder,
                             self.delivery_sub_folder,
                             "delivery.pdf",
                         ),
@@ -340,6 +365,39 @@ class BioinfoDoc:
             return False
         return None
 
+    def sftp_tree(self):
+        sftp_path = os.path.join(self.sftp_folder, self.resolution_folder)
+        try:
+            tree_result = subprocess.run(
+                ["tree", sftp_path], capture_output=True, text=True, check=True
+            )
+            tree_file_name = (
+                self.resolution_number + "_" + self.delivery_sub_folder + ".tree"
+            )
+            tree_file_path = os.path.join(
+                self.service_folder,
+                self.service_result_folder,
+                self.delivery_sub_folder,
+                tree_file_name,
+            )
+            f = open(tree_file_path, "w")
+            f.write(tree_result.stdout)
+            f.close()
+            stderr.print(
+                "[green]Successfully created tree file from %s in %s"
+                % (sftp_path, tree_file_path),
+                highlight=False,
+            )
+
+        except subprocess.CalledProcessError as e:
+            stderr.print("[red]ERROR: Failed to create tree from SFTP")
+            stderr.print("traceback error %s" % e)
+            sys.exit()
+        except IOError as e:
+            stderr.print("[red]ERROR: Failed to create tree file")
+            stderr.print("traceback error %s" % e)
+            sys.exit()
+
     def create_documentation(self):
         self.create_structure()
         if self.type == "service_info":
@@ -348,6 +406,7 @@ class BioinfoDoc:
         elif self.type == "delivery":
             pdf_resolution = self.generate_documentation_files("delivery")
             self.create_delivery_doc(pdf_resolution)
+            self.sftp_tree()
             return
         else:
             stderr.print("[red] invalid option")

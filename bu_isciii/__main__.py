@@ -312,11 +312,11 @@ def finish(resolution, path, ask_path, destination):
 @bu_isciii_cli.command(help_priority=6)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-l",
-    "--local_folder",
+    "-p",
+    "--path",
     type=click.Path(),
     default=None,
-    help="Directory containing the local folder which bioinfo_doc is mounted.",
+    help="Absolute path to bioinfo_doc directory.",
 )
 @click.option(
     "-a",
@@ -331,11 +331,27 @@ def finish(resolution, path, ask_path, destination):
     type=click.Choice(["service_info", "delivery"]),
     help="Select the documentation that will generate",
 )
-def bioinfo_doc(type, resolution, local_folder, ask_path):
+@click.option(
+    "-s",
+    "--sftp_folder",
+    type=click.Path(),
+    default=None,
+    help="Absolute path to sftp folfer containing service folder",
+)
+@click.option(
+    "-r",
+    "--report_pdf",
+    type=click.Path(),
+    default=None,
+    help="Absolute path to PDF report to use instead of the one in config file",
+)
+def bioinfo_doc(type, resolution, path, ask_path, sftp_folder, report_pdf):
     """
     Create the folder documentation structure in bioinfo_doc server
     """
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, local_folder, ask_path)
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(
+        type, resolution, path, ask_path, sftp_folder, report_pdf
+    )
     new_doc.create_documentation()
 
 
