@@ -65,9 +65,7 @@ class BioinfoDoc:
             if os.path.exists(report_pdf):
                 self.report_pdf = os.path.normpath(report_pdf)
             else:
-                stderr.print(
-                    "[red] ERROR: PDF file " + report_pdf + " does not exist."
-                )
+                stderr.print("[red] ERROR: PDF file " + report_pdf + " does not exist.")
                 sys.exit()
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -152,7 +150,9 @@ class BioinfoDoc:
                     )
                     log.info("Service folders created")
                 if self.type == "delivery":
-                    file_path = os.path.join(self.service_folder, self.service_result_folder)
+                    file_path = os.path.join(
+                        self.service_folder, self.service_result_folder
+                    )
                     delivery_date = self.resolution.get("resolutionDeliveryDate")
                     delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
                     delivery_date_folder = datetime.strftime(
@@ -279,7 +279,9 @@ class BioinfoDoc:
             file_path = os.path.join(self.service_folder, self.service_info_folder)
         elif type == "delivery":
             file_path = os.path.join(
-                self.service_folder, self.service_result_folder, self.delivery_sub_folder
+                self.service_folder,
+                self.service_result_folder,
+                self.delivery_sub_folder,
             )
         else:
             stderr.print("[red] invalid option")
@@ -311,7 +313,9 @@ class BioinfoDoc:
                 service_pdf = self.report_pdf
             else:
                 try:
-                    service_pdf = services_json.get_find(services_ids[0], "delivery_pdf")
+                    service_pdf = services_json.get_find(
+                        services_ids[0], "delivery_pdf"
+                    )
                 except KeyError as e:
                     stderr.print(
                         "[red]ERROR: Service id %s not found in services json file."
@@ -363,7 +367,9 @@ class BioinfoDoc:
     def sftp_tree(self):
         sftp_path = os.path.join(self.sftp_folder, self.resolution_folder)
         try:
-            tree_result = subprocess.run(["tree", sftp_path], capture_output=True, text=True, check = True)
+            tree_result = subprocess.run(
+                ["tree", sftp_path], capture_output=True, text=True, check=True
+            )
             tree_file_name = (
                 self.resolution_number + "_" + self.delivery_sub_folder + ".tree"
             )
@@ -378,9 +384,9 @@ class BioinfoDoc:
             f.close()
             stderr.print(
                 "[green]Successfully created tree file from %s in %s"
-                % (sftp_path,tree_file_path),
+                % (sftp_path, tree_file_path),
                 highlight=False,
-                )
+            )
 
         except subprocess.CalledProcessError as e:
             stderr.print("[red]ERROR: Failed to create tree from SFTP")
