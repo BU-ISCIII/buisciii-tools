@@ -8,9 +8,7 @@ import filecmp
 import shutil
 import sysrsync
 import rich
-
 import calendar
-
 from math import pow
 from calendar import month_name
 from datetime import date
@@ -36,13 +34,13 @@ def ask_date():
     return a 3 items list
     """
     # Range: year 2010 - current year
-    year = bu_isciii.utils.prompt_selection("Choose the year", 
-                                             [i for i in range(2010, date.today().year)])
+    year = bu_isciii.utils.prompt_year(lower_limit=2010,
+                                       upper_limit=date.today().year)
 
     # Limit the list to the current month if year = current year
     # This could be a one-liner:
     # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if year < date.today().year else month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
-    # I found it easier the way it is
+    # I found it easier the following way:
 
     if year < date.today().year:
         month_list = [[num, month] for num, month in enumerate(month_name)][1:]
@@ -138,7 +136,7 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, ser_type=None, year=None, api_token=None, option=None):
+    def __init__(self, resolution_id=None, ser_type=None, api_token=None,option=None):
         # resolution_id = Nombre de la resolución
         # ser_type = services_and_colaborations // research
         # year = año
@@ -146,7 +144,6 @@ class Archive:
 
         self.resolution_id = resolution_id
         self.type = ser_type
-        self.year = year
         self.option = option
 
         # assumption: year and no resolution_id >>> Batch management
@@ -168,70 +165,10 @@ class Archive:
                 ["Batch", "Single service"],
             )
 
-        if self.quantity == "Batch" and self.year is None:   
-             
-            self.year = bu_isciii.utils.prompt_year()
+        if self.quantity == "Batch":   
+            self.lower_date_limit = ask_date("Please state the first")
+            self.higher_date_limit = ask_date("")
             
-            while self.year < 2010 or self.year > date.today().year:
-
-                adjective = "vintage" if self.year < 2010 else "futuristic"
-                pun = "the oldest record we have is from the year 2010!" if self.year < 2010 else "time travel has not been released (yet)."
-
-                stderr.print(
-                    f"Thats pretty optimistic of you, but {pun} Year {self.year} is maybe too... {adjective}. Please, try again!",
-                    highlight=False,
-                )
-                self.year = bu_isciii.utils.prompt_year()
-
-
-            stderr.print(
-                f"You chose to archive services until year: {self.year}.",
-                highlight=False,
-            )
-
-            # if "Specify a limit month", ask which month
-            # I dont really like the "limit month" concept, I need to find a nicer one
-
-            month_selection = bu_isciii.utils.prompt_selection(
-                "Would you like to choose a limit month?",
-                ["Specify a limit month",
-                 f"Specify a range of months within {self.year}",
-                 f"Whole {self.year} year"]) 
-
-            if month_selection == "Specify a limit month":
-                
-                # Month list (if current year, show only months until current one)
-
-                if self.year < date.today().year:
-                    month_list = [[num, month] for num, month in enumerate(month_name)][1:]
-                else:
-                    month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
-                
-                # Last part can be done in a (long) one-liner:
-                # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if self.year < date.today().year else [[num, month] for num, month in enumerate(month_name)][1:date.today().month]
-                # I found it cleaner to do it separately
-
-                self.month = [bu_isciii.utils.prompt_selection(
-                             f"Until what month of year {self.year} would you like to archive services?",
-                             [f"month {num:02d}: {month}" for num, month in month_list],
-                             ).split(":")[0].split(" ")[1]]
-
-            elif month_selection == f"Specify a range of months within {self.year}":
-                
-                self.month = []
-                
-                pass
-
-            elif month_selection == f"Whole {self.year} year":
-                # If "whole year" for current year, choose only until current month
-                if self.year == date.today().year:
-                    self.month = date.today().month
-                    stderr.print(
-                        f"You chose the current year ({self.year}), so only services until the current month ({month_name[self.month]}) will be chosen",
-                        highlight=False,
-                    )
-                else:
-                    self.month = None
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -253,7 +190,6 @@ class Archive:
             "services", "state", "delivered", "date", str(self.year)
         )
 
-        print(self.services_to_move)
         # This would be a good place for the month filter
         # api will return "Jan. 25, 2023" ???.
         
