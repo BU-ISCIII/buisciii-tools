@@ -137,7 +137,7 @@ class BioinfoDoc:
                     )
                     log.info("Service folders created")
                 if self.type == "delivery":
-                    file_path = os.path.join(self.service_folder, "result")
+                    file_path = os.path.join(self.service_folder, self.service_result_folder)
                     delivery_date = self.resolution.get("resolutionDeliveryDate")
                     delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
                     delivery_date_folder = datetime.strftime(
@@ -310,7 +310,7 @@ class BioinfoDoc:
                 )
                 delivery_pdf_file = os.path.join(
                     self.service_folder,
-                    "result",
+                    self.service_result_folder,
                     self.delivery_sub_folder,
                     delivery_pdf_name,
                 )
@@ -322,7 +322,7 @@ class BioinfoDoc:
                         service_pdf,
                         os.path.join(
                             self.service_folder,
-                            "result",
+                            self.service_result_folder,
                             self.delivery_sub_folder,
                             "delivery.pdf",
                         ),
