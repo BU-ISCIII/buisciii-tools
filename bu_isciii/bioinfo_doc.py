@@ -61,7 +61,8 @@ class BioinfoDoc:
             self.sftp_folder = bu_isciii.utils.prompt_path(
                 msg="Absolute path to sftp folfer containing service folder"
             )
-        if report_pdf is not None:
+        self.report_pdf = report_pdf
+        if self.report_pdf is not None:
             if os.path.exists(report_pdf):
                 self.report_pdf = os.path.normpath(report_pdf)
             else:
@@ -309,7 +310,7 @@ class BioinfoDoc:
         services_json = bu_isciii.service_json.ServiceJson()
 
         if len(services_ids) == 1:
-            if self.report_pdf is not None:
+            if self.report_pdf:
                 service_pdf = self.report_pdf
             else:
                 try:
