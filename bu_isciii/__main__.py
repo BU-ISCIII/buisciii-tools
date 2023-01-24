@@ -331,11 +331,18 @@ def finish(resolution, path, ask_path, destination):
     type=click.Choice(["service_info", "delivery"]),
     help="Select the documentation that will generate",
 )
-def bioinfo_doc(type, resolution, path, ask_path):
+@click.option(
+    "-s",
+    "--sftp_folder",
+    type=click.Path(),
+    default=None,
+    help="Absolute path to sftp folfer containing service folder",
+)
+def bioinfo_doc(type, resolution, path, ask_path, sftp_folder):
     """
     Create the folder documentation structure in bioinfo_doc server
     """
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, path, ask_path)
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, path, ask_path, sftp_folder)
     new_doc.create_documentation()
 
 
