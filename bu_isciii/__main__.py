@@ -312,11 +312,11 @@ def finish(resolution, path, ask_path, destination):
 @bu_isciii_cli.command(help_priority=6)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-l",
-    "--local_folder",
+    "-p",
+    "--path",
     type=click.Path(),
     default=None,
-    help="Directory containing the local folder which bioinfo_doc is mounted.",
+    help="Absolute path to bioinfo_doc directory.",
 )
 @click.option(
     "-a",
