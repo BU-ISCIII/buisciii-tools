@@ -67,7 +67,7 @@ def ask_date():
     day = bu_isciii.utils.prompt_selection(f"Choose the day of {month_name} {year}",
                                            day_list)
 
-    return [year, month, day]
+    return [str(year), str(month_number), f"{day:02d}"]
 
 # function to compare directories (archived and non-archived)
 def dir_comparison(dir1, dir2):
@@ -165,9 +165,13 @@ class Archive:
                 ["Batch", "Single service"],
             )
 
-        if self.quantity == "Batch":   
-            self.lower_date_limit = ask_date("Please state the first")
-            self.higher_date_limit = ask_date("")
+        if self.quantity == "Batch":
+            
+            stderr.print("Please state the initial date for filtering")
+            self.lower_date_limit = ask_date()
+
+            stderr.print("Please state the final date for filtering")
+            self.upper_date_limit = ask_date()
             
 
         elif self.quantity == "Single service" and self.resolution_id is None:
