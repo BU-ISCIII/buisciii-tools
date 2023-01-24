@@ -32,12 +32,18 @@ stderr = rich.console.Console(
 def ask_date():
     """
     Ask the year, then the month, then the day of the month
+    This choice is always dependent on wether the date is or not available
     return a 3 items list
     """
-    year = bu_isciii.utils.prompt_selection("Choose the year from which start counting", 
+    # Range: year 2010 - current year
+    year = bu_isciii.utils.prompt_selection("Choose the year", 
                                              [i for i in range(2010, date.today().year)])
 
     # Limit the list to the current month if year = current year
+    # This could be a one-liner:
+    # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if year < date.today().year else month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
+    # I found it easier the way it is
+
     if year < date.today().year:
         month_list = [[num, month] for num, month in enumerate(month_name)][1:]
     else:
@@ -46,13 +52,24 @@ def ask_date():
     month_number, month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
                                              [f"month {num:02d}: {month}" for num, month in month_list]).replace("month").strip().split(":")
 
+    # For the day, use "calendar":
+    # calendar.month(year, month) returns a string with the calendar
+    # Use replace to move the "\n"
+    # Use split " " to generate a list
+    # Use filter to remove empty strings that may appear
+    # Do not get the 9 first elements bc they are:
+    # "Month", "Year", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
+
+    day_list = list(filter(None, calendar.month(year, int(month_number)).replace("\n"," ").split(" ")))[9:]
+
+    # if current month and day, limit the options to the current day
+    if year == date.today().year and int(month_number) == date.today().month:
+        day_list = day_list[:datetime.date.today().day]
+
     day = bu_isciii.utils.prompt_selection(f"Choose the day of {month_name} {year}",
-                                           [i for i in range(1, calendar.monthrange(year, int(month_number))[1]+1)]
-                                           )
+                                           day_list)
 
-    pass
-
-    return
+    return [year, month, day]
 
 # function to compare directories (archived and non-archived)
 def dir_comparison(dir1, dir2):
@@ -151,16 +168,8 @@ class Archive:
                 ["Batch", "Single service"],
             )
 
-        if self.quantity == "Batch":
-            
-
-            bu_isciii.utils.prompt_year(
-                "Please choose the first date. Services prior to that date wont be affected.",
-                [])
-        
-        
-         and self.year is None:
-            
+        if self.quantity == "Batch" and self.year is None:   
+             
             self.year = bu_isciii.utils.prompt_year()
             
             while self.year < 2010 or self.year > date.today().year:
