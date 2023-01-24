@@ -338,11 +338,18 @@ def finish(resolution, path, ask_path, destination):
     default=None,
     help="Absolute path to sftp folfer containing service folder",
 )
-def bioinfo_doc(type, resolution, path, ask_path, sftp_folder):
+@click.option(
+    "-r",
+    "--report_pdf",
+    type=click.Path(),
+    default=None,
+    help="Absolute path to PDF report to use instead of the one in config file",
+)
+def bioinfo_doc(type, resolution, path, ask_path, sftp_folder,report_pdf):
     """
     Create the folder documentation structure in bioinfo_doc server
     """
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, path, ask_path, sftp_folder)
+    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(type, resolution, path, ask_path, sftp_folder, report_pdf)
     new_doc.create_documentation()
 
 
