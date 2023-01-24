@@ -25,7 +25,6 @@ stderr = rich.console.Console(
     stderr=True, style="dim", highlight=False, force_terminal=rich_force_colors()
 )
 
-
 def prompt_resolution_id():
     stderr.print(
         "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
@@ -34,14 +33,21 @@ def prompt_resolution_id():
     return resolution_id
 
 
-def prompt_year():
-    stderr.print("Specify the year for which you want to archive services.")
-    year = questionary.text("Year").unsafe_ask()
-    
+def prompt_year(lower_limit,
+                upper_limit):
+
     while True:
         try:
             # test if it is an int
-            return int(year)
+            year = int(questionary.text("Year").unsafe_ask())
+            if year < lower_limit:
+                stderr.print(f"Sorry, but the oldest record we have is from the year {lower_limit}!\n \
+                               Year {year} is maybe too... Vintage. Please, try again!")
+            elif year > lower_limit:
+                stderr.print(f"Sorry, but the time machine has not been invented... Yet.\n \
+                               Year {year} is maybe too... Futuristic. Please, try again!")
+            else:
+                return year
         
         except ValueError:
             stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
