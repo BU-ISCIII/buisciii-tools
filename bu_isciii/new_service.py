@@ -63,57 +63,7 @@ class NewService:
         ]
         self.service_samples = self.resolution_info["Samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
-        #
-        # resolutionFullData example
-        #
-        # {
-        #    "Service": {
-        #        "pk": 1551,
-        #        "serviceRequestNumber": "SRVCNM564",
-        #        "serviceStatus": "queued",
-        #        "serviceUserId": {
-        #            "username": "smonzon",
-        #            "first_name": "Sara",
-        #            "last_name": "Monzon",
-        #            "email": "smonzon@isciii.es"
-        #        },
-        #        "serviceCreatedOnDate": "2022-02-24",
-        #        "serviceSeqCenter": "Centro Nacional de Microbiologia",
-        #        "serviceAvailableService": [
-        #            "Genomic Data Analysis",
-        #            "DNAseq: Exome sequencing (WES) / Genome sequencing (WGS) / Target (Amplicon, probes)  / Direct seq",
-        #            "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)"
-        #        ],
-        #        "serviceFileExt": null,
-        #        "serviceNotes": "this is for buisciii tools testing"
-        #    },
-        #    "Resolutions": {
-        #        "pk": 1716,
-        #        "resolutionNumber": "SRVCNM564.1",
-        #        "resolutionFullNumber": "SRVCNM564_20220224_TESTINGBUISCIIITOOLS_smonzon_S",
-        #        "resolutionServiceID": 1551,
-        #        "resolutionDate": "2022-02-24",
-        #        "resolutionEstimatedDate": "2022-02-25",
-        #        "resolutionOnQueuedDate": "2022-02-24",
-        #        "resolutionOnInProgressDate": null,
-        #        "resolutionDeliveryDate": null,
-        #        "resolutionNotes": "",
-        #        "resolutionPipelines": [],
-        #        "availableServices": [
-        #            {
-        #                "availServiceDescription": "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)",
-        #                "serviceId": "viralrecon"
-        #            }
-        #        ]
-        #    },
-        #    "Samples": [
-        #        {
-        #            "runName": "NovaSeq_GEN_032",
-        #            "projectName": "NovaSeq_GEN_032_20220209_RAbad",
-        #            "sampleName": "9793",
-        #            "samplePath": "220209_A01158_0051_AHWCJJDRXY"
-        #        }
-        #
+
 
     def create_folder(self):
         if not self.no_create_folder:
