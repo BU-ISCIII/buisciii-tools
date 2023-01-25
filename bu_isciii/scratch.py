@@ -32,7 +32,7 @@ class Scratch:
         path=None,
         tmp_dir=None,
         direction=None,
-        ask_path=False
+        ask_path=False,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
