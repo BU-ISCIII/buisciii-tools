@@ -60,6 +60,18 @@ class NewService:
         self.service_samples = self.resolution_info["samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
 
+    def get_service_paths(self, conf):
+        """
+        Given a service, a conf and a type,
+        get the path it would have service
+        """
+        service_path = os.path.join(
+            conf["data_path"],
+            "services_and_colaborations",
+            self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
+            self.resolution_info["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
+        )
+        return service_path
 
     def create_folder(self):
         if not self.no_create_folder:
