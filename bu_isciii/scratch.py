@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Generic imports
+import sys
 import os
 import subprocess
 import logging
@@ -31,16 +32,12 @@ class Scratch:
         path=None,
         tmp_dir=None,
         direction=None,
+        ask_path=False
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-
-        if service_dir is None:
-            self.service_dir = bu_isciii.utils.prompt_service_dir_path()
-        else:
-            self.service_dir = service_dir
 
         if tmp_dir is None:
             self.tmp_dir = bu_isciii.utils.prompt_tmp_dir_path()
@@ -55,13 +52,13 @@ class Scratch:
         else:
             self.direction = direction
 
-        self.rsync_command = bu_isciii.config_json.ConfigJson().get_find(
-            "scratch_copy", "command"
-        )
         # Load conf
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
         rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"])
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
+        self.rsync_command = self.conf["command"]
+
         self.resolution_info = rest_api.get_request(
             "resolution", "resolution", self.resolution_id
         )
@@ -70,6 +67,41 @@ class Scratch:
         self.out_file = os.path.join(
             self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
         )
+
+        if ask_path and path is None:
+            stderr.print("Directory where service folder is located.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = self.get_service_paths(self.conf)
+
+        self.full_path = os.path.join(self.path, self.service_folder)
+
+    def get_service_paths(self, conf):
+        """
+        Given a service, a conf and a type,
+        get the path it would have service
+        """
+        service_path = os.path.join(
+            conf["data_path"],
+            "services_and_colaborations",
+            self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
+            self.resolution_info["serviceUserId"]["profile"][
+                "profileClassificationArea"
+            ].lower(),
+        )
+        return service_path
 
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.service_dir)
