@@ -60,9 +60,11 @@ class Scratch:
         self.rsync_command = self.conf["command"]
 
         self.resolution_info = rest_api.get_request(
-            "resolution", "resolution", self.resolution_id
+            "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["resolutionFullNumber"]
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolutionFullNumber"
+        ]
         self.scratch_path = os.path.join(self.tmp_dir, self.service_folder)
         self.out_file = os.path.join(
             self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
