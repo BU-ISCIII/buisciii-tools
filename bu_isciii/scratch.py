@@ -106,33 +106,35 @@ class Scratch:
         return service_path
 
     def copy_scratch(self):
-        stderr.print("[blue]I will copy the service from %s" % self.service_dir)
+        stderr.print("[blue]I will copy the service from %s" % self.full_path)
         stderr.print("[blue]to %s" % self.scratch_path)
-        if self.service_folder in self.service_dir:
-            rsync_command = self.rsync_command + self.service_dir + " " + self.tmp_dir
+        if self.service_folder in self.full_path:
+            rsync_command = self.rsync_command + self.full_path + " " + self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
-                f = open(self.out_file, "a")
+                f = open(self.out_file, "w")
                 f.write("Temporal directory: " + self.scratch_path + "\n")
-                f.write("Origin service directory: " + self.service_dir + "\n")
+                f.write("Origin service directory: " + self.full_path + "\n")
                 f.close()
                 stderr.print(
                     "[green]Successfully copyed the directory to %s"
                     % self.scratch_path,
                     highlight=False,
                 )
-            except subprocess.CalledProcessError:
+            except subprocess.CalledProcessError as e:
                 stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.service_dir,
+                    "[red]ERROR: Copy of the directory %s failed" % self.full_path,
                     highlight=False,
                 )
+                log.exception("Unable to create pdf.", exc_info=e)
+                sys.exit()
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{self.service_dir}'"
+                f"Directory path not the same as service resolution. Skip folder copy '{self.full_path}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
-                + self.service_dir
+                + self.full_path
                 + " not the same as "
                 + self.service_folder,
                 highlight=False,
@@ -163,7 +165,7 @@ class Scratch:
                     "[red]ERROR: Directory "
                     + dest_folder
                     + " not the same as "
-                    + self.service_dir,
+                    + self.full_path,
                     highlight=False,
                 )
         except OSError:
