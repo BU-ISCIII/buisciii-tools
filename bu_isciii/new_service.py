@@ -49,13 +49,18 @@ class NewService:
         self.resolution_info = rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["resolutions"][0]["resolutionFullNumber"]
-        self.services_requested = self.resolution_info["resolutions"][0]["availableServices"]
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolutionFullNumber"
+        ]
+        self.services_requested = self.resolution_info["resolutions"][0][
+            "availableServices"
+        ]
         self.service_samples = self.resolution_info["samples"]
+
         if ask_path and path is None:
             stderr.print("Directory where you want to create the service folder.")
             self.path = bu_isciii.utils.prompt_path(msg="Path")
-        elif path == '-a':
+        elif path == "-a":
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
             )
@@ -81,7 +86,9 @@ class NewService:
             conf["data_path"],
             "services_and_colaborations",
             self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
-            self.resolution_info["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
+            self.resolution_info["serviceUserId"]["profile"][
+                "profileClassificationArea"
+            ].lower(),
         )
         return service_path
 
