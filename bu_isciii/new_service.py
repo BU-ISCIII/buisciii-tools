@@ -34,12 +34,6 @@ class NewService:
         else:
             self.resolution_id = resolution_id
 
-        if ask_path:
-            stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
-        else:
-            self.path = os.getcwd()
-
         if no_create_folder is None:
             self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
         else:
@@ -58,6 +52,24 @@ class NewService:
         self.service_folder = self.resolution_info["resolutions"][0]["resolutionFullNumber"]
         self.services_requested = self.resolution_info["resolutions"][0]["availableServices"]
         self.service_samples = self.resolution_info["samples"]
+        if ask_path and path is None:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == '-a':
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = self.get_service_paths(self.conf)
+
         self.full_path = os.path.join(self.path, self.service_folder)
 
     def get_service_paths(self, conf):
