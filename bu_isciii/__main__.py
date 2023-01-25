@@ -147,7 +147,7 @@ def list(service):
     "-p",
     "--path",
     type=click.Path(),
-    default=os.getcwd(),
+    default=None,
     help="Path to create the service folder",
 )
 @click.option(
