@@ -161,7 +161,7 @@ def list(service):
     "--ask_path",
     is_flag=True,
     default=False,
-    help="Please ask for path, not assume pwd.",
+    help="Please ask for path.",
 )
 def new_service(resolution, path, no_create_folder, ask_path):
     """
@@ -180,8 +180,15 @@ def new_service(resolution, path, no_create_folder, ask_path):
     "-p",
     "--path",
     type=click.Path(),
-    default=os.getcwd(),
-    help="Path to the service folder to clean",
+    default=None,
+    help="Absolute path to the service folder to clean",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for service path.",
 )
 @click.option(
     "-t",
@@ -197,12 +204,12 @@ def new_service(resolution, path, no_create_folder, ask_path):
     multiple=False,
     help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
 )
-def scratch(resolution, path, tmp_dir, direction):
+def scratch(resolution, path, tmp_dir, direction, ask_path):
     """
     Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, direction
+        resolution, path, tmp_dir, direction, ask_path
     )
     scratch_copy.handle_scratch()
 
