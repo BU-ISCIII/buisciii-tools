@@ -57,15 +57,15 @@ class CleanUp:
             conf_api["server"], conf_api["api_url"]
         )
         self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+            "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
+        self.service_folder = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
-        self.services_requested = self.resolution_info["Resolutions"][
+        self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"
         ]
-        self.service_samples = self.resolution_info["Samples"]
+        self.service_samples = self.resolution_info["samples"]
         if self.service_folder in self.path:
             self.full_path = self.path
         else:
@@ -81,7 +81,6 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
-        self.service_samples = self.resolution_info["Samples"]
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
