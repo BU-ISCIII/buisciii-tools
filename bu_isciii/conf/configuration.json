@@ -33,6 +33,7 @@
         "wkhtmltopdf_path" : "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf"
     },
     "new_service": {
+        "data_path": "/data/bi",
         "fastq_repo": "/srv/fastq_repo"
     },
     "scratch_copy": {
