@@ -28,7 +28,7 @@ class Scratch:
     def __init__(
         self,
         resolution_id=None,
-        service_dir=None,
+        path=None,
         tmp_dir=None,
         direction=None,
     ):

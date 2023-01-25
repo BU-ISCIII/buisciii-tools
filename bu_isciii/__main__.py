@@ -177,11 +177,11 @@ def new_service(resolution, path, no_create_folder, ask_path):
 @bu_isciii_cli.command(help_priority=3)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-s",
-    "--service_dir",
+    "-p",
+    "--path",
     type=click.Path(),
     default=os.getcwd(),
-    help="Directory containing service folder to copy to destination folder for execution. Default: Current directory. Example: /data/bi/service_and_collaboration/CNM/virologia/",
+    help="Path to the service folder to clean",
 )
 @click.option(
     "-t",
@@ -197,12 +197,12 @@ def new_service(resolution, path, no_create_folder, ask_path):
     multiple=False,
     help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
 )
-def scratch(resolution, service_dir, tmp_dir, direction):
+def scratch(resolution, path, tmp_dir, direction):
     """
     Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
-        resolution, service_dir, tmp_dir, direction
+        resolution, path, tmp_dir, direction
     )
     scratch_copy.handle_scratch()
 
