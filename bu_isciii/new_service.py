@@ -53,15 +53,11 @@ class NewService:
             conf_api["server"], conf_api["api_url"]
         )
         self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+            "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
-            "resolutionFullNumber"
-        ]
-        self.services_requested = self.resolution_info["Resolutions"][
-            "availableServices"
-        ]
-        self.service_samples = self.resolution_info["Samples"]
+        self.service_folder = self.resolution_info["resolutions"][0]["resolutionFullNumber"]
+        self.services_requested = self.resolution_info["resolutions"][0]["availableServices"]
+        self.service_samples = self.resolution_info["samples"]
         self.full_path = os.path.join(self.path, self.service_folder)
 
 
