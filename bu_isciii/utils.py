@@ -74,7 +74,7 @@ def prompt_day(lower_limit,
         try:
             day = int(day)
             if day < lower_limit or day > upper_limit:
-                stderr.print(f"Sorry, day {day} is out of bounds! Please choose a day between {lower_limit} and {upper_limit}")
+                stderr.print(f"Sorry, day {day} is out of bounds! Please choose a day between {lower_limit} and {upper_limit}.")
             else:
                 return day
         except ValueError:
