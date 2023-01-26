@@ -139,13 +139,14 @@ class Archive:
     def __init__(self, resolution_id=None, ser_type=None, api_token=None,option=None):
         # resolution_id = Nombre de la resolución
         # ser_type = services_and_colaborations // research
-        # year = año
         # option = archive/retrieve
 
         self.resolution_id = resolution_id
         self.type = ser_type
         self.option = option
 
+        """
+        ANCHOR CODE: when "year" option was removed, this chunk became deprecated 
         # assumption: year and no resolution_id >>> Batch management
         self.quantity = (
             "Batch" 
@@ -158,6 +159,7 @@ class Archive:
             if self.resolution_id is not None and self.year is None
             else None
         )
+        """
 
         if self.quantity is None:
             self.quantity = bu_isciii.utils.prompt_selection(
@@ -191,9 +193,11 @@ class Archive:
         )
 
         self.services_to_move = rest_api.get_request(
-            "services", "state", "delivered", "date", str(self.year)
+            "services", "state", "delivered", "date","aaa"
         )
         
+        print(self.services_to_move)
+
         # Calculate size of the directories (already in GB)
         stderr.print(
             "Calculating total size of the directories to be filed.",
