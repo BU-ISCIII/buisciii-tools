@@ -22,7 +22,7 @@
       "server": "http://iskylimsapi.isciiides.es"
     },
     "api_settings": {
-        "server": "http://iskylimsapi.isciiides.es",
+        "server": "http://iskylims.isciiides.es",
         "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
