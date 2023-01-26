@@ -66,11 +66,10 @@ def ask_date():
     # if current month and day, limit the options to the current day
     if year == date.today().year and int(chosen_month_number) == date.today().month:
         day_list = day_list[:date.today().day]
-        
+    
+    # from the list, get the first and last item as limits for the function
     day = bu_isciii.utils.prompt_day(lower_limit=day_list[0], upper_limit=day_list[-1])
 
-    print(day)
-    print(type(day))
 
     return [str(year), str(chosen_month_number), day]
 
