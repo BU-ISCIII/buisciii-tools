@@ -42,34 +42,44 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        if path is None:
-            if ask_path:
-                stderr.print("Directory where you want to create the service folder.")
-                self.path = bu_isciii.utils.prompt_path(msg="Path")
-            else:
-                self.path = os.getcwd()
-        else:
-            self.path = path
-
         # Obtain info from iskylims api
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
         self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+            "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
+        self.service_folder = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
-        self.services_requested = self.resolution_info["Resolutions"][
+        self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"
         ]
-        self.service_samples = self.resolution_info["Samples"]
-        if self.service_folder in self.path:
-            self.full_path = self.path
+        self.service_samples = self.resolution_info["samples"]
+
+        if ask_path and path is None:
+            stderr.print(
+                "Absolute path to the directory containing the service to clean."
+            )
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
         else:
-            self.full_path = os.path.join(self.path, self.service_folder)
+            self.path = self.get_service_paths(self.conf)
+
+        self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
@@ -81,7 +91,6 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
-        self.service_samples = self.resolution_info["Samples"]
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -97,6 +106,21 @@ class CleanUp:
             )
         else:
             self.option = option
+
+    def get_service_paths(self, conf):
+        """
+        Given a service, a conf and a type,
+        get the path it would have service
+        """
+        service_path = os.path.join(
+            conf["data_path"],
+            "services_and_colaborations",
+            self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
+            self.resolution_info["serviceUserId"]["profile"][
+                "profileClassificationArea"
+            ].lower(),
+        )
+        return service_path
 
     def get_clean_items(self, services_ids, type="files"):
         """

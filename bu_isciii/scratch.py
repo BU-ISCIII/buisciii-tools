@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Generic imports
+import sys
 import os
 import subprocess
 import logging
@@ -28,19 +29,15 @@ class Scratch:
     def __init__(
         self,
         resolution_id=None,
-        service_dir=None,
+        path=None,
         tmp_dir=None,
         direction=None,
+        ask_path=False,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-
-        if service_dir is None:
-            self.service_dir = bu_isciii.utils.prompt_service_dir_path()
-        else:
-            self.service_dir = service_dir
 
         if tmp_dir is None:
             self.tmp_dir = bu_isciii.utils.prompt_tmp_dir_path()
@@ -55,50 +52,89 @@ class Scratch:
         else:
             self.direction = direction
 
-        self.rsync_command = bu_isciii.config_json.ConfigJson().get_find(
-            "scratch_copy", "command"
-        )
         # Load conf
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
         rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"])
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
+        self.rsync_command = self.conf["command"]
+
         self.resolution_info = rest_api.get_request(
-            "resolution", "resolution", self.resolution_id
+            "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["resolutionFullNumber"]
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolutionFullNumber"
+        ]
         self.scratch_path = os.path.join(self.tmp_dir, self.service_folder)
         self.out_file = os.path.join(
             self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
         )
 
+        if ask_path and path is None:
+            stderr.print("Directory where service folder is located.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = self.get_service_paths(self.conf)
+
+        self.full_path = os.path.join(self.path, self.service_folder)
+
+    def get_service_paths(self, conf):
+        """
+        Given a service, a conf and a type,
+        get the path it would have service
+        """
+        service_path = os.path.join(
+            conf["data_path"],
+            "services_and_colaborations",
+            self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
+            self.resolution_info["serviceUserId"]["profile"][
+                "profileClassificationArea"
+            ].lower(),
+        )
+        return service_path
+
     def copy_scratch(self):
-        stderr.print("[blue]I will copy the service from %s" % self.service_dir)
+        stderr.print("[blue]I will copy the service from %s" % self.full_path)
         stderr.print("[blue]to %s" % self.scratch_path)
-        if self.service_folder in self.service_dir:
-            rsync_command = self.rsync_command + self.service_dir + " " + self.tmp_dir
+        if self.service_folder in self.full_path:
+            rsync_command = self.rsync_command + self.full_path + " " + self.tmp_dir
             try:
                 subprocess.run(rsync_command, shell=True, check=True)
-                f = open(self.out_file, "a")
+                f = open(self.out_file, "w")
                 f.write("Temporal directory: " + self.scratch_path + "\n")
-                f.write("Origin service directory: " + self.service_dir + "\n")
+                f.write("Origin service directory: " + self.full_path + "\n")
                 f.close()
                 stderr.print(
                     "[green]Successfully copyed the directory to %s"
                     % self.scratch_path,
                     highlight=False,
                 )
-            except subprocess.CalledProcessError:
+            except subprocess.CalledProcessError as e:
                 stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.service_dir,
+                    "[red]ERROR: Copy of the directory %s failed" % self.full_path,
                     highlight=False,
                 )
+                log.exception("Unable to create pdf.", exc_info=e)
+                sys.exit()
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{self.service_dir}'"
+                f"Directory path not the same as service resolution. Skip folder copy '{self.full_path}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
-                + self.service_dir
+                + self.full_path
                 + " not the same as "
                 + self.service_folder,
                 highlight=False,
@@ -129,7 +165,7 @@ class Scratch:
                     "[red]ERROR: Directory "
                     + dest_folder
                     + " not the same as "
-                    + self.service_dir,
+                    + self.full_path,
                     highlight=False,
                 )
         except OSError:

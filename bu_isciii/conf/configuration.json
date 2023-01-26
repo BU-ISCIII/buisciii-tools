@@ -1,5 +1,6 @@
 {
     "sftp_copy": {
+       "data_path": "/data/bi",
         "protocol": "rsync",
         "options": ["-rlpv", "--update", "-L", "--inplace"],
         "exclusions": [
@@ -33,10 +34,15 @@
         "wkhtmltopdf_path" : "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf"
     },
     "new_service": {
+        "data_path": "/data/bi",
         "fastq_repo": "/srv/fastq_repo"
     },
+    "cleanning": {
+        "data_path": "/data/bi"
+    },
     "scratch_copy": {
-        "command": "rsync -rlv --exclude 'service_info.txt' --exclude 'work' "
+      "data_path": "/data/bi",
+      "command": "rsync -rlv --exclude 'service_info.txt' --exclude 'work' "
     },
     "archive": {
         "data_path": "/data/bi",

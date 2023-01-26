@@ -34,12 +34,6 @@ class NewService:
         else:
             self.resolution_id = resolution_id
 
-        if ask_path:
-            stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
-        else:
-            self.path = os.getcwd()
-
         if no_create_folder is None:
             self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
         else:
@@ -53,67 +47,50 @@ class NewService:
             conf_api["server"], conf_api["api_url"]
         )
         self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+            "serviceFullData", "resolution", self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
+        self.service_folder = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
-        self.services_requested = self.resolution_info["Resolutions"][
+        self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"
         ]
-        self.service_samples = self.resolution_info["Samples"]
+        self.service_samples = self.resolution_info["samples"]
+
+        if ask_path and path is None:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = self.get_service_paths(self.conf)
+
         self.full_path = os.path.join(self.path, self.service_folder)
-        #
-        # resolutionFullData example
-        #
-        # {
-        #    "Service": {
-        #        "pk": 1551,
-        #        "serviceRequestNumber": "SRVCNM564",
-        #        "serviceStatus": "queued",
-        #        "serviceUserId": {
-        #            "username": "smonzon",
-        #            "first_name": "Sara",
-        #            "last_name": "Monzon",
-        #            "email": "smonzon@isciii.es"
-        #        },
-        #        "serviceCreatedOnDate": "2022-02-24",
-        #        "serviceSeqCenter": "Centro Nacional de Microbiologia",
-        #        "serviceAvailableService": [
-        #            "Genomic Data Analysis",
-        #            "DNAseq: Exome sequencing (WES) / Genome sequencing (WGS) / Target (Amplicon, probes)  / Direct seq",
-        #            "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)"
-        #        ],
-        #        "serviceFileExt": null,
-        #        "serviceNotes": "this is for buisciii tools testing"
-        #    },
-        #    "Resolutions": {
-        #        "pk": 1716,
-        #        "resolutionNumber": "SRVCNM564.1",
-        #        "resolutionFullNumber": "SRVCNM564_20220224_TESTINGBUISCIIITOOLS_smonzon_S",
-        #        "resolutionServiceID": 1551,
-        #        "resolutionDate": "2022-02-24",
-        #        "resolutionEstimatedDate": "2022-02-25",
-        #        "resolutionOnQueuedDate": "2022-02-24",
-        #        "resolutionOnInProgressDate": null,
-        #        "resolutionDeliveryDate": null,
-        #        "resolutionNotes": "",
-        #        "resolutionPipelines": [],
-        #        "availableServices": [
-        #            {
-        #                "availServiceDescription": "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)",
-        #                "serviceId": "viralrecon"
-        #            }
-        #        ]
-        #    },
-        #    "Samples": [
-        #        {
-        #            "runName": "NovaSeq_GEN_032",
-        #            "projectName": "NovaSeq_GEN_032_20220209_RAbad",
-        #            "sampleName": "9793",
-        #            "samplePath": "220209_A01158_0051_AHWCJJDRXY"
-        #        }
-        #
+
+    def get_service_paths(self, conf):
+        """
+        Given a service, a conf and a type,
+        get the path it would have service
+        """
+        service_path = os.path.join(
+            conf["data_path"],
+            "services_and_colaborations",
+            self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
+            self.resolution_info["serviceUserId"]["profile"][
+                "profileClassificationArea"
+            ].lower(),
+        )
+        return service_path
 
     def create_folder(self):
         if not self.no_create_folder:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # import sys
-import os
 import logging
 
 import click
@@ -147,7 +146,7 @@ def list(service):
     "-p",
     "--path",
     type=click.Path(),
-    default=os.getcwd(),
+    default=None,
     help="Path to create the service folder",
 )
 @click.option(
@@ -162,7 +161,7 @@ def list(service):
     "--ask_path",
     is_flag=True,
     default=False,
-    help="Please ask for path, not assume pwd.",
+    help="Please ask for path.",
 )
 def new_service(resolution, path, no_create_folder, ask_path):
     """
@@ -178,11 +177,18 @@ def new_service(resolution, path, no_create_folder, ask_path):
 @bu_isciii_cli.command(help_priority=3)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-s",
-    "--service_dir",
+    "-p",
+    "--path",
     type=click.Path(),
-    default=os.getcwd(),
-    help="Directory containing service folder to copy to destination folder for execution. Default: Current directory. Example: /data/bi/service_and_collaboration/CNM/virologia/",
+    default=None,
+    help="Absolute path to the folder containing service to copy",
+)
+@click.option(
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for service path.",
 )
 @click.option(
     "-t",
@@ -198,12 +204,12 @@ def new_service(resolution, path, no_create_folder, ask_path):
     multiple=False,
     help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
 )
-def scratch(resolution, service_dir, tmp_dir, direction):
+def scratch(resolution, path, tmp_dir, direction, ask_path):
     """
     Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
-        resolution, service_dir, tmp_dir, direction
+        resolution, path, tmp_dir, direction, ask_path
     )
     scratch_copy.handle_scratch()
 
@@ -215,15 +221,15 @@ def scratch(resolution, service_dir, tmp_dir, direction):
     "-p",
     "--path",
     type=click.Path(),
-    default=os.getcwd(),
-    help="Path to the service folder to clean",
+    default=None,
+    help="Absolute path to the folder containing service to clean",
 )
 @click.option(
     "-a",
     "--ask_path",
     is_flag=True,
     default=False,
-    help="Please ask for path, not assume pwd.",
+    help="Please ask for path",
 )
 @click.option(
     "-s",
@@ -253,36 +259,43 @@ def clean(resolution, path, ask_path, option):
 @bu_isciii_cli.command(help_priority=4)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-s",
-    "--source",
+    "-p",
+    "--path",
     type=click.Path(),
     default=None,
     help="Absolute path to directory containing files to transfer",
 )
 @click.option(
-    "-d",
-    "--destination",
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for path",
+)
+@click.option(
+    "-s",
+    "--sftp_folder",
     type=click.Path(),
     default=None,
     help="Absolute path to directory to which the files will be transfered",
 )
-def copy_sftp(resolution, source, destination):
+def copy_sftp(resolution, path, ask_path, sftp_folder):
     """
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
-    new_del = bu_isciii.copy_sftp.CopySftp(resolution, source, destination)
+    new_del = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder)
     new_del.copy_sftp()
 
 
-# CLEAN SERVICE AND COPY RESULTS FOLDER TO SFTP
+# CLEAN SCRATCH, COPY TO SERVICE, RENAME SERVICE AND COPY RESULTS FOLDER TO SFTP
 @bu_isciii_cli.command(help_priority=5)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
     "--path",
     type=click.Path(),
-    default=os.getcwd(),
-    help="Absolute path to the service folder to clean and copy",
+    default=None,
+    help="Absolute path to the folder containg the service to reaname and copy",
 )
 @click.option(
     "-a",
@@ -292,20 +305,39 @@ def copy_sftp(resolution, source, destination):
     help="Please ask for path, not assume pwd.",
 )
 @click.option(
-    "-d",
-    "--destination",
+    "-s",
+    "--sftp_folder",
     type=click.Path(),
     default=None,
     help="Absolute path to directory to which the files will be transfered",
 )
-def finish(resolution, path, ask_path, destination):
+@click.option(
+    "-t",
+    "--tmp_dir",
+    type=click.Path(),
+    default="/data/bi/scratch_tmp/bi/",
+    help="Absolute path to the scratch directory containing the service.",
+)
+def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
-    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, "full_clean")
-    clean.handle_clean()
-    copy = bu_isciii.copy_sftp.CopySftp(resolution, path, destination)
-    copy.copy_sftp()
+    print("Starting cleaning scratch directory: " + tmp_dir)
+    clean_scratch = bu_isciii.clean.CleanUp(resolution, tmp_dir, ask_path, "clean")
+    clean_scratch.handle_clean()
+    print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
+    copy_scratch2service = bu_isciii.scratch.Scratch(
+        resolution, path, tmp_dir, "Scratch_to_service", ask_path
+    )
+    copy_scratch2service.handle_scratch()
+    print("Starting renaming of the service directory.")
+    rename_databi = bu_isciii.clean.CleanUp(resolution, path, ask_path, "rename_nocopy")
+    rename_databi.handle_clean()
+    print("Starting copy of the service directory to the SFTP folder: " + sftp_folder)
+    copy_sftp = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder)
+    copy_sftp.copy_sftp()
+    print("Service correctly in SFTP folder")
+    print("Remember to generate delivery docs after setting delivery in iSkyLIMS.")
 
 
 # CREATE DOCS IN BIOINFO_DOC
