@@ -205,6 +205,11 @@ class Archive:
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            self.services_to_move = rest_api.get_request(
+                request_info = "services",
+                parameter1 = "serviceRequestNumber",
+                value1 = self.resolution_id
+            )
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -212,11 +217,6 @@ class Archive:
         # Get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
             "xtutatis_api_settings"
-        )
-        self.services_to_move = rest_api.get_request(
-            request_info = "services"
-            parameter1 = "serviceRequestNumber"
-            value1 = self.resolution_id
         )
 
         # Obtain info from iSkyLIMS api with the conf_api info
