@@ -60,7 +60,9 @@ class CleanUp:
         self.service_samples = self.resolution_info["samples"]
 
         if ask_path and path is None:
-            stderr.print("Absolute path to the directory containing the service to clean.")
+            stderr.print(
+                "Absolute path to the directory containing the service to clean."
+            )
             self.path = bu_isciii.utils.prompt_path(msg="Path")
         elif path == "-a":
             stderr.print(
