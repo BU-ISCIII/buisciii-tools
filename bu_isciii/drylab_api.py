@@ -29,9 +29,8 @@ class RestServiceApi:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
                 if safe:
-                    log.error(
-                        "Resolution id does not exist. Status code: "
-                        + str(req.status_code)
+                    log.info(
+                        f"Resolution ID does not exist. Status code: {req.status_code}"
                     )
                     sys.exit()
                 else:
