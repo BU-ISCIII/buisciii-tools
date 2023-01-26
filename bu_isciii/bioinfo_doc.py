@@ -80,34 +80,31 @@ class BioinfoDoc:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
-        resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+        self.resolution_info = rest_api.get_request(
+            "serviceFullData", "resolution", self.resolution_id
         )
         # TODO: When delivery info can be downloaded from iSkyLIMS
         # resolution_info = rest_api.get_request(
         #    "resolutionFullData", "delivery", self.resolution_id
         # )
-        if not resolution_info:
+        if not self.resolution_info:
             stderr.print(
                 "[red] Unable to fetch information for resolution "
                 + self.resolution_id
                 + "!"
             )
             sys.exit(1)
-        self.resolution_folder = resolution_info["Resolutions"]["resolutionFullNumber"]
-        self.resolution = resolution_info["Resolutions"]
-        self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
-        self.resolution_number = resolution_info["Resolutions"]["resolutionNumber"]
+        print(self.resolution_info)
+        self.resolution_id = self.resolution_info["resolutions"][0]["resolutionFullNumber"]
+        self.resolution_number = self.resolution_info["resolutions"][0]["resolutionNumber"]
         self.delivery_number = self.resolution_number.partition(".")[2]
-        service_date = resolution_info["Service"]["serviceCreatedOnDate"]
-        self.service_datetime = datetime.strptime(service_date, "%Y-%m-%d")
-        year = datetime.strftime(self.service_datetime, "%Y")
+        resolution_date = self.resolution_info["resolutions"][0]["resolutionDate"]
+        self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
+        year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
-            self.path, self.doc_conf["services_path"], year, self.resolution_folder
+            self.path, self.doc_conf["services_path"], year, self.resolution_id
         )
-        self.samples = resolution_info["Samples"]
-        self.user_data = resolution_info["Service"]["serviceUserId"]
-        self.service = resolution_info["Service"]
+        self.samples = self.resolution_info["samples"]
         self.handled_services = None
         path_to_wkhtmltopdf = os.path.normpath(self.doc_conf["wkhtmltopdf_path"])
         self.config_pdfkit = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
@@ -115,7 +112,7 @@ class BioinfoDoc:
             self.template_file = self.doc_conf["service_info_template_path_file"]
         else:
             self.template_file = self.doc_conf["delivery_template_path_file"]
-        self.services_requested = resolution_info["Resolutions"]["availableServices"]
+        self.services_requested = self.resolution_info["resolutions"][0]["availableServices"]
         self.service_info_folder = self.doc_conf["service_folder"][0]
         self.service_result_folder = self.doc_conf["service_folder"][1]
 
@@ -156,7 +153,7 @@ class BioinfoDoc:
                     file_path = os.path.join(
                         self.service_folder, self.service_result_folder
                     )
-                    delivery_date = self.resolution.get("resolutionDeliveryDate")
+                    delivery_date = self.resolution_info["resolutions"][0]["resolutionDeliveryDate"]
                     delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
                     delivery_date_folder = datetime.strftime(
                         delivery_datetime, "%Y%m%d"
@@ -189,8 +186,8 @@ class BioinfoDoc:
         log.info("Start creating the markdown file")
         markdown_data = {}
         # service related information
-        markdown_data["service"] = self.service
-        markdown_data["user_data"] = self.user_data
+        markdown_data["service"] = self.resolution_info
+        markdown_data["user_data"] = self.resolution_info["serviceUserId"]
         samples_in_service = {}
         for sample_data in self.samples:
             if sample_data["runName"] not in samples_in_service:
@@ -208,14 +205,14 @@ class BioinfoDoc:
         markdown_data["samples"] = samples_in_service
 
         # Resolution related information
-        markdown_data["resolution"] = self.resolution
+        markdown_data["resolution"] = self.resolution_info["resolutions"][0]
         f_name = self.resolution_number + ".md"
         file_name = os.path.join(file_path, f_name)
         file_name = os.path.join(file_path, f_name)
 
         # Delivery related information
         markdown_data["service_notes"] = (
-            self.service["serviceNotes"].replace("\r", "").replace("\n", " ")
+            self.resolution_info["serviceNotes"].replace("\r", "").replace("\n", " ")
         )
 
         pakage_path = os.path.dirname(os.path.realpath(__file__))
@@ -368,7 +365,7 @@ class BioinfoDoc:
         return None
 
     def sftp_tree(self):
-        sftp_path = os.path.join(self.sftp_folder, self.resolution_folder)
+        sftp_path = os.path.join(self.sftp_folder, self.resolution_id)
         try:
             tree_result = subprocess.run(
                 ["tree", sftp_path], capture_output=True, text=True, check=True
