@@ -54,7 +54,7 @@ def ask_date(previous_date=None):
         month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
 
     # If same year as before, limit the quantity of months
-    if previous_date is None and year == int(previous_date[0]):
+    if previous_date is not None and year == int(previous_date[0]):
         month_list = month_list[int(previous_date[1]):]
 
     chosen_month_number, chosen_month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
