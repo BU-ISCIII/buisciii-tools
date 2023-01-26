@@ -50,7 +50,7 @@ def ask_date():
     else:
         month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
 
-    month_number, month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
+    chosen_month_number, chosen_month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
                                              [f"month {num:02d}: {month}" for num, month in month_list]).replace("month").strip().split(":")
 
     # For the day, use "calendar":
@@ -67,7 +67,7 @@ def ask_date():
     if year == date.today().year and int(month_number) == date.today().month:
         day_list = day_list[:datetime.date.today().day]
 
-    day = bu_isciii.utils.prompt_selection(f"Choose the day of {month_name} {year}",
+    day = bu_isciii.utils.prompt_selection(f"Choose the day of {chosen_month_name} {year}",
                                            day_list)
 
     return [str(year), str(month_number), f"{day:02d}"]
