@@ -53,7 +53,8 @@ def ask_date(previous_date=None):
     else:
         month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
 
-    # If same year as before, limit the quantity of months
+    # If there is a previous date
+    # and year is the same as before, limit the quantity of months
     if previous_date is not None and year == int(previous_date[0]):
         month_list = month_list[int(previous_date[1]):]
 
@@ -74,7 +75,8 @@ def ask_date(previous_date=None):
     if year == date.today().year and int(chosen_month_number) == date.today().month:
         day_list = day_list[:date.today().day]
     
-    if year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
+    # if previous date  & same year & same month, limit days
+    if previous_date is not None and year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
         day_list = day_list[int(previous_date)[2]:]
 
     # from the list, get the first and last item as limits for the function
