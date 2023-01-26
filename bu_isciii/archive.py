@@ -65,7 +65,7 @@ def ask_date():
 
     # if current month and day, limit the options to the current day
     if year == date.today().year and int(chosen_month_number) == date.today().month:
-        day_list = day_list[:datetime.date.today().day]
+        day_list = day_list[:date.today().day]
 
     day = bu_isciii.utils.prompt_selection(f"Choose the day of {chosen_month_name} {year}",
                                            day_list)
