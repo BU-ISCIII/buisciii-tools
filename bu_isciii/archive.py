@@ -188,7 +188,8 @@ class Archive:
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
 
-            
+            print(self.date_from)
+            print(self.date_until)
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
