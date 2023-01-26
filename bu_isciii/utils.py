@@ -37,14 +37,15 @@ def prompt_year(lower_limit,
                 upper_limit):
 
     while True:
+
+        year = questionary.text("Year").unsafe_ask()
         try:
             # test if it is an int
-            year = int(questionary.text("Year").unsafe_ask())
-            if year < lower_limit:
-                stderr.print(f"Sorry, but the oldest record we have is from the year {lower_limit}!\n \
+            if int(year) < lower_limit:
+                stderr.print(f"Sorry, but the oldest record we have is from the year {lower_limit}! \
                                Year {year} is maybe too... Vintage. Please, try again!")
-            elif year > lower_limit:
-                stderr.print(f"Sorry, but the time machine has not been invented... Yet.\n \
+            elif int(year) > lower_limit:
+                stderr.print(f"Sorry, but the time machine has not been invented... Yet. \
                                Year {year} is maybe too... Futuristic. Please, try again!")
             else:
                 return year
