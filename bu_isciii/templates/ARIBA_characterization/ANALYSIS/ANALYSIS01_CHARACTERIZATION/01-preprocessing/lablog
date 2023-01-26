@@ -1,0 +1,7 @@
+# module load fastp 
+# if assembly pipeline was performed first and the trimmed sequences were saved, this should work:
+# cat ../samples_id | xargs -I mkdir @@; cd $_; ln -s ../../*/01-preprocessing/trimmed_sequences/@@*.gz @@; cd -
+# else: 
+mkdir logs
+scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+cat ../samples_id.txt | xargs -I @@ echo "mkdir @@; srun --chdir ${scratch_dir} --mem 10G --time 1:00:00 --job-name FP.@@ --output logs/FP.@@.%j.log --partition short_idx --cpus-per-task 5 fastp --in1 ../00-reads/@@_R1.fastq.gz --in2 ../00-reads/@@_R1.fastq.gz --thread 5 --cut_front --cut_tail --cut_mean_quality 15 --qualified_quality_phred 15 --trim_poly_x --detect_adapter_for_pe --json @@/@@_fastp.json --html @@/@@_fastp.html --out1 @@/@@_R1_filtered.fastq.gz --out2 @@/@@_R2_filtered.fastq.gz &" > _01_fastp.sh
