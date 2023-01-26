@@ -79,7 +79,7 @@ def ask_date(previous_date=None):
     if previous_date is not None: # and year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
 
         print(year, int(previous_date[0]))
-        print(chosen_month_number, int(previous_date))
+        print(chosen_month_number, previous_date)
 
         day_list = day_list[int(previous_date[2])-1:]
 
