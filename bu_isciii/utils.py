@@ -49,7 +49,7 @@ def prompt_year(lower_limit,
             year = int(year)
 
             if year < lower_limit:
-                stderr.print(f"Sorry, but the oldest record we have is from the year {lower_limit}! Year {year} is maybe too... Vintage. Please, try again!")
+                stderr.print(f"Sorry, but the year cant be earlier than {lower_limit}! That would cause a space-time rupture and the Doctor is nowhere to be found! Please, try again!")
             elif year > upper_limit:
                 stderr.print(f"Sorry, but the time machine has not been invented... Yet. Year {year} is maybe too... Futuristic. Please, try again!")
             else:
