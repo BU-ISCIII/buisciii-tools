@@ -151,7 +151,7 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "assets/reports/pdf/rnaseq.pdf"
     },
     "lowfreq_panel": {
         "label": "",
@@ -187,9 +187,25 @@
       "delivery_md": "",
       "delivery_pdf": ""
     },
-    "ARIBA_characterization": {
+    "seek_and_destroy": {
       "label": "",
-      "template": "",
+      "template": "seek_and_destroy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/GuilleGorines/Seek-Destroy",
+      "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "ariba_characterization": {
+      "label": "",
+      "template": "ARIBA_characterization",
       "url": "",
       "order": 1,
       "begin": "",
@@ -204,4 +220,5 @@
       "delivery_md": "",
       "delivery_pdf": ""
     }
+    
 }
