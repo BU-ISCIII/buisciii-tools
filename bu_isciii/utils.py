@@ -35,7 +35,12 @@ def prompt_resolution_id():
 
 def prompt_year(lower_limit,
                 upper_limit):
-
+    """
+    Ask the year (user prompt)
+    Check whether or not this input is a numeric value
+    Chech whether or not this input is within the limits
+    Maybe too specific for utils
+    """
     while True:
 
         year = questionary.text("Year").unsafe_ask()
@@ -52,10 +57,28 @@ def prompt_year(lower_limit,
         
         except ValueError:
             stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
-            # year = questionary.text("Year").unsafe_ask()
     
     return
 
+def prompt_day(lower_limit,
+               upper_limit):
+    """
+    Ask the day (user prompt)
+    Check whether or not this input is a numeric value
+    Chech whether or not this input is within the limits
+    Maybe too specific for utils
+    And similar to the prompt_year function (different context tho)
+    """
+    while True:
+        day = questionary.text(f"Day ({lower_limit} - {upper_limit})").unsafe_ask()
+        try:
+            day = int(day)
+            if day < lower_limit or day > upper_limit:
+                stderr.print(f"Sorry, day {day} is out of bounds! Please choose a day between {lower_limit} and {upper_limit}")
+            else:
+                return day
+        except ValueError:
+            stderr.print(f"Ooops, seems like the answer '{day}' is not a valid day! Please specify the day for which you want to archive services.")
 
 def prompt_service_dir_path():
     stderr.print("Service path to copy to execution temporal directory")
