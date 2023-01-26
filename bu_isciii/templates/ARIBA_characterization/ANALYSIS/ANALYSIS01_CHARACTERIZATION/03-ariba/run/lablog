@@ -1,0 +1,13 @@
+# conda activate ariba
+# ARIBA runs local assembli/processing_Data/bioinformatics/services_and_colaborations/CNM/bacteriologia/20190821_QCASSEMBLT_s.gonzalez_T/RAW/fastqc_2/.
+
+mkdir logs
+scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+
+# Cartesian product of the two files to avoid double looping
+join -j 2 ../../samples_id.txt ../databases.txt | sed 's/^ //g' > sample_database.txt
+
+# col 1 (arr[0]): sample
+# col 2 (arr[1]): database
+cat sample_database.txt | while read in; do arr=($in); echo "mkdir -p ${arr[0]}; srun --chdir $scratch_dir --output logs/ARIBA${arr[0]}_${arr[1]}.%j.log --job-name ARIBA_${arr[0]}_${arr[1]} --cpus-per-task 5 --mem 5G --partition short_idx --time 00:30:00 ariba run /data/bi/references/ariba/20211216/${arr[1]}/out.${arr[1]}.prepareref ../../01-preprocessing/${arr[0]}/*_R1_filtered.fastq.gz ../../01-preprocessing/${arr[0]}/*_R2_filtered.fastq.gz ${arr[0]}/out_${arr[1]}_${arr[0]}_run &"; done > _01_ariba.sh
+cat sample_database.txt | while read in; do arr=($in); echo "mv ${arr[0]}/out_${arr[1]}_${arr[0]}_run/report.tsv ${arr[0]}/out_${arr[1]}_${arr[0]}_run/${arr[0]}_${arr[1]}_report.tsv"; done > _02_fix_tsvreport.sh
