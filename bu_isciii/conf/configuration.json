@@ -36,6 +36,9 @@
         "data_path": "/data/bi",
         "fastq_repo": "/srv/fastq_repo"
     },
+    "cleanning": {
+        "data_path": "/data/bi"
+    },
     "scratch_copy": {
       "data_path": "/data/bi",
       "command": "rsync -rlv --exclude 'service_info.txt' --exclude 'work' "
