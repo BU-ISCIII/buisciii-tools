@@ -435,9 +435,9 @@ def bioinfo_doc(type, resolution, path, ask_path, sftp_folder, report_md, result
     type=click.Choice(["archive", "retrieve_from_archive"]),
     help="Select either you want to archive services or retrieve a service from archive.",
 )
-def archive(resolution, type, year, option):
+def archive(resolution, type, option):
     """Archive services or retrieve services from archive"""
-    archive_ser = bu_isciii.archive.Archive(resolution, year, type, option, api_pass)
+    archive_ser = bu_isciii.archive.Archive(resolution, type, option, api_pass)
     archive_ser.handle_archive()
 
 
