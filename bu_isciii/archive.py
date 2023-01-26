@@ -183,10 +183,10 @@ class Archive:
         if self.quantity == "Batch":
             
             stderr.print("Please state the initial date for filtering")
-            self.lower_date_limit = ask_date()
+            self.date_from = ask_date()
 
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
-            self.upper_date_limit = ask_date(previous_date=self.lower_date_limit)
+            self.date_until = ask_date(previous_date=self.lower_date_limit)
 
             
 
@@ -208,7 +208,7 @@ class Archive:
         )
 
         self.services_to_move = rest_api.get_request(
-            "services", "state", "date_from", "date","aaa"
+            "services", "date_from", "-".join(self.date_from), "date_until","-".join(self.date_until)
         )
         
         print(self.services_to_move)
