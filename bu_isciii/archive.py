@@ -66,14 +66,13 @@ def ask_date():
     # if current month and day, limit the options to the current day
     if year == date.today().year and int(chosen_month_number) == date.today().month:
         day_list = day_list[:date.today().day]
-
-    day = bu_isciii.utils.prompt_selection(f"Choose the day of {chosen_month_name} {year}",
-                                           day_list)
+        
+    day = bu_isciii.utils.prompt_day(lower_limit=day_list[0], upper_limit=day_list[-1])
 
     print(day)
     print(type(day))
 
-    return [str(year), str(chosen_month_number), f"{day:02d}"]
+    return [str(year), str(chosen_month_number), day]
 
 # function to compare directories (archived and non-archived)
 def dir_comparison(dir1, dir2):
