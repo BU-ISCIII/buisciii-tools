@@ -76,10 +76,10 @@ def ask_date(previous_date=None):
         day_list = day_list[:date.today().day]
     
     # if previous date  & same year & same month, limit days
-    if previous_date is not None and year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
+    if previous_date is not None: # and year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
 
         print(year, int(previous_date[0]))
-        print(chosen_month_number, int(previous_date[0]))
+        print(chosen_month_number, int(previous_date))
 
         day_list = day_list[int(previous_date[2])-1:]
 
