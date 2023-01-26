@@ -34,9 +34,6 @@ def ask_date():
     return a 3 items list
     """
     # Range: year 2010 - current year
-
-    print(f"LOWER_LIMIT: 2010; UPPER_LIMIT={date.today().year}")
-
     year = bu_isciii.utils.prompt_year(lower_limit=2010,
                                        upper_limit=date.today().year)
 
