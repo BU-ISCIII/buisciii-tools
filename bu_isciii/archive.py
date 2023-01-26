@@ -70,6 +70,9 @@ def ask_date():
     day = bu_isciii.utils.prompt_selection(f"Choose the day of {chosen_month_name} {year}",
                                            day_list)
 
+    print(day)
+    print(type(day))
+
     return [str(year), str(chosen_month_number), f"{day:02d}"]
 
 # function to compare directories (archived and non-archived)
