@@ -35,6 +35,7 @@ def ask_date(previous_date=None):
     If given a "previous_date" argument, always check that the date is posterior
     "previous_date" format is the same as this functions output:
     [year [str], chosen_month_number [str], day [str]]
+    Stored like this so that its easier to manage later
     """
     
     lower_limit_year = 2010 if previous_date is None else int(previous_date[0]) 
@@ -79,10 +80,11 @@ def ask_date(previous_date=None):
         day_list = day_list[int(previous_date[2])-1:]
 
     # from the list, get the first and last item as limits for the function
-    day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]), upper_limit=int(day_list[-1]))
+    day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]),
+                                     upper_limit=int(day_list[-1]))
 
 
-    return [str(year), str(chosen_month_number), day]
+    return [str(year), str(chosen_month_number), str(day)]
 
 # function to compare directories (archived and non-archived)
 def dir_comparison(dir1, dir2):
@@ -187,9 +189,6 @@ class Archive:
 
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
-
-            print(self.date_from)
-            print(self.date_until)
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
