@@ -38,16 +38,17 @@ def prompt_year(lower_limit,
     """
     Ask the year (user prompt)
     Check whether or not this input is a numeric value
-    Chech whether or not this input is within the limits
+    Check whether or not this input is within the limits
     Maybe too specific for utils
     """
     while True:
 
         year = questionary.text(f"Year ({lower_limit}-{upper_limit})").unsafe_ask()
         try:
-            # test if it is an int
+            # Check if it is an int
             year = int(year)
 
+            # Check limits
             if year < lower_limit:
                 stderr.print(f"Sorry, but the year cant be earlier than {lower_limit}! That would cause a space-time rupture and the Doctor is nowhere to be found! Please, try again!")
             elif year > upper_limit:
