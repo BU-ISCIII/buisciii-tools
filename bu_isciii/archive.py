@@ -182,13 +182,26 @@ class Archive:
             ["Batch", "Single service"],
         )
 
+        # Get configuration params from configuration.json
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
+
+        # Get data to connect to the api
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+
         if self.quantity == "Batch":
-            
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
+
+            self.services_to_move = rest_api.get_request(
+                request_info = "services",
+                parameter1 = "date_from", 
+                value1 = "-".join(self.date_from),
+                parameter2 = "date_until",
+                value2 = "-".join(self.date_until)
+            )
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -200,6 +213,11 @@ class Archive:
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
             "xtutatis_api_settings"
         )
+        self.services_to_move = rest_api.get_request(
+            request_info = "services"
+            parameter1 = "serviceRequestNumber"
+            value1 = self.resolution_id
+        )
 
         # Obtain info from iSkyLIMS api with the conf_api info
         stderr.print("Asking our trusty API")
@@ -207,11 +225,11 @@ class Archive:
             conf_api["server"], conf_api["api_url"], api_token
         )
 
-        self.services_to_move = rest_api.get_request(
-            "services", "date_from", "-".join(self.date_from), "date_until","-".join(self.date_until)
-        )
-        
-        print(self.services_to_move)
+        if self.services_to_move is False:
+            stderr.print("Query to the API did not find anything(?)")
+            sys.exit(1)
+        else:
+            stderr.print("Obtained data from the API!")
 
         # Calculate size of the directories (already in GB)
         stderr.print(
