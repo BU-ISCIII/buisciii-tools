@@ -1,5 +1,6 @@
 {
     "sftp_copy": {
+       "data_path": "/data/bi",
         "protocol": "rsync",
         "options": ["-rlpv", "--update", "-L", "--inplace"],
         "exclusions": [
