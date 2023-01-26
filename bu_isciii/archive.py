@@ -56,7 +56,7 @@ def ask_date(previous_date=None):
     # If there is a previous date
     # and year is the same as before, limit the quantity of months
     if previous_date is not None and year == int(previous_date[0]):
-        month_list = month_list[int(previous_date[1]):]
+        month_list = month_list[int(previous_date[1])-1:]
 
     chosen_month_number, chosen_month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
                                              [f"Month {num:02d}: {month}" for num, month in month_list]).replace("Month","").strip().split(": ")
@@ -77,7 +77,7 @@ def ask_date(previous_date=None):
     
     # if previous date  & same year & same month, limit days
     if previous_date is not None and year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
-        day_list = day_list[int(previous_date)[2]:]
+        day_list = day_list[int(previous_date)[2]-1:]
 
     # from the list, get the first and last item as limits for the function
     day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]), upper_limit=int(day_list[-1]))
