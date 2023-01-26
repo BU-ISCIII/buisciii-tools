@@ -43,7 +43,7 @@ def prompt_year(lower_limit,
     """
     while True:
 
-        year = questionary.text("Year").unsafe_ask()
+        year = questionary.text(f"Year ({lower_limit}-{upper_limit})").unsafe_ask()
         try:
             # test if it is an int
             year = int(year)

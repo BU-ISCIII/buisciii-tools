@@ -27,14 +27,20 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
-def ask_date():
+def ask_date(previous_date=None):
     """
     Ask the year, then the month, then the day of the month
     This choice is always dependent on wether the date is or not available
     return a 3 items list
+    If given a "previous_date" argument, always check that the date is posterior
+    "previous_date" format is the same as this functions output:
+    [year [str], chosen_month_number [str], day [str]]
     """
+    
+    lower_limit_year = 2010 if previous_date is None else int(previous_date[0]) 
+
     # Range: year 2010 - current year
-    year = bu_isciii.utils.prompt_year(lower_limit=2010,
+    year = bu_isciii.utils.prompt_year(lower_limit=lower_limit_year,
                                        upper_limit=date.today().year)
 
     # Limit the list to the current month if year = current year
@@ -46,6 +52,10 @@ def ask_date():
         month_list = [[num, month] for num, month in enumerate(month_name)][1:]
     else:
         month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
+
+    # If same year as before, limit the quantity of months
+    if previous_date is None and year == int(previous_date[0]):
+        month_list = month_list[int(previous_date[1]):]
 
     chosen_month_number, chosen_month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
                                              [f"Month {num:02d}: {month}" for num, month in month_list]).replace("Month","").strip().split(": ")
@@ -64,6 +74,9 @@ def ask_date():
     if year == date.today().year and int(chosen_month_number) == date.today().month:
         day_list = day_list[:date.today().day]
     
+    if year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
+        day_list = day_list[int(previous_date)[2]:]
+
     # from the list, get the first and last item as limits for the function
     day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]), upper_limit=int(day_list[-1]))
 
@@ -79,7 +92,6 @@ def dir_comparison(dir1, dir2):
 
     Heavily based on:
     https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
-
     """
     comparison = filecmp.dircmp(dir1, dir2)
     if (
@@ -173,7 +185,7 @@ class Archive:
             self.lower_date_limit = ask_date()
 
             stderr.print("Please state the final date for filtering")
-            self.upper_date_limit = ask_date()
+            self.upper_date_limit = ask_date(previous_date=self.lower_date_limit)
             
 
         elif self.quantity == "Single service" and self.resolution_id is None:
@@ -188,6 +200,7 @@ class Archive:
         )
 
         # Obtain info from iSkyLIMS api with the conf_api info
+        stderr.print("Asking our trusty API")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_token
         )
