@@ -61,10 +61,10 @@ def ask_date():
     # Do not get the 9 first elements bc they are:
     # "Month", "Year", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
 
-    day_list = list(filter(None, calendar.month(year, int(month_number)).replace("\n"," ").split(" ")))[9:]
+    day_list = list(filter(None, calendar.month(year, int(chosen_month_number)).replace("\n"," ").split(" ")))[9:]
 
     # if current month and day, limit the options to the current day
-    if year == date.today().year and int(month_number) == date.today().month:
+    if year == date.today().year and int(chosen_month_number) == date.today().month:
         day_list = day_list[:datetime.date.today().day]
 
     day = bu_isciii.utils.prompt_selection(f"Choose the day of {chosen_month_name} {year}",
