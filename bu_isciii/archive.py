@@ -200,7 +200,7 @@ class Archive:
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
             
-            stderr.print(f"Asking our trusty API about resolutions between: {"-".join(self.date_from)} and {"-".join(self.date_until)}")
+            stderr.print(f"Asking our trusty API about resolutions between: {"\-".join(self.date_from)} and {"\-".join(self.date_until)}")
             self.services_to_move = rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
