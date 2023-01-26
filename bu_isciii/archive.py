@@ -76,11 +76,7 @@ def ask_date(previous_date=None):
         day_list = day_list[:date.today().day]
     
     # if previous date  & same year & same month, limit days
-    if previous_date is not None: # and year == int(previous_date[0]) and chosen_month_number == int(previous_date[1]):
-
-        print(year, int(previous_date[0]))
-        print(chosen_month_number, previous_date)
-
+    if previous_date is not None and year == int(previous_date[0]) and chosen_month_number == previous_date[1]:
         day_list = day_list[int(previous_date[2])-1:]
 
     # from the list, get the first and last item as limits for the function
