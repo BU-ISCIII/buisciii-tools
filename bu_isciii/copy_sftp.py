@@ -37,7 +37,7 @@ stderr = Console(
 
 
 class CopySftp:
-    def __init__(self, resolution_id=None, source=None, destination=None):
+    def __init__(self, resolution_id=None, path=None, ask_path=False, sftp_folder=None):
         """
         Description:
             Class to perform the copy of the service to sftp folfer.
@@ -55,15 +55,10 @@ class CopySftp:
         else:
             self.resolution_id = resolution_id
 
-        if source is None:
-            self.source = bu_isciii.utils.prompt_source_path()
+        if sftp_folder is None:
+            self.sftp_folder = bu_isciii.utils.prompt_destination_path()
         else:
-            self.source = source
-
-        if destination is None:
-            self.destination = bu_isciii.utils.prompt_destination_path()
-        else:
-            self.destination = destination
+            self.sftp_folder = sftp_folder
 
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("sftp_copy")
@@ -86,7 +81,6 @@ class CopySftp:
         self.sftp_options = bu_isciii.config_json.ConfigJson().get_find(
             "sftp_copy", "options"
         )
-
         self.sftp_exclusions = bu_isciii.config_json.ConfigJson().get_find(
             "sftp_copy", "exclusions"
         )
@@ -95,6 +89,25 @@ class CopySftp:
         self.last_folders = self.get_last_folders(
             self.services_to_copy, type="last_folder"
         )
+        if ask_path and path is None:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = self.get_service_paths(self.conf)
+
+        self.full_path = os.path.join(self.path, self.service_folder)
 
     def get_last_folders(self, services_ids, type="last_folder"):
         """
@@ -124,22 +137,37 @@ class CopySftp:
 
         return last_folders_list
 
+    def get_service_paths(self, conf):
+        """
+        Given a service, a conf and a type,
+        get the path it would have service
+        """
+        service_path = os.path.join(
+            conf["data_path"],
+            "services_and_colaborations",
+            self.resolution_info["serviceUserId"]["profile"]["profileCenter"],
+            self.resolution_info["serviceUserId"]["profile"][
+                "profileClassificationArea"
+            ].lower(),
+        )
+        return service_path
+
     def listdirs(self, final_path):
         for path, subdirs, files in os.walk(final_path):
             for name in files:
                 print(os.path.join(path, name))
 
     def copy_sftp(self):
-        if self.service_folder in self.source:
+        if self.service_folder in self.full_path:
             today_date = datetime.today().strftime("%Y%m%d")
             log_command = (
-                "--log-file=" + self.source + "/DOC/rsync_" + today_date + ".log"
+                "--log-file=" + self.full_path + "/DOC/rsync_" + today_date + ".log"
             )
             self.sftp_options.append(log_command)
             try:
                 sysrsync.run(
-                    source=self.source,
-                    destination=self.destination,
+                    source=self.full_path,
+                    destination=self.sftp_folder,
                     options=self.sftp_options,
                     exclusions=self.sftp_exclusions,
                     sync_source_contents=False,
@@ -157,7 +185,7 @@ class CopySftp:
             finally:
                 for folders_list in self.last_folders:
                     final_folder = os.path.join(
-                        self.destination, self.service_folder, folders_list
+                        self.sftp_folder, self.service_folder, folders_list
                     )
                     stderr.print(
                         "Listing the content of the final folder %s" % folders_list
@@ -166,7 +194,7 @@ class CopySftp:
         else:
             stderr.print(
                 "[red]ERROR: Service number %s not in the source path %s"
-                % (self.service_folder, self.source)
+                % (self.service_folder, self.full_path)
             )
             sys.exit()
         return True
