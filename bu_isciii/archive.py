@@ -186,7 +186,7 @@ class Archive:
             self.date_from = ask_date()
 
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
-            self.date_until = ask_date(previous_date=self.lower_date_limit)
+            self.date_until = ask_date(previous_date=self.date_from)
 
             
 
