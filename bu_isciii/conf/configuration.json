@@ -17,13 +17,13 @@
         "'*.py'"
       ]
     },
-      "server": "http://iskylimsapi.isciii.es",
     "xtutatis_api_settings": {
-      "api_url": "/drylab/api/"
+      "api_url": "/drylab/api/",
+      "server": "http://iskylimsapi.isciiides.es"
     },
-      "server": "http://iskylims.isciii.es",
     "api_settings": {
-      "api_url": "/drylab/api/"
+      "api_url": "/drylab/api/",
+      "server": "http://iskylims.isciiides.es"
     },
     "bioinfo_doc": {
       "bioinfodoc_path": "/data/bioinfo_doc/",
