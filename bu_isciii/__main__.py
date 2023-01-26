@@ -418,12 +418,6 @@ def bioinfo_doc(type, resolution, path, ask_path, sftp_folder, report_md, result
 @bu_isciii_cli.command(help_priority=7)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-y",
-    "--year",
-    default=None,
-    help="Year for which you want to archive services.",
-)
-@click.option(
     "-t",
     "--type",
     type=click.Choice(["services_and_colaborations", "research"]),
