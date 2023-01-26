@@ -186,7 +186,7 @@ class Archive:
             stderr.print("Please state the initial date for filtering")
             self.lower_date_limit = ask_date()
 
-            stderr.print("Please state the final date for filtering")
+            stderr.print("Please state the final date for filtering (must be posterior to the initial date)")
             self.upper_date_limit = ask_date(previous_date=self.lower_date_limit)
             
 
