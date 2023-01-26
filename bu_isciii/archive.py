@@ -188,6 +188,7 @@ class Archive:
         # Get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
 
+        # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
@@ -198,8 +199,8 @@ class Archive:
 
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
+            
             stderr.print(f"Asking our trusty API for resolutions between: {"-".join(self.date_from)} and {"-".join(self.date_until)}")
-
             self.services_to_move = rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
@@ -211,7 +212,6 @@ class Archive:
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
             stderr.print(f"Asking our trusty API for resolution: {self.resolution_id}")
-
             self.services_to_move = rest_api.get_request(
                 request_info = "services",
                 parameter1 = "serviceRequestNumber",
