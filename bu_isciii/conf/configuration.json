@@ -22,8 +22,8 @@
       "server": "http://iskylimsapi.isciiides.es"
     },
     "api_settings": {
-      "api_url": "/drylab/api/",
-      "server": "http://iskylims.isciiides.es"
+        "server": "http://iskylimsapi.isciiides.es",
+        "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
       "bioinfodoc_path": "/data/bioinfo_doc/",

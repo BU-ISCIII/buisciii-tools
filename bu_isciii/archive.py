@@ -187,6 +187,7 @@ class Archive:
 
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.upper_date_limit = ask_date(previous_date=self.lower_date_limit)
+
             
 
         elif self.quantity == "Single service" and self.resolution_id is None:
@@ -207,7 +208,7 @@ class Archive:
         )
 
         self.services_to_move = rest_api.get_request(
-            "services", "state", "delivered", "date","aaa"
+            "services", "state", "date_from", "date","aaa"
         )
         
         print(self.services_to_move)
