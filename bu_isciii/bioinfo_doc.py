@@ -95,8 +95,12 @@ class BioinfoDoc:
             )
             sys.exit(1)
         print(self.resolution_info)
-        self.resolution_id = self.resolution_info["resolutions"][0]["resolutionFullNumber"]
-        self.resolution_number = self.resolution_info["resolutions"][0]["resolutionNumber"]
+        self.resolution_id = self.resolution_info["resolutions"][0][
+            "resolutionFullNumber"
+        ]
+        self.resolution_number = self.resolution_info["resolutions"][0][
+            "resolutionNumber"
+        ]
         self.delivery_number = self.resolution_number.partition(".")[2]
         resolution_date = self.resolution_info["resolutions"][0]["resolutionDate"]
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
@@ -112,7 +116,9 @@ class BioinfoDoc:
             self.template_file = self.doc_conf["service_info_template_path_file"]
         else:
             self.template_file = self.doc_conf["delivery_template_path_file"]
-        self.services_requested = self.resolution_info["resolutions"][0]["availableServices"]
+        self.services_requested = self.resolution_info["resolutions"][0][
+            "availableServices"
+        ]
         self.service_info_folder = self.doc_conf["service_folder"][0]
         self.service_result_folder = self.doc_conf["service_folder"][1]
 
@@ -153,7 +159,9 @@ class BioinfoDoc:
                     file_path = os.path.join(
                         self.service_folder, self.service_result_folder
                     )
-                    delivery_date = self.resolution_info["resolutions"][0]["resolutionDeliveryDate"]
+                    delivery_date = self.resolution_info["resolutions"][0][
+                        "resolutionDeliveryDate"
+                    ]
                     delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
                     delivery_date_folder = datetime.strftime(
                         delivery_datetime, "%Y%m%d"
