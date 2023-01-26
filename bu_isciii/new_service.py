@@ -27,11 +27,7 @@ stderr = rich.console.Console(
 
 class NewService:
     def __init__(
-        self,
-        resolution_id=None,
-        path=None,
-        no_create_folder=None,
-        ask_path=False
+        self, resolution_id=None, path=None, no_create_folder=None, ask_path=False
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()

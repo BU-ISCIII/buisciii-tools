@@ -327,7 +327,9 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     clean_scratch = bu_isciii.clean.CleanUp(resolution, tmp_dir, ask_path, "clean")
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
-    copy_scratch2service = bu_isciii.scratch.Scratch(resolution, path, tmp_dir, "Scratch_to_service", ask_path)
+    copy_scratch2service = bu_isciii.scratch.Scratch(
+        resolution, path, tmp_dir, "Scratch_to_service", ask_path
+    )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
     rename_databi = bu_isciii.clean.CleanUp(resolution, path, ask_path, "rename_nocopy")
@@ -337,6 +339,7 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
     print("Remember to generate delivery docs after setting delivery in iSkyLIMS.")
+
 
 # CREATE DOCS IN BIOINFO_DOC
 @bu_isciii_cli.command(help_priority=6)
