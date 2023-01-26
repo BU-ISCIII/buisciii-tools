@@ -260,24 +260,31 @@ def clean(resolution, path, ask_path, option):
 @bu_isciii_cli.command(help_priority=4)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
-    "-s",
-    "--source",
+    "-p",
+    "--path",
     type=click.Path(),
     default=None,
     help="Absolute path to directory containing files to transfer",
 )
 @click.option(
-    "-d",
-    "--destination",
+    "-a",
+    "--ask_path",
+    is_flag=True,
+    default=False,
+    help="Please ask for path",
+)
+@click.option(
+    "-s",
+    "--sftp_folder",
     type=click.Path(),
     default=None,
     help="Absolute path to directory to which the files will be transfered",
 )
-def copy_sftp(resolution, source, destination):
+def copy_sftp(resolution, path, ask_path, sftp_folder):
     """
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
-    new_del = bu_isciii.copy_sftp.CopySftp(resolution, source, destination)
+    new_del = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder)
     new_del.copy_sftp()
 
 
