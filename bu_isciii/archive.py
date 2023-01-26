@@ -144,7 +144,7 @@ class Archive:
         self.resolution_id = resolution_id
         self.type = ser_type
         self.option = option
-
+        
         """
         ANCHOR CODE: when "year" option was removed, this chunk became deprecated 
         # assumption: year and no resolution_id >>> Batch management
@@ -161,11 +161,10 @@ class Archive:
         )
         """
 
-        if self.quantity is None:
-            self.quantity = bu_isciii.utils.prompt_selection(
-                "Working with a batch, or a single resolution?",
-                ["Batch", "Single service"],
-            )
+        self.quantity = bu_isciii.utils.prompt_selection(
+            "Working with a batch, or a single resolution?",
+            ["Batch", "Single service"],
+        )
 
         if self.quantity == "Batch":
             
