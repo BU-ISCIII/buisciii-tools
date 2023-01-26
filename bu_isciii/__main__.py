@@ -181,7 +181,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
     "--path",
     type=click.Path(),
     default=None,
-    help="Absolute path to the service folder to clean",
+    help="Absolute path to the folder containing service to copy",
 )
 @click.option(
     "-a",
@@ -221,15 +221,15 @@ def scratch(resolution, path, tmp_dir, direction, ask_path):
     "-p",
     "--path",
     type=click.Path(),
-    default=os.getcwd(),
-    help="Path to the service folder to clean",
+    default=None,
+    help="Absolute path to the folder containing service to clean",
 )
 @click.option(
     "-a",
     "--ask_path",
     is_flag=True,
     default=False,
-    help="Please ask for path, not assume pwd.",
+    help="Please ask for path",
 )
 @click.option(
     "-s",
