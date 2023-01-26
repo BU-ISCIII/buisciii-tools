@@ -200,7 +200,7 @@ class Archive:
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
             
-            stderr.print(f"Asking our trusty API for resolutions between: {"-".join(self.date_from)} and {"-".join(self.date_until)}")
+            stderr.print(f"Asking our trusty API about resolutions between: {"-".join(self.date_from)} and {"-".join(self.date_until)}")
             self.services_to_move = rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
@@ -211,12 +211,13 @@ class Archive:
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
-            stderr.print(f"Asking our trusty API for resolution: {self.resolution_id}")
+            
+            stderr.print(f"Asking our trusty API about resolution: {self.resolution_id}")
             self.services_to_move = rest_api.get_request(
-                request_info = "services",
-                parameter1 = "serviceRequestNumber",
+                request_info = "resolutionFullData", 
+                parameter1 = "resolution", 
                 value1 = self.resolution_id
-            )
+        )
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -228,11 +229,8 @@ class Archive:
 
         # Obtain info from iSkyLIMS api with the conf_api info
 
-        if self.services_to_move is False:
-            stderr.print("Query to the API did not find anything(?)")
-            sys.exit(1)
-        else:
-            stderr.print("Obtained data from the API!")
+
+        print(self.services_to_move)
 
         # Calculate size of the directories (already in GB)
         stderr.print(
