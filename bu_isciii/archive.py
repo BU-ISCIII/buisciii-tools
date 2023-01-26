@@ -68,7 +68,7 @@ def ask_date():
         day_list = day_list[:date.today().day]
     
     # from the list, get the first and last item as limits for the function
-    day = bu_isciii.utils.prompt_day(lower_limit=day_list[0], upper_limit=day_list[-1])
+    day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]), upper_limit=int(day_list[-1]))
 
 
     return [str(year), str(chosen_month_number), day]

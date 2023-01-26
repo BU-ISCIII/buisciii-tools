@@ -78,7 +78,7 @@ def prompt_day(lower_limit,
             else:
                 return day
         except ValueError:
-            stderr.print(f"Ooops, seems like the answer '{day}' is not a valid day! Please specify the day for which you want to archive services.")
+            stderr.print(f"Ooops, seems like the answer '{day}' is not a valid day! Please specify the day for which you want to archive services (from {lower_limit} to {upper_limit}).")
 
 def prompt_service_dir_path():
     stderr.print("Service path to copy to execution temporal directory")
