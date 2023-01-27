@@ -94,7 +94,6 @@ class BioinfoDoc:
                 + "!"
             )
             sys.exit(1)
-        print(self.resolution_info)
         self.resolution_id = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
