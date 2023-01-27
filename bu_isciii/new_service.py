@@ -179,29 +179,44 @@ class NewService:
                 f.write(line)
 
     def create_symbolic_links(self):
+        samples_files = []
         for sample in self.service_samples:
             regex = os.path.join(
                 self.conf["fastq_repo"], sample["projectName"], "{}*"
             ).format(sample["sampleName"])
-            sample_files = glob.glob(regex)
-            if not sample_files:
+            sample_file = glob.glob(regex)
+            if sample_file:
+                samples_files.appned(sample_file)
+            else:
                 stderr.print(
                     "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project."
                     % regex
                 )
-
+        stderr.print(
+            "[blue] Service has %s number of selected samples in iSkyLIMS"
+            % len(self.service_samples)
+        )
+        stderr.print(
+            "[blue] %s number of samples where found to create symbolic links"
+            % len(samples_files)
+        )
+        if len(self.service_samples) != len(samples_files):
+            if not bu_isciii.utils.prompt_yn_question("Do you want to continue with the service creation?"):
+                stderr.print("Bye!")
+                sys.exit()
+        for file in samples_files:
             try:
-                for file in sample_files:
-                    os.symlink(
-                        file,
-                        os.path.join(self.full_path, "RAW", os.path.basename(file)),
-                    )
+                os.symlink(
+                    file,
+                    os.path.join(self.full_path, "RAW", os.path.basename(file)),
+                )
             except OSError as e:
                 stderr.print(
                     "[red]ERROR: Symbolic links creation failed for sample %s."
                     % sample["sampleName"]
                 )
                 stderr.print("Traceback: %s" % e)
+                sys.exit()
 
     def create_new_service(self):
         self.create_folder()
