@@ -94,7 +94,7 @@ class BioinfoDoc:
                 + "!"
             )
             sys.exit(1)
-        self.resolution_id = self.resolution_info["resolutions"][0][
+        self.service_folder = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
         self.resolution_number = self.resolution_info["resolutions"][0][
@@ -105,7 +105,7 @@ class BioinfoDoc:
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
         year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
-            self.path, self.doc_conf["services_path"], year, self.resolution_id
+            self.path, self.doc_conf["services_path"], year, self.service_folder
         )
         self.samples = self.resolution_info["samples"]
         self.handled_services = None
@@ -123,21 +123,21 @@ class BioinfoDoc:
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
-            log.info("Already creted the service folder for %s", self.resolution_id)
+            log.info("Already creted the service folder for %s", self.service_folder)
             stderr.print(
                 "[green] Skiping folder creation for service "
-                + self.resolution_id
+                + self.service_folder
                 + ". Trying with subfolders"
             )
             for folder in self.doc_conf["service_folder"]:
                 if os.path.exists(os.path.join(self.service_folder, folder)):
                     log.info(
                         "Already creted the service subfolders for %s",
-                        self.resolution_id,
+                        self.service_folder,
                     )
                     stderr.print(
                         "[green] Skiping folder creation for service "
-                        + self.resolution_id
+                        + self.service_folder
                         + "/"
                         + folder
                     )
@@ -147,7 +147,7 @@ class BioinfoDoc:
                         "[blue] Creating the service subfolderfolder "
                         + folder
                         + " for "
-                        + self.resolution_id
+                        + self.service_folder
                         + "!"
                     )
                     os.makedirs(
@@ -175,9 +175,9 @@ class BioinfoDoc:
                     )
 
         else:
-            log.info("Creating service folder for %s", self.resolution_id)
+            log.info("Creating service folder for %s", self.service_folder)
             stderr.print(
-                "[blue] Creating the service folder for " + self.resolution_id + "!"
+                "[blue] Creating the service folder for " + self.service_folder + "!"
             )
             for folder in self.doc_conf["service_folder"]:
                 os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
@@ -187,9 +187,9 @@ class BioinfoDoc:
     def create_markdown(self, file_path):
         """Create the markdown fetching the information from request api"""
         log.info(
-            "starting proccess to create markdown for service %s", self.resolution_id
+            "starting proccess to create markdown for service %s", self.service_folder
         )
-        stderr.print("[green] Creating markdown file for " + self.resolution_id + " !")
+        stderr.print("[green] Creating markdown file for " + self.service_folder + " !")
         log.info("Start creating the markdown file")
         markdown_data = {}
         # service related information
@@ -372,7 +372,7 @@ class BioinfoDoc:
         return None
 
     def sftp_tree(self):
-        sftp_path = os.path.join(self.sftp_folder, self.resolution_id)
+        sftp_path = os.path.join(self.sftp_folder, self.service_folder)
         try:
             tree_result = subprocess.run(
                 ["tree", sftp_path], capture_output=True, text=True, check=True
