@@ -77,10 +77,10 @@ class BioinfoDoc:
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
             "local_api_settings"
         )
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
-        self.resolution_info = rest_api.get_request(
+        self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
         # TODO: When delivery info can be downloaded from iSkyLIMS
@@ -405,6 +405,8 @@ class BioinfoDoc:
             sys.exit()
 
     def create_documentation(self):
+        if self.type == "delivery":
+            self.rest_api.put_request("updateState", "resolution", self.resolution_id, "state", "Delivery")
         self.create_structure()
         if self.type == "service_info":
             self.generate_documentation_files("service_info")
