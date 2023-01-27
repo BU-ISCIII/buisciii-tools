@@ -43,10 +43,10 @@ class NewService:
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
-        self.resolution_info = rest_api.get_request(
+        self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
@@ -208,6 +208,7 @@ class NewService:
         self.copy_template()
         self.create_samples_id()
         self.create_symbolic_links()
+        self.rest_api.put_request("updateState", "resolution", self.resolution_id, "state", "In%20Progress")
 
     def get_resolution_id(self):
         return self.resolution_id
