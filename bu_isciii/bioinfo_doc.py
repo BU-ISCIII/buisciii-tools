@@ -406,7 +406,9 @@ class BioinfoDoc:
 
     def create_documentation(self):
         if self.type == "delivery":
-            self.rest_api.put_request("updateState", "resolution", self.resolution_id, "state", "Delivery")
+            self.rest_api.put_request(
+                "updateState", "resolution", self.resolution_id, "state", "Delivery"
+            )
         self.create_structure()
         if self.type == "service_info":
             self.generate_documentation_files("service_info")

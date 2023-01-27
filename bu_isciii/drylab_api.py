@@ -49,18 +49,20 @@ class RestServiceApi:
             log.error("Unable to open connection towards iSkyLIMS")
             return False
 
-    def put_request(self, request_info, parameter1, value1, parameter2, value2, safe=True):
+    def put_request(
+        self, request_info, parameter1, value1, parameter2, value2, safe=True
+    ):
         url_http = str(
-        self.request_url
-        + request_info
-        + "?"
-        + parameter1
-        + "="
-        + value1
-        + "&"
-        + parameter2
-        + "="
-        + value2
+            self.request_url
+            + request_info
+            + "?"
+            + parameter1
+            + "="
+            + value1
+            + "&"
+            + parameter2
+            + "="
+            + value2
         )
         try:
             req = requests.put(url_http, headers=self.headers)
@@ -73,7 +75,7 @@ class RestServiceApi:
                     sys.exit()
                 else:
                     return req.status_code
-            #return json.loads(req.text)
+            # return json.loads(req.text)
             return True
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS")

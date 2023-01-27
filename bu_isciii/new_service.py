@@ -201,7 +201,9 @@ class NewService:
             % len(samples_files)
         )
         if len(self.service_samples) != len(samples_files):
-            if not bu_isciii.utils.prompt_yn_question("Do you want to continue with the service creation?"):
+            if not bu_isciii.utils.prompt_yn_question(
+                "Do you want to continue with the service creation?"
+            ):
                 stderr.print("Bye!")
                 sys.exit()
         for file in samples_files:
@@ -223,7 +225,9 @@ class NewService:
         self.copy_template()
         self.create_samples_id()
         self.create_symbolic_links()
-        self.rest_api.put_request("updateState", "resolution", self.resolution_id, "state", "In%20Progress")
+        self.rest_api.put_request(
+            "updateState", "resolution", self.resolution_id, "state", "In%20Progress"
+        )
 
     def get_resolution_id(self):
         return self.resolution_id
