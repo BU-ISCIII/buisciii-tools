@@ -62,7 +62,6 @@ class RestServiceApi:
         + "="
         + value2
         )
-        #url_http = str(self.request_url + request_info + "?" + parameter + "=" + value)
         try:
             req = requests.put(url_http, headers=self.headers)
             if req.status_code > 201:
