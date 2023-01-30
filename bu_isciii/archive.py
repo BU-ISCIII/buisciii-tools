@@ -108,7 +108,7 @@ def dir_comparison(dir1, dir2):
             return False
     return True
 
-def get_service_paths(conf, type, service):
+def get_service_paths(conf, ser_type, service):
     """
     Given a service, a conf and a type,
     get the path it would have in the
@@ -118,7 +118,7 @@ def get_service_paths(conf, type, service):
     # Path in archive
     archived = os.path.join(
         conf["archived_path"],
-        type,
+        ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
         service["serviceUserId"]["profile"]["profileClassificationArea"],
     )
@@ -126,7 +126,7 @@ def get_service_paths(conf, type, service):
     # Path out of archive
     non_archived = os.path.join(
         conf["data_path"],
-        type,
+        ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
         service["serviceUserId"]["profile"]["profileClassificationArea"],
     )
