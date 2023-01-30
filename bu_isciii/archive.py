@@ -228,7 +228,7 @@ class Archive:
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
-            )) for service_batch in rest_api.get_request(
+            ) for service_batch in rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
                 value1 = "-".join(self.date_from),
