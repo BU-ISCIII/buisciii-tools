@@ -240,11 +240,11 @@ class Archive:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
             
             stderr.print(f"Asking our trusty API about resolution: {self.resolution_id}")
-            self.services_to_move = rest_api.get_request(
+            self.services_to_move = [rest_api.get_request(
                     request_info = "serviceFullData", 
                     parameter1 = "resolution",
                     value1 = self.resolution_id
-                )
+                )]
         
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
