@@ -9,6 +9,8 @@ import shutil
 import sysrsync
 import rich
 import calendar
+import hashlib
+import tarfile
 from math import pow
 from datetime import date
 
@@ -114,13 +116,15 @@ def get_service_paths(conf, ser_type, service):
     Given a service, a conf and a type,
     get the path it would have in the
     archive, and outside of it
-    """
+
+    NOTE: for some services, the 'profileClassificationArea' is None, and the os.path.join may fail
+    
 
     print(f"archived_path : {conf['archived_path']}")
     print(f"ser_type : {ser_type}")
     print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
     print(f"area: {service['serviceUserId']['profile']['profileClassificationArea']}")
-
+    """
     # Path in archive
     archived = os.path.join(
         conf["archived_path"],
@@ -139,6 +143,7 @@ def get_service_paths(conf, ser_type, service):
 
     return archived, non_archived
 
+
 def get_dir_size(path):
     """
     Get the size of a given directory
@@ -152,18 +157,30 @@ def get_dir_size(path):
     return size
 
 
-def targz_dir():
+def targz_dir(tar_name, directory):
+    """
+    Generate a tar gz file with the contents of a directory 
+    """
+    try:
+        with tarfile.open(tar_name, "w:gz") as out_tar:
+            out_tar.add(directory)
+        return True
+    except Exception as e:
+        # Have to check which error to expect
+        return False
 
-    pass
+def get_md5(file):
+    """
+    Given a file, open it and digest to get the md5
+    NOTE: might be troublesome when infile is too big
+    Based on: 
+    https://www.quickprogrammingtips.com/python/how-to-calculate-md5-hash-of-a-file-in-python.html
+    """
+    with open(file,"rb") as infile:
+        infile = infile.read()
+        file_md5 = hashlib.md5(infile).hexdigest()
 
-    return
-
-
-def get_md5():
-
-    pass
-
-    return
+    return file_md5
 
 
 class Archive:
