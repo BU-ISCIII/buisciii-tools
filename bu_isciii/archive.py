@@ -117,7 +117,7 @@ def get_service_paths(conf, type, service):
 
     # Path in archive
     archived = os.path.join(
-        conf["archive"]["archive_path"],
+        conf["archived_path"],
         type,
         service["serviceUserId"]["profile"]["profileCenter"],
         service["serviceUserId"]["profile"]["profileClassificationArea"],
@@ -125,7 +125,7 @@ def get_service_paths(conf, type, service):
 
     # Path out of archive
     non_archived = os.path.join(
-        conf["archive"]["data_path"],
+        conf["data_path"],
         type,
         service["serviceUserId"]["profile"]["profileCenter"],
         service["serviceUserId"]["profile"]["profileClassificationArea"],
