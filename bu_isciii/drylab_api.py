@@ -16,7 +16,7 @@ class RestServiceApi:
         }
 
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
-    # by Guille: I used an fstring instead of all the + stuff, I think thats cleaner?
+    # by Guille: I used an f-string instead of all the + stuff, I think thats cleaner?
     def get_request(
         self, request_info, parameter1, value1, parameter2=None, value2=None, safe=True
     ):
