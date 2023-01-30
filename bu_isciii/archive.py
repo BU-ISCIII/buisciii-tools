@@ -268,7 +268,7 @@ class Archive:
         )
         self.total_size = sum([get_dir_size(directory) for directory in self.services_to_move]) * 9.31 * pow(10,-9)
         """
-        
+
         if self.type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
@@ -288,7 +288,7 @@ class Archive:
         
         # with a total size of {self.total_size:.2f} GB.
         if (bu_isciii.utils.prompt_selection(
-            f"The selection you want to file consists of {len(services_to_move)} services. Continue?",
+            f"The selection you want to file consists of {len(self.services_to_move)} services. Continue?",
             ["Yes, continue", "Hold up"])) == "Yes, continue":
 
             for service in self.services_to_move:
