@@ -115,6 +115,11 @@ def get_service_paths(conf, ser_type, service):
     archive, and outside of it
     """
 
+    print(f"archived_path : {conf['archived_path']}")
+    print(f"ser_type : {ser_type}")
+    print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
+    print(f"area: {service['serviceUserId']['profile']['profileClassificationArea']}")
+
     # Path in archive
     archived = os.path.join(
         conf["archived_path"],
