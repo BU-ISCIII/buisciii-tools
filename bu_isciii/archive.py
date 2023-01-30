@@ -10,7 +10,6 @@ import sysrsync
 import rich
 import calendar
 from math import pow
-from calendar import month_name
 from datetime import date
 
 # Local imports
@@ -49,9 +48,9 @@ def ask_date(previous_date=None):
     # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if year < date.today().year else month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
     # I found it easier the following way:
     if year < date.today().year:
-        month_list = [[num, month] for num, month in enumerate(month_name)][1:]
+        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:]
     else:
-        month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
+        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:date.today().month+1]
 
     # If there is a previous date
     # and year is the same as before, limit the quantity of months
