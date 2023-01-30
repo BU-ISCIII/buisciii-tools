@@ -146,6 +146,21 @@ def get_dir_size(path):
 
     return size
 
+
+def targz_dir():
+
+    pass
+
+    return
+
+
+def get_md5():
+
+    pass
+
+    return
+
+
 class Archive:
     """
     Class to perform the storage and retrieval
@@ -214,8 +229,8 @@ class Archive:
             
             stderr.print(f"Asking our trusty API about resolution: {self.resolution_id}")
             self.services_to_move = rest_api.get_request(
-                request_info = "resolutionFullData", 
-                parameter1 = "resolution", 
+                request_info = "serviceFullData", 
+                parameter1 = "resolution",
                 value1 = self.resolution_id
         )
 
