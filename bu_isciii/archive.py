@@ -216,7 +216,7 @@ class Archive:
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
 
-            self.services_to_move = [get_service_paths(conf, "aaaa", rest_api.get_request(
+            self.services_to_move = [get_service_paths(self.conf, "aaaa", rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
