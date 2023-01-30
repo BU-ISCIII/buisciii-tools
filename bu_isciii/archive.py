@@ -119,16 +119,16 @@ def get_service_paths(conf, type, service):
     archived = os.path.join(
         conf["archive_path"],
         type,
-        service["serviceUserId"]["Center"],
-        service["serviceUserId"]["Area"],
+        service["serviceUserId"]["profile"]["profileCenter"],
+        service["serviceUserId"]["profile"]["profileClassificationArea"],
     )
 
     # Path out of archive
     non_archived = os.path.join(
         conf["data_path"],
         type,
-        service["serviceUserId"]["Center"],
-        service["serviceUserId"]["Area"],
+        service["serviceUserId"]["profile"]["profileCenter"],
+        service["serviceUserId"]["profile"]["profileClassificationArea"],
     )
 
     return archived, non_archived
@@ -215,23 +215,30 @@ class Archive:
             self.date_until = ask_date(previous_date=self.date_from)
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
-            self.services_to_move = rest_api.get_request(
+            self.services_to_move = [rest_api.get_request(
+                request_info = "serviceFullData"
+                parameter1= "resolution"
+                value1 = f"{service_batch["serviceRequestNumber"]}.1"
+            ) for service_batch in rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
                 value1 = "-".join(self.date_from),
                 parameter2 = "date_until",
                 value2 = "-".join(self.date_until)
-            )
+            )]
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
             
             stderr.print(f"Asking our trusty API about resolution: {self.resolution_id}")
             self.services_to_move = rest_api.get_request(
-                request_info = "serviceFullData", 
-                parameter1 = "resolution",
-                value1 = self.resolution_id
-        )
+                    request_info = "serviceFullData", 
+                    parameter1 = "resolution",
+                    value1 = self.resolution_id
+                )
+        
+            
+
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
