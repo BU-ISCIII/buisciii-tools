@@ -108,6 +108,7 @@ def dir_comparison(dir1, dir2):
             return False
     return True
 
+
 def get_service_paths(conf, ser_type, service):
     """
     Given a service, a conf and a type,
@@ -221,7 +222,9 @@ class Archive:
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
 
-            self.services_to_move = [get_service_paths(self.conf, "aaaa", rest_api.get_request(
+            # Get individual serviceFullData for each data  
+            # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice
+            self.services_to_move = [rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
@@ -243,7 +246,6 @@ class Archive:
                     value1 = self.resolution_id
                 )
         
-
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
 
@@ -257,13 +259,14 @@ class Archive:
         print(self.services_to_move)
 
         # Calculate size of the directories (already in GB)
+        """
         stderr.print(
             "Calculating total size of the directories to be filed.",
             highlight=False,
         )
         self.total_size = sum([get_dir_size(directory) for directory in self.services_to_move]) * 9.31 * pow(10,-9)
 
-        if type is None:
+        if self.type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
                 ["services_and_colaborations", "research"],
@@ -274,7 +277,7 @@ class Archive:
                 "Options",
                 ["archive", "retrieve"],
             )
-
+        """
     def archive(self):
         """
         Archive services in selected year and month
