@@ -215,10 +215,11 @@ class Archive:
             self.date_until = ask_date(previous_date=self.date_from)
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
+
             self.services_to_move = [rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
-                value1 = f"{service_batch["serviceRequestNumber"]}.1",
+                value1 = f"{service_batch['serviceRequestNumber']}.1",
             ) for service_batch in rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
