@@ -236,6 +236,8 @@ class Archive:
                 value2 = "-".join(self.date_until),
             )]
 
+            stderr.print(f"Found {len(self.services_to_move)} services in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
+
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
             
@@ -265,7 +267,8 @@ class Archive:
             highlight=False,
         )
         self.total_size = sum([get_dir_size(directory) for directory in self.services_to_move]) * 9.31 * pow(10,-9)
-
+        """
+        
         if self.type is None:
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
@@ -277,14 +280,15 @@ class Archive:
                 "Options",
                 ["archive", "retrieve"],
             )
-        """
+        
     def archive(self):
         """
         Archive services in selected year and month
         """      
-
+        
+        # with a total size of {self.total_size:.2f} GB.
         if (bu_isciii.utils.prompt_selection(
-            f"The selection you want to file consists of {len(services_to_move)} services, with a total size of {self.total_size:.2f} GB. Continue?",
+            f"The selection you want to file consists of {len(services_to_move)} services. Continue?",
             ["Yes, continue", "Hold up"])) == "Yes, continue":
 
             for service in self.services_to_move:
