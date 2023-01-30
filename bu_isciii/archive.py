@@ -216,11 +216,11 @@ class Archive:
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
 
-            self.services_to_move = [rest_api.get_request(
+            self.services_to_move = [get_service_paths(conf, "aaaa", rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
-            ) for service_batch in rest_api.get_request(
+            )) for service_batch in rest_api.get_request(
                 request_info = "services",
                 parameter1 = "date_from", 
                 value1 = "-".join(self.date_from),
@@ -238,8 +238,6 @@ class Archive:
                     value1 = self.resolution_id
                 )
         
-            
-
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
