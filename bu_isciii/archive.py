@@ -229,7 +229,6 @@ class Archive:
 
         # Obtain info from iSkyLIMS api with the conf_api info
 
-
         print(self.services_to_move)
 
         # Calculate size of the directories (already in GB)
