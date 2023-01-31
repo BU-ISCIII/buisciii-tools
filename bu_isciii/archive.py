@@ -344,7 +344,7 @@ class Archive:
         for service in self.services_to_move:
             # stderr.print(service["servicFolderName"])
             source = os.path.join(
-                self.conf["archive_path"],
+                self.conf["archived_path"],
                 self.type,
                 service["serviceUserId"]["Center"],
                 service["serviceUserId"]["Area"],
