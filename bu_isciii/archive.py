@@ -123,14 +123,14 @@ def get_service_paths(conf, ser_type, service):
     print(f"archived_path : {conf['archived_path']}")
     print(f"ser_type : {ser_type}")
     print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
-    print(f"area: {service['serviceUserId']['profile']['profileClassificationArea']}")
+    print(f"area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}")
 
     # Path in archive
     archived = os.path.join(
         conf["archived_path"],
         ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
-        service["serviceUserId"]["profile"]["profileClassificationArea"],
+        service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
     )
 
     # Path out of archive
@@ -138,7 +138,7 @@ def get_service_paths(conf, ser_type, service):
         conf["data_path"],
         ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
-        service["serviceUserId"]["profile"]["profileClassificationArea"],
+        service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
     )
 
     return archived, non_archived
