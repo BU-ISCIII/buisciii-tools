@@ -119,12 +119,12 @@ def get_service_paths(conf, ser_type, service):
 
     NOTE: for some services, the 'profileClassificationArea' is None, and the os.path.join may fail
     
-
+    """
     print(f"archived_path : {conf['archived_path']}")
     print(f"ser_type : {ser_type}")
     print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
     print(f"area: {service['serviceUserId']['profile']['profileClassificationArea']}")
-    """
+
     # Path in archive
     archived = os.path.join(
         conf["archived_path"],
@@ -345,6 +345,12 @@ class Archive:
 
         for service in self.services_to_move:
             # stderr.print(service["servicFolderName"])
+
+            print(f"archived_path : {self.conf['archived_path']}")
+            print(f"type: {self.type}")
+            print(f"profileCenter: {service['serviceUserId']['profile']['profileCenter']}")
+            print(f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}")
+
             source = os.path.join(
                 self.conf["archived_path"],
                 self.type,
