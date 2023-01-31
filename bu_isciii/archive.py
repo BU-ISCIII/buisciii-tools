@@ -288,12 +288,14 @@ class Archive:
         """
 
         if self.type is None:
+            stderr.print(f"Working with a service, or a research resolution?")
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
                 ["services_and_colaborations", "research"],
             )
 
         if option is None:
+            stderr.print(f"Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
                 ["archive", "retrieve"],
