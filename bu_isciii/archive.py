@@ -169,6 +169,7 @@ def targz_dir(tar_name, directory):
         # Have to check which error to expect
         return False
 
+
 def get_md5(file):
     """
     Given a file, open it and digest to get the md5
