@@ -346,15 +346,15 @@ class Archive:
             source = os.path.join(
                 self.conf["archived_path"],
                 self.type,
-                service["serviceUserId"]["Center"],
-                service["serviceUserId"]["Area"],
+                service["serviceUserId"]["profile"]["profileCenter"],
+                service["serviceUserId"]["profile"]["profileClassificationArea"],
             )
 
             dest = os.path.join(
                 self.conf["data_path"],
                 self.type,
-                service["serviceUserId"]["Center"],
-                service["serviceUserId"]["Area"],
+                service["serviceUserId"]["profile"]["profileCenter"],
+                service["serviceUserId"]["profile"]["profileClassificationArea"],
             )
 
             try:
