@@ -347,14 +347,14 @@ class Archive:
                 self.conf["archived_path"],
                 self.type,
                 service["serviceUserId"]["profile"]["profileCenter"],
-                service["serviceUserId"]["profile"]["profileClassificationArea"],
+                service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
             )
 
             dest = os.path.join(
                 self.conf["data_path"],
                 self.type,
                 service["serviceUserId"]["profile"]["profileCenter"],
-                service["serviceUserId"]["profile"]["profileClassificationArea"],
+                service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
             )
 
             try:
