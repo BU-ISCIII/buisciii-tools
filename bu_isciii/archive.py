@@ -258,7 +258,7 @@ class Archive:
                 stderr.print(f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!")
                 sys.exit()
             else: 
-                stderr.print(f"Found {len(self.services_to_move)} services in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
+                stderr.print(f"Found {len(services_batch)} service(s) within the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
             
             # Get individual serviceFullData for each data
             # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
@@ -284,8 +284,8 @@ class Archive:
                     safe = False
                 )]
         
-            if isinstance(services_batch[0], int):
-                stderr.print(f"No services named {self.resolution_id} were found. Connection seemed right though!")
+            if isinstance(self.services_to_move[0], int):
+                stderr.print(f"No services named '{self.resolution_id}' were found. Connection seemed right though!")
                 sys.exit()
         
         # Get configuration params from configuration.json
