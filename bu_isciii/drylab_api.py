@@ -32,13 +32,9 @@ class RestServiceApi:
         else:
             url_http = f"{self.request_url}{request_info}?{parameter1}={value1}&{parameter2}={value2}"
         try:
-            # print(url_http)
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
                 if safe:
-                    stderr.print(
-                        f"Resolution ID '{value1}' does not exist. Status code: {req.status_code}",
-                    )
                     log.info(
                         f"Resolution ID does not exist. Status code: {req.status_code}"
                     )
