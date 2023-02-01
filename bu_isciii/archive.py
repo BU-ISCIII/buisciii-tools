@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Generic imports
-# import sys
+import sys
 import os
 import logging
 import filecmp
@@ -232,6 +232,7 @@ class Archive:
         )
 
         if self.quantity == "Batch":
+
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
@@ -240,37 +241,52 @@ class Archive:
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
 
+            # Ask the API for services within the range
+            # safe is False, so instead of exiting, an error code will be returned
+            services_batch = rest_api.get_request(
+                            request_info = "services",
+                            parameter1 = "date_from", 
+                            value1 = "-".join(self.date_from),
+                            parameter2 = "date_until",
+                            value2 = "-".join(self.date_until),
+                            safe = False,
+                        )
+
+            # if int (if error code), must be only bc status > 200
+            # Check drylab_api.get_request
+            if isinstance(services_batch, int):
+                stderr.print(f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!")
+                sys.exit()
+            else: 
+                stderr.print(f"Found {len(self.services_to_move)} services in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
+            
             # Get individual serviceFullData for each data
-            # Done in list comprehension to avoid creating useless objects
             # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
             self.services_to_move = [rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
-            ) for service_batch in rest_api.get_request(
-                request_info = "services",
-                parameter1 = "date_from", 
-                value1 = "-".join(self.date_from),
-                parameter2 = "date_until",
-                value2 = "-".join(self.date_until),
-            )]
+                ) for service_batch in services_batch]
             
-            if len(self.services_to_move) == 0:
-                stderr.print(f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
-                sys.exit()
-            else:
-                stderr.print(f"Found {len(self.services_to_move)} services in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
+            # services_batch does not seem useful from now on, so delete it from memory
+            del services_batch
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
             
             stderr.print(f"Asking our trusty API about resolution: {self.resolution_id}")
+
+            # Hold the results in a list so it can be accessed just like in the batch
             self.services_to_move = [rest_api.get_request(
                     request_info = "serviceFullData", 
                     parameter1 = "resolution",
-                    value1 = self.resolution_id
+                    value1 = self.resolution_id,
+                    safe = False
                 )]
-            print(self.services_to_move)
+        
+            if isinstance(services_batch[0], int):
+                stderr.print(f"No services named {self.resolution_id} were found. Connection seemed right though!")
+                sys.exit()
         
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -283,7 +299,7 @@ class Archive:
         # Obtain info from iSkyLIMS api with the conf_api info
 
         print(self.services_to_move)
-
+            
         # Calculate size of the directories (already in GB)
         """
         stderr.print(
