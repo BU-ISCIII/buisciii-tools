@@ -240,8 +240,9 @@ class Archive:
             
             stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
 
-            # Get individual serviceFullData for each data  
-            # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice
+            # Get individual serviceFullData for each data
+            # Done in list comprehension to avoid creating useless objects
+            # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
             self.services_to_move = [rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
@@ -253,8 +254,12 @@ class Archive:
                 parameter2 = "date_until",
                 value2 = "-".join(self.date_until),
             )]
-
-            stderr.print(f"Found {len(self.services_to_move)} services in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
+            
+            if len(self.services_to_move) == 0:
+                stderr.print(f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
+                sys.exit()
+            else:
+                stderr.print(f"Found {len(self.services_to_move)} services in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -265,6 +270,7 @@ class Archive:
                     parameter1 = "resolution",
                     value1 = self.resolution_id
                 )]
+            print(self.services_to_move)
         
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
