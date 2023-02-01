@@ -3,9 +3,16 @@ import logging
 import json
 import requests
 import sys
+import rich
+import bu_isciii.utils
 
 log = logging.getLogger(__name__)
-
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=bu_isciii.utils.rich_force_colors(),
+)
 
 class RestServiceApi:
     def __init__(self, server, url, password):
@@ -25,10 +32,13 @@ class RestServiceApi:
         else:
             url_http = f"{self.request_url}{request_info}?{parameter1}={value1}&{parameter2}={value2}"
         try:
-            print(url_http)
+            # print(url_http)
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
                 if safe:
+                    stderr.print(
+                        f"Resolution ID '{value1}' does not exist. Status code: {req.status_code}",
+                    )
                     log.info(
                         f"Resolution ID does not exist. Status code: {req.status_code}"
                     )
