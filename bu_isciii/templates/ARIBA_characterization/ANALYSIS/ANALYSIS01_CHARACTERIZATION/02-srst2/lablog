@@ -1,0 +1,9 @@
+# conda activate srst2
+# NOTE: DUE TO THE DEPENDENCY OF SRST2 WITH FILES
+# THIS LABLOG HAS NOT BEEN MODIFIED PRIOR ITS INCLUSION IN THE TOOLS
+
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat ../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir $scratch_dir --time 02:00:00 --output logs/SRST2.@@.%j.log srst2 --input_pe ../01-preprocessing/@@_1.trim.fastq.gz ../01-preprocessing/@@_2.trim.fastq.gz --forward \"_1.trim\" --reverse \"_2.trim\" --output @@ --log --mlst_db ../../../REFERENCES/Burkholderia_pseudomallei_mlst.fasta --mlst_definitions ../../../REFERENCES/Burkholderia_pseudomallei_profile.txt --mlst_delimiter \"_\" --threads 10 &" > _01_srst2_mlst.sh

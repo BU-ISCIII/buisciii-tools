@@ -67,8 +67,6 @@
       "delivery_md": "",
       "delivery_pdf": ""
   },
-
-
     "plasmidid_assembly": {
       "label": "",
       "template": "plasmidid_assembly",
@@ -201,9 +199,26 @@
         "folders":[""],
         "files":[]
       },
-      "no_copy": ["RAW", "TMP"],
+      "no_copy": ["RAW", "TMP", "00-reads"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "ariba_characterization": {
+      "label": "",
+      "template": "ARIBA_characterization",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "delivery_pdf": ""
     }
+    
 }
