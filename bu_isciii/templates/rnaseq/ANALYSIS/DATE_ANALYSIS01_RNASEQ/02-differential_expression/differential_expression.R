@@ -361,8 +361,13 @@ differential_plots <- function(res_de, de_results, ntd_subset, dds_subset){
   df <- as.data.frame(colData(dds_subset)[,c("condition")])
   colnames(df) <- c("condition")
   rownames(df) <- colnames(ntd_subset)
+  to_plot <- assay_ntd[select,]
+  to_plot_geneid <- as.data.frame(rownames(to_plot))
+  colnames(to_plot_geneid) <- "GeneID"
+  to_plot_geneid_merged <- merge(x = to_plot_geneid, y = gene_genename, by.x="GeneID", by.y = "GENEID", all.x = TRUE, all.y = FALSE)
+  rownames(to_plot) <- to_plot_geneid_merged$gene_name
   pdf(file="Differential_expression/DESeq2/heatmapCount_top20_differentially_expressed.pdf")
-  pheatmap(assay(ntd_subset)[select,], cluster_rows=TRUE, show_rownames=TRUE,
+  pheatmap(to_plot, cluster_rows=TRUE, show_rownames=TRUE,
            cluster_cols=TRUE, annotation_col=df, main="Top 20 significant genes")
   dev.off()
 }
@@ -436,8 +441,15 @@ quality_plots <- function(data_subset){
   df <- as.data.frame(colData(data_subset$subset_dds)[,c("condition")])
   colnames(df) <- c("Condition")
   rownames(df) <- colnames(data_subset$subset_ntd)
+  
+  to_plot <- assay(data_subset$subset_ntd)[select,]
+  to_plot_geneid <- as.data.frame(rownames(to_plot))
+  colnames(to_plot_geneid) <- "GeneID"
+  to_plot_geneid_merged <- merge(x = to_plot_geneid, y = gene_genename, by.x="GeneID", by.y = "GENEID", all.x = TRUE, all.y = FALSE)
+  rownames(to_plot) <- to_plot_geneid_merged$gene_name
+  
   pdf(file="Quality_plots/DESeq2/heatmapCount_top20_highest_expression.pdf")
-  pheatmap(assay(data_subset$subset_ntd)[select,], cluster_rows=FALSE, show_rownames=TRUE,
+  pheatmap(to_plot, cluster_rows=FALSE, show_rownames=TRUE,
            cluster_cols=TRUE, annotation_col=df, main="Normalized counts top 20 more expressed genes")
   dev.off()
 
