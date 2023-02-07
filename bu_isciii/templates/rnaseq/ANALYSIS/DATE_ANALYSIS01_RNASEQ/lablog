@@ -19,16 +19,18 @@ cat <<EOF > rnaseq.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /scratch/bi/pipelines/nf-core-rnaseq-3.5/workflow/main.nf \\
+/data/bi/pipelines/nf-core-rnaseq-3.10.1/workflow/main.nf \\
           -c ../../DOC/hpc_slurm_rnaseq.config \\
           -resume \\
           --input samplesheet.csv \\
           --outdir 01-$(date '+%Y%m%d')_rnaseq \\
-          --genome 'GRCh38' \\
+          --fasta '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/Homo_sapiens.GRCh38.dna.toplevel.fa' \\
+          --gtf '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/gene/Homo_sapiens.GRCh38.98.gtf' \\
+          --star_index '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/star_V2.7.10a/' \\
+          --salmon_index '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/salmon_v1.9.0' \\
           --save_align_intermeds \\
           --skip_markduplicates \\
-          --pseudo_aligner salmon \\
-          --saveTrimmed
+          --pseudo_aligner salmon
 EOF
 
 echo "sbatch rnaseq.sbatch" > _01_run_rnaseq.sh
