@@ -53,7 +53,7 @@ do
   cp _02_create_run_percentage_Ns.sh ${FOLDER_NAME}/
   printf 'echo "bash create_summary_report.sh" > _04_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
   cp create_assembly_stats.R ${FOLDER_NAME}/
-  echo "#module load R/4.1.0-foss-2021a" >> ${FOLDER_NAME}/lablog
+  echo "#module load R/4.2.1" >> ${FOLDER_NAME}/lablog
   printf 'echo "Rscript create_assembly_stats.R" > _05_create_stats_assembly.sh\n\n' >> ${FOLDER_NAME}/lablog
   printf 'echo "bash deduplicate_long_table.sh" > _06_deduplicate_long_table.sh\n\n' >> ${FOLDER_NAME}/lablog
 
