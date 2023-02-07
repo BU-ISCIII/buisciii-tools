@@ -2,7 +2,7 @@ ln -s ../00-reads/ .
 ln -s ../samples_id.txt .
 cat samples_id.txt | xargs -I % echo -e "%\tXY\t0\t%\t1\t00-reads/%_R1.fastq.gz\t00-reads/%_R2.fastq.gz" > samples.tsv
 
-#module load Nextflow singularity
+#module load Nextflow/21.10.6 singularity
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
