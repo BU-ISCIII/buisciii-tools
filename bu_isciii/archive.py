@@ -83,7 +83,6 @@ class Archive:
     """
 
     def __init__(self, resolution_id=None, type=None, year=None, option=None):
-
         # resolution_id = Nombre de la resolución
         # type = services_and_colaborations // research
         # year = año

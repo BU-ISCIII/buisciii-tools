@@ -42,16 +42,14 @@ class BioinfoDoc:
                 msg="Select the documentation type you want to create",
                 choices=["service_info", "delivery"],
             )
-        self.doc_conf = bu_isciii.config_json.ConfigJson().get_configuration(
-            "bioinfo_doc"
-        )
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
                 self.path = bu_isciii.utils.prompt_path(
                     msg="Path where bioinfo_doc folder is mounted in your local WS."
                 )
             else:
-                self.path = os.path.normpath(self.doc_conf["bioinfodoc_path"])
+                self.path = os.path.normpath(self.conf["bioinfodoc_path"])
         else:
             self.path = path
         if not os.path.exists(self.path):
@@ -87,6 +85,10 @@ class BioinfoDoc:
         # resolution_info = rest_api.get_request(
         #    "resolutionFullData", "delivery", self.resolution_id
         # )
+        if self.type == "delivery":
+            self.rest_api.put_request(
+                "updateState", "resolution", self.resolution_id, "state", "Delivery"
+            )
         if not self.resolution_info:
             stderr.print(
                 "[red] Unable to fetch information for resolution "
@@ -94,7 +96,7 @@ class BioinfoDoc:
                 + "!"
             )
             sys.exit(1)
-        self.service_folder = self.resolution_info["resolutions"][0][
+        self.service_name = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
         self.resolution_number = self.resolution_info["resolutions"][0][
@@ -105,21 +107,21 @@ class BioinfoDoc:
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
         year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
-            self.path, self.doc_conf["services_path"], year, self.service_folder
+            self.path, self.conf["services_path"], year, self.service_name
         )
         self.samples = self.resolution_info["samples"]
         self.handled_services = None
-        path_to_wkhtmltopdf = os.path.normpath(self.doc_conf["wkhtmltopdf_path"])
+        path_to_wkhtmltopdf = os.path.normpath(self.conf["wkhtmltopdf_path"])
         self.config_pdfkit = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
         if self.type == "service_info":
-            self.template_file = self.doc_conf["service_info_template_path_file"]
+            self.template_file = self.conf["service_info_template_path_file"]
         else:
-            self.template_file = self.doc_conf["delivery_template_path_file"]
+            self.template_file = self.conf["delivery_template_path_file"]
         self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"
         ]
-        self.service_info_folder = self.doc_conf["service_folder"][0]
-        self.service_result_folder = self.doc_conf["service_folder"][1]
+        self.service_info_folder = self.conf["service_folder"][0]
+        self.service_result_folder = self.conf["service_folder"][1]
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -129,7 +131,7 @@ class BioinfoDoc:
                 + self.service_folder
                 + ". Trying with subfolders"
             )
-            for folder in self.doc_conf["service_folder"]:
+            for folder in self.conf["service_folder"]:
                 if os.path.exists(os.path.join(self.service_folder, folder)):
                     log.info(
                         "Already creted the service subfolders for %s",
@@ -179,7 +181,7 @@ class BioinfoDoc:
             stderr.print(
                 "[blue] Creating the service folder for " + self.service_folder + "!"
             )
-            for folder in self.doc_conf["service_folder"]:
+            for folder in self.conf["service_folder"]:
                 os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
             log.info("Service folders created")
         return
@@ -257,10 +259,10 @@ class BioinfoDoc:
         file_name += ".html"
         html_template_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
-            self.doc_conf["html_template_path_file"],
+            self.conf["html_template_path_file"],
         )
         css_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), self.doc_conf["path_to_css"]
+            os.path.dirname(os.path.realpath(__file__)), self.conf["path_to_css"]
         )
         with open(html_template_file, "r") as fh:
             file_read = fh.read()
@@ -405,10 +407,6 @@ class BioinfoDoc:
             sys.exit()
 
     def create_documentation(self):
-        if self.type == "delivery":
-            self.rest_api.put_request(
-                "updateState", "resolution", self.resolution_id, "state", "Delivery"
-            )
         self.create_structure()
         if self.type == "service_info":
             self.generate_documentation_files("service_info")
