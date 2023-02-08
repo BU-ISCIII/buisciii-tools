@@ -42,9 +42,7 @@ class BioinfoDoc:
                 msg="Select the documentation type you want to create",
                 choices=["service_info", "delivery"],
             )
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration(
-            "bioinfo_doc"
-        )
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
                 self.path = bu_isciii.utils.prompt_path(
