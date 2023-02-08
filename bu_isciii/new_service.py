@@ -5,7 +5,7 @@ import sys
 import os
 import logging
 import glob
-
+import json
 import shutil
 import rich
 
@@ -220,11 +220,21 @@ class NewService:
                 stderr.print("Traceback: %s" % e)
                 sys.exit()
 
+    def samples_json(self):
+        json_samples = json.dumps(self.service_samples, indent = 4)
+        service_path = self.get_service_paths(self.conf)
+        json_file_name =  self.resolution_id + ".json"
+        json_samples_file = os.path.join(service_path, self.service_folder, "RAW", json_file_name)
+        f = open(json_samples_file, "w")
+        f.write(json_samples)
+        f.close()
+
     def create_new_service(self):
         self.create_folder()
         self.copy_template()
         self.create_samples_id()
         self.create_symbolic_links()
+        self.samples_json()
         self.rest_api.put_request(
             "updateState", "resolution", self.resolution_id, "state", "In%20Progress"
         )
