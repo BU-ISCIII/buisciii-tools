@@ -87,6 +87,10 @@ class BioinfoDoc:
         # resolution_info = rest_api.get_request(
         #    "resolutionFullData", "delivery", self.resolution_id
         # )
+        if self.type == "delivery":
+            self.rest_api.put_request(
+                "updateState", "resolution", self.resolution_id, "state", "Delivery"
+            )
         if not self.resolution_info:
             stderr.print(
                 "[red] Unable to fetch information for resolution "
@@ -405,10 +409,6 @@ class BioinfoDoc:
             sys.exit()
 
     def create_documentation(self):
-        if self.type == "delivery":
-            self.rest_api.put_request(
-                "updateState", "resolution", self.resolution_id, "state", "Delivery"
-            )
         self.create_structure()
         if self.type == "service_info":
             self.generate_documentation_files("service_info")
