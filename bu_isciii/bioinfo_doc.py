@@ -98,7 +98,7 @@ class BioinfoDoc:
                 + "!"
             )
             sys.exit(1)
-        self.service_folder = self.resolution_info["resolutions"][0][
+        self.service_name = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
         self.resolution_number = self.resolution_info["resolutions"][0][
