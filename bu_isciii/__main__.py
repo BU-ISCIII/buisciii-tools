@@ -112,7 +112,6 @@ class CustomHelpOrder(click.Group):
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
 def bu_isciii_cli(verbose, log_file):
-
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
