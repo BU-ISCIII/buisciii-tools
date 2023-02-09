@@ -5,3 +5,4 @@ kraken2_db: '/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_
 variant_caller: 'ivar'
 consensus_caller: 'bcftools'
 skip_assembly: true
+nextclade_dataset_name: 'sars-cov-2'
