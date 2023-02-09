@@ -61,6 +61,8 @@ class BioinfoDoc:
             self.sftp_folder = bu_isciii.utils.prompt_path(
                 msg="Absolute path to sftp folfer containing service folder"
             )
+        else:
+            self.sftp_folder = sftp_folder
         self.report_pdf = report_pdf
         if self.report_pdf is not None:
             if os.path.exists(report_pdf):
