@@ -5,5 +5,5 @@ cd $(date '+%Y%m%d')_entrega01
 #Individual files
 ln -s ../../ANALYSIS/*_MET/99-stats/multiqc_report.html ./krona_results.html
 ln -s ../../ANALYSIS/*FLU_IRMA/04-irma/all_samples_completo.txt .
-ln -s ../../ANALYSIS/*FLU_IRMA/04-irma/H* .
-unlink HA_types.txt
+ln -s ../../ANALYSIS/*FLU_IRMA/04-irma/A_H* .
+ln -s ../../ANALYSIS/*FLU_IRMA/04-irma/B .
