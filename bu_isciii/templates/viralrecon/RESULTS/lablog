@@ -11,8 +11,8 @@ mkdir blast
 #Create symbolic links depending on the analysis
 #Individual files
 ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
-ln -s ../../ANALYSIS/*/mapping_illumina.xlsx ./mapping_illumina.xlsx
-ln -s ../../ANALYSIS/*/*/variants/ivar/variants_long_table.xlsx ./variants_long_table.xlsx
+ln -s ../../ANALYSIS/*/mapping_illumina*.xlsx ./mapping_illumina.xlsx
+ln -s ../../ANALYSIS/*/*/variants/ivar/variants_long_table*.xlsx ./
 ln -s ../../ANALYSIS/*/*/variants/ivar/consensus/bcftools/pangolin/pangolin.xlsx ./pangolin.xlsx
 ln -s ../../ANALYSIS/*/*/variants/ivar/consensus/bcftools/nextclade/nextclade.xlsx ./nextclade.xlsx
 ln -s ../../ANALYSIS/*/assembly_stats.xlsx ./assembly_stats.xlsx
