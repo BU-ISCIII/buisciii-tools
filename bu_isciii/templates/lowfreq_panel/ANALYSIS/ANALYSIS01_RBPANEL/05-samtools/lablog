@@ -22,7 +22,7 @@ SAMPLE_LIST=(\$(<$samples_file))
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 
 mkdir \$SAMPLE
-samtools mpileup -A -d 20000 -Q 0 -f /data/bi/references/eukaria/homo_sapiens/hg38/UCSC/genome/hg38.fullAnalysisSet.fa ../04-mapping/\${SAMPLE}/\${SAMPLE}_sorted.bam > \${SAMPLE}/\${SAMPLE}.pileup
+samtools mpileup -A -d 20000 -Q 0 -f /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ../04-mapping/\${SAMPLE}/\${SAMPLE}_sorted.bam > \${SAMPLE}/\${SAMPLE}.pileup
 
 EOF
 

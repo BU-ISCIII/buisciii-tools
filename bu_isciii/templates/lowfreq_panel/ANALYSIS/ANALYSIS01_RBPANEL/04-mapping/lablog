@@ -24,7 +24,7 @@ SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 echo \$SAMPLE
 
 mkdir \$SAMPLE
-bwa mem -t 4 /data/bi/references/eukaria/homo_sapiens/hg38/UCSC/genome/hg38.fullAnalysisSet.fa ../02-preprocessing/\$SAMPLE/\${SAMPLE}_R1_filtered.fastq.gz ../02-preprocessing/\$SAMPLE/\${SAMPLE}_R2_filtered.fastq.gz | samtools view -bS -o \$SAMPLE/\${SAMPLE}.bam -
+bwa mem -t 4 /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ../02-preprocessing/\$SAMPLE/\${SAMPLE}_R1_filtered.fastq.gz ../02-preprocessing/\$SAMPLE/\${SAMPLE}_R2_filtered.fastq.gz | samtools view -bS -o \$SAMPLE/\${SAMPLE}.bam -
 samtools sort \${SAMPLE}/\${SAMPLE}.bam -T \${SAMPLE}_sorted -o \${SAMPLE}/\${SAMPLE}_sorted.bam
 samtools index \${SAMPLE}/\${SAMPLE}_sorted.bam
 rm \${SAMPLE}/\${SAMPLE}.bam
