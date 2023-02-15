@@ -159,11 +159,11 @@ class CopySftp:
             os.path.dirname(__file__), "templates", "sftp_user.json"
         )
         user_sftp_file = open(json_file)
-        self.json_data = json.load(user_sftp_file)
+        json_data = json.load(user_sftp_file)
         user_sftp_file.close()
-        for user_sftp in self.json_data:
+        for user_sftp in json_data:
             if user_sftp == service_user:
-                sftp_folders_list = self.json_data[user_sftp]
+                sftp_folders_list = json_data[user_sftp]
         if len(sftp_folders_list) == 1:
             sftp_folder = os.path.join(conf["data_path"], "sftp", sftp_folders_list[0])
         else:
