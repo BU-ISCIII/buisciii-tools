@@ -14,6 +14,7 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
+
 class RestServiceApi:
     def __init__(self, server, url, password):
         self.request_url = server + url
@@ -27,10 +28,12 @@ class RestServiceApi:
     def get_request(
         self, request_info, parameter1, value1, parameter2=None, value2=None, safe=True
     ):
-        if parameter2 is None:
-            url_http = f"{self.request_url}{request_info}?{parameter1}={value1}"
-        else:
-            url_http = f"{self.request_url}{request_info}?{parameter1}={value1}&{parameter2}={value2}"
+        url_http = (
+            f"{self.request_url}{request_info}?{parameter1}={value1}"
+            if parameter2 is None
+            else f"{self.request_url}{request_info}?{parameter1}={value1}&{parameter2}={value2}"
+        )
+        print(url_http)
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
@@ -38,6 +41,7 @@ class RestServiceApi:
                     log.info(
                         f"Resolution ID does not exist. Status code: {req.status_code}"
                     )
+                    stderr.print(f"Resolution {value1} not found")
                     sys.exit()
                 else:
                     return req.status_code
