@@ -259,14 +259,15 @@ class CleanUp:
 
         """
         self.check_path_exists()
-        workdir = []
+        workdirs = []
         # key: root, values: [[files inside], [dirs inside]]
         for root, dirs, files in os.walk(self.full_path):
             for name in dirs:
                 if name == "work":
                     if os.path.exists(os.path.join(root, name)):
                         workdir = os.path.join(root, name)
-        return workdir
+                        workdirs.append(workdir)
+        return workdirs
 
     def rename(self, to_find, add, verbose=True):
         """
@@ -380,7 +381,8 @@ class CleanUp:
         """
         work_dir = self.find_work()
         if work_dir:
-            shutil.rmtree(work_dir)
+            for work_folder in work_dir:
+                shutil.rmtree(work_folder)
         else:
             stderr.print("There is no work folder here")
 

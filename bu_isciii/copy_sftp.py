@@ -16,6 +16,7 @@
 import os
 import sys
 import logging
+import json
 from rich.console import Console
 import sysrsync
 from sysrsync.exceptions import RsyncError
@@ -55,11 +56,6 @@ class CopySftp:
         else:
             self.resolution_id = resolution_id
 
-        if sftp_folder is None:
-            self.sftp_folder = bu_isciii.utils.prompt_destination_path()
-        else:
-            self.sftp_folder = sftp_folder
-
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("sftp_copy")
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
@@ -72,6 +68,11 @@ class CopySftp:
         self.resolution_info = rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
+        if sftp_folder is None:
+            self.sftp_folder = self.get_sftp_folder(self.conf)
+        else:
+            self.sftp_folder = sftp_folder
+
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
         ]
@@ -151,6 +152,29 @@ class CopySftp:
             ].lower(),
         )
         return service_path
+
+    def get_sftp_folder(self, conf):
+        service_user = self.resolution_info["serviceUserId"]["username"]
+        json_file = os.path.join(
+            os.path.dirname(__file__), "templates", "sftp_user.json"
+        )
+        user_sftp_file = open(json_file)
+        json_data = json.load(user_sftp_file)
+        user_sftp_file.close()
+        for user_sftp in json_data:
+            if user_sftp == service_user:
+                sftp_folders_list = json_data[user_sftp]
+        if len(sftp_folders_list) == 1:
+            sftp_folder = os.path.join(conf["data_path"], "sftp", sftp_folders_list[0])
+        else:
+            sftp_final_folder = bu_isciii.utils.prompt_selection(
+                msg="Select SFTP folder to copy service.", choices=sftp_folders_list
+            )
+            sftp_folder = os.path.join(
+                self.conf["data_path"], "sftp", sftp_final_folder
+            )
+
+        return sftp_folder
 
     def listdirs(self, final_path):
         for path, subdirs, files in os.walk(final_path):
