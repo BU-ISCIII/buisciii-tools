@@ -332,7 +332,7 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     print("Starting renaming of the service directory.")
     rename_databi = bu_isciii.clean.CleanUp(resolution, path, ask_path, "rename_nocopy")
     rename_databi.handle_clean()
-    print("Starting copy of the service directory to the SFTP folder: " + sftp_folder)
+    print("Starting copy of the service directory to the SFTP folder")
     copy_sftp = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder)
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
