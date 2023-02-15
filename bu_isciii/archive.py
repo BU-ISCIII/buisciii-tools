@@ -28,6 +28,7 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
+
 def ask_date(previous_date=None):
     """
     Ask the year, then the month, then the day of the month
@@ -38,12 +39,13 @@ def ask_date(previous_date=None):
     [year [str], chosen_month_number [str], day [str]]
     Stored like this so that its easier to manage later
     """
-    
-    lower_limit_year = 2010 if previous_date is None else int(previous_date[0]) 
+
+    lower_limit_year = 2010 if previous_date is None else int(previous_date[0])
 
     # Range: lower_limit_year - current year
-    year = bu_isciii.utils.prompt_year(lower_limit=lower_limit_year,
-                                       upper_limit=date.today().year)
+    year = bu_isciii.utils.prompt_year(
+        lower_limit=lower_limit_year, upper_limit=date.today().year
+    )
 
     # Limit the list to the current month if year = current year
     # This could be a one-liner:
@@ -52,15 +54,24 @@ def ask_date(previous_date=None):
     if year < date.today().year:
         month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:]
     else:
-        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:date.today().month+1]
+        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][
+            1 : date.today().month + 1
+        ]
 
     # If there is a previous date
     # and year is the same as before, limit the quantity of months
     if previous_date is not None and year == int(previous_date[0]):
-        month_list = month_list[int(previous_date[1])-1:]
-        
-    chosen_month_number, chosen_month_name = bu_isciii.utils.prompt_selection(f"Choose the month of {year} from which start counting",
-                                             [f"Month {num:02d}: {month}" for num, month in month_list]).replace("Month","").strip().split(": ")
+        month_list = month_list[int(previous_date[1]) - 1 :]
+
+    chosen_month_number, chosen_month_name = (
+        bu_isciii.utils.prompt_selection(
+            f"Choose the month of {year} from which start counting",
+            [f"Month {num:02d}: {month}" for num, month in month_list],
+        )
+        .replace("Month", "")
+        .strip()
+        .split(": ")
+    )
 
     # For the day, use "calendar":
     # calendar.month(year, month) returns a string with the calendar
@@ -70,22 +81,34 @@ def ask_date(previous_date=None):
     # Do not get the 9 first elements bc they are:
     # "Month", "Year", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
 
-    day_list = list(filter(None, calendar.month(year, int(chosen_month_number)).replace("\n"," ").split(" ")))[9:]
+    day_list = list(
+        filter(
+            None,
+            calendar.month(year, int(chosen_month_number))
+            .replace("\n", " ")
+            .split(" "),
+        )
+    )[9:]
 
     # if current month and day, limit the options to the current day
     if year == date.today().year and int(chosen_month_number) == date.today().month:
-        day_list = day_list[:date.today().day]
-    
+        day_list = day_list[: date.today().day]
+
     # if previous date  & same year & same month, limit days
-    if previous_date is not None and year == int(previous_date[0]) and chosen_month_number == previous_date[1]:
-        day_list = day_list[int(previous_date[2])-1:]
+    if (
+        previous_date is not None
+        and year == int(previous_date[0])
+        and chosen_month_number == previous_date[1]
+    ):
+        day_list = day_list[int(previous_date[2]) - 1 :]
 
     # from the list, get the first and last item as limits for the function
-    day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]),
-                                     upper_limit=int(day_list[-1]))
-
+    day = bu_isciii.utils.prompt_day(
+        lower_limit=int(day_list[0]), upper_limit=int(day_list[-1])
+    )
 
     return [str(year), str(chosen_month_number), str(day)]
+
 
 # function to compare directories (archived and non-archived)
 def dir_comparison(dir1, dir2):
@@ -118,12 +141,14 @@ def get_service_paths(conf, ser_type, service):
     archive, and outside of it
 
     NOTE: for some services, the 'profileClassificationArea' is None, and the os.path.join may fail
-    
+
     """
     print(f"archived_path : {conf['archived_path']}")
     print(f"ser_type : {ser_type}")
     print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
-    print(f"area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}")
+    print(
+        f"area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
+    )
 
     # Path in archive
     archived = os.path.join(
@@ -151,7 +176,7 @@ def get_dir_size(path):
     size = 0
 
     for path, dirs, files in os.walk(path):
-        for f in files:
+        for file in files:
             size += os.path.getsize(os.path.join(path, file))
 
     return size
@@ -159,14 +184,14 @@ def get_dir_size(path):
 
 def targz_dir(tar_name, directory):
     """
-    Generate a tar gz file with the contents of a directory 
+    Generate a tar gz file with the contents of a directory
     """
     try:
         with tarfile.open(tar_name, "w:gz") as out_tar:
             out_tar.add(directory)
         return True
-    except Exception as e:
-        # Have to check which error to expect
+    except Exception:
+        # Have to check which error(s) to expect
         return False
 
 
@@ -174,10 +199,10 @@ def get_md5(file):
     """
     Given a file, open it and digest to get the md5
     NOTE: might be troublesome when infile is too big
-    Based on: 
+    Based on:
     https://www.quickprogrammingtips.com/python/how-to-calculate-md5-hash-of-a-file-in-python.html
     """
-    with open(file,"rb") as infile:
+    with open(file, "rb") as infile:
         infile = infile.read()
         file_md5 = hashlib.md5(infile).hexdigest()
 
@@ -198,13 +223,13 @@ class Archive:
         self.resolution_id = resolution_id
         self.type = ser_type
         self.option = option
-        
+
         """
-        ANCHOR CODE: when "year" option was removed, this chunk became deprecated 
+        ANCHOR CODE: when "year" option was removed, this chunk became deprecated
         # assumption: year and no resolution_id >>> Batch management
         self.quantity = (
-            "Batch" 
-            if self.year is not None and self.resolution_id is None 
+            "Batch"
+            if self.year is not None and self.resolution_id is None
             else None
         )
         # assumption: resolution_id and no year >>> Single service management
@@ -222,7 +247,7 @@ class Archive:
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
-        
+
         # Get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
 
@@ -236,56 +261,89 @@ class Archive:
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
-            stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
+            stderr.print(
+                "Please state the final date for filtering (must be posterior or identical to the initial date)"
+            )
             self.date_until = ask_date(previous_date=self.date_from)
-            
-            stderr.print(f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}")
+
+            stderr.print(
+                f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}"
+            )
 
             # Ask the API for services within the range
             # safe is False, so instead of exiting, an error code will be returned
             services_batch = rest_api.get_request(
-                            request_info = "services",
-                            parameter1 = "date_from", 
-                            value1 = "-".join(self.date_from),
-                            parameter2 = "date_until",
-                            value2 = "-".join(self.date_until),
-                            safe = False,
-                        )
+                request_info="services",
+                parameter1="date_from",
+                value1="-".join(self.date_from),
+                parameter2="date_until",
+                value2="-".join(self.date_until),
+                safe=False,
+            )
 
             # if int (if error code), must be only bc status > 200
             # Check drylab_api.get_request
             if isinstance(services_batch, int):
-                stderr.print(f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!")
+                stderr.print(
+                    f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!"
+                )
                 sys.exit()
-            else: 
-                stderr.print(f"Found {len(services_batch)} service(s) within the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!")
-            
+            else:
+                stderr.print(
+                    f"Found {len(services_batch)} service(s) within the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!"
+                )
+
             # Get individual serviceFullData for each data
             # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
+            # The only way I found to check in real time and keeping track of the missing id was a loop
+            # instead of a list comprehension (check anchor code)
+            """
+            ANCHOR CODE: How this was made before
             self.services_to_move = [rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
                 ) for service_batch in services_batch]
-            
+            """
+            self.services_to_move = []
+            for service in services_batch:
+                request = rest_api.get_request(
+                    request_info="serviceFullData",
+                    parameter1="resolution",
+                    value1=f"{service['serviceRequestNumber']}.1",
+                    safe=False,
+                )
+                if isinstance(request, int):
+                    stderr.print(
+                        f"Resolution '{service['serviceRequestNumber']}.1' could not be found. Connection seemed right though!"
+                    )
+                else:
+                    self.services_to_move.append(request)
+
             # services_batch does not seem useful from now on, so delete it from memory
             del services_batch
 
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
-            
-            stderr.print(f"Asking our trusty API about resolution: {self.resolution_id}")
+
+            stderr.print(
+                f"Asking our trusty API about resolution: {self.resolution_id}"
+            )
 
             # Hold the results in a list so it can be accessed just like in the batch
-            self.services_to_move = [rest_api.get_request(
-                    request_info = "serviceFullData", 
-                    parameter1 = "resolution",
-                    value1 = self.resolution_id,
-                    safe = False
-                )]
-        
+            self.services_to_move = [
+                rest_api.get_request(
+                    request_info="serviceFullData",
+                    parameter1="resolution",
+                    value1=self.resolution_id,
+                    safe=False,
+                )
+            ]
+
             if isinstance(self.services_to_move[0], int):
-                stderr.print(f"No services named '{self.resolution_id}' were found. Connection seemed right though!")
+                stderr.print(
+                    f"No services named '{self.resolution_id}' were found. Connection seemed right though!"
+                )
                 sys.exit()
         
         # Get configuration params from configuration.json
@@ -310,28 +368,35 @@ class Archive:
         """
 
         if self.type is None:
-            stderr.print(f"Working with a service, or a research resolution?")
+            stderr.print("Working with a service, or a research resolution?")
             self.type = bu_isciii.utils.prompt_selection(
                 "Type",
                 ["services_and_colaborations", "research"],
             )
 
         if option is None:
-            stderr.print(f"Willing to archive, or retrieve a resolution?")
+            stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
-                ["archive", "retrieve"],
+                [
+                    "Full archive: compress and archive",
+                    "Full retrieve: retrieve and uncompress",
+                    "That should be all, thank you!",
+                ],
             )
-        
+
     def archive(self):
         """
         Archive services in selected year and month
-        """      
-        
+        """
+
         # with a total size of {self.total_size:.2f} GB.
-        if (bu_isciii.utils.prompt_selection(
-            f"The selection you want to file consists of {len(self.services_to_move)} services. Continue?",
-            ["Yes, continue", "Hold up"])) == "Yes, continue":
+        if (
+            bu_isciii.utils.prompt_selection(
+                f"The selection you want to file consists of {len(self.services_to_move)} services. Continue?",
+                ["Yes, continue", "Hold up"],
+            )
+        ) == "Yes, continue":
 
             for service in self.services_to_move:
                 # stderr.print(service["servicFolderName"])
@@ -370,21 +435,29 @@ class Archive:
 
             print(f"archived_path : {self.conf['archived_path']}")
             print(f"type: {self.type}")
-            print(f"profileCenter: {service['serviceUserId']['profile']['profileCenter']}")
-            print(f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}")
+            print(
+                f"profileCenter: {service['serviceUserId']['profile']['profileCenter']}"
+            )
+            print(
+                f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
+            )
 
             source = os.path.join(
                 self.conf["archived_path"],
                 self.type,
                 service["serviceUserId"]["profile"]["profileCenter"],
-                service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
+                service["serviceUserId"]["profile"][
+                    "profileClassificationArea"
+                ].lower(),
             )
 
             dest = os.path.join(
                 self.conf["data_path"],
                 self.type,
                 service["serviceUserId"]["profile"]["profileCenter"],
-                service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
+                service["serviceUserId"]["profile"][
+                    "profileClassificationArea"
+                ].lower(),
             )
 
             try:
@@ -433,8 +506,10 @@ class Archive:
         """
         Handle archive class options
         """
-        if self.option == "archive":
+        if self.option == "Full archive: compress and archive":
             self.archive()
-        if self.option == "retrieve":
+        elif self.option == "Full retrieve: retrieve and uncompress":
             self.retrieve_from_archive()
+        elif self.option == "That should be all, thank you!":
+            sys.exit()
         return

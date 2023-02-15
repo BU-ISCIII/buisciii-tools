@@ -25,6 +25,7 @@ stderr = rich.console.Console(
     stderr=True, style="dim", highlight=False, force_terminal=rich_force_colors()
 )
 
+
 def prompt_resolution_id():
     stderr.print(
         "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
@@ -33,8 +34,7 @@ def prompt_resolution_id():
     return resolution_id
 
 
-def prompt_year(lower_limit,
-                upper_limit):
+def prompt_year(lower_limit, upper_limit):
     """
     Ask the year (user prompt)
     Check whether or not this input is a numeric value
@@ -50,19 +50,25 @@ def prompt_year(lower_limit,
 
             # Check limits
             if year < lower_limit:
-                stderr.print(f"Sorry, but the year cant be earlier than {lower_limit}! That would cause a space-time rupture and the Doctor is nowhere to be found! Please, try again!")
+                stderr.print(
+                    f"Sorry, but the year cant be earlier than {lower_limit}! That would cause a space-time rupture and the Doctor is nowhere to be found! Please, try again!"
+                )
             elif year > upper_limit:
-                stderr.print(f"Sorry, but the time machine has not been invented... Yet. Year {year} is maybe too... Futuristic. Please, try again!")
+                stderr.print(
+                    f"Sorry, but the time machine has not been invented... Yet. Year {year} is maybe too... Futuristic. Please, try again!"
+                )
             else:
                 return year
-        
+
         except ValueError:
-            stderr.print(f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services.")
-    
+            stderr.print(
+                f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services."
+            )
+
     return
 
-def prompt_day(lower_limit,
-               upper_limit):
+
+def prompt_day(lower_limit, upper_limit):
     """
     Ask the day (user prompt)
     Check whether or not this input is a numeric value
@@ -75,11 +81,16 @@ def prompt_day(lower_limit,
         try:
             day = int(day)
             if day < lower_limit or day > upper_limit:
-                stderr.print(f"Sorry, day {day} is out of bounds! Please choose a day between {lower_limit} and {upper_limit}.")
+                stderr.print(
+                    f"Sorry, day {day} is out of bounds! Please choose a day between {lower_limit} and {upper_limit}."
+                )
             else:
                 return day
         except ValueError:
-            stderr.print(f"Ooops, seems like the answer '{day}' is not a valid day! Please specify the day for which you want to archive services (from {lower_limit} to {upper_limit}).")
+            stderr.print(
+                f"Ooops, seems like the answer '{day}' is not a valid day! Please specify the day for which you want to archive services (from {lower_limit} to {upper_limit})."
+            )
+
 
 def prompt_service_dir_path():
     stderr.print("Service path to copy to execution temporal directory")
