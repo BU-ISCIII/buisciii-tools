@@ -103,7 +103,7 @@ class BioinfoDoc:
             "resolutionNumber"
         ]
         self.delivery_number = self.resolution_number.partition(".")[2]
-        resolution_date = self.resolution_info["resolutions"][0]["resolutionDate"]
+        resolution_date = self.resolution_info["serviceCreatedOnDate"]
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
         year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
