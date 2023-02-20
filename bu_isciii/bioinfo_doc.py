@@ -11,6 +11,7 @@ import markdown
 import pdfkit
 import PyPDF2
 import subprocess
+import json
 
 # Local imports
 import bu_isciii.utils
@@ -78,17 +79,36 @@ class BioinfoDoc:
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
         )
-        self.resolution_info = self.rest_api.get_request(
-            "serviceFullData", "resolution", self.resolution_id
-        )
-        # TODO: When delivery info can be downloaded from iSkyLIMS
-        # resolution_info = rest_api.get_request(
-        #    "resolutionFullData", "delivery", self.resolution_id
-        # )
+
         if self.type == "delivery":
+            delivery_notes = bu_isciii.utils.get_delivery_notes()
+
+            delivery_dict = {
+            "resolutionNumber": self.resolution_id,
+            "pipelinesInDelivery":"",
+            "deliveryNotes" : delivery_notes
+            }
+
+            # How json should be fully formatted:
+            # delivery_dict = {
+            # "resolutionNumber": "SRVSGAFI005.1",
+            # "pipelinesInDelivery":"",
+            # "deliveryNotes" : delivery_notes,
+            # "executionStartDate" : "YYYY-MM-DD",
+            # "executionEndDate" : "YYYY-MM-DD",
+            # "permanentUsedSpace" : "",
+            # "temporaryUsedSpace" : ""
+            # }
+
+            self.rest_api.post_request(
+                "createDelivery", json.dumps(delivery_dict)
+            )
             self.rest_api.put_request(
                 "updateState", "resolution", self.resolution_id, "state", "Delivery"
             )
+        self.resolution_info = self.rest_api.get_request(
+            "serviceFullData", "resolution", self.resolution_id
+        )
         if not self.resolution_info:
             stderr.print(
                 "[red] Unable to fetch information for resolution "
