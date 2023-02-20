@@ -88,13 +88,9 @@ class RestServiceApi:
             if req.status_code > 201:
                 if safe:
                     log.error(
-                        "Some error occurred. Status code: "
-                        + str(req.status_code)
+                        "Some error occurred. Status code: " + str(req.status_code)
                     )
-                    log.error(
-                        "Status text: "
-                        + str(json.loads(req.text))
-                    )
+                    log.error("Status text: " + str(json.loads(req.text)))
                     sys.exit()
                 else:
                     return req.status_code

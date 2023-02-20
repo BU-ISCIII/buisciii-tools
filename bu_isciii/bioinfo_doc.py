@@ -79,7 +79,9 @@ class BioinfoDoc:
             )
             if resolution_info["resolutions"][0]["delivery"][0]["deliveryResolutionID"]:
                 print("Service delivery already exist.")
-                if bu_isciii.utils.prompt_yn_question("Do you want to overwrite delivery info?"):
+                if bu_isciii.utils.prompt_yn_question(
+                    "Do you want to overwrite delivery info?"
+                ):
                     self.post_delivery_info()
             else:
                 self.post_delivery_info()
@@ -191,9 +193,9 @@ class BioinfoDoc:
         delivery_notes = bu_isciii.utils.get_delivery_notes()
 
         delivery_dict = {
-        "resolutionNumber": self.resolution_id,
-        "pipelinesInDelivery":"",
-        "deliveryNotes" : delivery_notes
+            "resolutionNumber": self.resolution_id,
+            "pipelinesInDelivery": "",
+            "deliveryNotes": delivery_notes,
         }
 
         # How json should be fully formatted:
@@ -207,9 +209,7 @@ class BioinfoDoc:
         # "temporaryUsedSpace" : ""
         # }
 
-        self.rest_api.post_request(
-            "createDelivery", json.dumps(delivery_dict)
-        )
+        self.rest_api.post_request("createDelivery", json.dumps(delivery_dict))
         self.rest_api.put_request(
             "updateState", "resolution", self.resolution_id, "state", "Delivery"
         )
@@ -229,7 +229,8 @@ class BioinfoDoc:
             sftp_folder = os.path.join(conf["data_path"], "sftp", sftp_folders_list[0])
         else:
             sftp_final_folder = bu_isciii.utils.prompt_selection(
-                msg="Select SFTP folder containing the service to make tree from.", choices=sftp_folders_list
+                msg="Select SFTP folder containing the service to make tree from.",
+                choices=sftp_folders_list,
             )
             sftp_folder = os.path.join(
                 self.conf["data_path"], "sftp", sftp_final_folder
