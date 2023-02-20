@@ -81,15 +81,28 @@ class RestServiceApi:
             log.error("Unable to open connection towards iSkyLIMS")
             return False
 
-    def post_request(self, data):
+    def post_request(self, request_info, data, safe=True):
+        url_http = self.request_url + request_info
         try:
-            req = requests.post(self.request_url, data=data, headers=self.headers)
+            req = requests.post(url_http, data=data, headers=self.headers)
             if req.status_code > 201:
-                log.error(str(req.status_code))
-                return False
+                if safe:
+                    log.error(
+                        "Some error occurred. Status code: "
+                        + str(req.status_code)
+                    )
+                    log.error(
+                        "Status text: "
+                        + str(json.loads(req.text))
+                    )
+                    sys.exit()
+                else:
+                    return req.status_code
+            return True
+
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS")
-        return True
+            return False
 
 
 """ Example usage
