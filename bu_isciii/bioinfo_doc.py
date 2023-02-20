@@ -81,7 +81,15 @@ class BioinfoDoc:
         )
 
         if self.type == "delivery":
+            resolution_info = self.rest_api.get_request(
+                "serviceFullData", "resolution", self.resolution_id
             )
+            if resolution_info["resolutions"][0]["delivery"][0]["deliveryResolutionID"]:
+                print("Service delivery already exist.")
+                if bu_isciii.utils.prompt_yn_question("Do you want to overwrite delivery info?"):
+                    self.post_delivery_info()
+            else:
+                self.post_delivery_info()
         self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
