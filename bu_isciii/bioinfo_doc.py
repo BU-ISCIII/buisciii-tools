@@ -81,30 +81,6 @@ class BioinfoDoc:
         )
 
         if self.type == "delivery":
-            delivery_notes = bu_isciii.utils.get_delivery_notes()
-
-            delivery_dict = {
-            "resolutionNumber": self.resolution_id,
-            "pipelinesInDelivery":"",
-            "deliveryNotes" : delivery_notes
-            }
-
-            # How json should be fully formatted:
-            # delivery_dict = {
-            # "resolutionNumber": "SRVSGAFI005.1",
-            # "pipelinesInDelivery":"",
-            # "deliveryNotes" : delivery_notes,
-            # "executionStartDate" : "YYYY-MM-DD",
-            # "executionEndDate" : "YYYY-MM-DD",
-            # "permanentUsedSpace" : "",
-            # "temporaryUsedSpace" : ""
-            # }
-
-            self.rest_api.post_request(
-                "createDelivery", json.dumps(delivery_dict)
-            )
-            self.rest_api.put_request(
-                "updateState", "resolution", self.resolution_id, "state", "Delivery"
             )
         self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
@@ -205,6 +181,33 @@ class BioinfoDoc:
                 os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
             log.info("Service folders created")
         return
+
+    def post_delivery_info(self):
+        delivery_notes = bu_isciii.utils.get_delivery_notes()
+
+        delivery_dict = {
+        "resolutionNumber": self.resolution_id,
+        "pipelinesInDelivery":"",
+        "deliveryNotes" : delivery_notes
+        }
+
+        # How json should be fully formatted:
+        # delivery_dict = {
+        # "resolutionNumber": "SRVSGAFI005.1",
+        # "pipelinesInDelivery":"",
+        # "deliveryNotes" : delivery_notes,
+        # "executionStartDate" : "YYYY-MM-DD",
+        # "executionEndDate" : "YYYY-MM-DD",
+        # "permanentUsedSpace" : "",
+        # "temporaryUsedSpace" : ""
+        # }
+
+        self.rest_api.post_request(
+            "createDelivery", json.dumps(delivery_dict)
+        )
+        self.rest_api.put_request(
+            "updateState", "resolution", self.resolution_id, "state", "Delivery"
+        )
 
     def create_markdown(self, file_path):
         """Create the markdown fetching the information from request api"""
