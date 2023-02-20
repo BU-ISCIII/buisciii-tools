@@ -24,6 +24,7 @@
         "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
+        "data_path": "/data/bi",
         "bioinfodoc_path": "/data/bioinfo_doc/",
         "services_path": "services",
         "service_folder": ["service_info", "result"],
