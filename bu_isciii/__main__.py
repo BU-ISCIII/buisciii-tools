@@ -112,7 +112,11 @@ class CustomHelpOrder(click.Group):
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
 @click.option(
-    "-a", "--api-password", help="Password for the API logging", required=False, default=None
+    "-a",
+    "--api-password",
+    help="Password for the API logging",
+    required=False,
+    default=None,
 )
 def bu_isciii_cli(verbose, log_file, api_password):
     # Set the base logger to output DEBUG
@@ -134,6 +138,7 @@ def bu_isciii_cli(verbose, log_file, api_password):
         api_pass = api_password
     else:
         api_pass = bu_isciii.utils.ask_api_pass()
+
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
@@ -290,7 +295,9 @@ def copy_sftp(resolution, path, ask_path, sftp_folder):
     """
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
-    new_del = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder, api_pass)
+    new_del = bu_isciii.copy_sftp.CopySftp(
+        resolution, path, ask_path, sftp_folder, api_pass
+    )
     new_del.copy_sftp()
 
 
@@ -330,7 +337,9 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
     print("Starting cleaning scratch directory: " + tmp_dir)
-    clean_scratch = bu_isciii.clean.CleanUp(resolution, tmp_dir, ask_path, "clean", api_pass)
+    clean_scratch = bu_isciii.clean.CleanUp(
+        resolution, tmp_dir, ask_path, "clean", api_pass
+    )
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
     copy_scratch2service = bu_isciii.scratch.Scratch(
@@ -338,10 +347,14 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
-    rename_databi = bu_isciii.clean.CleanUp(resolution, path, ask_path, "rename_nocopy", api_pass)
+    rename_databi = bu_isciii.clean.CleanUp(
+        resolution, path, ask_path, "rename_nocopy", api_pass
+    )
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
-    copy_sftp = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder, api_pass)
+    copy_sftp = bu_isciii.copy_sftp.CopySftp(
+        resolution, path, ask_path, sftp_folder, api_pass
+    )
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
     print("Remember to generate delivery docs after setting delivery in iSkyLIMS.")
