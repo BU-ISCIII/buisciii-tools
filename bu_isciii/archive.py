@@ -82,7 +82,7 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, type=None, year=None, option=None):
+    def __init__(self, resolution_id=None, type=None, year=None, option=None, api_password=None,):
         # resolution_id = Nombre de la resolución
         # type = services_and_colaborations // research
         # year = año
@@ -119,7 +119,7 @@ class Archive:
 
         # Obtain info from iSkyLIMS api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"], conf_api["api_url"], api_password
         )
         self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", self.year
