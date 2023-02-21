@@ -33,6 +33,7 @@ class Scratch:
         tmp_dir=None,
         direction=None,
         ask_path=False,
+        api_password = None
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -55,7 +56,7 @@ class Scratch:
         # Load conf
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
-        rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"])
+        rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"], api_password)
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
         self.rsync_command = self.conf["command"]
 

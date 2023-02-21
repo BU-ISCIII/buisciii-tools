@@ -37,6 +37,7 @@ class BioinfoDoc:
         ask_path=False,
         sftp_folder=False,
         report_pdf=False,
+        api_password = None
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
@@ -71,7 +72,7 @@ class BioinfoDoc:
             "local_api_settings"
         )
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"], conf_api["api_url"], api_password
         )
         if self.type == "delivery":
             resolution_info = self.rest_api.get_request(
