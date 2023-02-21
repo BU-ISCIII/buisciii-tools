@@ -38,7 +38,7 @@ stderr = Console(
 
 
 class CopySftp:
-    def __init__(self, resolution_id=None, path=None, ask_path=False, sftp_folder=None):
+    def __init__(self, resolution_id=None, path=None, ask_path=False, sftp_folder=None, api_password = None):
         """
         Description:
             Class to perform the copy of the service to sftp folfer.
@@ -62,7 +62,7 @@ class CopySftp:
 
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"], conf_api["api_url"], api_password
         )
 
         self.resolution_info = rest_api.get_request(

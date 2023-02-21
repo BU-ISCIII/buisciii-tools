@@ -111,7 +111,10 @@ class CustomHelpOrder(click.Group):
 @click.option(
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
-def bu_isciii_cli(verbose, log_file):
+@click.option(
+    "-a", "--api-password", help="Password for the API logging", required=False, default=None
+)
+def bu_isciii_cli(verbose, log_file, api_password):
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
@@ -126,6 +129,8 @@ def bu_isciii_cli(verbose, log_file):
         )
         log.addHandler(log_fh)
 
+    global api_pass
+    api_pass = api_password
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
@@ -167,7 +172,7 @@ def new_service(resolution, path, no_create_folder, ask_path):
     Create new service, it will create folder and copy template depending on selected service.
     """
     new_ser = bu_isciii.new_service.NewService(
-        resolution, path, no_create_folder, ask_path
+        resolution, path, no_create_folder, ask_path, api_pass
     )
     new_ser.create_new_service()
 
@@ -208,7 +213,7 @@ def scratch(resolution, path, tmp_dir, direction, ask_path):
     Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, direction, ask_path
+        resolution, path, tmp_dir, direction, ask_path, api_pass
     )
     scratch_copy.handle_scratch()
 
@@ -250,7 +255,7 @@ def clean(resolution, path, ask_path, option):
     """
     Service cleaning. It will either remove big files, rename folders before copy, revert this renaming, show removable files or show folders for no copy.
     """
-    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option)
+    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option, api_pass)
     clean.handle_clean()
 
 
@@ -282,7 +287,7 @@ def copy_sftp(resolution, path, ask_path, sftp_folder):
     """
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
-    new_del = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder)
+    new_del = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder, api_pass)
     new_del.copy_sftp()
 
 
@@ -322,18 +327,18 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
     print("Starting cleaning scratch directory: " + tmp_dir)
-    clean_scratch = bu_isciii.clean.CleanUp(resolution, tmp_dir, ask_path, "clean")
+    clean_scratch = bu_isciii.clean.CleanUp(resolution, tmp_dir, ask_path, "clean", api_pass)
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
     copy_scratch2service = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, "Scratch_to_service", ask_path
+        resolution, path, tmp_dir, "Scratch_to_service", ask_path, api_pass
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
-    rename_databi = bu_isciii.clean.CleanUp(resolution, path, ask_path, "rename_nocopy")
+    rename_databi = bu_isciii.clean.CleanUp(resolution, path, ask_path, "rename_nocopy", api_pass)
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
-    copy_sftp = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder)
+    copy_sftp = bu_isciii.copy_sftp.CopySftp(resolution, path, ask_path, sftp_folder, api_pass)
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
     print("Remember to generate delivery docs after setting delivery in iSkyLIMS.")
@@ -381,7 +386,7 @@ def bioinfo_doc(type, resolution, path, ask_path, sftp_folder, report_pdf):
     Create the folder documentation structure in bioinfo_doc server
     """
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(
-        type, resolution, path, ask_path, sftp_folder, report_pdf
+        type, resolution, path, ask_path, sftp_folder, report_pdf, api_pass
     )
     new_doc.create_documentation()
 
