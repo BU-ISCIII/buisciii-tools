@@ -130,7 +130,10 @@ def bu_isciii_cli(verbose, log_file, api_password):
         log.addHandler(log_fh)
 
     global api_pass
-    api_pass = api_password
+    if api_password:
+        api_pass = api_password
+    else:
+        api_pass = bu_isciii.utils.ask_api_pass()
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
