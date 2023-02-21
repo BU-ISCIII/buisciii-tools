@@ -38,7 +38,14 @@ stderr = Console(
 
 
 class CopySftp:
-    def __init__(self, resolution_id=None, path=None, ask_path=False, sftp_folder=None, api_password = None):
+    def __init__(
+        self,
+        resolution_id=None,
+        path=None,
+        ask_path=False,
+        sftp_folder=None,
+        api_password=None,
+    ):
         """
         Description:
             Class to perform the copy of the service to sftp folfer.

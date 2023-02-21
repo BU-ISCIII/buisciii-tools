@@ -37,7 +37,7 @@ class BioinfoDoc:
         ask_path=False,
         sftp_folder=False,
         report_pdf=False,
-        api_password = None
+        api_password=None,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(

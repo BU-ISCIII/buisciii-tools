@@ -23,7 +23,14 @@ stderr = Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_id=None, path=None, ask_path=False, option=None, api_password = None):
+    def __init__(
+        self,
+        resolution_id=None,
+        path=None,
+        ask_path=False,
+        option=None,
+        api_password=None,
+    ):
         """
         Description:
             Class to perform the cleaning.
