@@ -99,9 +99,9 @@ class BioinfoDoc:
         self.resolution_id = resolution_info["Resolutions"]["resolutionFullNumber"]
         self.resolution_number = resolution_info["Resolutions"]["resolutionNumber"]
         self.delivery_number = self.resolution_number.partition(".")[2]
-        resolution_date = self.resolution.get("resolutionDate")
-        self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
-        year = datetime.strftime(self.resolution_datetime, "%Y")
+        service_date = resolution_info["Service"]["serviceCreatedOnDate"]
+        self.service_datetime = datetime.strptime(service_date, "%Y-%m-%d")
+        year = datetime.strftime(self.service_datetime, "%Y")
         self.service_folder = os.path.join(
             self.path, self.doc_conf["services_path"], year, self.resolution_folder
         )
