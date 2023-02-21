@@ -8,9 +8,12 @@ log = logging.getLogger(__name__)
 
 
 class RestServiceApi:
-    def __init__(self, server, url):
+    def __init__(self, server, url, password):
         self.request_url = server + url
-        self.headers = {"content-type": "application/json"}
+        self.headers = {
+            "content-type": "application/json",
+            "authorization": "Basic "+password,
+        }
 
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
     def get_request(

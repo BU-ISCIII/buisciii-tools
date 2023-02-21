@@ -23,7 +23,7 @@ stderr = Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_id=None, path=None, ask_path=False, option=None):
+    def __init__(self, resolution_id=None, path=None, ask_path=False, option=None, api_password = None):
         """
         Description:
             Class to perform the cleaning.
@@ -46,7 +46,7 @@ class CleanUp:
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"], conf_api["api_url"], api_password
         )
         self.resolution_info = rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
