@@ -2,6 +2,8 @@
 import os
 import rich
 import questionary
+import bu_isciii
+import bu_isciii.config_json
 
 
 def rich_force_colors():
@@ -106,3 +108,20 @@ def ask_api_pass():
     stderr.print("Write API password for logging")
     api_password = questionary.text("API password: ").unsafe_ask()
     return api_password
+
+
+def get_service_paths(resolution_info):
+    """
+    Given a service, a conf and a type,
+    get the path it would have service
+    """
+    global_conf = bu_isciii.config_json.ConfigJson().get_configuration("global")
+    service_path = os.path.join(
+        global_conf["data_path"],
+        "services_and_colaborations",
+        resolution_info["serviceUserId"]["profile"]["profileCenter"],
+        resolution_info["serviceUserId"]["profile"][
+            "profileClassificationArea"
+        ].lower(),
+    )
+    return service_path
