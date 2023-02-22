@@ -212,10 +212,9 @@ class NewService:
 
     def samples_json(self):
         json_samples = json.dumps(self.service_samples, indent=4)
-        service_path = self.get_service_paths(self.conf)
         json_file_name = self.resolution_id + ".json"
         json_samples_file = os.path.join(
-            service_path, self.service_folder, "RAW", json_file_name
+            self.path, self.service_folder, "RAW", json_file_name
         )
         f = open(json_samples_file, "w")
         f.write(json_samples)
