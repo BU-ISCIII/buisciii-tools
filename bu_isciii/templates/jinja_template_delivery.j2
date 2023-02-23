@@ -54,8 +54,23 @@ Here we describe information about the resolution delivery.
 {% if resolution.resolutionDeliveryDate %}
 * Resolution Delivery date: {{ resolution.resolutionDeliveryDate }}
 {% endif %}
-{% if resolution.resolutionDeliveryNotes %}
-* Resolution Delivery notes: {{ resolution.resolutionDeliveryNotes }}
+{% if delivery.deliveryNotes %}
+* Resolution Delivery notes: {{ delivery.deliveryNotes }}
+{% endif %}
+{% if delivery.pipelinesInDelivery %}
+* Pipelines in delivery: {{ delivery.pipelinesInDelivery }}
+{% endif %}
+{% if delivery.executionStartDate %}
+* Execution start date: {{ delivery.executionStartDate }}
+{% endif %}
+{% if delivery.executionEndDate %}
+* Execution end date: {{ delivery.executionEndDate }}
+{% endif %}
+{% if delivery.permanentUsedSpace %}
+* Permanent used space: {{ delivery.permanentUsedSpace }}
+{% endif %}
+{% if delivery.temporaryUsedSpace %}
+* Temporary used space: {{ delivery.temporaryUsedSpace }}
 {% endif %}
 
 ### Samples sequenced at iSCIII:
