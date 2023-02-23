@@ -267,7 +267,9 @@ class BioinfoDoc:
 
         # Resolution related information
         markdown_data["resolution"] = self.resolution_info["resolutions"][0]
-        markdown_data["delivery"] = self.resolution_info["resolutions"][0]["delivery"][0]
+        markdown_data["delivery"] = self.resolution_info["resolutions"][0]["delivery"][
+            0
+        ]
         f_name = self.resolution_number + ".md"
         file_name = os.path.join(file_path, f_name)
         file_name = os.path.join(file_path, f_name)
