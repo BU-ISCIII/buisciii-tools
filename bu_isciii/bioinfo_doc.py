@@ -195,14 +195,13 @@ class BioinfoDoc:
 
         delivery_dict = {
             "resolutionNumber": self.resolution_id,
-            "pipelinesInDelivery": "",
             "deliveryNotes": delivery_notes,
         }
 
         # How json should be fully formatted:
         # delivery_dict = {
         # "resolutionNumber": "SRVSGAFI005.1",
-        # "pipelinesInDelivery":"",
+        # "pipelinesInDelivery": ["viralrecon"],
         # "deliveryNotes" : delivery_notes,
         # "executionStartDate" : "YYYY-MM-DD",
         # "executionEndDate" : "YYYY-MM-DD",
