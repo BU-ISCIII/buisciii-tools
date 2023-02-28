@@ -42,7 +42,6 @@ def prompt_year(lower_limit, upper_limit):
     Maybe too specific for utils
     """
     while True:
-
         year = questionary.text(f"Year ({lower_limit}-{upper_limit})").unsafe_ask()
         try:
             # Check if it is an int
