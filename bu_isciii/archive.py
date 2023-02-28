@@ -11,7 +11,8 @@ import rich
 import calendar
 import hashlib
 import tarfile
-from math import pow
+
+# from math import pow
 from datetime import date
 
 # Local imports
@@ -215,7 +216,7 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, ser_type=None, api_token=None,option=None):
+    def __init__(self, resolution_id=None, ser_type=None, year=None, api_token=None, option=None):
         # resolution_id = Nombre de la resolución
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
