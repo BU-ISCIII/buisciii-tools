@@ -1,17 +1,5 @@
 #!/usr/bin/env python
 
-"""
-=============================================================
- HEADER
-=============================================================
- INSTITUTION: BU-ISCIII
- AUTHOR: Alberto Lema Blanco
- EDITOR: Guillermo Jorge Gorines Cordero
-================================================================
- END_OF_HEADER
-================================================================
-"""
-
 # Generic imports
 import re
 import logging

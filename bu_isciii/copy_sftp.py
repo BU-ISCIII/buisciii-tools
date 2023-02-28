@@ -1,17 +1,5 @@
 #!/usr/bin/env python
 
-"""
- =============================================================
- HEADER
- =============================================================
- INSTITUTION: BU-ISCIII
- AUTHORS: Erika Kvalem Soto and Sarai Varona Fernandez
- ================================================================
- END_OF_HEADER
- ================================================================
-
- """
-
 # Generic imports
 import os
 import sys
