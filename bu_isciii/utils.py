@@ -99,9 +99,8 @@ def get_service_ids(services_requested):
     return services_sel
 
 
-def get_delivery_notes():
-    stderr.print("Write delivery notes for this resolution")
-    delivery_notes = questionary.text("Delivery notes: ").unsafe_ask()
+def get_delivery_notes(msg):
+    delivery_notes = questionary.text(msg).unsafe_ask()
     return delivery_notes
 
 
