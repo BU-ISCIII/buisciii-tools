@@ -4,6 +4,7 @@ import rich
 import questionary
 import bu_isciii
 import bu_isciii.config_json
+import json
 
 
 def rich_force_colors():
@@ -125,3 +126,27 @@ def get_service_paths(resolution_info):
         ].lower(),
     )
     return service_path
+
+def get_sftp_folder(resolution_info):
+    service_user = resolution_info["serviceUserId"]["username"]
+    json_file = os.path.join(
+        os.path.dirname(__file__), "templates", "sftp_user.json"
+    )
+    user_sftp_file = open(json_file)
+    json_data = json.load(user_sftp_file)
+    user_sftp_file.close()
+    for user_sftp in json_data:
+        if user_sftp == service_user:
+            sftp_folders_list = json_data[user_sftp]
+    data_path = bu_isciii.config_json.ConfigJson().get_configuration("global")["data_path"]
+    if len(sftp_folders_list) == 1:
+        sftp_folder = os.path.join(data_path, "sftp", sftp_folders_list[0])
+    else:
+        sftp_final_folder = bu_isciii.utils.prompt_selection(
+            msg="Select SFTP folder containing the service to make tree from.",
+            choices=sftp_folders_list,
+        )
+        sftp_folder = os.path.join(data_path,"sftp",sftp_final_folder
+        )
+
+    return sftp_folder, sftp_final_folder

@@ -89,8 +89,10 @@ class BioinfoDoc:
         self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
+        if self.type == "delivery":
+            self.sftp_data = bu_isciii.utils.get_sftp_folder(self.resolution_info)
         if self.type == "delivery" and sftp_folder is None:
-            self.sftp_folder = self.get_sftp_folder(self.conf)
+            self.sftp_folder = self.sftp_data[0]
         else:
             self.sftp_folder = sftp_folder
         if not self.resolution_info:
@@ -213,30 +215,6 @@ class BioinfoDoc:
         self.rest_api.put_request(
             "updateState", "resolution", self.resolution_id, "state", "Delivery"
         )
-
-    def get_sftp_folder(self, conf):
-        service_user = self.resolution_info["serviceUserId"]["username"]
-        json_file = os.path.join(
-            os.path.dirname(__file__), "templates", "sftp_user.json"
-        )
-        user_sftp_file = open(json_file)
-        json_data = json.load(user_sftp_file)
-        user_sftp_file.close()
-        for user_sftp in json_data:
-            if user_sftp == service_user:
-                sftp_folders_list = json_data[user_sftp]
-        if len(sftp_folders_list) == 1:
-            sftp_folder = os.path.join(conf["data_path"], "sftp", sftp_folders_list[0])
-        else:
-            sftp_final_folder = bu_isciii.utils.prompt_selection(
-                msg="Select SFTP folder containing the service to make tree from.",
-                choices=sftp_folders_list,
-            )
-            sftp_folder = os.path.join(
-                self.conf["data_path"], "sftp", sftp_final_folder
-            )
-
-        return sftp_folder
 
     def create_markdown(self, file_path):
         """Create the markdown fetching the information from request api"""
