@@ -248,6 +248,9 @@ class BioinfoDoc:
         markdown_data["delivery"] = self.resolution_info["resolutions"][0]["delivery"][
             0
         ]
+        markdown_data["resolution_serviceIDs"] = []
+        for available_service in self.resolution_info["resolutions"][0]["availableServices"]:
+            markdown_data["resolution_serviceIDs"].append(available_service["availServiceDescription"])
         f_name = self.resolution_number + ".md"
         file_name = os.path.join(file_path, f_name)
 
