@@ -12,7 +12,7 @@ import calendar
 import hashlib
 import tarfile
 
-from math import pow
+# from math import pow
 from datetime import date
 
 # Local imports
