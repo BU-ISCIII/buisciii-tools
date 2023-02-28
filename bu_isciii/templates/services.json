@@ -14,7 +14,8 @@
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf"
+        "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf",
+        "email": ["assembly_annotation"]
     },
     "mtbseq_assembly": {
         "label": "",
@@ -31,7 +32,8 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "",
+        "email": ["mtbseq_assembly"]
     },
     "mtbseq": {
         "label": "",
@@ -48,7 +50,8 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "",
+        "email": ["mtbseq"]
     },
     "pikavirus": {
       "label": "",
@@ -65,7 +68,8 @@
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "delivery_pdf": "",
+      "email": ["pikavirus"]
   },
     "plasmidid_assembly": {
       "label": "",
@@ -81,7 +85,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "delivery_md": "",
-      "delivery_pdf": ""
+      "delivery_pdf": "",
+      "email": ["plasmidid_assembly"]
   },
     "wgmlst_taranis": {
         "label": "",
@@ -99,7 +104,8 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "",
+        "email": ["wgmlst_taranis"]
     },
     "wgmlst_chewbbaca": {
         "label": "",
@@ -117,7 +123,8 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "",
+        "email": ["wgmlst_chewbbaca"]
     },
     "viralrecon": {
         "label": "",
@@ -134,7 +141,8 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
         "delivery_md": "",
-        "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf"
+        "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf",
+        "email": ["viralrecon"]
     },
     "rnaseq": {
         "label": "",
@@ -151,7 +159,8 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
         "delivery_md": "",
-        "delivery_pdf": "assets/reports/pdf/rnaseq.pdf"
+        "delivery_pdf": "assets/reports/pdf/rnaseq.pdf",
+        "email": ["rnaseq"]
     },
     "lowfreq_panel": {
         "label": "",
@@ -168,7 +177,8 @@
         "no_copy": ["RAW", "TMP", "00-reads"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "delivery_pdf": "",
+        "email": ["lowfreq_panel"]
     },
     "snippy": {
       "label": "",
@@ -185,7 +195,8 @@
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "delivery_pdf": "",
+      "email": ["snippy"]
     },
     "seek_and_destroy": {
       "label": "",
@@ -218,7 +229,8 @@
       "no_copy": ["RAW", "TMP", "00-reads"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "delivery_pdf": "",
+      "email": ["seek_and_destroy"]
     }
     
 }
