@@ -57,10 +57,10 @@ class BioinfoDoc:
         if not os.path.exists(self.path):
             stderr.print("[red] Folder does not exist. " + self.path + "!")
             sys.exit(1)
-        self.report_pdf = report_pdf
-        if self.report_pdf is not None:
+        self.report_md = report_pdf
+        if self.report_md is not None:
             if os.path.exists(report_pdf):
-                self.report_pdf = os.path.normpath(report_pdf)
+                self.report_md = os.path.normpath(report_pdf)
             else:
                 stderr.print("[red] ERROR: PDF file " + report_pdf + " does not exist.")
                 sys.exit()
@@ -354,8 +354,8 @@ class BioinfoDoc:
         services_json = bu_isciii.service_json.ServiceJson()
 
         if len(services_ids) == 1:
-            if self.report_pdf:
-                service_pdf = self.report_pdf
+            if self.report_md:
+                service_pdf = self.report_md
             else:
                 try:
                     service_pdf = services_json.get_find(
