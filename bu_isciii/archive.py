@@ -258,7 +258,6 @@ class Archive:
         )
 
         if self.quantity == "Batch":
-
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
@@ -398,7 +397,6 @@ class Archive:
                 ["Yes, continue", "Hold up"],
             )
         ) == "Yes, continue":
-
             for service in self.services_to_move:
                 # stderr.print(service["servicFolderName"])
 
