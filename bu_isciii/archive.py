@@ -11,8 +11,7 @@ import rich
 import calendar
 import hashlib
 import tarfile
-
-# from math import pow
+from math import pow
 from datetime import date
 
 # Local imports
@@ -172,7 +171,7 @@ def get_service_paths(conf, ser_type, service):
 
 def get_dir_size(path):
     """
-    Get the size of a given directory
+    Get the size in bytes of a given directory
     """
     size = 0
 
@@ -396,12 +395,20 @@ class Archive:
         Extract the MD5 as well, to do it all in a single function (might regret later)
         """
         for service in self.services_to_move:
-            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
-            
-            compressed_filepath = non_archived_path + ".tar.gz"
-            targz_dir(compressed_filepath, directory)
-            md5 = get_md5(compressed_filepath)
-        return True
+
+            _, non_archived_path = get_service_paths(self.conf, self.type, service)
+
+            initial_size = get_dir_size(non_archived_path) / pow(1024,3)
+            stderr.print(f"Service {non_archived_path.split("/")[-1]} will be compressed")
+
+            try:
+                targz_dir(non_archived_path + ".tar.gz", directory)
+                md5 = get_md5(compressed_filepath)
+                compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024,3)
+                stderr.print(f"Service {non_archived_path.split("/")[-1]} was compressed\nInitial size:{initial_size}\nCompressed size:{compressed_size}")
+            except:
+                return False
+            return True
 
 
     def archive(self):
