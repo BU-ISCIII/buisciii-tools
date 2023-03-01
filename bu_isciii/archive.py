@@ -372,7 +372,7 @@ class Archive:
                 [
                     "Full archive: compress and archive",
                     "Partial archive: compress NON-archived directory",
-                    "Partial archive: archive NON-archived directory (must be compressed first)",
+                    "Partial archive: archive NON-archived directory (must be compressed first), delete origin",
                     "Full retrieve: retrieve and uncompress",
                     "That should be all, thank you!",
                 ],
@@ -412,6 +412,8 @@ class Archive:
     def archive(self):
         """
         Archive selected services
+        Make sure they are .tar.gz files
+        Delete origin if everything is alright
         """
         
         for service in self.services_to_move:
@@ -442,6 +444,8 @@ class Archive:
                         f"[green] Service {archived_path.split("/")[-1]}: Data copied successfully to its destiny archive folder (MD5: {previous_md5}; equal in both sides)",
                         highlight=False,
                     )
+                    stderr.print(f"Deleting original path: {non_archived_path}")
+                    shutil.rmtree(non_archived_path)
 
             except OSError as e:
                 stderr.print(
@@ -475,10 +479,10 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source=archived_path + ".tar.gz",
-                    destination=non_archived_path + "tar.gz",
-                    options=self.conf["options"],
-                    sync_source_contents=False,
+                    source = archived_path + ".tar.gz",
+                    destination = non_archived_path + "tar.gz",
+                    options = self.conf["options"],
+                    sync_source_contents = False,
                 )
                 stderr.print(
                     "[green] Data retrieved successfully from its archive folder.",
@@ -496,25 +500,6 @@ class Archive:
 
         return
 
-    def delete_origin(self):
-        """
-        Delete the origin of the previous archive or retrieval
-        """
-        for service in self.services_to_move:
-            if self.option == "archive":
-                dest, source = get_service_paths(self.conf, self.type, service)
-            elif self.option == "retrieve":
-                source, dest = get_service_paths(self.conf, self.type, service)
-
-            if not dir_comparison(source, dest):
-                err_msg = f"[red]ERROR: Cannot delete {source} because it does not match {dest}"
-                stderr.print(err_msg)
-                log.error(err_msg)
-            else:
-                shutil.rmtree(source)
-
-        return
-
     def handle_archive(self):
         """
         Handle archive class options
@@ -523,7 +508,7 @@ class Archive:
             self.archive()
         elif self.option == "Partial archive: compress NON-archived directory":
             pass
-        elif self.option == "Partial archive: archive NON-archived directory (must be compressed first)":
+        elif self.option == "Partial archive: archive NON-archived directory (must be compressed first), delete origin":
             pass
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.retrieve_from_archive()
