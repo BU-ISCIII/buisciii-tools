@@ -110,30 +110,6 @@ def ask_date(previous_date=None):
     return [str(year), str(chosen_month_number), str(day)]
 
 
-# function to compare directories (archived and non-archived)
-def dir_comparison(dir1, dir2):
-    """
-    Generates a filecmp.dircmp comparison object
-    RECURSIVELY, checks each of the dirs to check if
-    they are the same.
-
-    Heavily based on:
-    https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
-    """
-    comparison = filecmp.dircmp(dir1, dir2)
-    if (
-        comparison.left_only
-        or comparison.right_only
-        or comparison.diff_files
-        or comparison.funny_files
-    ):
-        return False
-    for subdir in comparison.common_dirs:
-        if not dir_comparison(os.path.join(dir1, subdir), os.path.join(dir2, subdir)):
-            return False
-    return True
-
-
 def get_service_paths(conf, ser_type, service):
     """
     Given a service, a conf and a type,
@@ -462,7 +438,6 @@ class Archive:
         """
         Copy a service back from archive
         """
-
         for service in self.services_to_move:
             # stderr.print(service["servicFolderName"])
 
