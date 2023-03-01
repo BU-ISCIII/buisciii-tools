@@ -292,26 +292,29 @@ class Archive:
                 stderr.print(
                     f"Found {len(services_batch)} service(s) within the interval between {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!"
                 )
+                if (bu_isciii.utils.prompt_selection("Continue?",["Yes, continue", "Hold up"])) == "Hold up":
+                    stderr.print("Exiting")
+                    sys.exit()
 
             # Get individual serviceFullData for each data
             # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
             # The only way I found to check in real time and keeping track of the missing id was a loop
             # instead of a list comprehension (check anchor code)
             """
-            ANCHOR CODE: How this was made before
+            ANCHOR CODE: How this was made before (list comprehension)
             self.services_to_move = [rest_api.get_request(
                 request_info = "serviceFullData",
                 parameter1= "resolution",
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
                 ) for service_batch in services_batch]
             """
-            
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
-                    parameter1="resolution",
-                    value1=f"{service['serviceRequestNumber']}.1",
-                    safe=False,
+                    par
+            # check that 
+            if (bu_isciii.utils.prompt_selection(f"The selection you want to file consists of {len(self.services_to_move)} services. ,)) :
+                sys.exit()e=False,
                 )
                 if isinstance(request, int):
                     stderr.print(
@@ -322,7 +325,7 @@ class Archive:
 
             # services_batch does not seem useful from now on, so delete it from memory
             del services_batch
-
+        
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
 
@@ -390,9 +393,9 @@ class Archive:
 
     def targz_directory(self):
         """
-        Creates the tar.gz file
+        Creates the tar.gz file for all services
         Function created to make a tar.gz file from a NON-archived directory
-        Extract the MD5 as well, to do it all in a single function (might regret later)
+        Extracts the MD5 and size as well, to do it all in a single function (might regret later)
         """
         for service in self.services_to_move:
 
@@ -405,25 +408,16 @@ class Archive:
                 targz_dir(non_archived_path + ".tar.gz", directory)
                 md5 = get_md5(compressed_filepath)
                 compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024,3)
-                stderr.print(f"Service {non_archived_path.split("/")[-1]} was compressed\nInitial size:{initial_size}\nCompressed size:{compressed_size}")
+                stderr.print(f"Service {non_archived_path.split("/")[-1]} was compressed\nInitial size:{initial_size:.3f}GB\nCompressed size:{compressed_size:.3f}\n Saved space: {initial_size - compressed_size:.3.find()}")
             except:
                 return False
-            return True
-
+            return md5
 
     def archive(self):
         """
         Archive services in selected year and month
-
         """
 
-        # with a total size of {self.total_size:.2f} GB.
-        if (
-            bu_isciii.utils.prompt_selection(
-                f"The selection you want to file consists of {len(self.services_to_move)} services. Continue?",
-                ["Yes, continue", "Hold up"],
-            )
-        ) == "Yes, continue":
             for service in self.services_to_move:
                 # stderr.print(service["servicFolderName"])
                 archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
