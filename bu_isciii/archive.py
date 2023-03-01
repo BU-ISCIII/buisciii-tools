@@ -4,7 +4,6 @@
 import sys
 import os
 import logging
-import filecmp
 import shutil
 import sysrsync
 import rich
@@ -191,8 +190,8 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, ser_type=None, year=None, api_token=None, option=None):
-        # resolution_id = Nombre de la resolución
+    def __init__(self, resolution_id=None, ser_type=None, year=None, api_token=None,option=None):
+        # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
 
@@ -268,7 +267,11 @@ class Archive:
                 stderr.print(
                     f"Found {len(services_batch)} service(s) within the interval between {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!"
                 )
-                if (bu_isciii.utils.prompt_selection("Continue?",["Yes, continue", "Hold up"])) == "Hold up":
+                if (
+                    bu_isciii.utils.prompt_selection(
+                        "Continue?", ["Yes, continue", "Hold up"]
+                    )
+                ) == "Hold up":
                     stderr.print("Exiting")
                     sys.exit()
 
@@ -287,9 +290,9 @@ class Archive:
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
-                    parameter1= "resolution",
-                    value1 = f"{service_batch['serviceRequestNumber']}.1",
-                    )
+                    parameter1="resolution",
+                    value1=f"{services_batch['serviceRequestNumber']}.1",
+                )
 
                 if isinstance(request, int):
                     stderr.print(
@@ -300,7 +303,7 @@ class Archive:
 
             # services_batch does not seem useful from now on, so delete it from memory
             del services_batch
-        
+
         elif self.quantity == "Single service" and self.resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
 
@@ -341,7 +344,7 @@ class Archive:
                 ["services_and_colaborations", "research"],
             )
 
-        if option is None:  
+        if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
@@ -356,34 +359,42 @@ class Archive:
 
     def targz_directory(self):
         """
-        Creates the tar.gz file for all services
-        Function created to make a tar.gz file from a NON-archived directory
+        Creates the .tar.gz file for all chosen services
+        Function created to make a .tar.gz file from a NON-archived directory
         Extracts the MD5 and size as well, to do it all in a single function (might regret later)
         """
         total_initial_size = 0
         total_compressed_size = 0
 
         for service in self.services_to_move:
-
             _, non_archived_path = get_service_paths(self.conf, self.type, service)
 
-            initial_size = get_dir_size(non_archived_path) / pow(1024,3)
-            stderr.print(f"Service {non_archived_path.split("/")[-1]} will be compressed")
+            initial_size = get_dir_size(non_archived_path) / pow(1024, 3)
+            stderr.print(
+                f"Service {non_archived_path.split('/')[-1]} will be compressed"
+            )
             total_initial_size += initial_size
-            
+
             try:
-                targz_dir(non_archived_path + ".tar.gz", directory)
-                
-                compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024,3)
+                targz_dir(non_archived_path + ".tar.gz", non_archived_path)
+
+                compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(
+                    1024, 3
+                )
                 total_compressed_size += compressed_size
 
-                stderr.print(f"Service {non_archived_path.split("/")[-1]} was compressed\nInitial size:{initial_size:.3f}GB\nCompressed size:{compressed_size:.3f}\n Saved space: {initial_size - compressed_size:.3.find()}\n")
-            except:
+                stderr.print(
+                    f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size:{initial_size:.3f}GB\nCompressed size:{compressed_size:.3f}\n Saved space: {initial_size - compressed_size:.3.find()}\n"
+                )
+            # Just an error placeholder. TODO: see what errors might arise
+            except IOError:
                 return False
 
-            stderr.print(f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f}GB\nTotal compressed size: {total_compressed_size:.3f}\nSaved space: {total_initial_size - total_compressed_size:.3f}")
-            
-            return 
+            stderr.print(
+                f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f}GB\nTotal compressed size: {total_compressed_size:.3f}\nSaved space: {total_initial_size - total_compressed_size:.3f}"
+            )
+
+            return
 
     def archive(self):
         """
@@ -391,17 +402,29 @@ class Archive:
         Make sure they are .tar.gz files
         Delete origin if everything is alright
         """
-        
+
         for service in self.services_to_move:
             # stderr.print(service["servicFolderName"])
-            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
+            archived_path, non_archived_path = get_service_paths(
+                self.conf, self.type, service
+            )
 
-            if os.path.exists(archived_path) and not os.path.exists(archived_path + ".tar.gz"):
-                if self.option == "Partial archive: archive NON-archived directory (must be compressed first)":
+            if os.path.exists(archived_path) and not os.path.exists(
+                archived_path + ".tar.gz"
+            ):
+                if (
+                    self.option
+                    == "Partial archive: archive NON-archived directory (must be compressed first)"
+                ):
                     stderr.print(
-                        f"{archived_path.split("/")[-1] + ".tar.gz"} was not found in the directory. You have chosen a partial archiving process, make sure this file has been compressed to .tar.gz" 
+                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the directory. You have chosen a partial archiving process, make sure this file has been compressed"
                     )
-                    if (bu_isciii.utils.prompt_selection("Continue?",["Yes, continue", "Hold up"])) == "Hold up":
+
+                    if (
+                        bu_isciii.utils.prompt_selection(
+                            "Continue?", ["Yes, continue", "Hold up"]
+                        )
+                    ) == "Hold up":
                         sys.exit()
                     break
 
@@ -409,15 +432,15 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source = non_archived_path + ".tar.gz",
-                    destination = archived_path + ".tar.gz",
-                    options = self.conf["options"],
-                    sync_source_contents = False,
+                    source=non_archived_path + ".tar.gz",
+                    destination=archived_path + ".tar.gz",
+                    options=self.conf["options"],
+                    sync_source_contents=False,
                 )
 
                 if previous_md5 == get_md5(archived_path + ".tar.gz"):
                     stderr.print(
-                        f"[green] Service {archived_path.split("/")[-1]}: Data copied successfully to its destiny archive folder (MD5: {previous_md5}; equal in both sides)",
+                        f"[green] Service {archived_path.split('/')[-1]}: Data copied successfully to its destiny archive folder (MD5: {previous_md5}; equal in both sides)",
                         highlight=False,
                     )
                     stderr.print(f"Deleting original path: {non_archived_path}")
@@ -425,7 +448,7 @@ class Archive:
 
             except OSError as e:
                 stderr.print(
-                    f"[red] ERROR: {archived_path.split("/")[-1]} could not be copied to its destiny archive folder.",
+                    f"[red] ERROR: {archived_path.split('/')[-1]} could not be copied to its destiny archive folder.",
                     highlight=False,
                 )
                 log.error(
@@ -450,14 +473,16 @@ class Archive:
                 f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
             )
 
-            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
+            archived_path, non_archived_path = get_service_paths(
+                self.conf, self.type, service
+            )
 
             try:
                 sysrsync.run(
-                    source = archived_path + ".tar.gz",
-                    destination = non_archived_path + "tar.gz",
-                    options = self.conf["options"],
-                    sync_source_contents = False,
+                    source=archived_path + ".tar.gz",
+                    destination=non_archived_path + ".tar.gz",
+                    options=self.conf["options"],
+                    sync_source_contents=False,
                 )
                 stderr.print(
                     "[green] Data retrieved successfully from its archive folder.",
@@ -483,7 +508,10 @@ class Archive:
             self.archive()
         elif self.option == "Partial archive: compress NON-archived directory":
             pass
-        elif self.option == "Partial archive: archive NON-archived directory (must be compressed first), delete origin":
+        elif (
+            self.option
+            == "Partial archive: archive NON-archived directory (must be compressed first), delete origin"
+        ):
             pass
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.retrieve_from_archive()
