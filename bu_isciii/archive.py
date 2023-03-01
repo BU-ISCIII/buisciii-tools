@@ -311,11 +311,10 @@ class Archive:
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
-                    par
-            # check that 
-            if (bu_isciii.utils.prompt_selection(f"The selection you want to file consists of {len(self.services_to_move)} services. ,)) :
-                sys.exit()e=False,
-                )
+                    parameter1= "resolution",
+                    value1 = f"{service_batch['serviceRequestNumber']}.1",
+                    )
+
                 if isinstance(request, int):
                     stderr.print(
                         f"Resolution '{service['serviceRequestNumber']}.1' could not be found. Connection seemed right though!"
@@ -359,17 +358,6 @@ class Archive:
 
         # Obtain info from iSkyLIMS api with the conf_api info
 
-        print(self.services_to_move)
-            
-        # Calculate size of the directories (already in GB)
-        """
-        stderr.print(
-            "Calculating total size of the directories to be filed.",
-            highlight=False,
-        )
-        self.total_size = sum([get_dir_size(directory) for directory in self.services_to_move]) * 9.31 * pow(10,-9)
-        """
-
         if self.type is None:
             stderr.print("Working with a service, or a research resolution?")
             self.type = bu_isciii.utils.prompt_selection(
@@ -378,13 +366,12 @@ class Archive:
             )
 
         if option is None:  
-            print(f"archived_path : {self.conf['archived_path']}")
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
                 [
                     "Full archive: compress and archive",
-                    "Partial archive: compress NON-archived directory (and get MD5)",
+                    "Partial archive: compress NON-archived directory",
                     "Partial archive: archive NON-archived directory (must be compressed first)",
                     "Full retrieve: retrieve and uncompress",
                     "That should be all, thank you!",
@@ -397,52 +384,75 @@ class Archive:
         Function created to make a tar.gz file from a NON-archived directory
         Extracts the MD5 and size as well, to do it all in a single function (might regret later)
         """
+        total_initial_size = 0
+        total_compressed_size = 0
+
         for service in self.services_to_move:
 
             _, non_archived_path = get_service_paths(self.conf, self.type, service)
 
             initial_size = get_dir_size(non_archived_path) / pow(1024,3)
             stderr.print(f"Service {non_archived_path.split("/")[-1]} will be compressed")
-
+            total_initial_size += initial_size
+            
             try:
                 targz_dir(non_archived_path + ".tar.gz", directory)
-                md5 = get_md5(compressed_filepath)
+                
                 compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024,3)
-                stderr.print(f"Service {non_archived_path.split("/")[-1]} was compressed\nInitial size:{initial_size:.3f}GB\nCompressed size:{compressed_size:.3f}\n Saved space: {initial_size - compressed_size:.3.find()}")
+                total_compressed_size += compressed_size
+
+                stderr.print(f"Service {non_archived_path.split("/")[-1]} was compressed\nInitial size:{initial_size:.3f}GB\nCompressed size:{compressed_size:.3f}\n Saved space: {initial_size - compressed_size:.3.find()}\n")
             except:
                 return False
-            return md5
+
+            stderr.print(f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f}GB\nTotal compressed size: {total_compressed_size:.3f}\nSaved space: {total_initial_size - total_compressed_size:.3f}")
+            
+            return 
 
     def archive(self):
         """
-        Archive services in selected year and month
+        Archive selected services
         """
+        
+        for service in self.services_to_move:
+            # stderr.print(service["servicFolderName"])
+            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
 
-            for service in self.services_to_move:
-                # stderr.print(service["servicFolderName"])
-                archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
-
-                try:
-                    sysrsync.run(
-                        source=non_archived_path,
-                        destination=archived_path,
-                        options=self.conf["options"],
-                        sync_source_contents=False,
-                    )
+            if os.path.exists(archived_path) and not os.path.exists(archived_path + ".tar.gz"):
+                if self.option == "Partial archive: archive NON-archived directory (must be compressed first)":
                     stderr.print(
-                        "[green] Data copied successfully to its destiny archive folder",
+                        f"{archived_path.split("/")[-1] + ".tar.gz"} was not found in the directory. You have chosen a partial archiving process, make sure this file has been compressed to .tar.gz" 
+                    )
+                    if (bu_isciii.utils.prompt_selection("Continue?",["Yes, continue", "Hold up"])) == "Hold up":
+                        sys.exit()
+                    break
+
+            previous_md5 = get_md5(non_archived_path + ".tar.gz")
+
+            try:
+                sysrsync.run(
+                    source = non_archived_path + ".tar.gz",
+                    destination = archived_path + ".tar.gz",
+                    options = self.conf["options"],
+                    sync_source_contents = False,
+                )
+
+                if previous_md5 == get_md5(archived_path + ".tar.gz"):
+                    stderr.print(
+                        f"[green] Service {archived_path.split("/")[-1]}: Data copied successfully to its destiny archive folder (MD5: {previous_md5}; equal in both sides)",
                         highlight=False,
                     )
-                except OSError as e:
-                    stderr.print(
-                        "[red] ERROR: Data could not be copied to its destiny archive folder.",
-                        highlight=False,
-                    )
-                    log.error(
-                        f"Directory {non_archived_path} could not be archived to {archived_path}.\
-                            Reason: {e}"
-                    )
-            return
+
+            except OSError as e:
+                stderr.print(
+                    f"[red] ERROR: {archived_path.split("/")[-1]} could not be copied to its destiny archive folder.",
+                    highlight=False,
+                )
+                log.error(
+                    f"Directory {non_archived_path} could not be archived to {archived_path}.\
+                        Reason: {e}"
+                )
+        return
 
     def retrieve_from_archive(self):
         """
@@ -465,8 +475,8 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source=archived_path,
-                    destination=non_archived_path,
+                    source=archived_path + ".tar.gz",
+                    destination=non_archived_path + "tar.gz",
                     options=self.conf["options"],
                     sync_source_contents=False,
                 )
@@ -511,7 +521,7 @@ class Archive:
         """
         if self.option == "Full archive: compress and archive":
             self.archive()
-        elif self.option == "Partial archive: compress NON-archived directory (and get MD5)":
+        elif self.option == "Partial archive: compress NON-archived directory":
             pass
         elif self.option == "Partial archive: archive NON-archived directory (must be compressed first)":
             pass
