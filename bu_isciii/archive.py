@@ -152,7 +152,7 @@ def get_service_paths(conf, ser_type, service):
     )
 
     # Path in archive
-    archived = os.path.join(
+    archived_path = os.path.join(
         conf["archived_path"],
         ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
@@ -160,14 +160,14 @@ def get_service_paths(conf, ser_type, service):
     )
 
     # Path out of archive
-    non_archived = os.path.join(
+    non_archived_path = os.path.join(
         conf["data_path"],
         ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
         service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
     )
 
-    return archived, non_archived
+    return archived_path, non_archived_path
 
 
 def get_dir_size(path):
@@ -224,6 +224,7 @@ class Archive:
         self.resolution_id = resolution_id
         self.type = ser_type
         self.option = option
+        self.services_to_move = []
 
         """
         ANCHOR CODE: when "year" option was removed, this chunk became deprecated
@@ -285,12 +286,12 @@ class Archive:
             # Check drylab_api.get_request
             if isinstance(services_batch, int):
                 stderr.print(
-                    f"No services were found in the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!"
+                    f"No services were found in the interval between {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!"
                 )
                 sys.exit()
             else:
                 stderr.print(
-                    f"Found {len(services_batch)} service(s) within the interval {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!"
+                    f"Found {len(services_batch)} service(s) within the interval between {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!"
                 )
 
             # Get individual serviceFullData for each data
@@ -305,7 +306,7 @@ class Archive:
                 value1 = f"{service_batch['serviceRequestNumber']}.1",
                 ) for service_batch in services_batch]
             """
-            self.services_to_move = []
+            
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
@@ -374,20 +375,39 @@ class Archive:
                 ["services_and_colaborations", "research"],
             )
 
-        if option is None:
+        if option is None:  
+            print(f"archived_path : {self.conf['archived_path']}")
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
                 [
                     "Full archive: compress and archive",
+                    "Partial archive: compress NON-archived directory (and get MD5)",
+                    "Partial archive: archive NON-archived directory (must be compressed first)",
                     "Full retrieve: retrieve and uncompress",
                     "That should be all, thank you!",
                 ],
             )
 
+    def targz_directory(self):
+        """
+        Creates the tar.gz file
+        Function created to make a tar.gz file from a NON-archived directory
+        Extract the MD5 as well, to do it all in a single function (might regret later)
+        """
+        for service in self.services_to_move:
+            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
+            
+            compressed_filepath = non_archived_path + ".tar.gz"
+            targz_dir(compressed_filepath, directory)
+            md5 = get_md5(compressed_filepath)
+        return True
+
+
     def archive(self):
         """
         Archive services in selected year and month
+
         """
 
         # with a total size of {self.total_size:.2f} GB.
@@ -399,13 +419,12 @@ class Archive:
         ) == "Yes, continue":
             for service in self.services_to_move:
                 # stderr.print(service["servicFolderName"])
-
-                dest, source = get_service_paths(self.conf, self.type, service)
+                archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
 
                 try:
                     sysrsync.run(
-                        source=source,
-                        destination=dest,
+                        source=non_archived_path,
+                        destination=archived_path,
                         options=self.conf["options"],
                         sync_source_contents=False,
                     )
@@ -419,7 +438,7 @@ class Archive:
                         highlight=False,
                     )
                     log.error(
-                        f"Directory {self.source} could not be archived to {self.dest}.\
+                        f"Directory {non_archived_path} could not be archived to {archived_path}.\
                             Reason: {e}"
                     )
             return
@@ -441,28 +460,12 @@ class Archive:
                 f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
             )
 
-            source = os.path.join(
-                self.conf["archived_path"],
-                self.type,
-                service["serviceUserId"]["profile"]["profileCenter"],
-                service["serviceUserId"]["profile"][
-                    "profileClassificationArea"
-                ].lower(),
-            )
-
-            dest = os.path.join(
-                self.conf["data_path"],
-                self.type,
-                service["serviceUserId"]["profile"]["profileCenter"],
-                service["serviceUserId"]["profile"][
-                    "profileClassificationArea"
-                ].lower(),
-            )
+            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
 
             try:
                 sysrsync.run(
-                    source=source,
-                    destination=dest,
+                    source=archived_path,
+                    destination=non_archived_path,
                     options=self.conf["options"],
                     sync_source_contents=False,
                 )
@@ -507,6 +510,10 @@ class Archive:
         """
         if self.option == "Full archive: compress and archive":
             self.archive()
+        elif self.option == "Partial archive: compress NON-archived directory (and get MD5)":
+            pass
+        elif self.option == "Partial archive: archive NON-archived directory (must be compressed first)":
+            pass
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.retrieve_from_archive()
         elif self.option == "That should be all, thank you!":
