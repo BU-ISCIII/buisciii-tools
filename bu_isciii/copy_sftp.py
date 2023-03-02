@@ -53,7 +53,9 @@ class CopySftp:
 
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("sftp_copy")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
 
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(

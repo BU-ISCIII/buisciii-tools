@@ -122,7 +122,9 @@ class Archive:
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
 
         # Get data to connect to the api
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
 
         # Obtain info from iSkyLIMS api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(

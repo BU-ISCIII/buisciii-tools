@@ -54,7 +54,9 @@ class Scratch:
             self.direction = direction
 
         # Load conf
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         # Obtain info from iskylims api
         rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"], api_password)
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")

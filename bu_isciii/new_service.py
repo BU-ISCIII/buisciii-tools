@@ -46,7 +46,9 @@ class NewService:
 
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         # Obtain info from iskylims api
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_password

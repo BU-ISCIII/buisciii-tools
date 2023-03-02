@@ -68,9 +68,7 @@ class BioinfoDoc:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "local_api_settings"
-        )
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_password
         )

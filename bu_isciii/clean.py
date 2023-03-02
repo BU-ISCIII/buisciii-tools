@@ -51,7 +51,9 @@ class CleanUp:
 
         # Obtain info from iskylims api
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_password
         )
