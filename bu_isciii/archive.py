@@ -325,11 +325,17 @@ class Archive:
                 "Options",
                 [
                     "Full archive: compress and archive",
-                    "Partial archive: compress NON-archived directory",
-                    "Partial archive: archive NON-archived directory (must be compressed first), delete origin",
-                    "Full retrieve: retrieve and uncompress",
+                    "Partial archive: compress NON-archived service", 
+                    "Partial archive: archive NON-archived service (must be compressed first) and check md5",       
+                    "Partial archive: uncompress newly archived compressed service",
+                    "Partial archive: remove newly archived compressed service from DATA directory",
+                    "Partial archive: remove newly archived compressed service from ARCHIVED directory",
+                    "Full retrieve: retrieve and uncompress",        
+                    "Partial retrieve: compress archived service",
+                    "Partial retrieve: retrieve archived service (must be compressed first, and check md5",
+                    "Partial retrieve: uncompress retrieved service",
                     "That should be all, thank you!",
-                ],
+                ]
             )
 
     def targz_directory(self):
@@ -452,9 +458,6 @@ class Archive:
                         f"[green] Service {archived_path.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({non_archived_path}) to its destiny folder ({archived_path}) (MD5: {previous_md5}; equal in both sides)",
                         highlight=False,
                     )
-                    stderr.print(f"Deleting original path: {non_archived_path}")
-                    stderr.print("NOT ACTUALLY REMOVING FOR TESTING PURPOSES")
-                    #shutil.rmtree(non_archived_path)
 
             except OSError as e:
                 stderr.print(
@@ -514,19 +517,38 @@ class Archive:
         """
         Handle archive class options
         """
-        if self.option == "Full archive: compress and archive":
+        if (self.option == "Full archive: compress and archive"):
             self.targz_directory()
             self.archive()
         
-        elif self.option == "Partial archive: compress NON-archived directory":
+        elif (self.option == "Partial archive: compress NON-archived service"):
             self.targz_directory()
         
-        elif (self.option == "Partial archive: archive NON-archived directory (must be compressed first), delete origin"):
+        elif (self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5"):
             self.archive()
         
-        elif self.option == "Full retrieve: retrieve and uncompress":
-            self.retrieve_from_archive()
+        elif (self.option == "Partial archive: uncompress newly archived compressed service"):
+            pass
+
+        elif (self.option == "Partial archive: remove newly archived compressed service from DATA directory"):
+            pass
+
+        elif (self.option == "Partial archive: remove newly archived compressed service from ARCHIVED directory"):
+            pass
+
+        elif (self.option == "Full retrieve: retrieve and uncompress"):
+            pass
+            #self.retrieve_from_archive()
         
-        elif self.option == "That should be all, thank you!":
+        elif (self.option == "Partial retrieve: compress archived service"):
+            pass
+        
+        elif (self.option == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"):
+            pass
+
+        elif (self.option == "Partial retrieve: uncompress retrieved service"):
+            pass
+
+        elif (self.option == "That should be all, thank you!"):
             sys.exit()
         return
