@@ -4,7 +4,8 @@
 import sys
 import os
 import logging
-import shutil
+
+# import shutil
 import sysrsync
 import rich
 import calendar
@@ -117,7 +118,13 @@ def get_service_paths(conf, ser_type, service):
 
     NOTE: for some services, the 'profileClassificationArea' is None, and the os.path.join may fail
     """
-    center = service["serviceUserId"]["profile"]["profileClassificationArea"].lower() if isinstance(service["serviceUserId"]["profile"]["profileClassificationArea"], str) else ""
+    center = (
+        service["serviceUserId"]["profile"]["profileClassificationArea"].lower()
+        if isinstance(
+            service["serviceUserId"]["profile"]["profileClassificationArea"], str
+        )
+        else ""
+    )
 
     # print(service)
     # print(f"data_path: {conf['data_path']}")
@@ -202,10 +209,9 @@ class Archive:
         # Record of failed services in any of the steps
         self.failed_services = {
             "failed_compression": [],
-            "failed_movement" : [],
+            "failed_movement": [],
             "failed_uncompression": [],
         }
-
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -218,7 +224,13 @@ class Archive:
             conf_api["server"], conf_api["api_url"]
         )
 
-        if bu_isciii.utils.prompt_selection("Working with a batch, or a single resolution?",["Batch of services", "Single service"],) == "Batch of services":
+        if (
+            bu_isciii.utils.prompt_selection(
+                "Working with a batch, or a single resolution?",
+                ["Batch of services", "Single service"],
+            )
+            == "Batch of services"
+        ):
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
@@ -280,13 +292,15 @@ class Archive:
             del services_batch
 
         else:
-            self.resolution_id = bu_isciii.utils.prompt_service_id() if self.resolution_id is None else self.resolution_id
-            
-            stderr.print(
-                f"Asking our trusty API about service: {self.resolution_id}"
+            self.resolution_id = (
+                bu_isciii.utils.prompt_service_id()
+                if self.resolution_id is None
+                else self.resolution_id
             )
 
-            # Hold the results in a list so it can be accessed 
+            stderr.print(f"Asking our trusty API about service: {self.resolution_id}")
+
+            # Hold the results in a list so it can be accessed
             # Just like in batch mode
             self.services_to_move = [
                 rest_api.get_request(
@@ -325,17 +339,17 @@ class Archive:
                 "Options",
                 [
                     "Full archive: compress and archive",
-                    "Partial archive: compress NON-archived service", 
-                    "Partial archive: archive NON-archived service (must be compressed first) and check md5",       
+                    "Partial archive: compress NON-archived service",
+                    "Partial archive: archive NON-archived service (must be compressed first) and check md5",
                     "Partial archive: uncompress newly archived compressed service",
                     "Partial archive: remove newly archived compressed services from DATA directory",
                     "Partial archive: remove newly archived compressed services from ARCHIVED directory",
-                    "Full retrieve: retrieve and uncompress",        
+                    "Full retrieve: retrieve and uncompress",
                     "Partial retrieve: compress archived service",
                     "Partial retrieve: retrieve archived service (must be compressed first, and check md5",
                     "Partial retrieve: uncompress retrieved service",
                     "That should be all, thank you!",
-                ]
+                ],
             )
 
     def targz_directory(self, direction):
@@ -353,40 +367,46 @@ class Archive:
 
         # try:
         for service in self.services_to_move:
-            
             # Get paths (archived and non-archived counterparts)
-            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
+            archived_path, non_archived_path = get_service_paths(
+                self.conf, self.type, service
+            )
 
             # Identify
             dir_to_tar = non_archived_path if direction == "archive" else archived_path
 
             initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
-           
+
             # Check if there is a prior ".tar.gz" file
             # NOTE: I find dir_to_tar + ".tar.gz" easier to locate the compressed files
             if os.path.exists(dir_to_tar + ".tar.gz"):
                 compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
                 stderr.print(
-                    f"Seems like service {dir_to_tar.split('/')[-1]} has already been compressed\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
-                
-                if (bu_isciii.utils.prompt_selection("What to do?", ["Just skip it", f"Delete previous {dir_to_tar.split('/')[-1] + '.tar.gz'}"])) == "Just skip it":
+                    f"Seems like service {dir_to_tar.split('/')[-1]} has already been compressed\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB"
+                )
+
+                if (
+                    bu_isciii.utils.prompt_selection(
+                        "What to do?",
+                        [
+                            "Just skip it",
+                            f"Delete previous {dir_to_tar.split('/')[-1] + '.tar.gz'} and compress again",
+                        ],
+                    )
+                ) == "Just skip it":
                     total_initial_size += initial_size
                     total_compressed_size += compressed_size
-                    already_compressed_services.append(dir_to_tar.split('/')[-1])
+                    already_compressed_services.append(dir_to_tar.split("/")[-1])
                     continue
                 else:
                     os.remove(dir_to_tar + ".tar.gz")
 
-            stderr.print(
-                f"Compressing service {dir_to_tar.split('/')[-1]}"
-            )
-            
+            stderr.print(f"Compressing service {dir_to_tar.split('/')[-1]}")
+
             targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
 
-            compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(
-                1024, 3
-            )
-            
+            compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
+
             total_initial_size += initial_size
             total_compressed_size += compressed_size - compressed_size
 
@@ -394,20 +414,20 @@ class Archive:
                 f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size: {initial_size:.3f} GB\nCompressed size: {compressed_size:.3f} GB\nSaved space: {initial_size - compressed_size:.3f} GB\n"
             )
 
-        # Just an error placeholder. 
+        # Just an error placeholder.
         # TODO: see what errors might arise
         # except IOError:
         #    return False
 
         stderr.print(
-            f"Compressed all {len(self.services_to_move)} services\nTotal initial size: {total_initial_size:.3f} GB\nTotal compressed size: {total_compressed_size:.3f} GB\nSaved space: {total_initial_size - total_compressed_size:.3f} GB"
+            f"\nCompressed all {len(self.services_to_move)} services\nTotal initial size: {total_initial_size:.3f} GB\nTotal compressed size: {total_compressed_size:.3f} GB\nSaved space: {total_initial_size - total_compressed_size:.3f} GB\n"
         )
 
         if len(already_compressed_services) > 0:
             stderr.print(
                 f"Numbers above include the following {len(already_compressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
             )
-                
+
         return
 
     def move_directory(self, direction):
@@ -422,21 +442,36 @@ class Archive:
                 self.conf, self.type, service
             )
 
-            [origin, destiny] = [non_archived_path, archived_path] if direction == "archive" else [archived_path, non_archived_path]
+            [origin, destiny] = (
+                [non_archived_path, archived_path]
+                if direction == "archive"
+                else [archived_path, non_archived_path]
+            )
 
             # If origin cant be found, next
             if not (os.path.exists(origin)):
                 stderr.print(
-                        f"{origin.split('/')[-1]} was not found in the origin directory ({'/'.join(origin.split('/'))[:-1]})"
-                    )
+                    f"{origin.split('/')[-1]} was not found in the origin directory ({'/'.join(origin.split('/'))[:-1]})"
+                )
                 continue
 
             # If origin is found, but no compressed origin
-            if ((os.path.exists(origin)) and not (os.path.exists(origin + ".tar.gz"))):
-                if ((self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5") or
-                    (self.option == "Partial retrieve: retrieve archived service (must be compressed first, and check md5")):
-                    stderr.print(f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial process, make sure this file has been compressed beforehand")
-                    if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
+            if (os.path.exists(origin)) and not (os.path.exists(origin + ".tar.gz")):
+                if (
+                    self.option
+                    == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
+                ) or (
+                    self.option
+                    == "Partial retrieve: retrieve archived service (must be compressed first, and check md5"
+                ):
+                    stderr.print(
+                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial process, make sure this file has been compressed beforehand"
+                    )
+                    if (
+                        bu_isciii.utils.prompt_selection(
+                            "Continue?", ["Yes, continue", "Hold up"]
+                        )
+                    ) == "Hold up":
                         sys.exit()
                 # else:
                 # si es un total archive o total retrieve,
@@ -444,10 +479,17 @@ class Archive:
                 continue
 
             # If compresed destiny exists
-            if (os.path.exists(destiny + ".tar.gz")):
-                stderr.print(f"Seems like this service ({destiny.split('/')[-1]}) has already been {direction + 'd'}")
-                # SHOW SIZE OF ORIGINAL AND SIZE OF COMPRESSED FILE?  
-                if (bu_isciii.utils.prompt_selection("What to do?", [f"Remove it and {direction} it again", "Ignore this service"])) == "Ignore this service":
+            if os.path.exists(destiny + ".tar.gz"):
+                stderr.print(
+                    f"Seems like this service ({destiny.split('/')[-1]}) has already been {direction + 'd'}"
+                )
+                # SHOW SIZE OF ORIGINAL AND SIZE OF COMPRESSED FILE?
+                if (
+                    bu_isciii.utils.prompt_selection(
+                        "What to do?",
+                        [f"Remove it and {direction} it again", "Ignore this service"],
+                    )
+                ) == "Ignore this service":
                     continue
                 else:
                     os.remove(destiny + ".tar.gz")
@@ -456,10 +498,10 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source = origin + ".tar.gz",
-                    destination = destiny + ".tar.gz",
-                    options = self.conf["options"],
-                    sync_source_contents = False,
+                    source=origin + ".tar.gz",
+                    destination=destiny + ".tar.gz",
+                    options=self.conf["options"],
+                    sync_source_contents=False,
                 )
 
                 if origin_md5 == get_md5(destiny + ".tar.gz"):
@@ -483,46 +525,61 @@ class Archive:
         """
         Handle archive class options
         """
-        if (self.option == "Full archive: compress and archive"):
+        if self.option == "Full archive: compress and archive":
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
             # self.uncompress_targz_directory(direction="archive")
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial archive: compress NON-archived service"):
+        elif self.option == "Partial archive: compress NON-archived service":
             self.targz_directory(direction="archive")
 
-        elif (self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5"):
+        elif (
+            self.option
+            == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
+        ):
             self.move_directory(direction="archive")
-        
-        elif (self.option == "Partial archive: uncompress newly archived compressed service"):
+
+        elif (
+            self.option
+            == "Partial archive: uncompress newly archived compressed service"
+        ):
             # self.uncompress_targz_directory(direction="archive")
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial archive: remove newly archived compressed services from DATA directory"):
+        elif (
+            self.option
+            == "Partial archive: remove newly archived compressed services from DATA directory"
+        ):
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial archive: remove newly archived compressed services from ARCHIVED directory"):
+        elif (
+            self.option
+            == "Partial archive: remove newly archived compressed services from ARCHIVED directory"
+        ):
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Full retrieve: retrieve and uncompress"):
+        elif self.option == "Full retrieve: retrieve and uncompress":
             # self.targz_directory(direction="retrieve")
             # self.move_directory(direction="retrieve")
             # self.uncompress_targz_directory(direction="retrieve")
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial retrieve: compress archived service"):
+        elif self.option == "Partial retrieve: compress archived service":
             # self.targz_directory(direction="retrieve")
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"):
+        elif (
+            self.option
+            == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
+        ):
             # self.move_directory(direction="retrieve")
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial retrieve: uncompress retrieved service"):
+        elif self.option == "Partial retrieve: uncompress retrieved service":
             # self.uncompress_targz_directory(direction="retrieve")
             stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "That should be all, thank you!"):
+        elif self.option == "That should be all, thank you!":
             sys.exit()
         return
