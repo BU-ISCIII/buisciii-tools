@@ -25,14 +25,9 @@ class RestServiceApi:
 
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
     # by Guille: I used an f-string instead of all the + stuff, I think thats cleaner?
-    def get_request(
-        self, request_info, parameter1, value1, parameter2=None, value2=None, safe=True
-    ):
-        url_http = (
-            f"{self.request_url}{request_info}?{parameter1}={value1}"
-            if parameter2 is None
-            else f"{self.request_url}{request_info}?{parameter1}={value1}&{parameter2}={value2}"
-        )
+    # by Guille: **kwargs time!
+    def get_request(self, request_info,safe=True,**kwargs):
+        url_http = f"{self.request_url}{request_info}?{''.join[f'{key}={value}' for key,value in kwargs.items()]}"
         print(url_http)
         try:
             req = requests.get(url_http, headers=self.headers)
