@@ -3,9 +3,9 @@
 </p>
 <br>
 <br>
-## Service requested to  Bioinformatics Unit (BU-ISCIII)
+# Service requested to  Bioinformatics Unit (BU-ISCIII)
 
-### {{ service.serviceRequestNumber }} service information:
+## {{ service.serviceRequestNumber }} service information:
 
 Here we describe the information about the service request:
 
@@ -19,7 +19,7 @@ Here we describe the information about the service request:
 {% endfor %}
 * Service Notes : {{service_notes}}
 
-### User information:
+## User information:
 
 Here we describe the information about the user requesting the service.
 
@@ -29,7 +29,7 @@ Here we describe the information about the user requesting the service.
 
 
 {% if resolution %}
-### Resolution information
+## Resolution information
 
 Here we describe information about the requested resolution.
 
@@ -50,7 +50,7 @@ Here we describe information about the requested resolution.
 * Resolution Notes: {{ resolution.resolutionNotes }}
 {% endif %}
 
-### Samples sequenced at ISCIII:
+## Samples sequenced at ISCIII:
 
 Here we describe information about the project associated to the service:
 {% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }}{% endif %}
