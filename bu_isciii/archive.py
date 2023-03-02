@@ -361,8 +361,8 @@ class Archive:
             dir_to_tar = non_archived_path if direction == "archive" else archived_path
 
             initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
-            # Check if there is a prior "tar.gz" file
-            
+           
+            # Check if there is a prior ".tar.gz" file
             # NOTE: I find dir_to_tar + ".tar.gz" easier to locate the compressed files
             if os.path.exists(dir_to_tar + ".tar.gz"):
                 compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
@@ -422,17 +422,17 @@ class Archive:
                 self.conf, self.type, service
             )
 
-            origin, destiny = non_archived_path, archived_path if direction == "archive" else archived_path, non_archived_path
+            [origin, destiny] = [non_archived_path, archived_path] if direction == "archive" else [archived_path, non_archived_path]
 
             # If origin cant be found, next
-            if not os.path.exists(origin):
+            if not (os.path.exists(origin)):
                 stderr.print(
                         f"{origin.split('/')[-1]} was not found in the origin directory ({'/'.join(origin.split('/'))[:-1]})"
                     )
                 continue
 
             # If origin is found, but no compressed origin
-            if os.path.exists(destiny) and not os.path.exists(archived_path + ".tar.gz"):
+            if ((os.path.exists(origin)) and not (os.path.exists(origin + ".tar.gz"))):
                 if ((self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5") or
                     (self.option == "Partial retrieve: retrieve archived service (must be compressed first, and check md5")):
                     stderr.print(f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial process, make sure this file has been compressed beforehand")
@@ -441,8 +441,16 @@ class Archive:
                 # else:
                 # si es un total archive o total retrieve,
                 # revisar en el diccionario de fails si ha fallado en el paso de compresión
-
                 continue
+
+            # If compresed destiny exists
+            if (os.path.exists(destiny + ".tar.gz")):
+                stderr.print(f"Seems like this service ({destiny.split('/')[-1]}) has already been {direction + 'd'}")
+                # SHOW SIZE OF ORIGINAL AND SIZE OF COMPRESSED FILE?  
+                if (bu_isciii.utils.prompt_selection("What to do?", [f"Remove it and {direction} it again", "Ignore this service"])) == "Ignore this service":
+                    continue
+                else:
+                    os.remove(destiny + ".tar.gz")
 
             origin_md5 = get_md5(origin + ".tar.gz")
 
@@ -478,8 +486,9 @@ class Archive:
         if (self.option == "Full archive: compress and archive"):
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
-            self.uncompress_targz_directory(direction="archive")
-        
+            # self.uncompress_targz_directory(direction="archive")
+            stderr.print("This is not ready yet, Im on it!")
+
         elif (self.option == "Partial archive: compress NON-archived service"):
             self.targz_directory(direction="archive")
 
