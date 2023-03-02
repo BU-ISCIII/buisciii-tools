@@ -116,7 +116,6 @@ def get_service_paths(conf, ser_type, service):
     archive, and outside of it
 
     NOTE: for some services, the 'profileClassificationArea' is None, and the os.path.join may fail
-
     """
     print(f"archived_path : {conf['archived_path']}")
     print(f"ser_type : {ser_type}")
@@ -199,28 +198,7 @@ class Archive:
         self.type = ser_type
         self.option = option
         self.services_to_move = []
-
-        """
-        ANCHOR CODE: when "year" option was removed, this chunk became deprecated
-        # assumption: year and no resolution_id >>> Batch management
-        self.quantity = (
-            "Batch"
-            if self.year is not None and self.resolution_id is None
-            else None
-        )
-        # assumption: resolution_id and no year >>> Single service management
-        self.quantity = (
-            "Single service"
-            if self.resolution_id is not None and self.year is None
-            else None
-        )
-        """
-
-        self.quantity = bu_isciii.utils.prompt_selection(
-            "Working with a batch, or a single resolution?",
-            ["Batch", "Single service"],
-        )
-
+        
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
 
@@ -230,6 +208,12 @@ class Archive:
         # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
+        )
+
+
+        self.quantity = bu_isciii.utils.prompt_selection(
+            "Working with a batch, or a single resolution?",
+            ["Batch", "Single service"],
         )
 
         if self.quantity == "Batch":
@@ -277,16 +261,6 @@ class Archive:
 
             # Get individual serviceFullData for each data
             # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
-            # The only way I found to check in real time and keeping track of the missing id was a loop
-            # instead of a list comprehension (check anchor code)
-            """
-            ANCHOR CODE: How this was made before (list comprehension)
-            self.services_to_move = [rest_api.get_request(
-                request_info = "serviceFullData",
-                parameter1= "resolution",
-                value1 = f"{service_batch['serviceRequestNumber']}.1",
-                ) for service_batch in services_batch]
-            """
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
@@ -311,7 +285,8 @@ class Archive:
                 f"Asking our trusty API about resolution: {self.resolution_id}"
             )
 
-            # Hold the results in a list so it can be accessed just like in the batch
+            # Hold the results in a list so it can be accessed 
+            # Just like in batch mode
             self.services_to_move = [
                 rest_api.get_request(
                     request_info="serviceFullData",
@@ -359,17 +334,39 @@ class Archive:
 
     def targz_directory(self):
         """
+        For all chosen services:
+        Check no prior .tar.gz file has been created
+
         Creates the .tar.gz file for all chosen services
         Function created to make a .tar.gz file from a NON-archived directory
         Extracts the MD5 and size as well, to do it all in a single function (might regret later)
         """
         total_initial_size = 0
         total_compressed_size = 0
+        already_compressed_services = []
 
         for service in self.services_to_move:
+            # Get path
             _, non_archived_path = get_service_paths(self.conf, self.type, service)
-
             initial_size = get_dir_size(non_archived_path) / pow(1024, 3)
+
+            # Check if there is a prior "tar.gz" file
+            # NOTE: I find non_archived_path + ".tar.gz" easier to locate the compressed files
+            if os.path.exists(non_archived_path + ".tar.gz"):
+                compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024, 3)
+                stderr.print(
+                    f"Seems like service {non_archived_path.split('/')[-1]} has already been compressed\nPath: {non_archived_path + '.tar.gz'}\nUncompressed size:{initial_size:.3f} GB\nFound compressed size:{compressed_size:.3f} GB")
+                if (bu_isciii.utils.prompt_selection("What to do?", ["Just skip it", f"Delete previous {non_archived_path.split('/')[-1] + '.tar.gz'}"])) == "Just skip it":
+                    total_initial_size += initial_size
+                    total_compressed_size += compressed_size
+                    already_compressed_services.append(non_archived_path.split('/')[-1])
+                    break
+                else:
+                    shutil()
+
+
+
+
             stderr.print(
                 f"Service {non_archived_path.split('/')[-1]} will be compressed"
             )
@@ -377,15 +374,16 @@ class Archive:
 
             try:
                 targz_dir(non_archived_path + ".tar.gz", non_archived_path)
-
                 compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(
                     1024, 3
                 )
                 total_compressed_size += compressed_size
-
                 stderr.print(
-                    f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size:{initial_size:.3f}GB\nCompressed size:{compressed_size:.3f}\n Saved space: {initial_size - compressed_size:.3.find()}\n"
+                    f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size:{initial_size:.3f}GB\
+                    \nCompressed size:{compressed_size:.3f}GB\
+                    \n Saved space: {initial_size - compressed_size:.3.find()}\n"
                 )
+
             # Just an error placeholder. TODO: see what errors might arise
             except IOError:
                 return False
@@ -393,6 +391,13 @@ class Archive:
             stderr.print(
                 f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f}GB\nTotal compressed size: {total_compressed_size:.3f}\nSaved space: {total_initial_size - total_compressed_size:.3f}"
             )
+
+            if len(already_compressed_services) > 0:
+                stderr.print(
+                    f"The following {len(already_compressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
+                )
+                
+
 
             return
 
