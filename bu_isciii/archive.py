@@ -120,6 +120,7 @@ def get_service_paths(conf, ser_type, service):
     center = service["serviceUserId"]["profile"]["profileClassificationArea"].lower() if isinstance(service["serviceUserId"]["profile"]["profileClassificationArea"], str) else ""
 
     # print(service)
+    # print(f"data_path: {conf['data_path']}")
     # print(f"archived_path : {conf['archived_path']}")
     # print(f"ser_type : {ser_type}")
     # print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
@@ -164,7 +165,7 @@ def targz_dir(tar_name, directory):
     Generate a tar gz file with the contents of a directory
     """
     with tarfile.open(tar_name, "w:gz") as out_tar:
-        out_tar.add(directory)
+        out_tar.add(directory, arcname="/".join(directory.split("/")[:-1])[:-1])
     return True
 
 
@@ -264,7 +265,7 @@ class Archive:
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
-                    resolution=f"{services_batch['serviceRequestNumber']}.1",
+                    resolution=f"{service['serviceRequestNumber']}.1",
                 )
 
                 if isinstance(request, int):
@@ -344,6 +345,7 @@ class Archive:
         total_compressed_size = 0
         already_compressed_services = []
 
+        # try:
         for service in self.services_to_move:
             # Get path
             _, non_archived_path = get_service_paths(self.conf, self.type, service)
@@ -362,7 +364,6 @@ class Archive:
                     already_compressed_services.append(non_archived_path.split('/')[-1])
                     break
                 else:
-                    # maybe a "try" here to avoid permission error?
                     os.remove(non_archived_path + ".tar.gz")
 
             stderr.print(
@@ -383,21 +384,21 @@ class Archive:
                 f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size: {initial_size:.3f} GB\nCompressed size: {compressed_size:.3f} GB\nSaved space: {initial_size - compressed_size:.3f} GB\n"
             )
 
-            # Just an error placeholder. 
-            # TODO: see what errors might arise
-            # except IOError:
-            #    return False
+        # Just an error placeholder. 
+        # TODO: see what errors might arise
+        # except IOError:
+        #    return False
 
+        stderr.print(
+            f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f} GB\nTotal compressed size: {total_compressed_size:.3f} GB\nSaved space: {total_initial_size - total_compressed_size:.3f} GB"
+        )
+
+        if len(already_compressed_services) > 0:
             stderr.print(
-                f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f}GB\nTotal compressed size: {total_compressed_size:.3f}\nSaved space: {total_initial_size - total_compressed_size:.3f}"
+                f"Numbers above include the following {len(already_compressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
             )
-
-            if len(already_compressed_services) > 0:
-                stderr.print(
-                    f"Numbers above include the following {len(already_compressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
-                )
                 
-            return
+        return
 
     def archive(self):
         """
@@ -414,7 +415,7 @@ class Archive:
 
             if os.path.exists(non_archived_path):
                 stderr.print(
-                        f"{archived_path.split('/')[-1]} was not found in the origin directory"
+                        f"{archived_path.split('/')[-1]} was not found in the origin directory ({'/'.join(archived_path.split('/'))[:-1]})"
                     )
 
 
@@ -426,7 +427,7 @@ class Archive:
                     == "Partial archive: archive NON-archived directory (must be compressed first)"
                 ):
                     stderr.print(
-                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory. You have chosen a partial archiving process, make sure this file has been compressed beforehand"
+                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial archiving process, make sure this file has been compressed beforehand"
                     )
 
                     if (
@@ -439,6 +440,8 @@ class Archive:
 
             previous_md5 = get_md5(non_archived_path + ".tar.gz")
 
+            print(f"ORIGIN: {non_archived_path + '.tar.gz'}\nDESTINATION: {archived_path + '.tar.gz'}")
+
             try:
                 sysrsync.run(
                     source = non_archived_path + ".tar.gz",
@@ -449,11 +452,12 @@ class Archive:
 
                 if previous_md5 == get_md5(archived_path + ".tar.gz"):
                     stderr.print(
-                        f"[green] Service {archived_path.split('/')[-1]}: Data copied successfully to its destiny archive folder (MD5: {previous_md5}; equal in both sides)",
+                        f"[green] Service {archived_path.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({non_archived_path}) to its destiny folder ({archived_path}) (MD5: {previous_md5}; equal in both sides)",
                         highlight=False,
                     )
                     stderr.print(f"Deleting original path: {non_archived_path}")
-                    shutil.rmtree(non_archived_path)
+                    stderr.print("NOT ACTUALLY REMOVING FOR TESTING PURPOSES")
+                    #shutil.rmtree(non_archived_path)
 
             except OSError as e:
                 stderr.print(
