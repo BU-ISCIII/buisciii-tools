@@ -354,31 +354,36 @@ class Archive:
         # try:
         for service in self.services_to_move:
             
-            # Get path
-            _, non_archived_path = get_service_paths(self.conf, self.type, service)
-            initial_size = get_dir_size(non_archived_path) / pow(1024, 3)
+            # Get paths (archived and non-archived counterparts)
+            archived_path, non_archived_path = get_service_paths(self.conf, self.type, service)
+
+            # Identify
+            dir_to_tar = non_archived_path if direction == "archive" else archived_path
+
+            initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
             # Check if there is a prior "tar.gz" file
-            # NOTE: I find non_archived_path + ".tar.gz" easier to locate the compressed files
-            if os.path.exists(non_archived_path + ".tar.gz"):
-                compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024, 3)
+            
+            # NOTE: I find dir_to_tar + ".tar.gz" easier to locate the compressed files
+            if os.path.exists(dir_to_tar + ".tar.gz"):
+                compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
                 stderr.print(
-                    f"Seems like service {non_archived_path.split('/')[-1]} has already been compressed\nPath: {non_archived_path + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
+                    f"Seems like service {dir_to_tar.split('/')[-1]} has already been compressed\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
                 
-                if (bu_isciii.utils.prompt_selection("What to do?", ["Just skip it", f"Delete previous {non_archived_path.split('/')[-1] + '.tar.gz'}"])) == "Just skip it":
+                if (bu_isciii.utils.prompt_selection("What to do?", ["Just skip it", f"Delete previous {dir_to_tar.split('/')[-1] + '.tar.gz'}"])) == "Just skip it":
                     total_initial_size += initial_size
                     total_compressed_size += compressed_size
-                    already_compressed_services.append(non_archived_path.split('/')[-1])
+                    already_compressed_services.append(dir_to_tar.split('/')[-1])
                     continue
                 else:
-                    os.remove(non_archived_path + ".tar.gz")
+                    os.remove(dir_to_tar + ".tar.gz")
 
             stderr.print(
-                f"Compressing service {non_archived_path.split('/')[-1]}"
+                f"Compressing service {dir_to_tar.split('/')[-1]}"
             )
             
-            targz_dir(non_archived_path + ".tar.gz", non_archived_path)
+            targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
 
-            compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(
+            compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(
                 1024, 3
             )
             
@@ -417,99 +422,53 @@ class Archive:
                 self.conf, self.type, service
             )
 
-            if os.path.exists(non_archived_path):
+            origin, destiny = non_archived_path, archived_path if direction == "archive" else archived_path, non_archived_path
+
+            # If origin cant be found, next
+            if not os.path.exists(origin):
                 stderr.print(
-                        f"{archived_path.split('/')[-1]} was not found in the origin directory ({'/'.join(archived_path.split('/'))[:-1]})"
+                        f"{origin.split('/')[-1]} was not found in the origin directory ({'/'.join(origin.split('/'))[:-1]})"
                     )
+                continue
 
-
-            if os.path.exists(archived_path) and not os.path.exists(
-                archived_path + ".tar.gz"
-            ):
-                if (
-                    self.option
-                    == "Partial archive: archive NON-archived directory (must be compressed first)"
-                ):
-                    stderr.print(
-                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial archiving process, make sure this file has been compressed beforehand"
-                    )
-
-                    if (
-                        bu_isciii.utils.prompt_selection(
-                            "Continue?", ["Yes, continue", "Hold up"]
-                        )
-                    ) == "Hold up":
+            # If origin is found, but no compressed origin
+            if os.path.exists(destiny) and not os.path.exists(archived_path + ".tar.gz"):
+                if ((self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5") or
+                    (self.option == "Partial retrieve: retrieve archived service (must be compressed first, and check md5")):
+                    stderr.print(f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial process, make sure this file has been compressed beforehand")
+                    if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
                         sys.exit()
-                    continue
+                # else:
+                # si es un total archive o total retrieve,
+                # revisar en el diccionario de fails si ha fallado en el paso de compresión
 
-            previous_md5 = get_md5(non_archived_path + ".tar.gz")
+                continue
+
+            origin_md5 = get_md5(origin + ".tar.gz")
 
             try:
                 sysrsync.run(
-                    source = non_archived_path + ".tar.gz",
-                    destination = archived_path + ".tar.gz",
+                    source = origin + ".tar.gz",
+                    destination = destiny + ".tar.gz",
                     options = self.conf["options"],
                     sync_source_contents = False,
                 )
 
-                if previous_md5 == get_md5(archived_path + ".tar.gz"):
+                if origin_md5 == get_md5(destiny + ".tar.gz"):
                     stderr.print(
-                        f"[green] Service {archived_path.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({non_archived_path}) to its destiny folder ({archived_path}) (MD5: {previous_md5}; equal in both sides)",
+                        f"[green] Service {origin.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({origin}) to its destiny folder ({destiny}) (MD5: {origin_md5}; identical in both sides)",
                         highlight=False,
                     )
 
             except OSError as e:
                 stderr.print(
-                    f"[red] ERROR: {archived_path.split('/')[-1]} could not be copied to its destiny archive folder.",
+                    f"[red] ERROR: {origin.split('/')[-1] + '.tar.gz'} could not be copied to its destiny archive folder, {destiny}.",
                     highlight=False,
                 )
                 log.error(
-                    f"Directory {non_archived_path} could not be archived to {archived_path}.\
+                    f"Directory {origin} could not be archived to {archived_path}.\
                         Reason: {e}"
                 )
-        return
-
-    def retrieve_from_archive(self):
-        """
-        Copy a service back from archive
-        """
-        for service in self.services_to_move:
-            # stderr.print(service["servicFolderName"])
-
-            # print(f"archived_path : {self.conf['archived_path']}")
-            # print(f"type: {self.type}")
-            # print(
-            #     f"profileCenter: {service['serviceUserId']['profile']['profileCenter']}"
-            #)
-            # print(
-            #    f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
-            #)
-
-            archived_path, non_archived_path = get_service_paths(
-                self.conf, self.type, service
-            )
-
-            try:
-                sysrsync.run(
-                    source=archived_path + ".tar.gz",
-                    destination=non_archived_path + ".tar.gz",
-                    options=self.conf["options"],
-                    sync_source_contents=False,
-                )
-                stderr.print(
-                    "[green] Data retrieved successfully from its archive folder.",
-                    highlight=False,
-                )
-            except OSError as e:
-                stderr.print(
-                    "[red] ERROR: Data could not be retrieved from its archive folder.",
-                    highlight=False,
-                )
-                log.error(
-                    f"[red] ERROR: Directory {self.source} could not be archived to {self.dest}.\
-                    Reason: {e}"
-                )
-
         return
 
     def handle_archive(self):
