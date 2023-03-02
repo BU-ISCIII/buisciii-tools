@@ -264,8 +264,7 @@ class Archive:
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
-                    parameter1="resolution",
-                    value1=f"{services_batch['serviceRequestNumber']}.1",
+                    resolution=f"{services_batch['serviceRequestNumber']}.1",
                 )
 
                 if isinstance(request, int):
@@ -291,9 +290,8 @@ class Archive:
             self.services_to_move = [
                 rest_api.get_request(
                     request_info="serviceFullData",
-                    parameter1="resolution",
-                    value1=self.resolution_id,
                     safe=False,
+                    resolution=resolution_id,
                 )
             ]
 
