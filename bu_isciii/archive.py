@@ -198,7 +198,15 @@ class Archive:
         self.type = ser_type
         self.option = option
         self.services_to_move = []
-        
+
+        # Record of failed services in any of the steps
+        self.failed_services = {
+            "failed_compression": [],
+            "failed_movement" : []
+            "failed_uncompression": []
+        }
+
+
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
 
@@ -227,11 +235,9 @@ class Archive:
             # safe is False, so instead of exiting, an error code will be returned
             services_batch = rest_api.get_request(
                 request_info="services",
-                parameter1="date_from",
-                value1="-".join(self.date_from),
-                parameter2="date_until",
-                value2="-".join(self.date_until),
                 safe=False,
+                date_from="-".join(self.date_from),
+                date_until="-".join(self.date_until),
             )
 
             # if int (if error code), must be only bc status > 200
@@ -269,12 +275,13 @@ class Archive:
                 else:
                     self.services_to_move.append(request)
 
-            # services_batch does not seem useful from now on, so delete it from memory
+            # services_batch does not seem useful from now on
+            # so delete it from memory
             del services_batch
 
         else:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id() if self.resolution_id is None else self.resolution_id
-
+            
             stderr.print(
                 f"Asking our trusty API about resolution: {self.resolution_id}"
             )
@@ -350,16 +357,15 @@ class Archive:
                 compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024, 3)
                 stderr.print(
                     f"Seems like service {non_archived_path.split('/')[-1]} has already been compressed\nPath: {non_archived_path + '.tar.gz'}\nUncompressed size:{initial_size:.3f} GB\nFound compressed size:{compressed_size:.3f} GB")
+                
                 if (bu_isciii.utils.prompt_selection("What to do?", ["Just skip it", f"Delete previous {non_archived_path.split('/')[-1] + '.tar.gz'}"])) == "Just skip it":
                     total_initial_size += initial_size
                     total_compressed_size += compressed_size
                     already_compressed_services.append(non_archived_path.split('/')[-1])
                     break
                 else:
-                    shutil()
-
-
-
+                    # maybe a "try" here to avoid permission error?
+                    os.remove(non_archived_path + ".tar.gz")
 
             stderr.print(
                 f"Service {non_archived_path.split('/')[-1]} will be compressed"
@@ -378,7 +384,8 @@ class Archive:
                     \n Saved space: {initial_size - compressed_size:.3.find()}\n"
                 )
 
-            # Just an error placeholder. TODO: see what errors might arise
+            # Just an error placeholder. 
+            # TODO: see what errors might arise
             except IOError:
                 return False
 
@@ -388,11 +395,9 @@ class Archive:
 
             if len(already_compressed_services) > 0:
                 stderr.print(
-                    f"The following {len(already_compressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
+                    f"Numbers above include the following {len(already_compressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
                 )
                 
-
-
             return
 
     def archive(self):
