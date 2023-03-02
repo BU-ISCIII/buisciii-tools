@@ -117,19 +117,21 @@ def get_service_paths(conf, ser_type, service):
 
     NOTE: for some services, the 'profileClassificationArea' is None, and the os.path.join may fail
     """
-    print(f"archived_path : {conf['archived_path']}")
-    print(f"ser_type : {ser_type}")
-    print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
-    print(
-        f"area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
-    )
+    center = service["serviceUserId"]["profile"]["profileClassificationArea"].lower() if isinstance(service["serviceUserId"]["profile"]["profileClassificationArea"], str) else ""
+
+    # print(service)
+    # print(f"archived_path : {conf['archived_path']}")
+    # print(f"ser_type : {ser_type}")
+    # print(f"profilecenter: {service['serviceUserId']['profile']['profileCenter']}")
+    # print(f"clasfification area: {center}")
 
     # Path in archive
     archived_path = os.path.join(
         conf["archived_path"],
         ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
-        service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
+        center,
+        service["serviceRequestNumber"],
     )
 
     # Path out of archive
@@ -137,7 +139,8 @@ def get_service_paths(conf, ser_type, service):
         conf["data_path"],
         ser_type,
         service["serviceUserId"]["profile"]["profileCenter"],
-        service["serviceUserId"]["profile"]["profileClassificationArea"].lower(),
+        center,
+        service["serviceRequestNumber"],
     )
 
     return archived_path, non_archived_path
@@ -160,13 +163,9 @@ def targz_dir(tar_name, directory):
     """
     Generate a tar gz file with the contents of a directory
     """
-    try:
-        with tarfile.open(tar_name, "w:gz") as out_tar:
-            out_tar.add(directory)
-        return True
-    except Exception:
-        # Have to check which error(s) to expect
-        return False
+    with tarfile.open(tar_name, "w:gz") as out_tar:
+        out_tar.add(directory)
+    return True
 
 
 def get_md5(file):
@@ -218,7 +217,7 @@ class Archive:
             conf_api["server"], conf_api["api_url"]
         )
 
-        if bu_isciii.utils.prompt_selection("Working with a batch, or a single resolution?",["Batch", "Single service"],) == "Batch":
+        if bu_isciii.utils.prompt_selection("Working with a batch, or a single resolution?",["Batch of services", "Single service"],) == "Batch of services":
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
@@ -261,7 +260,7 @@ class Archive:
                     sys.exit()
 
             # Get individual serviceFullData for each data
-            # I dont really like hardcoding the .1 in the f-string but I doubt I have a choice honestly
+            # Not a huge fan of adding the .1 to resolutions honestly
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
@@ -270,7 +269,7 @@ class Archive:
 
                 if isinstance(request, int):
                     stderr.print(
-                        f"Resolution '{service['serviceRequestNumber']}.1' could not be found. Connection seemed right though!"
+                        f"Service '{service['serviceRequestNumber']}' could not be found. Connection seemed right though!"
                     )
                 else:
                     self.services_to_move.append(request)
@@ -283,7 +282,7 @@ class Archive:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id() if self.resolution_id is None else self.resolution_id
             
             stderr.print(
-                f"Asking our trusty API about resolution: {self.resolution_id}"
+                f"Asking our trusty API about service: {self.resolution_id}"
             )
 
             # Hold the results in a list so it can be accessed 
@@ -292,7 +291,7 @@ class Archive:
                 rest_api.get_request(
                     request_info="serviceFullData",
                     safe=False,
-                    resolution=resolution_id,
+                    resolution=f"{self.resolution_id}.1",
                 )
             ]
 
@@ -355,7 +354,7 @@ class Archive:
             if os.path.exists(non_archived_path + ".tar.gz"):
                 compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(1024, 3)
                 stderr.print(
-                    f"Seems like service {non_archived_path.split('/')[-1]} has already been compressed\nPath: {non_archived_path + '.tar.gz'}\nUncompressed size:{initial_size:.3f} GB\nFound compressed size:{compressed_size:.3f} GB")
+                    f"Seems like service {non_archived_path.split('/')[-1]} has already been compressed\nPath: {non_archived_path + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
                 
                 if (bu_isciii.utils.prompt_selection("What to do?", ["Just skip it", f"Delete previous {non_archived_path.split('/')[-1] + '.tar.gz'}"])) == "Just skip it":
                     total_initial_size += initial_size
@@ -369,24 +368,25 @@ class Archive:
             stderr.print(
                 f"Service {non_archived_path.split('/')[-1]} will be compressed"
             )
-            total_initial_size += initial_size
+            
 
-            try:
-                targz_dir(non_archived_path + ".tar.gz", non_archived_path)
-                compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(
-                    1024, 3
-                )
-                total_compressed_size += compressed_size
-                stderr.print(
-                    f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size:{initial_size:.3f}GB\
-                    \nCompressed size:{compressed_size:.3f}GB\
-                    \n Saved space: {initial_size - compressed_size:.3.find()}\n"
-                )
+            targz_dir(non_archived_path + ".tar.gz", non_archived_path)
+            
+            compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(
+                1024, 3
+            )
+            
+            total_initial_size += initial_size
+            total_compressed_size += compressed_size - compressed_size
+
+            stderr.print(
+                f"Service {non_archived_path.split('/')[-1]} was compressed\nInitial size: {initial_size:.3f} GB\nCompressed size: {compressed_size:.3f} GB\nSaved space: {initial_size - compressed_size:.3f} GB\n"
+            )
 
             # Just an error placeholder. 
             # TODO: see what errors might arise
-            except IOError:
-                return False
+            # except IOError:
+            #    return False
 
             stderr.print(
                 f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f}GB\nTotal compressed size: {total_compressed_size:.3f}\nSaved space: {total_initial_size - total_compressed_size:.3f}"
@@ -412,6 +412,12 @@ class Archive:
                 self.conf, self.type, service
             )
 
+            if os.path.exists(non_archived_path):
+                stderr.print(
+                        f"{archived_path.split('/')[-1]} was not found in the origin directory"
+                    )
+
+
             if os.path.exists(archived_path) and not os.path.exists(
                 archived_path + ".tar.gz"
             ):
@@ -420,7 +426,7 @@ class Archive:
                     == "Partial archive: archive NON-archived directory (must be compressed first)"
                 ):
                     stderr.print(
-                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the directory. You have chosen a partial archiving process, make sure this file has been compressed"
+                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory. You have chosen a partial archiving process, make sure this file has been compressed beforehand"
                     )
 
                     if (
@@ -435,10 +441,10 @@ class Archive:
 
             try:
                 sysrsync.run(
-                    source=non_archived_path + ".tar.gz",
-                    destination=archived_path + ".tar.gz",
-                    options=self.conf["options"],
-                    sync_source_contents=False,
+                    source = non_archived_path + ".tar.gz",
+                    destination = archived_path + ".tar.gz",
+                    options = self.conf["options"],
+                    sync_source_contents = False,
                 )
 
                 if previous_md5 == get_md5(archived_path + ".tar.gz"):
@@ -508,16 +514,18 @@ class Archive:
         Handle archive class options
         """
         if self.option == "Full archive: compress and archive":
+            self.targz_directory()
             self.archive()
+        
         elif self.option == "Partial archive: compress NON-archived directory":
-            pass
-        elif (
-            self.option
-            == "Partial archive: archive NON-archived directory (must be compressed first), delete origin"
-        ):
-            pass
+            self.targz_directory()
+        
+        elif (self.option == "Partial archive: archive NON-archived directory (must be compressed first), delete origin"):
+            self.archive()
+        
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.retrieve_from_archive()
+        
         elif self.option == "That should be all, thank you!":
             sys.exit()
         return
