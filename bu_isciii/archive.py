@@ -265,7 +265,7 @@ class Archive:
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
-                    resolution=f"{service['serviceRequestNumber']}.1",
+                    service=f"{service['serviceRequestNumber']}",
                 )
 
                 if isinstance(request, int):
@@ -280,7 +280,7 @@ class Archive:
             del services_batch
 
         else:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id() if self.resolution_id is None else self.resolution_id
+            self.resolution_id = bu_isciii.utils.prompt_service_id() if self.resolution_id is None else self.resolution_id
             
             stderr.print(
                 f"Asking our trusty API about service: {self.resolution_id}"
@@ -292,7 +292,7 @@ class Archive:
                 rest_api.get_request(
                     request_info="serviceFullData",
                     safe=False,
-                    resolution=f"{self.resolution_id}.1",
+                    service=f"{self.resolution_id}",
                 )
             ]
 
@@ -328,8 +328,8 @@ class Archive:
                     "Partial archive: compress NON-archived service", 
                     "Partial archive: archive NON-archived service (must be compressed first) and check md5",       
                     "Partial archive: uncompress newly archived compressed service",
-                    "Partial archive: remove newly archived compressed service from DATA directory",
-                    "Partial archive: remove newly archived compressed service from ARCHIVED directory",
+                    "Partial archive: remove newly archived compressed services from DATA directory",
+                    "Partial archive: remove newly archived compressed services from ARCHIVED directory",
                     "Full retrieve: retrieve and uncompress",        
                     "Partial retrieve: compress archived service",
                     "Partial retrieve: retrieve archived service (must be compressed first, and check md5",
@@ -338,7 +338,7 @@ class Archive:
                 ]
             )
 
-    def targz_directory(self):
+    def targz_directory(self, direction):
         """
         For all chosen services:
         Check no prior .tar.gz file has been created
@@ -405,11 +405,10 @@ class Archive:
                 
         return
 
-    def archive(self):
+    def move_directory(self, direction):
         """
         Archive selected services
         Make sure they are .tar.gz files
-        Delete origin if everything is alright
         """
 
         for service in self.services_to_move:
@@ -441,7 +440,7 @@ class Archive:
                         )
                     ) == "Hold up":
                         sys.exit()
-                    break
+                    continue
 
             previous_md5 = get_md5(non_archived_path + ".tar.gz")
 
@@ -518,36 +517,42 @@ class Archive:
         Handle archive class options
         """
         if (self.option == "Full archive: compress and archive"):
-            self.targz_directory()
-            self.archive()
+            self.targz_directory(direction="archive")
+            self.move_directory(direction="archive")
+            self.uncompress_targz_directory(direction="archive")
         
         elif (self.option == "Partial archive: compress NON-archived service"):
-            self.targz_directory()
-        
+            self.targz_directory(direction="archive")
+
         elif (self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5"):
-            self.archive()
+            self.move_directory(direction="archive")
         
         elif (self.option == "Partial archive: uncompress newly archived compressed service"):
-            pass
+            # self.uncompress_targz_directory(direction="archive")
+            stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial archive: remove newly archived compressed service from DATA directory"):
-            pass
+        elif (self.option == "Partial archive: remove newly archived compressed services from DATA directory"):
+            stderr.print("This is not ready yet, Im on it!")
 
-        elif (self.option == "Partial archive: remove newly archived compressed service from ARCHIVED directory"):
-            pass
+        elif (self.option == "Partial archive: remove newly archived compressed services from ARCHIVED directory"):
+            stderr.print("This is not ready yet, Im on it!")
 
         elif (self.option == "Full retrieve: retrieve and uncompress"):
-            pass
-            #self.retrieve_from_archive()
-        
+            # self.targz_directory(direction="retrieve")
+            # self.move_directory(direction="retrieve")
+            # self.uncompress_targz_directory(direction="retrieve")
+
         elif (self.option == "Partial retrieve: compress archived service"):
-            pass
-        
+            # self.targz_directory(direction="retrieve")
+            stderr.print("This is not ready yet, Im on it!")
+
         elif (self.option == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"):
-            pass
+            # self.move_directory(direction="retrieve")
+            stderr.print("This is not ready yet, Im on it!")
 
         elif (self.option == "Partial retrieve: uncompress retrieved service"):
-            pass
+            # self.uncompress_targz_directory(direction="retrieve")
+            stderr.print("This is not ready yet, Im on it!")
 
         elif (self.option == "That should be all, thank you!"):
             sys.exit()
