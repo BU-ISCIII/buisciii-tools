@@ -27,7 +27,7 @@ class RestServiceApi:
     # by Guille: I used an f-string instead of all the + stuff, I think thats cleaner?
     # by Guille: **kwargs time!
     def get_request(self, request_info,safe=True,**kwargs):
-        url_http = f"{self.request_url}{request_info}?{''.join[f'{key}={value}' for key,value in kwargs.items()]}"
+        url_http = f"{self.request_url}\{request_info}?{''.join([f'{key}={value}&' for key,value in kwargs.items()])[:-1]}"
         print(url_http)
         try:
             req = requests.get(url_http, headers=self.headers)
