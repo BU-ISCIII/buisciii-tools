@@ -140,8 +140,10 @@ def get_sftp_folder(resolution_info):
     data_path = bu_isciii.config_json.ConfigJson().get_configuration("global")[
         "data_path"
     ]
+
     if len(sftp_folders_list) == 1:
         sftp_folder = os.path.join(data_path, "sftp", sftp_folders_list[0])
+        sftp_final_folder = sftp_folders_list[0]
     else:
         sftp_final_folder = bu_isciii.utils.prompt_selection(
             msg="Select SFTP folder containing the service to make tree from.",
