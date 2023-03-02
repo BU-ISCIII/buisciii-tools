@@ -203,5 +203,22 @@
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "results_md": ""
+    },
+    "mag_met": {
+      "label": "",
+      "template": "mag_met",
+      "order": 2,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/nf-core/mag",
+      "description": "Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"RESULTS",
+      "delivery_md": "assets/reports/md/mag.md",
+      "results_md": "assets/reports/results/mag.md"
     }
 }
