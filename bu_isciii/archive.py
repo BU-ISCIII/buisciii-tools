@@ -541,6 +541,7 @@ class Archive:
             # self.targz_directory(direction="retrieve")
             # self.move_directory(direction="retrieve")
             # self.uncompress_targz_directory(direction="retrieve")
+            stderr.print("This is not ready yet, Im on it!")
 
         elif (self.option == "Partial retrieve: compress archived service"):
             # self.targz_directory(direction="retrieve")
