@@ -347,10 +347,10 @@ class Archive:
 
         # try:
         for service in self.services_to_move:
+            
             # Get path
             _, non_archived_path = get_service_paths(self.conf, self.type, service)
             initial_size = get_dir_size(non_archived_path) / pow(1024, 3)
-
             # Check if there is a prior "tar.gz" file
             # NOTE: I find non_archived_path + ".tar.gz" easier to locate the compressed files
             if os.path.exists(non_archived_path + ".tar.gz"):
@@ -362,17 +362,16 @@ class Archive:
                     total_initial_size += initial_size
                     total_compressed_size += compressed_size
                     already_compressed_services.append(non_archived_path.split('/')[-1])
-                    break
+                    continue
                 else:
                     os.remove(non_archived_path + ".tar.gz")
 
             stderr.print(
-                f"Service {non_archived_path.split('/')[-1]} will be compressed"
+                f"Compressing service {non_archived_path.split('/')[-1]}"
             )
             
-
             targz_dir(non_archived_path + ".tar.gz", non_archived_path)
-            
+
             compressed_size = os.path.getsize(non_archived_path + ".tar.gz") / pow(
                 1024, 3
             )
@@ -390,7 +389,7 @@ class Archive:
         #    return False
 
         stderr.print(
-            f"Compressed all {len(self.services_to_move)} services\nTotal initial size:{total_initial_size:.3f} GB\nTotal compressed size: {total_compressed_size:.3f} GB\nSaved space: {total_initial_size - total_compressed_size:.3f} GB"
+            f"Compressed all {len(self.services_to_move)} services\nTotal initial size: {total_initial_size:.3f} GB\nTotal compressed size: {total_compressed_size:.3f} GB\nSaved space: {total_initial_size - total_compressed_size:.3f} GB"
         )
 
         if len(already_compressed_services) > 0:
@@ -440,8 +439,6 @@ class Archive:
 
             previous_md5 = get_md5(non_archived_path + ".tar.gz")
 
-            print(f"ORIGIN: {non_archived_path + '.tar.gz'}\nDESTINATION: {archived_path + '.tar.gz'}")
-
             try:
                 sysrsync.run(
                     source = non_archived_path + ".tar.gz",
@@ -477,14 +474,14 @@ class Archive:
         for service in self.services_to_move:
             # stderr.print(service["servicFolderName"])
 
-            print(f"archived_path : {self.conf['archived_path']}")
-            print(f"type: {self.type}")
-            print(
-                f"profileCenter: {service['serviceUserId']['profile']['profileCenter']}"
-            )
-            print(
-                f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
-            )
+            # print(f"archived_path : {self.conf['archived_path']}")
+            # print(f"type: {self.type}")
+            # print(
+            #     f"profileCenter: {service['serviceUserId']['profile']['profileCenter']}"
+            #)
+            # print(
+            #    f"Area: {service['serviceUserId']['profile']['profileClassificationArea'].lower()}"
+            #)
 
             archived_path, non_archived_path = get_service_paths(
                 self.conf, self.type, service
