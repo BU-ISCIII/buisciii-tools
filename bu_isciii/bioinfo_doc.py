@@ -36,7 +36,8 @@ class BioinfoDoc:
         path=None,
         ask_path=False,
         sftp_folder=False,
-        report_pdf=False,
+        report_md=False,
+        results_md=False,
         api_password=None,
     ):
         if type is None:
