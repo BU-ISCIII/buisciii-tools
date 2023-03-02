@@ -202,8 +202,8 @@ class Archive:
         # Record of failed services in any of the steps
         self.failed_services = {
             "failed_compression": [],
-            "failed_movement" : []
-            "failed_uncompression": []
+            "failed_movement" : [],
+            "failed_uncompression": [],
         }
 
 
@@ -236,6 +236,7 @@ class Archive:
             services_batch = rest_api.get_request(
                 request_info="services",
                 safe=False,
+                state="delivered",
                 date_from="-".join(self.date_from),
                 date_until="-".join(self.date_until),
             )
