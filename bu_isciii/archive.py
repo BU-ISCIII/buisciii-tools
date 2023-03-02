@@ -210,13 +210,7 @@ class Archive:
             conf_api["server"], conf_api["api_url"]
         )
 
-
-        self.quantity = bu_isciii.utils.prompt_selection(
-            "Working with a batch, or a single resolution?",
-            ["Batch", "Single service"],
-        )
-
-        if self.quantity == "Batch":
+        if bu_isciii.utils.prompt_selection("Working with a batch, or a single resolution?",["Batch", "Single service"],) == "Batch":
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
 
@@ -278,8 +272,8 @@ class Archive:
             # services_batch does not seem useful from now on, so delete it from memory
             del services_batch
 
-        elif self.quantity == "Single service" and self.resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+        else:
+            self.resolution_id = bu_isciii.utils.prompt_resolution_id() if self.resolution_id is None else self.resolution_id
 
             stderr.print(
                 f"Asking our trusty API about resolution: {self.resolution_id}"
