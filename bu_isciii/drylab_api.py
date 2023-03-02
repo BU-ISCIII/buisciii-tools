@@ -26,17 +26,15 @@ class RestServiceApi:
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
     # by Guille: I used an f-string instead of all the + stuff, I think thats cleaner?
     # by Guille: **kwargs time!
-    def get_request(self, request_info,safe=True,**kwargs):
+    def get_request(self, request_info, safe=True, **kwargs):
         url_http = f"{self.request_url}{request_info}?{''.join([f'{key}={value}&' for key,value in kwargs.items()])[:-1]}"
-        print(url_http)
+        print(f"{url_http}(SHOW URL JUST FOR TESTING)")
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
                 if safe:
-                    log.info(
-                        f"Resolution ID does not exist. Status code: {req.status_code}"
-                    )
-                    stderr.print(f"Resolution {value1} not found")
+                    log.info(f"Query does not exist. Status code: {req.status_code}")
+                    stderr.print("Query not found")
                     sys.exit()
                 else:
                     return req.status_code
