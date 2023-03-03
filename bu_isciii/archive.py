@@ -177,7 +177,7 @@ def uncompress_targz_directory(tar_name, directory):
     Untar GZ file
     """
     with tarfile.open(tar_name) as out_tar:
-        out_tar.extractall(directory)
+        out_tar.extractall("/".join(directory.split("/")[:-1]))
     return
 
 def get_md5(file):
@@ -680,7 +680,7 @@ class Archive:
         elif self.option == "    Partial retrieve: remove compressed services from directories":
             self.delete_targz_dirs(direction="retrieve")
 
-        elif.self.option == "Remove selected services from data dir (only if they are already in archive dir)":
+        elif self.option == "Remove selected services from data dir (only if they are already in archive dir)":
             self.delete_non_archived_dirs()
 
         elif self.option == "That should be all, thank you!":
