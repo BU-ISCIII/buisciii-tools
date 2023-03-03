@@ -175,6 +175,13 @@ def targz_dir(tar_name, directory):
         out_tar.add(directory, arcname=os.path.basename(directory))
     return True
 
+def uncompress_targz_directory(tar_name, directory):
+    """
+    Untar GZ file
+    """
+    with open(tar_name) as tarfile:
+        tarfile.extractall(directory)
+    return
 
 def get_md5(file):
     """
@@ -520,6 +527,14 @@ class Archive:
                         Reason: {e}"
                 )
         return
+
+    def uncompress_targz_directory(self, direction):
+
+        pass
+
+        return
+
+
 
     def handle_archive(self):
         """
