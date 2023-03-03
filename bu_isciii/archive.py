@@ -152,6 +152,7 @@ def get_service_paths(conf, ser_type, service):
 
     return archived_path, non_archived_path
 
+
 def get_dir_size(path):
     """
     Get the size in bytes of a given directory
@@ -164,6 +165,7 @@ def get_dir_size(path):
 
     return size
 
+
 def targz_dir(tar_name, directory):
     """
     Generate a tar gz file with the contents of a directory
@@ -172,6 +174,7 @@ def targz_dir(tar_name, directory):
         out_tar.add(directory, arcname=os.path.basename(directory))
     return True
 
+
 def uncompress_targz_directory(tar_name, directory):
     """
     Untar GZ file
@@ -179,6 +182,7 @@ def uncompress_targz_directory(tar_name, directory):
     with tarfile.open(tar_name) as out_tar:
         out_tar.extractall("/".join(directory.split("/")[:-1]))
     return
+
 
 def get_md5(file):
     """
@@ -192,6 +196,7 @@ def get_md5(file):
         file_md5 = hashlib.md5(infile).hexdigest()
 
     return file_md5
+
 
 class Archive:
     """
@@ -490,7 +495,7 @@ class Archive:
                 if (
                     bu_isciii.utils.prompt_selection(
                         "What to do?",
-                        [f"Remove it and {direction} it again", "Ignore this service"]
+                        [f"Remove it and {direction} it again", "Ignore this service"],
                     )
                 ) == "Ignore this service":
                     continue
@@ -536,40 +541,61 @@ class Archive:
                 self.conf, self.type, service
             )
 
-        # When archiving, you untar to archived_path
-        # When retrieving, you untar to non_archived_path
-            dir_to_untar = archived_path if (direction == "archive") else non_archived_path
+            # When archiving, you untar to archived_path
+            # When retrieving, you untar to non_archived_path
+            dir_to_untar = (
+                archived_path if (direction == "archive") else non_archived_path
+            )
 
             # Check whether the compressed file is not there
             if not os.path.exists(dir_to_untar + ".tar.gz"):
-                stderr.print(f"The compressed service { dir_to_untar.split('/')[-1] + '.tar.gz'} could not be found")
-                
+                stderr.print(
+                    f"The compressed service { dir_to_untar.split('/')[-1] + '.tar.gz'} could not be found"
+                )
+
                 # Check whether the uncompressed dir is already there
                 if os.path.exists(dir_to_untar):
-                    stderr.print(f"However, like this service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
+                    stderr.print(
+                        f"However, like this service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
+                    )
                 else:
-                    stderr.print(f"The uncompressed service, {dir_to_untar} could not be found either.")
+                    stderr.print(
+                        f"The uncompressed service, {dir_to_untar} could not be found either."
+                    )
                     continue
             else:
                 if os.path.exists(dir_to_untar):
-                    stderr.print(f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
-                    if (bu_isciii.utils.prompt_selection("What to do?", ["Skip (dont uncompress)",f"Delete {dir_to_untar.split('/')[-1]} and uncompress again"]) == "Skip (dont uncompress)"): 
-                        already_uncompressed_services.append(dir_to_untar.split("/")[-1])
+                    stderr.print(
+                        f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
+                    )
+                    if (
+                        bu_isciii.utils.prompt_selection(
+                            "What to do?",
+                            [
+                                "Skip (dont uncompress)",
+                                f"Delete {dir_to_untar.split('/')[-1]} and uncompress again",
+                            ],
+                        )
+                        == "Skip (dont uncompress)"
+                    ):
+                        already_uncompressed_services.append(
+                            dir_to_untar.split("/")[-1]
+                        )
                         continue
                     else:
                         shutil.rmtree(dir_to_untar)
-                
+
                 stderr.print(f"Uncompressing {dir_to_untar.split('/')[-1] + '.tar.gz'}")
                 uncompress_targz_directory(dir_to_untar + ".tar.gz", dir_to_untar)
-                stderr.print(f"{dir_to_untar.split('/')[-1]} has been successfully uncompressed")
+                stderr.print(
+                    f"{dir_to_untar.split('/')[-1]} has been successfully uncompressed"
+                )
 
-        stderr.print(
-            f"\nUncompressed all {len(self.services_to_move)} services"
-        )
+        stderr.print(f"\nUncompressed all {len(self.services_to_move)} services")
 
         if len(already_uncompressed_services) > 0:
             stderr.print(
-                f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
+                f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_uncompressed_services)}"
             )
 
         return
@@ -592,27 +618,44 @@ class Archive:
 
             # Origin will always be deleted last
             # [destiny, origin]
-            file_locations = [non_archived_path, archived_path] if direction == "archive" else [archived_path, non_archived_path]
+            file_locations = (
+                [non_archived_path, archived_path]
+                if direction == "archive"
+                else [archived_path, non_archived_path]
+            )
 
             # First we delete origin
             # Check if there is a non-compressed
             for place in file_locations:
                 if os.path.exists(place):
-                    stderr.print(f"Uncompressed service {place.split('/')[-1]} has been found in the destiny folder {'/'.join(place.split('/')[:-1])}, so there should be no problem deleting the compressed file {place.split('/')[-1] + '.tar.gz'}. Deleting.\n")
+                    stderr.print(
+                        f"Uncompressed service {place.split('/')[-1]} has been found in the destiny folder {'/'.join(place.split('/')[:-1])}, so there should be no problem deleting the compressed file {place.split('/')[-1] + '.tar.gz'}. Deleting.\n"
+                    )
                     os.remove(place + ".tar.gz")
-                    
+
                 else:
-                    stderr.print(f"Uncompressed service {place.split('/')[-1]} NOT FOUND in the folder {'/'.join(place.split('/')[:-1])}")
-                    
-                    if (bu_isciii.utils.prompt_selection("What to do?",["Skip deletion", "Delete anyways"]) == "Skip deletion"):
+                    stderr.print(
+                        f"Uncompressed service {place.split('/')[-1]} NOT FOUND in the folder {'/'.join(place.split('/')[:-1])}"
+                    )
+
+                    if (
+                        bu_isciii.utils.prompt_selection(
+                            "What to do?", ["Skip deletion", "Delete anyways"]
+                        )
+                        == "Skip deletion"
+                    ):
                         non_deleted_services.append(place.split("/")[-1])
                         continue
                     else:
                         os.remove(place + ".tar.gz")
-        
-        stderr.print(f"Deleted {2*len(self.services_to_move) - len(non_deleted_services)} compressed services.")
+
+        stderr.print(
+            f"Deleted {2*len(self.services_to_move) - len(non_deleted_services)} compressed services."
+        )
         if len(non_deleted_services) > 0:
-                stderr.print(f"{len(non_deleted_services)} compressed services could not be deleted: {', '.join(non_deleted_services)}")
+            stderr.print(
+                f"{len(non_deleted_services)} compressed services could not be deleted: {', '.join(non_deleted_services)}"
+            )
 
         return
 
@@ -628,14 +671,20 @@ class Archive:
             )
 
             if not os.path.exists(non_archived_path):
-                stderr.print(f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n")
+                stderr.print(
+                    f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n"
+                )
                 # this continue should not be necessary but I think its more efficient
                 continue
             else:
                 if not os.path.exists(archived_path):
-                    stderr.print(f"Archived path for service {archived_path.split('/')[-1]} NOT. Skipping.\n")
+                    stderr.print(
+                        f"Archived path for service {archived_path.split('/')[-1]} NOT. Skipping.\n"
+                    )
                 else:
-                    stderr.print(f"Found archived path for service {archived_path.split('/')[-1]}. It is safe to delete this non_archived service. Deleting.\n")
+                    stderr.print(
+                        f"Found archived path for service {archived_path.split('/')[-1]}. It is safe to delete this non_archived service. Deleting.\n"
+                    )
                     shutil.rmtree(non_archived_path)
         return
 
@@ -653,13 +702,22 @@ class Archive:
         elif self.option == "    Partial archive: compress NON-archived service":
             self.targz_directory(direction="archive")
 
-        elif (self.option == "    Partial archive: archive NON-archived service (must be compressed first) and check md5"):
+        elif (
+            self.option
+            == "    Partial archive: archive NON-archived service (must be compressed first) and check md5"
+        ):
             self.move_directory(direction="archive")
 
-        elif (self.option == "    Partial archive: uncompress newly archived compressed service"):
+        elif (
+            self.option
+            == "    Partial archive: uncompress newly archived compressed service"
+        ):
             self.uncompress_targz_directory(direction="archive")
 
-        elif (self.option == "    Partial archive: remove compressed services from directories"):
+        elif (
+            self.option
+            == "    Partial archive: remove compressed services from directories"
+        ):
             self.delete_targz_dirs(direction="archive")
 
         elif self.option == "Full retrieve: retrieve and uncompress":
@@ -671,16 +729,25 @@ class Archive:
         elif self.option == "    Partial retrieve: compress archived service":
             self.targz_directory(direction="retrieve")
 
-        elif (self.option == "    Partial retrieve: retrieve archived service (must be compressed first) and check md5"):
+        elif (
+            self.option
+            == "    Partial retrieve: retrieve archived service (must be compressed first) and check md5"
+        ):
             self.move_directory(direction="retrieve")
 
         elif self.option == "    Partial retrieve: uncompress retrieved service":
             self.uncompress_targz_directory(direction="retrieve")
 
-        elif self.option == "    Partial retrieve: remove compressed services from directories":
+        elif (
+            self.option
+            == "    Partial retrieve: remove compressed services from directories"
+        ):
             self.delete_targz_dirs(direction="retrieve")
 
-        elif self.option == "Remove selected services from data dir (only if they are already in archive dir)":
+        elif (
+            self.option
+            == "Remove selected services from data dir (only if they are already in archive dir)"
+        ):
             self.delete_non_archived_dirs()
 
         elif self.option == "That should be all, thank you!":
