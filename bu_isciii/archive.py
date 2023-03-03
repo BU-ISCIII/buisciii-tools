@@ -629,7 +629,7 @@ class Archive:
 
             if not os.path.exists(non_archived_path):
                 stderr.print(f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n")
-                # this continue shouldnt be necessary but I think its more efficient
+                # this continue should not be necessary but I think its more efficient
                 continue
             else:
                 if not os.path.exists(archived_path):
@@ -680,7 +680,8 @@ class Archive:
         elif self.option == "    Partial retrieve: remove compressed services from directories":
             self.delete_targz_dirs(direction="retrieve")
 
-        elif.self.option == "Remove selected services from data dir (only if they are already in archive dir)"
+        elif.self.option == "Remove selected services from data dir (only if they are already in archive dir)":
+            self.delete_non_archived_dirs()
 
         elif self.option == "That should be all, thank you!":
             sys.exit()
