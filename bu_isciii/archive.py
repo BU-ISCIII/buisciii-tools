@@ -593,7 +593,7 @@ class Archive:
 
             # Origin will always be deleted last
             # [destiny, origin]
-            file_locations = [non_archived, archived] if direction == "archive" else [archived, non_archived]
+            file_locations = [non_archived_path, archived_path] if direction == "archive" else [archived_path, non_archived_path]
 
             # First we delete origin
             # Check if there is a non-compressed
