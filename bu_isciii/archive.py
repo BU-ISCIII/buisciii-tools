@@ -617,6 +617,10 @@ class Archive:
 
         return
 
+    def delete_non_archived_dirs(self):
+        pass
+        return
+
     def handle_archive(self):
         """
         Handle archive class options
