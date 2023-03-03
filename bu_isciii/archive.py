@@ -178,8 +178,8 @@ def uncompress_targz_directory(tar_name, directory):
     """
     Untar GZ file
     """
-    with tarfile.open(tar_name) as tarfile:
-        tarfile.extractall(directory)
+    with tarfile.open(tar_name) as out_tar:
+        out_tar.extractall(directory)
     return
 
 def get_md5(file):
@@ -194,7 +194,6 @@ def get_md5(file):
         file_md5 = hashlib.md5(infile).hexdigest()
 
     return file_md5
-
 
 class Archive:
     """
