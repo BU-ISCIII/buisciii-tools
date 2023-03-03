@@ -350,6 +350,7 @@ class Archive:
                     "    Partial retrieve: compress archived service",
                     "    Partial retrieve: retrieve archived service (must be compressed first) and check md5",
                     "    Partial retrieve: uncompress retrieved service",
+                    "Remove selected services from data dir (only if they are already in archive dir)",
                     "That should be all, thank you!",
                 ],
             )
@@ -621,7 +622,7 @@ class Archive:
         Delete the non-archived copy
         NOTE: archived_path should NEVER have to be deleted
         """
-        for service in self.services_to_move():
+        for service in self.services_to_move:
             archived_path, non_archived_path = get_service_paths(
                 self.conf, self.type, service
             )
@@ -634,7 +635,7 @@ class Archive:
                 if not os.path.exists(archived_path):
                     stderr.print(f"Archived path for service {archived_path.split('/')[-1]} NOT. Skipping.\n")
                 else:
-                    stderr.print(f"Found archived path for service {archived_path.split('/')[-1]} .It is safe to delete this non_archived service. Deleting.\n")
+                    stderr.print(f"Found archived path for service {archived_path.split('/')[-1]}. It is safe to delete this non_archived service. Deleting.\n")
                     shutil.rmtree(non_archived_path)
         return
 
@@ -678,6 +679,8 @@ class Archive:
 
         elif self.option == "    Partial retrieve: remove compressed services from directories":
             self.delete_targz_dirs(direction="retrieve")
+
+        elif.self.option == "Remove selected services from data dir (only if they are already in archive dir)"
 
         elif self.option == "That should be all, thank you!":
             sys.exit()
