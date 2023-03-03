@@ -601,13 +601,15 @@ class Archive:
                 if os.path.exists(place):
                     stderr.print(f"Uncompressed service {place.split('/')[-1]} has been found in the destiny folder {'/'.join(place.split('/')[:-1])}, so there should be no problem deleting the compressed file {place.split('/')[-1] + '.tar.gz'}. Deleting.")
                     os.remove(place + ".tar.gz")
-                    stderr.print(f"Uncompressed service {place.split('/')[-1]} NOT FOUND in the folder {'/'.join(place.split('/')[:-1])}")
                     
-                    if (bu_isciii.utils.prompt_selection("What to do?",["Skip deletion", "Delete anyways"]) == "Skip deletion"):
-                        non_deleted_services.append(place.split("/")[-1])
-                        break
                     else:
-                        os.remove(place + ".tar.gz")
+                        stderr.print(f"Uncompressed service {place.split('/')[-1]} NOT FOUND in the folder {'/'.join(place.split('/')[:-1])}")
+                        
+                        if (bu_isciii.utils.prompt_selection("What to do?",["Skip deletion", "Delete anyways"]) == "Skip deletion"):
+                            non_deleted_services.append(place.split("/")[-1])
+                            continue
+                        else:
+                            os.remove(place + ".tar.gz")
         
         stderr.print(f"Deleted {2*len(self.services_to_move) - len(non_deleted_services)} compressed services.")
         if len(non_deleted_services) > 0:
