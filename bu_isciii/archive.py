@@ -152,7 +152,6 @@ def get_service_paths(conf, ser_type, service):
 
     return archived_path, non_archived_path
 
-
 def get_dir_size(path):
     """
     Get the size in bytes of a given directory
@@ -164,7 +163,6 @@ def get_dir_size(path):
             size += os.path.getsize(os.path.join(path, file))
 
     return size
-
 
 def targz_dir(tar_name, directory):
     """
@@ -618,7 +616,26 @@ class Archive:
         return
 
     def delete_non_archived_dirs(self):
-        pass
+        """
+        Check that the archived counterpart exists
+        Delete the non-archived copy
+        NOTE: archived_path should NEVER have to be deleted
+        """
+        for service in self.services_to_move():
+            archived_path, non_archived_path = get_service_paths(
+                self.conf, self.type, service
+            )
+
+            if not os.path.exists(non_archived_path):
+                stderr.print(f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n")
+                # this continue shouldnt be necessary but I think its more efficient
+                continue
+            else:
+                if not os.path.exists(archived_path):
+                    stderr.print(f"Archived path for service {archived_path.split('/')[-1]} NOT. Skipping.\n")
+                else:
+                    stderr.print(f"Found archived path for service {archived_path.split('/')[-1]} .It is safe to delete this non_archived service. Deleting.\n")
+                    shutil.rmtree(non_archived_path)
         return
 
     def handle_archive(self):
@@ -630,6 +647,7 @@ class Archive:
             self.move_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
             self.delete_targz_dirs(direction="archive")
+            self.delete_non_archived_dirs()
 
         elif self.option == "    Partial archive: compress NON-archived service":
             self.targz_directory(direction="archive")
