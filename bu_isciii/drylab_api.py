@@ -28,7 +28,7 @@ class RestServiceApi:
     # by Guille: **kwargs time!
     def get_request(self, request_info, safe=True, **kwargs):
         url_http = f"{self.request_url}{request_info}?{''.join([f'{key}={value}&' for key,value in kwargs.items()])[:-1]}"
-        print(f"{url_http}(SHOW URL JUST FOR TESTING)")
+        print(f"{url_http} (SHOW URL JUST FOR TESTING)")
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:

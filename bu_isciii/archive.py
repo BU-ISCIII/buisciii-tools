@@ -346,7 +346,7 @@ class Archive:
                     "Partial archive: remove newly archived compressed services from ARCHIVED directory",
                     "Full retrieve: retrieve and uncompress",
                     "Partial retrieve: compress archived service",
-                    "Partial retrieve: retrieve archived service (must be compressed first, and check md5",
+                    "Partial retrieve: retrieve archived service (must be compressed first) and check md5",
                     "Partial retrieve: uncompress retrieved service",
                     "That should be all, thank you!",
                 ],
@@ -449,9 +449,9 @@ class Archive:
             )
 
             # If origin cant be found, next
-            if not (os.path.exists(origin)):
+            if not (os.path.exists(origin + ".tar.gz")):
                 stderr.print(
-                    f"{origin.split('/')[-1]} was not found in the origin directory ({'/'.join(origin.split('/'))[:-1]})"
+                    f"{origin.split('/')[-1] + "tar.gz"} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])})"
                 )
                 continue
 
@@ -462,7 +462,7 @@ class Archive:
                     == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
                 ) or (
                     self.option
-                    == "Partial retrieve: retrieve archived service (must be compressed first, and check md5"
+                    == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
                 ):
                     stderr.print(
                         f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial process, make sure this file has been compressed beforehand"
@@ -560,21 +560,19 @@ class Archive:
             stderr.print("This is not ready yet, Im on it!")
 
         elif self.option == "Full retrieve: retrieve and uncompress":
-            # self.targz_directory(direction="retrieve")
-            # self.move_directory(direction="retrieve")
+            self.targz_directory(direction="retrieve")
+            self.move_directory(direction="retrieve")
             # self.uncompress_targz_directory(direction="retrieve")
             stderr.print("This is not ready yet, Im on it!")
 
         elif self.option == "Partial retrieve: compress archived service":
-            # self.targz_directory(direction="retrieve")
-            stderr.print("This is not ready yet, Im on it!")
+            self.targz_directory(direction="retrieve")
 
         elif (
             self.option
             == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
         ):
-            # self.move_directory(direction="retrieve")
-            stderr.print("This is not ready yet, Im on it!")
+            self.move_directory(direction="retrieve")
 
         elif self.option == "Partial retrieve: uncompress retrieved service":
             # self.uncompress_targz_directory(direction="retrieve")
