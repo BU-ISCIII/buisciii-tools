@@ -4,8 +4,7 @@
 import sys
 import os
 import logging
-
-# import shutil
+import shutil
 import sysrsync
 import rich
 import calendar
@@ -385,7 +384,7 @@ class Archive:
             initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
 
             # Check if there is a prior ".tar.gz" file
-            # NOTE: I find dir_to_tar + ".tar.gz" easier to locate the compressed files
+            # NOTE: I find dir_to_tar + ".tar.gz" easier to mentally locate the compressed files
             if os.path.exists(dir_to_tar + ".tar.gz"):
                 compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
                 stderr.print(
@@ -529,12 +528,54 @@ class Archive:
         return
 
     def uncompress_targz_directory(self, direction):
+        """
+        Uncompress chosen services
+        """
 
-        pass
+        already_uncompressed_services = []
+
+        for service in self.services_to_move:
+            archived_path, non_archived_path = get_service_paths(
+                self.conf, self.type, service
+            )
+
+        # When archiving, you untar to archived_path
+        # When retrieving, you untar to non_archived_path
+            dir_to_untar = archived_path if (direction == "archive") else non_archived_path
+
+            # Check whether the compressed file is not there
+            if not os.path.exists(dir_to_tar + ".tar.gz"):
+                stderr.print(f"The compressed service { dir_to_tar.split("/")[-1] + '.tar.gz'} could not be found")
+                
+                # Check whether the uncompressed dir is already there
+                if os.path.exists(dir_to_tar):
+                    stderr.print(f"However, like this service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
+                else:
+                    stderr.print(f"The uncompressed service, {dir_to_untar} could not be found either.")
+                    continue
+            else:
+                if os.path.exists(dir_to_tar):
+                    stderr.print(f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}").
+                    if (bu_isciii.utils.prompt_selection("What to do?", ["Skip (dont uncompress)",f"Delete {dir_to_tar.split('/')[-1]} and uncompress again"]) == "Skip (dont uncompress)") 
+                        already_uncompressed_services.append(dir_to_tar)
+                        continue
+                    else:
+                        shutil.rmtree(dir_to_tar)
+                
+                stderr.print(f"Uncompressing {dir_to_tar.split('/')[-1] + '.tar.gz'}").
+                uncompress_targz_directory(dir_to_tar + ".tar.gz", dir_to_tar)
+                stderr.print(f"{dir_to_tar.split('/')[-1]} has been successfully uncompressed").
+
+        stderr.print(
+            f"\nUncompressed all {len(self.services_to_move)} services"
+        )
+
+        if len(already_uncompressed_services) > 0:
+            stderr.print(
+                f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
+            )
 
         return
-
-
 
     def handle_archive(self):
         """
@@ -543,55 +584,38 @@ class Archive:
         if self.option == "Full archive: compress and archive":
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
-            # self.uncompress_targz_directory(direction="archive")
-            stderr.print("This is not ready yet, Im on it!")
+            self.uncompress_targz_directory(direction="archive")
+            stderr.print("Deleting is not ready yet, Im on it!")
 
         elif self.option == "Partial archive: compress NON-archived service":
             self.targz_directory(direction="archive")
 
-        elif (
-            self.option
-            == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
-        ):
+        elif (self.option == "Partial archive: archive NON-archived service (must be compressed first) and check md5"):
             self.move_directory(direction="archive")
 
-        elif (
-            self.option
-            == "Partial archive: uncompress newly archived compressed service"
-        ):
-            # self.uncompress_targz_directory(direction="archive")
-            stderr.print("This is not ready yet, Im on it!")
+        elif (self.option == "Partial archive: uncompress newly archived compressed service"):
+            self.uncompress_targz_directory(direction="archive")
 
-        elif (
-            self.option
-            == "Partial archive: remove newly archived compressed services from DATA directory"
-        ):
-            stderr.print("This is not ready yet, Im on it!")
+        elif (self.option == "Partial archive: remove newly archived compressed services from DATA directory"):
+            stderr.print("Deleting is not ready yet, Im on it!")
 
-        elif (
-            self.option
-            == "Partial archive: remove newly archived compressed services from ARCHIVED directory"
-        ):
-            stderr.print("This is not ready yet, Im on it!")
+        elif (self.option == "Partial archive: remove newly archived compressed services from ARCHIVED directory"):
+            stderr.print("Deleting is not ready yet, Im on it!")
 
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.targz_directory(direction="retrieve")
             self.move_directory(direction="retrieve")
-            # self.uncompress_targz_directory(direction="retrieve")
-            stderr.print("This is not ready yet, Im on it!")
+            self.uncompress_targz_directory(direction="retrieve")
+            stderr.print("Deleting is not ready yet, Im on it!")
 
         elif self.option == "Partial retrieve: compress archived service":
             self.targz_directory(direction="retrieve")
 
-        elif (
-            self.option
-            == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
-        ):
+        elif (self.option == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"):
             self.move_directory(direction="retrieve")
 
         elif self.option == "Partial retrieve: uncompress retrieved service":
-            # self.uncompress_targz_directory(direction="retrieve")
-            stderr.print("This is not ready yet, Im on it!")
+            self.uncompress_targz_directory(direction="retrieve")
 
         elif self.option == "That should be all, thank you!":
             sys.exit()
