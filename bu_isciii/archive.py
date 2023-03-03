@@ -492,7 +492,7 @@ class Archive:
                 if (
                     bu_isciii.utils.prompt_selection(
                         "What to do?",
-                        [f"Remove it and {direction} it again", "Ignore this service"],
+                        [f"Remove it and {direction} it again", "Ignore this service"]
                     )
                 ) == "Ignore this service":
                     continue
@@ -556,7 +556,7 @@ class Archive:
                 if os.path.exists(dir_to_untar):
                     stderr.print(f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
                     if (bu_isciii.utils.prompt_selection("What to do?", ["Skip (dont uncompress)",f"Delete {dir_to_untar.split('/')[-1]} and uncompress again"]) == "Skip (dont uncompress)"): 
-                        already_uncompressed_services.append(dir_to_untar)
+                        already_uncompressed_services.append(dir_to_untar.split("/")[-1])
                         continue
                     else:
                         shutil.rmtree(dir_to_untar)
@@ -573,6 +573,46 @@ class Archive:
             stderr.print(
                 f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_compressed_services)}"
             )
+
+        return
+
+    def delete_targz_dirs(self, direction):
+        """
+        Delete the targz dirs when the original, uncompressed service is present
+        The origin directory will always be deleted last
+        This is:
+            Direction "archive": archived compressed dir will be deleted first bc the original dir is in non_archived
+            Direction "retrieve": non_archived compressed dir will be deleted first bc the original dir is in archive
+        """
+
+        non_deleted_services = []
+
+        for service in self.services_to_move:
+            archived_path, non_archived_path = get_service_paths(
+                self.conf, self.type, service
+            )
+
+            # Origin will always be deleted last
+            # [destiny, origin]
+            file_locations = [non_archived, archived] if direction == "archive" else [archived, non_archived]
+
+            # First we delete origin
+            # Check if there is a non-compressed
+            for place in file_locations:
+                if os.path.exists(place):
+                    stderr.print(f"Uncompressed service {place.split('/')[-1]} has been found in the destiny folder {'/'.join(place.split('/')[:-1])}, so there should be no problem deleting the compressed file {place.split('/')[-1] + '.tar.gz'}. Deleting.")
+                    os.remove(place + ".tar.gz")
+                    stderr.print(f"Uncompressed service {place.split('/')[-1]} NOT FOUND in the folder {'/'.join(place.split('/')[:-1])}")
+                    
+                    if (bu_isciii.utils.prompt_selection("What to do?",["Skip deletion", "Delete anyways"]) == "Skip deletion"):
+                        non_deleted_services.append(place.split("/")[-1])
+                        break
+                    else:
+                        os.remove(place + ".tar.gz")
+        
+        stderr.print(f"Deleted {2*len(self.services_to_move) - len(non_deleted_services)} compressed services.")
+        if len(non_deleted_services) > 0:
+                stderr.print(f"{len(non_deleted_services)} compressed services could not be deleted: {', '.join(non_deleted_services)}")
 
         return
 
