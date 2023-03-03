@@ -178,7 +178,7 @@ def uncompress_targz_directory(tar_name, directory):
     """
     Untar GZ file
     """
-    with open(tar_name) as tarfile:
+    with tarfile.open(tar_name) as tarfile:
         tarfile.extractall(directory)
     return
 
@@ -544,27 +544,27 @@ class Archive:
             dir_to_untar = archived_path if (direction == "archive") else non_archived_path
 
             # Check whether the compressed file is not there
-            if not os.path.exists(dir_to_tar + ".tar.gz"):
-                stderr.print(f"The compressed service { dir_to_tar.split("/")[-1] + '.tar.gz'} could not be found")
+            if not os.path.exists(dir_to_untar + ".tar.gz"):
+                stderr.print(f"The compressed service { dir_to_untar.split('/')[-1] + '.tar.gz'} could not be found")
                 
                 # Check whether the uncompressed dir is already there
-                if os.path.exists(dir_to_tar):
+                if os.path.exists(dir_to_untar):
                     stderr.print(f"However, like this service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
                 else:
                     stderr.print(f"The uncompressed service, {dir_to_untar} could not be found either.")
                     continue
             else:
-                if os.path.exists(dir_to_tar):
-                    stderr.print(f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}").
-                    if (bu_isciii.utils.prompt_selection("What to do?", ["Skip (dont uncompress)",f"Delete {dir_to_tar.split('/')[-1]} and uncompress again"]) == "Skip (dont uncompress)") 
-                        already_uncompressed_services.append(dir_to_tar)
+                if os.path.exists(dir_to_untar):
+                    stderr.print(f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
+                    if (bu_isciii.utils.prompt_selection("What to do?", ["Skip (dont uncompress)",f"Delete {dir_to_untar.split('/')[-1]} and uncompress again"]) == "Skip (dont uncompress)"): 
+                        already_uncompressed_services.append(dir_to_untar)
                         continue
                     else:
-                        shutil.rmtree(dir_to_tar)
+                        shutil.rmtree(dir_to_untar)
                 
-                stderr.print(f"Uncompressing {dir_to_tar.split('/')[-1] + '.tar.gz'}").
-                uncompress_targz_directory(dir_to_tar + ".tar.gz", dir_to_tar)
-                stderr.print(f"{dir_to_tar.split('/')[-1]} has been successfully uncompressed").
+                stderr.print(f"Uncompressing {dir_to_untar.split('/')[-1] + '.tar.gz'}")
+                uncompress_targz_directory(dir_to_untar + ".tar.gz", dir_to_untar)
+                stderr.print(f"{dir_to_untar.split('/')[-1]} has been successfully uncompressed")
 
         stderr.print(
             f"\nUncompressed all {len(self.services_to_move)} services"
