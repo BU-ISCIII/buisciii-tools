@@ -172,7 +172,7 @@ def targz_dir(tar_name, directory):
     Generate a tar gz file with the contents of a directory
     """
     with tarfile.open(tar_name, "w:gz") as out_tar:
-        out_tar.add(directory, arcname="/".join(directory.split("/")[:-1])[:-1])
+        out_tar.add(directory, arcname=os.path.basename(directory))
     return True
 
 
@@ -451,7 +451,7 @@ class Archive:
             # If origin cant be found, next
             if not (os.path.exists(origin + ".tar.gz")):
                 stderr.print(
-                    f"{origin.split('/')[-1] + "tar.gz"} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])})"
+                    f"{origin.split('/')[-1] + 'tar.gz'} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])})"
                 )
                 continue
 
