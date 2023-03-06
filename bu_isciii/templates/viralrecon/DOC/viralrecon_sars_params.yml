@@ -6,3 +6,5 @@ variant_caller: 'ivar'
 consensus_caller: 'bcftools'
 skip_assembly: true
 nextclade_dataset_name: 'sars-cov-2'
+nextclade_dataset: false
+nextclade_dataset_tag: '2023-02-25T12:00:00Z'
