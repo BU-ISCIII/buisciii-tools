@@ -92,6 +92,57 @@ class BioinfoDoc:
             "availableServices"
         ]
         if self.type == "delivery":
+            self.delivery_md_list = []
+            if report_md is not None:
+                if os.path.exists(report_md):
+                    self.delivery_md_list.append(os.path.normpath(report_md))
+                else:
+                    stderr.print(
+                        "[red] ERROR: Markdown file " + report_md + " does not exist."
+                    )
+                    sys.exit()
+            else:
+                self.service_ids_requested_list = (
+                    bu_isciii.utils.append_end_to_service_id_list(
+                        self.services_requested
+                    )
+                )
+                for service_id_requested in self.service_ids_requested_list:
+                    if (
+                        bu_isciii.service_json.ServiceJson().get_find(
+                            service_id_requested, "delivery_md"
+                        )
+                        not in self.delivery_md_list
+                    ):
+                        self.delivery_md_list.append(
+                            bu_isciii.service_json.ServiceJson().get_find(
+                                service_id_requested, "delivery_md"
+                            )
+                        )
+
+            self.results_md_list = []
+            if results_md is not None:
+                if os.path.exists(results_md):
+                    self.results_md_list.append(os.path.normpath(results_md))
+                else:
+                    stderr.print(
+                        "[red] ERROR: Markdown file " + results_md + " does not exist."
+                    )
+                    sys.exit()
+            else:
+                for service_id_requested in self.service_ids_requested_list:
+                    if (
+                        bu_isciii.service_json.ServiceJson().get_find(
+                            service_id_requested, "results_md"
+                        )
+                        not in self.results_md_list
+                    ):
+                        self.results_md_list.append(
+                            bu_isciii.service_json.ServiceJson().get_find(
+                                service_id_requested, "results_md"
+                            )
+                        )
+
         if self.type == "delivery":
             self.sftp_data = bu_isciii.utils.get_sftp_folder(self.resolution_info)
         if self.type == "delivery" and sftp_folder is None:
