@@ -454,6 +454,19 @@ class BioinfoDoc:
             sys.exit()
             return False
         return None
+    def clean_files(self):
+        file_path = os.path.join(
+            self.service_folder,
+            self.service_result_folder,
+            self.delivery_sub_folder,
+        )
+        for f in os.listdir(file_path):
+            if re.search("_resolution", f):
+                os.remove(os.path.join(file_path, f))
+            if re.search("_results", f):
+                os.remove(os.path.join(file_path, f))
+            if re.search("_service", f):
+                os.remove(os.path.join(file_path, f))
 
     def sftp_tree(self):
         sftp_path = os.path.join(self.sftp_folder, self.service_folder)
@@ -497,6 +510,8 @@ class BioinfoDoc:
             doc_pdf = self.generate_documentation_files("delivery")
             result_pdf = self.create_results_doc(self.results_md_list, "results")
             service_pdf = self.create_results_doc(self.delivery_md_list, "service")
+            self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
+            self.clean_files()
             self.sftp_tree()
             return
         else:
