@@ -1,0 +1,58 @@
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+       /* Add custom classes and styles that you want inlined here */
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container">
+      <div class="card my-10">
+        <div class="card-body">
+          <h1 class="h3 mb-2">Entrega {{ delivery_number }} - {{ service_id }} - {{ service_acronym }}</h1>
+          <h6 class="text-teal-700">Servicio Unidad de Bioinformática del Instituto de Salud Carlos III (BU-ISCIII)</h6>
+          <hr>
+          <div class="space-y-3">
+            <p class="text-gray-700">Buenas {{ user_data.first_name }},</p>
+            <p class="text-gray-700">
+              La entrega {{ delivery_number }} del análisis del servicio <b><u>{{ service_id }} - {{ service_acronym }}</u></b> ha concluído.<br>
+            </p>
+            {% if email_notes %}
+              <p class="text-gray-700"><u>Notas:</u></p>
+              <p class="text-gray-700">{{ email_notes }} </p>
+            {% endif %}
+            <p class="text-gray-700"><u>Datos sftp:</u></p>
+            <p class="text-gray-700"><i>Para descargar los datos desde el sftp:</i></p>
+          </div>
+          <div>
+          <ul class="text-gray-700">
+              <li><b>Servidor:</b> sftpbioinfo.isciii.es</li>
+              <li><b>Carpeta:</b> {{ sftp_folder }}</li>
+              <li><b>Usuario:</b> {{ user_data.email }} (mail isciii)</li>
+              <li><b>Contraseña:</b> contraseña de dominio</li>
+              <li><b>Puerto:</b> 22 (desde el isciii)</li>
+              <li><b>Puerto:</b> 50122 (desde fuera del isciii)</li>
+            </ul>
+          </div>
+          <div class="space-y-3">
+            <p class="text-gray-700">
+              Si tenéis cualquier pregunta no dudéis en comentárnoslo.​
+            </p>
+            <p class="text-gray-700">Un saludo</p>
+            <hr>
+          </div>
+          <div class="row">
+            <div class="col-7">
+              <p>BU-ISCIII</p>
+              <p>Bioinformatics Unit, ISCIII</p>
+            </div>
+            <div class="col-5">
+              <img class="max-w-80 w-full" src="https://github.com/BU-ISCIII/buisciii-tools/blob/iskylims_isciiides/bu_isciii/assets/BU_ISCIII_logo.png?raw=true" alt="buisciii_logo"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
