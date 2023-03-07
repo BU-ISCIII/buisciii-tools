@@ -494,8 +494,9 @@ class BioinfoDoc:
             self.generate_documentation_files("service_info")
             return
         elif self.type == "delivery":
-            pdf_resolution = self.generate_documentation_files("delivery")
-            self.create_delivery_doc(pdf_resolution)
+            doc_pdf = self.generate_documentation_files("delivery")
+            result_pdf = self.create_results_doc(self.results_md_list, "results")
+            service_pdf = self.create_results_doc(self.delivery_md_list, "service")
             self.sftp_tree()
             return
         else:
