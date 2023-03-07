@@ -42,8 +42,8 @@ Here we describe information about the requested resolution.
 * Resolution in Progress date: {{ resolution.resolutionOnInProgressDate }}
 {%- endif %}
 * Requested services handle in this resoution:
-{% for a_service in resolution.availableServices %}
-    {{ a_service }}
+{% for a_service in resolution_serviceIDs %}
+    - {{ a_service }}
 {% endfor %}
 * Resolution Notes: {{ resolution.resolutionNotes }}
 
