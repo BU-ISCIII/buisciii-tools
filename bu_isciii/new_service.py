@@ -32,7 +32,7 @@ class NewService:
         path=None,
         no_create_folder=None,
         ask_path=False,
-        api_password=None,
+        api_token=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -51,7 +51,7 @@ class NewService:
         )
         # Obtain info from iskylims api
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_password
+            conf_api["server"], conf_api["api_url"], api_token
         )
         self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id

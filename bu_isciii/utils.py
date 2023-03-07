@@ -107,8 +107,8 @@ def get_delivery_notes(msg):
 
 def ask_api_pass():
     stderr.print("Write API password for logging")
-    api_password = questionary.password("API password: ").unsafe_ask()
-    return api_password
+    api_token = questionary.password("API password: ").unsafe_ask()
+    return api_token
 
 
 def get_service_paths(resolution_info):
