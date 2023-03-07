@@ -5,6 +5,7 @@ from datetime import datetime
 import logging
 import rich.console
 import os
+import re
 import sys
 import jinja2
 import markdown
