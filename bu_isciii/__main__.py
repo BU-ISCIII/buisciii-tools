@@ -113,12 +113,12 @@ class CustomHelpOrder(click.Group):
 )
 @click.option(
     "-t",
-    "--api-password",
+    "--api-token",
     help="Password for the API logging",
     required=False,
     default=None,
 )
-def bu_isciii_cli(verbose, log_file, api-token):
+def bu_isciii_cli(verbose, log_file, api_token):
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
@@ -134,8 +134,8 @@ def bu_isciii_cli(verbose, log_file, api-token):
         log.addHandler(log_fh)
 
     global api_pass
-    if api-token:
-        api_pass = api-token
+    if api_token:
+        api_pass = api_token
     else:
         api_pass = bu_isciii.utils.ask_api_pass()
 
