@@ -368,7 +368,7 @@ class BioinfoDoc:
     def generate_documentation_files(self, type):
         if type == "service_info":
             file_path = os.path.join(self.service_folder, self.service_info_folder)
-        elif type == "delivery":
+        elif self.type == "delivery":
             file_path = os.path.join(
                 self.service_folder,
                 self.service_result_folder,
