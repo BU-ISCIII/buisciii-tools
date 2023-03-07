@@ -502,6 +502,30 @@ class BioinfoDoc:
             stderr.print("traceback error %s" % e)
             sys.exit()
 
+    def email_creation(self):
+        email_data = {}
+        if bu_isciii.utils.prompt_yn_question(
+            "Do you want to add some delivery notes to the e-mail?"
+        ):
+            email_data["email_notes"] = bu_isciii.utils.get_delivery_notes(
+                msg="Write email notes"
+            )
+
+        email_data["user_data"] = self.resolution_info["serviceUserId"]
+        email_data["service_id"] = self.service_name.split("_", 5)[0]
+        email_data["service_acronym"] = self.service_name.split("_", 5)[2]
+        email_data["delivery_number"] = self.delivery_number
+        email_data["sftp_folder"] = self.sftp_data[1]
+
+        email_template_file = "templates/email.j2"
+        pakage_path = os.path.dirname(os.path.realpath(__file__))
+        templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        template = templateEnv.get_template(email_template_file)
+
+        email_html = template.render(email_data)
+        return email_html
+
     def create_documentation(self):
         self.create_structure()
         if self.type == "service_info":
@@ -514,6 +538,14 @@ class BioinfoDoc:
             self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
             self.clean_files()
             self.sftp_tree()
+            email_html = self.email_creation()
+            if bu_isciii.utils.prompt_yn_question(
+                "Do you want to send e-mail automatically?"
+            ):
+                stderr.print("[red] This is not yet implemented. I'll print the e-mail HTML.")
+                print(email_html)
+            else:
+                print(email_html)
             return
         else:
             stderr.print("[red] invalid option")
