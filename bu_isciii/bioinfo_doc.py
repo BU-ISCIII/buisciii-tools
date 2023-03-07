@@ -58,13 +58,6 @@ class BioinfoDoc:
         if not os.path.exists(self.path):
             stderr.print("[red] Folder does not exist. " + self.path + "!")
             sys.exit(1)
-        self.report_md = report_pdf
-        if self.report_md is not None:
-            if os.path.exists(report_pdf):
-                self.report_md = os.path.normpath(report_pdf)
-            else:
-                stderr.print("[red] ERROR: PDF file " + report_pdf + " does not exist.")
-                sys.exit()
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
