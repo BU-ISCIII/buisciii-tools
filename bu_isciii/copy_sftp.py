@@ -4,7 +4,6 @@
 import os
 import sys
 import logging
-import json
 from rich.console import Console
 import sysrsync
 from sysrsync.exceptions import RsyncError
