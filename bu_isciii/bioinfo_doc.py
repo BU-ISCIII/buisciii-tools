@@ -193,7 +193,9 @@ class BioinfoDoc:
         return
 
     def post_delivery_info(self):
-        delivery_notes = bu_isciii.utils.get_delivery_notes()
+        delivery_notes = bu_isciii.utils.get_delivery_notes(
+            msg="Write some delivery notes:"
+        )
 
         delivery_dict = {
             "resolutionNumber": self.resolution_id,
