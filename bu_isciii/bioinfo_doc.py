@@ -268,8 +268,13 @@ class BioinfoDoc:
         log.info(
             "starting proccess to create markdown for service %s", self.service_folder
         )
-        stderr.print("[green] Creating markdown file for " + self.service_folder + " !")
+        stderr.print(
+            "[green] Creating service information markdown file for "
+            + self.service_folder
+            + " !"
+        )
         log.info("Start creating the markdown file")
+
         markdown_data = {}
         # service related information
         markdown_data["service"] = self.resolution_info
@@ -293,30 +298,29 @@ class BioinfoDoc:
         # Resolution related information
         markdown_data["resolution"] = self.resolution_info["resolutions"][0]
         markdown_data["resolution_serviceIDs"] = []
-        for available_service in self.resolution_info["resolutions"][0]["availableServices"]:
-            markdown_data["resolution_serviceIDs"].append(available_service["availServiceDescription"])
-        f_name = self.resolution_number + ".md"
+        for available_service in self.resolution_info["resolutions"][0][
+            "availableServices"
+        ]:
+            markdown_data["resolution_serviceIDs"].append(
+                available_service["availServiceDescription"]
+            )
+
         if self.type == "delivery":
             markdown_data["delivery"] = self.resolution_info["resolutions"][0][
                 "delivery"
             ][0]
+        print("markdown_data/delivery")
+        print(markdown_data["delivery"])
+        f_name = self.resolution_number + "_resolution.md"
         file_name = os.path.join(file_path, f_name)
 
         # Delivery related information
-        markdown_data["service_notes"] = (
-            self.resolution_info["serviceNotes"].replace("\r", "").replace("\n", " ")
-        )
-
         pakage_path = os.path.dirname(os.path.realpath(__file__))
         templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template(self.template_file)
         # Create markdown
         mk_text = template.render(markdown_data)
-
-        with open(file_name, "wb") as fh:
-            fh.write(mk_text.encode("utf-8"))
-        log.info("Creation the markdown file is completed")
         return str(mk_text), file_name
 
     def convert_markdown_to_html(self, mk_text):
@@ -388,73 +392,84 @@ class BioinfoDoc:
         pdf_file = html_file_name.replace(".html", ".pdf")
         return pdf_file
 
-    def join_pdf_files(self, service_pdf, result_template, out_file):
-        mergeFile = PyPDF2.PdfFileMerger()
-        mergeFile.append(PyPDF2.PdfFileReader(service_pdf, "rb"))
-        mergeFile.append(PyPDF2.PdfFileReader(result_template, "rb"))
-        mergeFile.write(out_file)
+    def join_pdf_files(self, documentation_pdf, results_pdf, service_pdf):
+        delivery_pdf_name = (
+            self.resolution_number + "_" + self.delivery_sub_folder + ".pdf"
+        )
+        delivery_pdf_file = os.path.join(
+            self.service_folder,
+            self.service_result_folder,
+            self.delivery_sub_folder,
+            delivery_pdf_name,
+        )
+        try:
+            mergeFile = PyPDF2.PdfFileMerger()
+            mergeFile.append(PyPDF2.PdfFileReader(documentation_pdf, "rb"))
+            mergeFile.append(PyPDF2.PdfFileReader(results_pdf, "rb"))
+            mergeFile.append(PyPDF2.PdfFileReader(service_pdf, "rb"))
+            mergeFile.write(delivery_pdf_file)
+            stderr.print(
+                "[green]Successfully merged the PDFs %s, %s and %s to the directory %s"
+                % (
+                    documentation_pdf,
+                    results_pdf,
+                    service_pdf,
+                    os.path.join(
+                        self.service_folder,
+                        self.service_result_folder,
+                        self.delivery_sub_folder,
+                        "delivery.pdf",
+                    ),
+                ),
+                highlight=False,
+            )
+
+        except OSError as e:
+            stderr.print("[red]ERROR: Merging PDFs failed.")
+            stderr.print("traceback error %s" % e)
+            sys.exit()
         return
 
-    def create_delivery_doc(self, resolution_pdf):
-        """Get the service pdf file from the requested service"""
-        services_ids = bu_isciii.utils.get_service_ids(self.services_requested)
-        services_json = bu_isciii.service_json.ServiceJson()
-
-        if len(services_ids) == 1:
-            if self.report_md:
-                service_pdf = self.report_md
-            else:
-                try:
-                    service_pdf = services_json.get_find(
-                        services_ids[0], "delivery_pdf"
-                    )
-                except KeyError as e:
-                    stderr.print(
-                        "[red]ERROR: Service id %s not found in services json file."
-                        % services_ids[0]
-                    )
-                    stderr.print("traceback error %s" % e)
-                    sys.exit()
-            try:
-                real_path = os.path.join(
-                    os.path.dirname(os.path.realpath(__file__)), service_pdf
-                )
-                delivery_pdf_name = (
-                    self.resolution_number + "_" + self.delivery_sub_folder + ".pdf"
-                )
-                delivery_pdf_file = os.path.join(
-                    self.service_folder,
-                    self.service_result_folder,
-                    self.delivery_sub_folder,
-                    delivery_pdf_name,
-                )
-                self.join_pdf_files(resolution_pdf, real_path, delivery_pdf_file)
-                stderr.print(
-                    "[green]Successfully merged the PDFs %s and %s to the directory %s"
-                    % (
-                        resolution_pdf,
-                        service_pdf,
-                        os.path.join(
-                            self.service_folder,
-                            self.service_result_folder,
-                            self.delivery_sub_folder,
-                            "delivery.pdf",
-                        ),
-                    ),
-                    highlight=False,
-                )
-
-            except OSError as e:
-                stderr.print("[red]ERROR: Merging PDFs failed.")
-                stderr.print("traceback error %s" % e)
-                sys.exit()
+    def create_results_doc(self, md_list, md_type):
+        stderr.print(
+            "[green] Creating service results markdown file for "
+            + self.service_folder
+            + " !"
+        )
+        file_path = os.path.join(
+            self.service_folder,
+            self.service_result_folder,
+            self.delivery_sub_folder,
+        )
+        if md_type == "service":
+            mk_text = ""
         else:
-            stderr.print(
-                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry! Please re-run and select one of the service ids."
+            mk_text = (
+                "# Results\nHere we describe the content of the  `RESULTS` folder.\n"
             )
-            sys.exit()
-            return False
-        return None
+        for results_md in md_list:
+            results_md_path = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), results_md
+            )
+            with open(results_md_path, "r") as fr:
+                md_text = fr.read()
+                mk_text = mk_text + "\n" + md_text
+
+        if md_type == "service":
+            mk_text = mk_text.replace(
+                '<details markdown="1">', '<details open markdown="1">'
+            )
+            f_name = self.resolution_number + "_service.md"
+        else:
+            f_name = self.resolution_number + "_results.md"
+        file_name = os.path.join(file_path, f_name)
+        file_name_without_ext = file_name.replace(".md", "")
+        html_text = self.convert_markdown_to_html(mk_text)
+        html_file_name = self.wrap_html(html_text, file_name_without_ext)
+        self.convert_to_pdf(html_file_name)
+        pdf_file = html_file_name.replace(".html", ".pdf")
+        return pdf_file
+
     def clean_files(self):
         file_path = os.path.join(
             self.service_folder,
