@@ -88,6 +88,10 @@ class BioinfoDoc:
         self.resolution_info = self.rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id
         )
+        self.services_requested = self.resolution_info["resolutions"][0][
+            "availableServices"
+        ]
+        if self.type == "delivery":
         if self.type == "delivery":
             self.sftp_data = bu_isciii.utils.get_sftp_folder(self.resolution_info)
         if self.type == "delivery" and sftp_folder is None:
@@ -122,9 +126,6 @@ class BioinfoDoc:
             self.template_file = self.conf["service_info_template_path_file"]
         else:
             self.template_file = self.conf["delivery_template_path_file"]
-        self.services_requested = self.resolution_info["resolutions"][0][
-            "availableServices"
-        ]
         self.service_info_folder = self.conf["service_folder"][0]
         self.service_result_folder = self.conf["service_folder"][1]
 
