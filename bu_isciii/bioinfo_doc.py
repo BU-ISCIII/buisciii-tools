@@ -557,7 +557,9 @@ class BioinfoDoc:
             if bu_isciii.utils.prompt_yn_question(
                 "Do you want to send e-mail automatically?"
             ):
-                stderr.print("[red] This is not yet implemented. I'll print the e-mail HTML.")
+                stderr.print(
+                    "[red] This is not yet implemented. I'll print the e-mail HTML."
+                )
                 print(email_html)
             else:
                 print(email_html)
