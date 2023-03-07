@@ -29,7 +29,7 @@ class CleanUp:
         path=None,
         ask_path=False,
         option=None,
-        api_password=None,
+        api_token=None,
     ):
         """
         Description:
@@ -55,7 +55,7 @@ class CleanUp:
             "xtutatis_api_settings"
         )
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_password
+            conf_api["server"], conf_api["api_url"], api_token
         )
         self.resolution_info = rest_api.get_request(
             "serviceFullData", "resolution", self.resolution_id

@@ -88,7 +88,7 @@ class Archive:
         type=None,
         year=None,
         option=None,
-        api_password=None,
+        api_token=None,
     ):
         # resolution_id = Nombre de la resolución
         # type = services_and_colaborations // research
@@ -128,7 +128,7 @@ class Archive:
 
         # Obtain info from iSkyLIMS api with the conf_api info
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_password
+            conf_api["server"], conf_api["api_url"], api_token
         )
         self.services_to_move = rest_api.get_request(
             "services", "state", "delivered", "date", self.year

@@ -112,13 +112,13 @@ class CustomHelpOrder(click.Group):
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
 @click.option(
-    "-a",
+    "-t",
     "--api-password",
     help="Password for the API logging",
     required=False,
     default=None,
 )
-def bu_isciii_cli(verbose, log_file, api_password):
+def bu_isciii_cli(verbose, log_file, api-token):
     # Set the base logger to output DEBUG
     log.setLevel(logging.DEBUG)
 
@@ -134,8 +134,8 @@ def bu_isciii_cli(verbose, log_file, api_password):
         log.addHandler(log_fh)
 
     global api_pass
-    if api_password:
-        api_pass = api_password
+    if api-token:
+        api_pass = api-token
     else:
         api_pass = bu_isciii.utils.ask_api_pass()
 

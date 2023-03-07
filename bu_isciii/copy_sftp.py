@@ -32,7 +32,7 @@ class CopySftp:
         path=None,
         ask_path=False,
         sftp_folder=None,
-        api_password=None,
+        api_token=None,
     ):
         """
         Description:
@@ -59,7 +59,7 @@ class CopySftp:
 
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_password
+            conf_api["server"], conf_api["api_url"], api_token
         )
 
         self.resolution_info = rest_api.get_request(
