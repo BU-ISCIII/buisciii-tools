@@ -15,7 +15,6 @@ from math import pow
 
 # Local imports
 import bu_isciii
-import bu_isciii.list
 import bu_isciii.utils
 import bu_isciii.config_json
 import bu_isciii.drylab_api
@@ -341,6 +340,23 @@ class Archive:
             stderr.print(f"The following services were not found on iSkyLIMS: {','.join(not_found_services)[:-1]}")
             if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
                         sys.exit()
+
+        # Check on the directories to get location and size
+        stderr.print("Finding the services in the directory tree")
+        for service in self.services.keys():
+
+            if os.path.exists(self.services[service]["archived_path"]):
+                self.services[service]["found"].append("Archive")
+                self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
+            else:
+                self.services[service]["archived_size"] = 0
+
+            if os.path.exists(self.services[service]["non_archived_path"]):
+                self.services[service]["found"].append("Data dir")
+                self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
+            else:
+                self.services[service]["non_archived_size"] = 0
+
 
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
