@@ -236,8 +236,7 @@ class Archive:
         # self.service_info = {
         #     "failed_compression": [],
         #     "failed_movement": [],
-        #     "failed_uncompression": [],
-        # }
+        #     "failed_uncompression": [],}
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -390,6 +389,13 @@ class Archive:
                     "That should be all, thank you!",
                 ],
             )
+
+    def scout_directory_sizes(self):
+
+        pass
+
+        return
+
 
     def targz_directory(self, direction):
         """
