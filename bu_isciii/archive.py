@@ -338,12 +338,14 @@ class Archive:
         # Ask the API for services within the range
         # safe is False, so instead of exiting, an error code will be returned
 
-            if isinstance(self.services_to_move[0], int):
-                stderr.print(
-                    f"No services named '{self.resolution_id}' were found. Connection seemed right though!"
-                )
-                sys.exit()
-        
+        """
+        if isinstance(self.services_to_move[0], int):
+            stderr.print(
+                f"No services named '{self.resolution_id}' were found. Connection seemed right though!"
+            )
+            sys.exit()
+        """
+
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
 
