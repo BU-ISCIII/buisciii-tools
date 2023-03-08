@@ -108,6 +108,13 @@ def ask_date(previous_date=None):
 
     return [str(year), str(chosen_month_number), str(day)]
 
+def validate_date(year, month, day, previous_date=None):
+
+    
+
+    pass
+
+    return
 
 def get_service_paths(conf, ser_type, service):
     """
@@ -281,7 +288,6 @@ class Archive:
                     sys.exit()
 
             # Get individual serviceFullData for each data
-            # Not a huge fan of adding the .1 to resolutions honestly
             for service in services_batch:
                 request = rest_api.get_request(
                     request_info="serviceFullData",
