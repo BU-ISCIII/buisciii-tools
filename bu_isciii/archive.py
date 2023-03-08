@@ -215,7 +215,7 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, ser_type=None, option=None, api_token=None):
+    def __init__(self, service_id=None, ser_type=None, option=None, api_token=None):
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
