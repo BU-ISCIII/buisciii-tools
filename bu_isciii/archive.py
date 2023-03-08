@@ -108,11 +108,13 @@ def ask_date(previous_date=None, initial_year=2010):
 
     return datetime.date([year, chosen_month_number, day])
 
-def validate_date(year, month, day, previous_date=None):
+
+def validate_date(date, previous_date=None):
 
     pass
 
     return
+
 
 def get_service_paths(conf, ser_type, service):
     """
@@ -239,10 +241,10 @@ class Archive:
 
         if (
             bu_isciii.utils.prompt_selection(
-                "Working with a batch, or a single resolution?",
-                ["Batch of services", "Single service"],
+                "Search services by date, or by resolution ID?",
+                ["Search by date", "Resolution ID"],
             )
-            == "Batch of services"
+            == "Search by date"
         ):
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
