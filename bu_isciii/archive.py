@@ -357,12 +357,26 @@ class Archive:
             else:
                 self.services[service]["non_archived_size"] = 0
 
+        # Generate the table
+        size_table = rich.table.Table()
+        
+        size_table.add_column("Service ID")
+        size_table.add_column("Directory size")
+        size_table.add_column("Found in")
 
+        for service in self.services.keys():
+            table.add_row(
+                service,
+                services[service]["non_archived_path"],
+                services[service]["found"]
+            )
+    
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
                 [
+                    "Scout for service size"
                     "Full archive: compress and archive",
                     "    Partial archive: compress NON-archived service",
                     "    Partial archive: archive NON-archived service (must be compressed first) and check md5",
@@ -709,7 +723,10 @@ class Archive:
         """
         Handle archive class options
         """
-        if self.option == "Full archive: compress and archive":
+
+        if self.option == "Scout for service size":
+            pass
+        elif self.option == "Full archive: compress and archive":
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
