@@ -45,18 +45,18 @@ def ask_date(previous_date=None, initial_year=2010):
 
     # Range: lower_limit_year - current year
     year = bu_isciii.utils.prompt_year(
-        lower_limit=lower_limit_year, upper_limit=date.today().year
+        lower_limit=lower_limit_year, upper_limit=datetime.date.today().year
     )
 
     # Limit the list to the current month if year = current year
     # This could be a one-liner:
     # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if year < date.today().year else month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
     # I found it easier the following way:
-    if year < date.today().year:
+    if year < datetime.date.today().year:
         month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:]
     else:
         month_list = [[num, month] for num, month in enumerate(calendar.month_name)][
-            1 : date.today().month + 1
+            1 : datetime.date.today().month + 1
         ]
 
     # If there is a previous date
@@ -92,8 +92,11 @@ def ask_date(previous_date=None, initial_year=2010):
     )[9:]
 
     # if current month and day, limit the options to the current day
-    if year == date.today().year and int(chosen_month_number) == date.today().month:
-        day_list = day_list[: date.today().day]
+    if (
+        year == datetime.date.today().year
+        and int(chosen_month_number) == datetime.date.today().month
+    ):
+        day_list = day_list[: datetime.date.today().day]
 
     # if previous date  & same year & same month, limit days
     if (
@@ -112,7 +115,6 @@ def ask_date(previous_date=None, initial_year=2010):
 
 
 def validate_date(date, previous_date=None):
-
     pass
 
     return
@@ -217,17 +219,19 @@ class Archive:
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
-        
+
         self.type = ser_type
         self.option = option
-        self.services = {resolution_id: {
-                                        "found_in_system":"",
-                                        "archived_path":"",
-                                        "non_archived_path":"",
-                                        "found":[],
-                                        "archived_size":int(),
-                                        "non_archived_size":int()}
-                                         }
+        self.services = {
+            resolution_id: {
+                "found_in_system": "",
+                "archived_path": "",
+                "non_archived_path": "",
+                "found": [],
+                "archived_size": int(),
+                "non_archived_size": int(),
+            }
+        }
 
         # Record of failed services in any of the steps
         # self.service_info = {
@@ -235,8 +239,6 @@ class Archive:
         #     "failed_movement": [],
         #     "failed_uncompression": [],
         # }
-
-        
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -274,24 +276,46 @@ class Archive:
             stderr.print(
                 f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
             )
-            
-            self.services = {service["serviceRequestNumber"] : {"found_in_system":True} for service in rest_api.get_request(request_info="services", safe=False, state="delivered", date_from=str(self.date_from), date_until=str(self.date_until),)}
+
+            self.services = {
+                service["serviceRequestNumber"]: {"found_in_system": True}
+                for service in rest_api.get_request(
+                    request_info="services",
+                    safe=False,
+                    state="delivered",
+                    date_from=str(self.date_from),
+                    date_until=str(self.date_until),
+                )
+            }
 
         else:
             if len(self.services.keys()) == 1 and self.services.keys([0]) is None:
                 self.services[bu_isciii.utils.prompt_service_id()] = {}
-                            
+
             # Ask if more services will be chosen
             while True:
-                if bu_isciii.utils.prompt_selection(f"Would you like to add any other service?", ["Add more services", "Do not add more services"]) == "Do not add more services":
+                if (
+                    bu_isciii.utils.prompt_selection(
+                        "Would you like to add any other service?",
+                        ["Add more services", "Do not add more services"],
+                    )
+                    == "Do not add more services"
+                ):
                     break
                 else:
                     self.services[bu_isciii.utils.prompt_service_id()]
-            
+
         for service in self.services.keys():
             stderr.print(f"Asking our trusty API about service: {service}")
-            
-            if isinstance((service_data := rest_api.get_request(request_info="serviceFullData", safe=False, service=service)), int):
+
+            if isinstance(
+                (
+                    service_data := rest_api.get_request(
+                        request_info="serviceFullData", safe=False, service=service
+                    )
+                ),
+                int,
+            ):
                 stderr.print(
                     f"No services named '{service}' were found. Connection seemed right though!"
                 )
@@ -300,9 +324,10 @@ class Archive:
                 self.services[service]["non_archived_path"] = None
             else:
                 self.services[service]["found_in_system"] = True
-                self.services[service]["archived_path"], self.services[service]["non_archived_path"] = get_service_paths(self.conf, self.type, service_data)
-
-
+                (
+                    self.services[service]["archived_path"],
+                    self.services[service]["non_archived_path"],
+                ) = get_service_paths(self.conf, self.type, service_data)
 
         """
         if len(self.resolution_id) == 0:
@@ -313,9 +338,6 @@ class Archive:
         # Ask the API for services within the range
         # safe is False, so instead of exiting, an error code will be returned
 
-
-
-<<<<<<< HEAD
             if isinstance(self.services_to_move[0], int):
                 stderr.print(
                     f"No services named '{self.resolution_id}' were found. Connection seemed right though!"
@@ -331,9 +353,6 @@ class Archive:
         )
 
         # Obtain info from iSkyLIMS api with the conf_api info
-=======
->>>>>>> less confusing managing of init
-
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
