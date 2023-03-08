@@ -15,9 +15,11 @@ from math import pow
 
 # Local imports
 import bu_isciii
+import bu_isciii.list
 import bu_isciii.utils
 import bu_isciii.config_json
 import bu_isciii.drylab_api
+
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -239,6 +241,13 @@ class Archive:
             conf_api["server"], conf_api["api_url"]
         )
 
+        if self.type is None:
+            stderr.print("Working with a service, or a research resolution?")
+            self.type = bu_isciii.utils.prompt_selection(
+                "Type",
+                ["services_and_colaborations", "research"],
+            )
+
         if (
             bu_isciii.utils.prompt_selection(
                 "Search services by date, or by resolution ID?",
@@ -255,7 +264,7 @@ class Archive:
             self.date_until = ask_date(previous_date=self.date_from)
 
             stderr.print(
-                f"Asking our trusty API about resolutions between: {'-'.join(self.date_from)} and {'-'.join(self.date_until)}"
+                f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
             )
 
             # Ask the API for services within the range
@@ -279,6 +288,13 @@ class Archive:
                 stderr.print(
                     f"Found {len(services_batch)} service(s) within the interval between {self.date_from} and {self.date_until}!"
                 )
+
+                for service in services_batch:
+                    # we dont know where they are so we have to check both sides
+
+                    pass
+
+
                 if (
                     bu_isciii.utils.prompt_selection(
                         "Continue?", ["Yes, continue", "Hold up"]
@@ -339,13 +355,6 @@ class Archive:
         )
 
         # Obtain info from iSkyLIMS api with the conf_api info
-
-        if self.type is None:
-            stderr.print("Working with a service, or a research resolution?")
-            self.type = bu_isciii.utils.prompt_selection(
-                "Type",
-                ["services_and_colaborations", "research"],
-            )
 
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
