@@ -10,8 +10,8 @@ import rich
 import calendar
 import hashlib
 import tarfile
+import datetime
 from math import pow
-from datetime import date
 
 # Local imports
 import bu_isciii
@@ -28,7 +28,7 @@ stderr = rich.console.Console(
 )
 
 
-def ask_date(previous_date=None):
+def ask_date(previous_date=None, initial_year=2010):
     """
     Ask the year, then the month, then the day of the month
     This choice is always dependent on wether the date is or not available
@@ -39,7 +39,7 @@ def ask_date(previous_date=None):
     Stored like this so that its easier to manage later
     """
 
-    lower_limit_year = 2010 if previous_date is None else int(previous_date[0])
+    lower_limit_year = initial_year if previous_date is None else previous_date.year
 
     # Range: lower_limit_year - current year
     year = bu_isciii.utils.prompt_year(
@@ -59,8 +59,8 @@ def ask_date(previous_date=None):
 
     # If there is a previous date
     # and year is the same as before, limit the quantity of months
-    if previous_date is not None and year == int(previous_date[0]):
-        month_list = month_list[int(previous_date[1]) - 1 :]
+    if previous_date is not None and year == previous_date.year:
+        month_list = month_list[previous_date.month - 1 :]
 
     chosen_month_number, chosen_month_name = (
         bu_isciii.utils.prompt_selection(
@@ -96,21 +96,19 @@ def ask_date(previous_date=None):
     # if previous date  & same year & same month, limit days
     if (
         previous_date is not None
-        and year == int(previous_date[0])
-        and chosen_month_number == previous_date[1]
+        and year == previous_date.year
+        and chosen_month_number == previous_date.month
     ):
-        day_list = day_list[int(previous_date[2]) - 1 :]
+        day_list = day_list[previous_date.day - 1 :]
 
     # from the list, get the first and last item as limits for the function
     day = bu_isciii.utils.prompt_day(
         lower_limit=int(day_list[0]), upper_limit=int(day_list[-1])
     )
 
-    return [str(year), str(chosen_month_number), str(day)]
+    return datetime.date([year, chosen_month_number, day])
 
 def validate_date(year, month, day, previous_date=None):
-
-    
 
     pass
 
@@ -264,20 +262,20 @@ class Archive:
                 request_info="services",
                 safe=False,
                 state="delivered",
-                date_from="-".join(self.date_from),
-                date_until="-".join(self.date_until),
+                date_from=str(self.date_from),
+                date_until=str(self.date_until),
             )
 
             # if int (if error code), must be only bc status > 200
             # Check drylab_api.get_request
             if isinstance(services_batch, int):
                 stderr.print(
-                    f"No services were found in the interval between {'-'.join(self.date_from)} and {'-'.join(self.date_until)}. Connection seemed right though!"
+                    f"No services were found in the interval between {self.date_from} and {self.date_until}. Connection seemed right though!"
                 )
                 sys.exit()
             else:
                 stderr.print(
-                    f"Found {len(services_batch)} service(s) within the interval between {'-'.join(self.date_from)} and {'-'.join(self.date_until)}!"
+                    f"Found {len(services_batch)} service(s) within the interval between {self.date_from} and {self.date_until}!"
                 )
                 if (
                     bu_isciii.utils.prompt_selection(
