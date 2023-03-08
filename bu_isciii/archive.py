@@ -242,10 +242,9 @@ class Archive:
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
-
         # Get data to connect to the api
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
-
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("xtutatis_api_settings")
+        
         # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"]
@@ -311,7 +310,9 @@ class Archive:
             if isinstance(
                 (
                     service_data := rest_api.get_request(
-                        request_info="serviceFullData", safe=False, service=service
+                        request_info="serviceFullData",
+                        safe=False,
+                        service=service
                     )
                 ),
                 int,
@@ -329,32 +330,18 @@ class Archive:
                     self.services[service]["non_archived_path"],
                 ) = get_service_paths(self.conf, self.type, service_data)
 
-        """
-        if len(self.resolution_id) == 0:
-            stderr.print(f"None of the specified service ID(s); {','.join(self.resolution_id)[:-1]} was found")
-            sys.exit(1)
-        """
-        # Get individual serviceFullData for each data
-        # Ask the API for services within the range
-        # safe is False, so instead of exiting, an error code will be returned
+        # Check on not-found services
+        not_found_services = [service for service in self.services.keys() if self.services[service]["found_in_system"] is False]
+        if len(not_found_services) == len(self.services):
+            stderr.print(f"None of the specified services was found: {','.join(not_found_services)[:-1]}")
+            sys.exit(0)
+        elif len(not_found_services) == 0:
+            pass
+        else:
+            stderr.print(f"The following services were not found on iSkyLIMS: {','.join(not_found_services)[:-1]}")
+            if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
+                        sys.exit()
 
-        """
-        if isinstance(self.services_to_move[0], int):
-            stderr.print(
-                f"No services named '{self.resolution_id}' were found. Connection seemed right though!"
-            )
-            sys.exit()
-        """
-
-        # Get configuration params from configuration.json
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
-
-        # Get data to connect to the api
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
-
-        # Obtain info from iSkyLIMS api with the conf_api info
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
