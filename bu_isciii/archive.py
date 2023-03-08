@@ -213,22 +213,30 @@ class Archive:
     of a service
     """
 
-    def __init__(self, resolution_id=None, ser_type=None, year=None, api_token=None,option=None):
+    def __init__(self, resolution_id=None, ser_type=None, option=None, api_token=None):
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
-
-        self.resolution_id = resolution_id
+        
         self.type = ser_type
         self.option = option
-        self.services_to_move = []
+        self.services = {resolution_id: {
+                                        "found_in_system":"",
+                                        "archived_path":"",
+                                        "non_archived_path":"",
+                                        "found":[],
+                                        "archived_size":int(),
+                                        "non_archived_size":int()}
+                                         }
 
         # Record of failed services in any of the steps
-        self.failed_services = {
-            "failed_compression": [],
-            "failed_movement": [],
-            "failed_uncompression": [],
-        }
+        # self.service_info = {
+        #     "failed_compression": [],
+        #     "failed_movement": [],
+        #     "failed_uncompression": [],
+        # }
+
+        
 
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -266,80 +274,48 @@ class Archive:
             stderr.print(
                 f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
             )
-
-            # Ask the API for services within the range
-            # safe is False, so instead of exiting, an error code will be returned
-            services_batch = rest_api.get_request(
-                request_info="services",
-                safe=False,
-                state="delivered",
-                date_from=str(self.date_from),
-                date_until=str(self.date_until),
-            )
-
-            # if int (if error code), must be only bc status > 200
-            # Check drylab_api.get_request
-            if isinstance(services_batch, int):
-                stderr.print(
-                    f"No services were found in the interval between {self.date_from} and {self.date_until}. Connection seemed right though!"
-                )
-                sys.exit()
-            else:
-                stderr.print(
-                    f"Found {len(services_batch)} service(s) within the interval between {self.date_from} and {self.date_until}!"
-                )
-
-                for service in services_batch:
-                    # we dont know where they are so we have to check both sides
-
-                    pass
-
-
-                if (
-                    bu_isciii.utils.prompt_selection(
-                        "Continue?", ["Yes, continue", "Hold up"]
-                    )
-                ) == "Hold up":
-                    stderr.print("Exiting")
-                    sys.exit()
-
-            # Get individual serviceFullData for each data
-            for service in services_batch:
-                request = rest_api.get_request(
-                    request_info="serviceFullData",
-                    service=f"{service['serviceRequestNumber']}",
-                )
-
-                if isinstance(request, int):
-                    stderr.print(
-                        f"Service '{service['serviceRequestNumber']}' could not be found. Connection seemed right though!"
-                    )
-                else:
-                    self.services_to_move.append(request)
-
-            # services_batch does not seem useful from now on
-            # so delete it from memory
-            del services_batch
+            
+            self.services = {service["serviceRequestNumber"] : {"found_in_system":True} for service in rest_api.get_request(request_info="services", safe=False, state="delivered", date_from=str(self.date_from), date_until=str(self.date_until),)}
 
         else:
-            self.resolution_id = (
-                bu_isciii.utils.prompt_service_id()
-                if self.resolution_id is None
-                else self.resolution_id
-            )
-
-            stderr.print(f"Asking our trusty API about service: {self.resolution_id}")
-
-            # Hold the results in a list so it can be accessed
-            # Just like in batch mode
-            self.services_to_move = [
-                rest_api.get_request(
-                    request_info="serviceFullData",
-                    safe=False,
-                    service=f"{self.resolution_id}",
+            if len(self.services.keys()) == 1 and self.services.keys([0]) is None:
+                self.services[bu_isciii.utils.prompt_service_id()] = {}
+                            
+            # Ask if more services will be chosen
+            while True:
+                if bu_isciii.utils.prompt_selection(f"Would you like to add any other service?", ["Add more services", "Do not add more services"]) == "Do not add more services":
+                    break
+                else:
+                    self.services[bu_isciii.utils.prompt_service_id()]
+            
+        for service in self.services.keys():
+            stderr.print(f"Asking our trusty API about service: {service}")
+            
+            if isinstance((service_data := rest_api.get_request(request_info="serviceFullData", safe=False, service=service)), int):
+                stderr.print(
+                    f"No services named '{service}' were found. Connection seemed right though!"
                 )
-            ]
+                self.services[service]["found_in_system"] = False
+                self.services[service]["archived_path"] = None
+                self.services[service]["non_archived_path"] = None
+            else:
+                self.services[service]["found_in_system"] = True
+                self.services[service]["archived_path"], self.services[service]["non_archived_path"] = get_service_paths(self.conf, self.type, service_data)
 
+
+
+        """
+        if len(self.resolution_id) == 0:
+            stderr.print(f"None of the specified service ID(s); {','.join(self.resolution_id)[:-1]} was found")
+            sys.exit(1)
+        """
+        # Get individual serviceFullData for each data
+        # Ask the API for services within the range
+        # safe is False, so instead of exiting, an error code will be returned
+
+
+
+<<<<<<< HEAD
             if isinstance(self.services_to_move[0], int):
                 stderr.print(
                     f"No services named '{self.resolution_id}' were found. Connection seemed right though!"
@@ -355,6 +331,8 @@ class Archive:
         )
 
         # Obtain info from iSkyLIMS api with the conf_api info
+=======
+>>>>>>> less confusing managing of init
 
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
