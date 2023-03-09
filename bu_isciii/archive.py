@@ -110,7 +110,7 @@ def ask_date(previous_date=None, initial_year=2010):
         lower_limit=int(day_list[0]), upper_limit=int(day_list[-1])
     )
 
-    return datetime.date([year, chosen_month_number, day])
+    return datetime.date(int(year), int(chosen_month_number), int(day))
 
 
 def validate_date(date, previous_date=None):
@@ -214,7 +214,7 @@ class Archive:
     of a service
     """
 
-    def __init__(self, service_id=None, ser_type=None, option=None, api_token=None):
+    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None):
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
@@ -226,9 +226,9 @@ class Archive:
                 "found_in_system": "",
                 "archived_path": "",
                 "non_archived_path": "",
-                "found": [],
                 "archived_size": int(),
                 "non_archived_size": int(),
+                "found": [],
             }
         }
 
@@ -241,11 +241,13 @@ class Archive:
         # Get configuration params from configuration.json
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
         # Get data to connect to the api
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("xtutatis_api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         
         # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"],
+            conf_api["api_url"],
+            api_pass,
         )
 
         if self.type is None:
@@ -274,16 +276,20 @@ class Archive:
                 f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
             )
 
-            self.services = {
-                service["serviceRequestNumber"]: {"found_in_system": True}
-                for service in rest_api.get_request(
-                    request_info="services",
-                    safe=False,
-                    state="delivered",
-                    date_from=str(self.date_from),
-                    date_until=str(self.date_until),
-                )
-            }
+            try:
+                self.services = {
+                    service["serviceRequestNumber"] : {"found_in_system": True}
+                    for service in rest_api.get_request(
+                        request_info="services",
+                        safe=False,
+                        state="delivered",
+                        date_from=str(self.date_from),
+                        date_until=str(self.date_until),
+                    )
+                }
+            except TypeError:
+                stderr.print("Could not connect to the api (wrong password?)", style="red")
+                sys.exit(1)
 
         else:
             if len(self.services.keys()) == 1 and self.services.keys([0]) is None:
@@ -302,9 +308,9 @@ class Archive:
                 else:
                     self.services[bu_isciii.utils.prompt_service_id()]
 
+        stderr.print(f"Asking our trusty API about services:")
         for service in self.services.keys():
-            stderr.print(f"Asking our trusty API about service: {service}")
-
+            stderr.print(service)
             if isinstance(
                 (
                     service_data := rest_api.get_request(
@@ -327,6 +333,10 @@ class Archive:
                     self.services[service]["archived_path"],
                     self.services[service]["non_archived_path"],
                 ) = get_service_paths(self.conf, self.type, service_data)
+            
+            self.services[service]["archived_size"] = None
+            self.services[service]["non_archived_size"] = None
+            self.services[service]["found"] = []
 
         # Check on not-found services
         not_found_services = [service for service in self.services.keys() if self.services[service]["found_in_system"] is False]
@@ -340,23 +350,21 @@ class Archive:
             if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
                         sys.exit()
 
-        # Check on the directories to get location and initialize size
+        # Check on the directories to get location and whether or not it was found
         stderr.print("Finding the services in the directory tree")
         for service in self.services.keys():
             if os.path.exists(self.services[service]["archived_path"]):
                 self.services[service]["found"].append("Archive")
-                self.services[service]["archived_size"] = None
 
             if os.path.exists(self.services[service]["non_archived_path"]):
                 self.services[service]["found"].append("Data dir")
-                self.services[service]["non_archived_size"] = None
-    
+
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
                 [
-                    "Scout for service size"
+                    "Scout for service size",
                     "Full archive: compress and archive",
                     "    Partial archive: compress NON-archived service",
                     "    Partial archive: archive NON-archived service (must be compressed first) and check md5",
@@ -383,13 +391,12 @@ class Archive:
                 self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
             if "Archive" in self.services[service]["found"]:
                 self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
-        
-        
+    
         # Generate table with the generated info
         size_table = rich.table.Table()
-        size_table.add_column("Service ID")
-        size_table.add_column("Directory size")
-        size_table.add_column("Found in")
+        size_table.add_column("Service ID", justify="center")
+        size_table.add_column("Directory size", justify="center")
+        size_table.add_column("Found in", justify="center")
         
         # Different loop to allow for modifications
         # Reasoning here:
@@ -411,13 +418,13 @@ class Archive:
                 elif "Data dir" in self.services[service]["found"]:
                     size = self.services[service]["non_archived_size"]
 
-            table.add_row(
+            size_table.add_row(
                 service,
-                self.services[service]["non_archived_size"],
-                ",".join(self.services[service]["found"])[:-1],
+                "-" if self.services[service]["non_archived_size"] is None else self.services[service]["non_archived_size"],
+                ",".join(self.services[service]["found"])[:-1] if len(self.services[service]["found"]) > 0 else "Not found in Archive or Data dir",
             )
         
-        rich.console.Console(size_table)
+        stderr.print(size_table)
         return
 
 
@@ -755,10 +762,10 @@ class Archive:
         Handle archive class options
         """
 
-        if self.option == "Scout for service size":
+        if (self.option == "Scout for service size"):
             self.scout_directory_sizes()
 
-        elif self.option == "Full archive: compress and archive":
+        elif (self.option == "Full archive: compress and archive"):
             self.scout_directory_sizes()
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
