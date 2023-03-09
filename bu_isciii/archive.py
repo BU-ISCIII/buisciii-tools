@@ -242,7 +242,7 @@ class Archive:
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
         # Get data to connect to the api
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
-        
+
         # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"],
@@ -278,7 +278,7 @@ class Archive:
 
             try:
                 self.services = {
-                    service["serviceRequestNumber"] : {"found_in_system": True}
+                    service["serviceRequestNumber"]: {"found_in_system": True}
                     for service in rest_api.get_request(
                         request_info="services",
                         safe=False,
@@ -288,13 +288,15 @@ class Archive:
                     )
                 }
             except TypeError:
-                stderr.print("Could not connect to the api (wrong password?)", style="red")
+                stderr.print(
+                    "Could not connect to the api (wrong password?)", style="red"
+                )
                 sys.exit(1)
 
         else:
             # list(self.services.keys())[0] is None should be more than enough but I dont trust anyone anymore
             if len(self.services.keys()) == 1 and list(self.services.keys())[0] is None:
-                self.services = {bu_isciii.utils.prompt_service_id() : {}}
+                self.services = {bu_isciii.utils.prompt_service_id(): {}}
 
             # Ask if more services will be chosen
             while True:
@@ -315,9 +317,7 @@ class Archive:
             if isinstance(
                 (
                     service_data := rest_api.get_request(
-                        request_info="serviceFullData",
-                        safe=False,
-                        service=service
+                        request_info="serviceFullData", safe=False, service=service
                     )
                 ),
                 int,
@@ -334,22 +334,34 @@ class Archive:
                     self.services[service]["archived_path"],
                     self.services[service]["non_archived_path"],
                 ) = get_service_paths(self.conf, self.type, service_data)
-            
+
             self.services[service]["archived_size"] = None
             self.services[service]["non_archived_size"] = None
             self.services[service]["found"] = []
 
         # Check on not-found services
-        not_found_services = [service for service in self.services.keys() if self.services[service]["found_in_system"] is False]
+        not_found_services = [
+            service
+            for service in self.services.keys()
+            if self.services[service]["found_in_system"] is False
+        ]
 
         if len(not_found_services) != 0:
             # if none of the services was found, exit
             if len(not_found_services) == len(self.services):
-                stderr.print(f"None of the specified services was found: {','.join(not_found_services)}")
+                stderr.print(
+                    f"None of the specified services was found: {','.join(not_found_services)}"
+                )
                 sys.exit(0)
             else:
-                stderr.print(f"The following services were not found on iSkyLIMS: {','.join(not_found_services)}")
-                if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
+                stderr.print(
+                    f"The following services were not found on iSkyLIMS: {','.join(not_found_services)}"
+                )
+                if (
+                    bu_isciii.utils.prompt_selection(
+                        "Continue?", ["Yes, continue", "Hold up"]
+                    )
+                ) == "Hold up":
                     sys.exit(0)
 
         # Check on the directories to get location and whether or not it was found
@@ -390,28 +402,37 @@ class Archive:
         stderr.print("Extracting the size for the involved directories")
         for service in self.services.keys():
             if "Data dir" in self.services[service]["found"]:
-                self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
+                self.services[service]["non_archived_size"] = get_dir_size(
+                    self.services[service]["non_archived_path"]
+                ) / pow(1024, 3)
             if "Archive" in self.services[service]["found"]:
-                self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
-    
+                self.services[service]["archived_size"] = get_dir_size(
+                    self.services[service]["archived_path"]
+                ) / pow(1024, 3)
+
         # Generate table with the generated info
         size_table = rich.table.Table()
         size_table.add_column("Service ID", justify="center")
         size_table.add_column("Directory size", justify="center")
         size_table.add_column("Found in", justify="center")
-        
+
         # Different loop to allow for modifications
         # Reasoning here:
         #   len 0: not found, size "-"
         #   len 2: found in both sides, compare sizes, if different, notify, else, pick archived size (for instance, shouldn't matter)
         #   len 1: if "Archive" in "found", size is archived size, else, non_archived
-        
+
         for service in self.services.keys():
             if len(self.services[service]["found"]) == 0:
                 size = "-"
             elif len(self.services[service]["found"]) == 2:
-                if self.services[service]["archived_size"] != self.services[service]["non_archived_size"]:
-                    stderr.print(f"For service {service}, archived size {self.services[service]['archived_size']} and non-archived size {self.services[service]['non_archived_size']} are equal")
+                if (
+                    self.services[service]["archived_size"]
+                    != self.services[service]["non_archived_size"]
+                ):
+                    stderr.print(
+                        f"For service {service}, archived size {self.services[service]['archived_size']} and non-archived size {self.services[service]['non_archived_size']} are equal"
+                    )
                 else:
                     size = self.services[service]["non_archived_size"]
             else:
@@ -422,13 +443,16 @@ class Archive:
 
             size_table.add_row(
                 service,
-                "-" if self.services[service]["non_archived_size"] is None else self.services[service]["non_archived_size"],
-                ",".join(self.services[service]["found"])[:-1] if len(self.services[service]["found"]) > 0 else "Not found in Archive or Data dir",
+                "-"
+                if self.services[service]["non_archived_size"] is None
+                else self.services[service]["non_archived_size"],
+                ",".join(self.services[service]["found"])
+                if len(self.services[service]["found"]) > 0
+                else "Not found in Archive or Data dir",
             )
-        
+
         stderr.print(size_table)
         return
-
 
     def targz_directory(self, direction):
         """
@@ -445,8 +469,11 @@ class Archive:
 
         # try:
         for service in self.services.keys():
-
-            dir_to_tar = self.services[service]["non_archived_path"] if direction == "archive" else self.services[service]["archived_path"]
+            dir_to_tar = (
+                self.services[service]["non_archived_path"]
+                if direction == "archive"
+                else self.services[service]["archived_path"]
+            )
 
             # If dir size has been obtained previously, get it
             # if dir could not be found, pass
@@ -454,21 +481,25 @@ class Archive:
             if direction == "archive":
                 if self.services[service]["non_archived_size"] is None:
                     if "Data dir" in self.services[service]["found"]:
-                        initial_size =  get_dir_size(dir_to_tar) / pow(1024, 3)
+                        initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
                         self.services[service]["non_archived_size"] = initial_size
                     else:
-                        stderr.print(f"Service {service} could not be found in the data directory")
+                        stderr.print(
+                            f"Service {service} could not be found in the data directory"
+                        )
                         continue
                 else:
                     self.services[service]["non_archived_size"] = initial_size
-            
+
             elif direction == "retrieve":
                 if self.services[service]["archived_size"] is None:
                     if "Archive" in self.services[service]["found"]:
-                        initial_size =  get_dir_size(dir_to_tar) / pow(1024, 3)
-                        self.services[service]["archived_size"] =  initial_size
+                        initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
+                        self.services[service]["archived_size"] = initial_size
                     else:
-                        stderr.print(f"Service {service} could not be found in the archive directory")
+                        stderr.print(
+                            f"Service {service} could not be found in the archive directory"
+                        )
                         continue
                 else:
                     self.services[service]["archived_size"] = initial_size
@@ -534,7 +565,17 @@ class Archive:
         Make sure they are '.tar.gz' files
         """
         for service in self.services.keys():
-            (origin, destiny) = (self.services[service]["non_archived_path"], self.services[service]["archived_path"]) if direction == "archive" else (self.services[service]["archived_path"], self.services[service]["non_archived_path"])
+            (origin, destiny) = (
+                (
+                    self.services[service]["non_archived_path"],
+                    self.services[service]["archived_path"],
+                )
+                if direction == "archive"
+                else (
+                    self.services[service]["archived_path"],
+                    self.services[service]["non_archived_path"],
+                )
+            )
 
             # If origin cant be found, next
             if not (os.path.exists(origin + ".tar.gz")):
@@ -615,7 +656,11 @@ class Archive:
         already_uncompressed_services = []
 
         for service in self.services.keys():
-            dir_to_untar = (self.services[service]["archived_path"] if (direction == "archive") else self.services[service]["non_archived_path"])
+            dir_to_untar = (
+                self.services[service]["archived_path"]
+                if (direction == "archive")
+                else self.services[service]["non_archived_path"]
+            )
 
             # Check whether the compressed file is not there
             if not os.path.exists(dir_to_untar + ".tar.gz"):
@@ -682,16 +727,17 @@ class Archive:
         non_deleted_services = []
 
         for service in self.services_to_move:
-            
             # Origin will always be deleted last
             #   if direction = archive: origin is non-archived, and you are moving to archived
             #   if direction = retrieve: origin is archive, and you are moving to non-archived
             # [destiny, origin]
             file_locations = (
                 [
-                    self.services[service]["non_archived_path"], 
+                    self.services[service]["non_archived_path"],
                     self.services[service]["archived_path"],
-                ] if direction == "archive" else [
+                ]
+                if direction == "archive"
+                else [
                     self.services[service]["archived_path"],
                     self.services[service]["non_archived_path"],
                 ]
@@ -740,7 +786,6 @@ class Archive:
         """
 
         for service in self.services.keys():
-
             if not os.path.exists(self.services[service]["archived_path"]):
                 stderr.print(
                     f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n"
@@ -764,10 +809,10 @@ class Archive:
         Handle archive class options
         """
 
-        if (self.option == "Scout for service size"):
+        if self.option == "Scout for service size":
             self.scout_directory_sizes()
 
-        elif (self.option == "Full archive: compress and archive"):
+        elif self.option == "Full archive: compress and archive":
             self.scout_directory_sizes()
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
