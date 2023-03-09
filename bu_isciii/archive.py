@@ -340,24 +340,16 @@ class Archive:
             if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
                         sys.exit()
 
-        # Check on the directories to get location and size
+        # Check on the directories to get location and initialize size
         stderr.print("Finding the services in the directory tree")
         for service in self.services.keys():
             if os.path.exists(self.services[service]["archived_path"]):
                 self.services[service]["found"].append("Archive")
+                self.services[service]["archived_size"] = None
+
             if os.path.exists(self.services[service]["non_archived_path"]):
                 self.services[service]["found"].append("Data dir")
-
-        # Generate the table
-        """
-            self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
-        else:
-            self.services[service]["archived_size"] = 0
-
-            self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
-        else:
-            self.services[service]["non_archived_size"] = 0
-        """
+                self.services[service]["non_archived_size"] = None
     
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
@@ -443,16 +435,34 @@ class Archive:
         already_compressed_services = []
 
         # try:
-        for service in self.services_to_move:
-            # Get paths (archived and non-archived counterparts)
-            archived_path, non_archived_path = get_service_paths(
-                self.conf, self.type, service
-            )
+        for service in self.services.keys():
 
-            # Identify
-            dir_to_tar = non_archived_path if direction == "archive" else archived_path
+            dir_to_tar = self.services[service]["non_archived_path"] if direction == "archive" else self.services[service]["archived_path"]
 
-            initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
+            # If dir size has been obtained previously, get it
+            # if dir could not be found, pass
+            # This could very much be a function on its own
+            if direction == "archive":
+                if self.services[service]["non_archived_size"] is None:
+                    if "Data dir" in self.services[service]["found"]:
+                        initial_size =  get_dir_size(dir_to_tar) / pow(1024, 3)
+                        self.services[service]["non_archived_size"] = initial_size
+                    else:
+                        stderr.print(f"Service {service} could not be found in the data directory")
+                        continue
+                else:
+                    self.services[service]["non_archived_size"] = initial_size
+            
+            elif direction == "retrieve":
+                if self.services[service]["archived_size"] is None:
+                    if "Archive" in self.services[service]["found"]:
+                        initial_size =  get_dir_size(dir_to_tar) / pow(1024, 3)
+                        self.services[service]["archived_size"] =  initial_size
+                    else:
+                        stderr.print(f"Service {service} could not be found in the archive directory")
+                        continue
+                else:
+                    self.services[service]["archived_size"] = initial_size
 
             # Check if there is a prior ".tar.gz" file
             # NOTE: I find dir_to_tar + ".tar.gz" easier to mentally locate the compressed files
