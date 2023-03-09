@@ -292,8 +292,9 @@ class Archive:
                 sys.exit(1)
 
         else:
-            if len(self.services.keys()) == 1 and self.services.keys([0]) is None:
-                self.services[bu_isciii.utils.prompt_service_id()] = {}
+            # list(self.services.keys())[0] is None should be more than enough but I dont trust anyone anymore
+            if len(self.services.keys()) == 1 and list(self.services.keys())[0] is None:
+                self.services = {bu_isciii.utils.prompt_service_id() : {}}
 
             # Ask if more services will be chosen
             while True:
@@ -306,7 +307,7 @@ class Archive:
                 ):
                     break
                 else:
-                    self.services[bu_isciii.utils.prompt_service_id()]
+                    self.services[bu_isciii.utils.prompt_service_id()] = {}
 
         stderr.print(f"Asking our trusty API about services:")
         for service in self.services.keys():
@@ -340,15 +341,16 @@ class Archive:
 
         # Check on not-found services
         not_found_services = [service for service in self.services.keys() if self.services[service]["found_in_system"] is False]
-        if len(not_found_services) == len(self.services):
-            stderr.print(f"None of the specified services was found: {','.join(not_found_services)[:-1]}")
-            sys.exit(0)
-        elif len(not_found_services) == 0:
-            pass
-        else:
-            stderr.print(f"The following services were not found on iSkyLIMS: {','.join(not_found_services)[:-1]}")
-            if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
-                        sys.exit()
+
+        if len(not_found_services) != 0:
+            # if none of the services was found, exit
+            if len(not_found_services) == len(self.services):
+                stderr.print(f"None of the specified services was found: {','.join(not_found_services)}")
+                sys.exit(0)
+            else:
+                stderr.print(f"The following services were not found on iSkyLIMS: {','.join(not_found_services)}")
+                if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
+                    sys.exit(0)
 
         # Check on the directories to get location and whether or not it was found
         stderr.print("Finding the services in the directory tree")
