@@ -600,20 +600,13 @@ class Archive:
     def uncompress_targz_directory(self, direction):
         """
         Uncompress chosen services
+            When archiving, you untar to archived_path
+            When retrieving, you untar to non_archived_path
         """
-
         already_uncompressed_services = []
 
-        for service in self.services_to_move:
-            archived_path, non_archived_path = get_service_paths(
-                self.conf, self.type, service
-            )
-
-            # When archiving, you untar to archived_path
-            # When retrieving, you untar to non_archived_path
-            dir_to_untar = (
-                archived_path if (direction == "archive") else non_archived_path
-            )
+        for service in self.services.keys():
+            dir_to_untar = (self.services[service]["archived_path"] if (direction == "archive") else self.services[service]["non_archived_path"])
 
             # Check whether the compressed file is not there
             if not os.path.exists(dir_to_untar + ".tar.gz"):
@@ -680,16 +673,19 @@ class Archive:
         non_deleted_services = []
 
         for service in self.services_to_move:
-            archived_path, non_archived_path = get_service_paths(
-                self.conf, self.type, service
-            )
-
+            
             # Origin will always be deleted last
+            #   if direction = archive: origin is non-archived, and you are moving to archived
+            #   if direction = retrieve: origin is archive, and you are moving to non-archived
             # [destiny, origin]
             file_locations = (
-                [non_archived_path, archived_path]
-                if direction == "archive"
-                else [archived_path, non_archived_path]
+                [
+                    self.services[service]["non_archived_path"], 
+                    self.services[service]["archived_path"],
+                ] if direction == "archive" else [
+                    self.services[service]["archived_path"],
+                    self.services[service]["non_archived_path"],
+                ]
             )
 
             # First we delete origin
@@ -733,27 +729,25 @@ class Archive:
         Delete the non-archived copy
         NOTE: archived_path should NEVER have to be deleted
         """
-        for service in self.services_to_move:
-            archived_path, non_archived_path = get_service_paths(
-                self.conf, self.type, service
-            )
 
-            if not os.path.exists(non_archived_path):
+        for service in self.services.keys():
+
+            if not os.path.exists(self.services[service]["archived_path"]):
                 stderr.print(
                     f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n"
                 )
                 # this continue should not be necessary but I think its more efficient
                 continue
             else:
-                if not os.path.exists(archived_path):
+                if not os.path.exists(self.services[service]["archived_path"]):
                     stderr.print(
-                        f"Archived path for service {archived_path.split('/')[-1]} NOT. Skipping.\n"
+                        f"Archived path for service {self.services[service]['archived_path'].split('/')[-1]} NOT. Skipping.\n"
                     )
                 else:
                     stderr.print(
-                        f"Found archived path for service {archived_path.split('/')[-1]}. It is safe to delete this non_archived service. Deleting.\n"
+                        f"Found archived path for service {self.services[service]['archived_path'].split('/')[-1]}. It is safe to delete this non_archived service. Deleting.\n"
                     )
-                    shutil.rmtree(non_archived_path)
+                    shutil.rmtree(self.services[service]["non_archived_path"])
         return
 
     def handle_archive(self):
