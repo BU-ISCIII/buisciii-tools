@@ -519,21 +519,13 @@ class Archive:
 
     def move_directory(self, direction):
         """
-        Archive selected services
-        Make sure they are .tar.gz files
+        Move chosen services from a place to another depending on the direction chosen:
+            direction="archive": move service from "non_archived" to "archived"
+            direction="retrieve": move service from "archived" to "non_archived"
+        Make sure they are '.tar.gz' files
         """
-
-        for service in self.services_to_move:
-            # stderr.print(service["servicFolderName"])
-            archived_path, non_archived_path = get_service_paths(
-                self.conf, self.type, service
-            )
-
-            [origin, destiny] = (
-                [non_archived_path, archived_path]
-                if direction == "archive"
-                else [archived_path, non_archived_path]
-            )
+        for service in self.services.keys():
+            (origin, destiny) = (self.services[service]["non_archived_path"], self.services[service]["archived_path"]) if direction == "archive" else (self.services[service]["archived_path"], self.services[service]["non_archived_path"])
 
             # If origin cant be found, next
             if not (os.path.exists(origin + ".tar.gz")):
@@ -560,9 +552,6 @@ class Archive:
                         )
                     ) == "Hold up":
                         sys.exit()
-                # else:
-                # si es un total archive o total retrieve,
-                # revisar en el diccionario de fails si ha fallado en el paso de compresión
                 continue
 
             # If compresed destiny exists
