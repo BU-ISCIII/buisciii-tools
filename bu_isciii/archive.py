@@ -222,7 +222,7 @@ class Archive:
         self.type = ser_type
         self.option = option
         self.services = {
-            resolution_id: {
+            service_id: {
                 "found_in_system": "",
                 "archived_path": "",
                 "non_archived_path": "",
