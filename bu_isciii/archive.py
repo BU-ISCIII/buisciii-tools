@@ -343,32 +343,21 @@ class Archive:
         # Check on the directories to get location and size
         stderr.print("Finding the services in the directory tree")
         for service in self.services.keys():
-
             if os.path.exists(self.services[service]["archived_path"]):
                 self.services[service]["found"].append("Archive")
-                self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
-            else:
-                self.services[service]["archived_size"] = 0
-
             if os.path.exists(self.services[service]["non_archived_path"]):
                 self.services[service]["found"].append("Data dir")
-                self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
-            else:
-                self.services[service]["non_archived_size"] = 0
 
         # Generate the table
-        size_table = rich.table.Table()
-        
-        size_table.add_column("Service ID")
-        size_table.add_column("Directory size")
-        size_table.add_column("Found in")
+        """
+            self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
+        else:
+            self.services[service]["archived_size"] = 0
 
-        for service in self.services.keys():
-            table.add_row(
-                service,
-                services[service]["non_archived_path"],
-                services[service]["found"]
-            )
+            self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
+        else:
+            self.services[service]["non_archived_size"] = 0
+        """
     
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
@@ -391,9 +380,52 @@ class Archive:
             )
 
     def scout_directory_sizes(self):
+        """
+        Get size for involved service if the dir has been found,
+        Print a table to see said info (service ID, Dir size, where it has been found)
+        Generates a log with said info
+        """
+        stderr.print("Extracting the size for the involved directories")
+        for service in self.services.keys():
+            if "Data dir" in self.services[service]["found"]:
+                self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
+            if "Archive" in self.services[service]["found"]:
+                self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
+        
+        
+        # Generate table with the generated info
+        size_table = rich.table.Table()
+        size_table.add_column("Service ID")
+        size_table.add_column("Directory size")
+        size_table.add_column("Found in")
+        
+        # Different loop to allow for modifications
+        # Reasoning here:
+        #   len 0: not found, size "-"
+        #   len 2: found in both sides, compare sizes, if different, notify, else, pick archived size (for instance, shouldn't matter)
+        #   len 1: if "Archive" in "found", size is archived size, else, non_archived
+        
+        for service in self.services.keys():
+            if len(self.services[service]["found"]) == 0:
+                size = "-"
+            elif len(self.services[service]["found"]) == 2:
+                if self.services[service]["archived_size"] != self.services[service]["non_archived_size"]:
+                    stderr.print(f"For service {service}, archived size {self.services[service]['archived_size']} and non-archived size {self.services[service]['non_archived_size']} are equal")
+                else:
+                    size = self.services[service]["non_archived_size"]
+            else:
+                if "Archive" in self.services[service]["found"]:
+                    size = self.services[service]["archived_size"]
+                elif "Data dir" in self.services[service]["found"]:
+                    size = self.services[service]["non_archived_size"]
 
-        pass
-
+            table.add_row(
+                service,
+                self.services[service]["non_archived_size"],
+                ",".join(self.services[service]["found"])[:-1],
+            )
+        
+        rich.console.Console(size_table)
         return
 
 
@@ -731,8 +763,10 @@ class Archive:
         """
 
         if self.option == "Scout for service size":
-            pass
+            self.scout_directory_sizes()
+
         elif self.option == "Full archive: compress and archive":
+            self.scout_directory_sizes()
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
