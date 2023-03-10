@@ -13,6 +13,12 @@ import pdfkit
 import PyPDF2
 import subprocess
 import json
+import shutil
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+from smtplib import SMTP
+import ssl
 
 # Local imports
 import bu_isciii.utils
@@ -433,7 +439,9 @@ class BioinfoDoc:
             stderr.print("[red]ERROR: Merging PDFs failed.")
             stderr.print("traceback error %s" % e)
             sys.exit()
-        return
+
+        return delivery_pdf_file
+
     def copy_images(self):
         file_path = os.path.join(
             self.service_folder,
@@ -564,6 +572,60 @@ class BioinfoDoc:
         email_html = template.render(email_data)
         return email_html
 
+    def send_email(self, html_text, results_pdf_file):
+        EMAIL_HOST = self.conf["email_host"]
+        EMAIL_PORT = self.conf["email_port"]
+        EMAIL_HOST_USER = self.conf["email_host_user"]
+        EMAIL_HOST_PASSWORD = self.email_psswd
+        EMAIL_USE_TLS = self.conf["email_use_tls"]
+
+        context = ssl.create_default_context()
+        try:
+            server = SMTP(host=EMAIL_HOST, port=EMAIL_PORT)
+            server.ehlo()
+            server.starttls(context=context)
+            server.ehlo()
+            server.login(user=EMAIL_HOST_USER, password=EMAIL_HOST_PASSWORD)
+        except Exception as e:
+            stderr.print("[red] Unable to send e-mail"+e)
+
+        msg = MIMEMultipart("alternative")
+        msg["To"] = self.resolution_info["serviceUserId"]["email"]
+        msg["From"] = EMAIL_HOST_USER
+        msg["Subject"] = (
+            "Entrega "
+            + self.delivery_number
+            + " - "
+            + self.service_name.split("_", 5)[0]
+            + " - "
+            + self.service_name.split("_", 5)[2]
+        )
+        if bu_isciii.utils.prompt_yn_question(
+            "Do you want to add any other sender? appart from "+self.resolution_info["serviceUserId"]["email"],dflt=False
+        ):
+            stderr.print("[red] Write emails to be added in semicolon separated format: bioinformatica@isciii.es;icuesta@isciii.es")
+            msg["CC"] = bu_isciii.utils.ask_for_some_text(
+                msg="E-mails:"
+            )
+            rcpt = msg["CC"].split(";") + [msg["To"]]
+        else:
+            rcpt = self.resolution_info["serviceUserId"]["email"]
+
+        html = MIMEText(html_text, "html")
+        msg.attach(html)
+        with open(results_pdf_file, "rb") as f:
+            attach = MIMEApplication(f.read(),_subtype="pdf")
+        attach.add_header('Content-Disposition','attachment',filename=str(os.path.basename(results_pdf_file)))
+        msg.attach(attach)
+
+        server.sendmail(
+            EMAIL_HOST_USER,
+            rcpt,
+            msg.as_string(),
+        )
+        server.quit()
+        stderr.print("[green] Mail sent correctly")
+
     def create_documentation(self):
         self.create_structure()
         if self.type == "service_info":
@@ -574,17 +636,14 @@ class BioinfoDoc:
             self.copy_images()
             result_pdf = self.create_results_doc(self.results_md_list, "results")
             service_pdf = self.create_results_doc(self.delivery_md_list, "service")
-            self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
+            results_pdf = self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
             self.clean_files()
             self.sftp_tree()
             email_html = self.email_creation()
             if bu_isciii.utils.prompt_yn_question(
                 "Do you want to send e-mail automatically?",dflt=True
             ):
-                stderr.print(
-                    "[red] This is not yet implemented. I'll print the e-mail HTML."
-                )
-                print(email_html)
+                self.send_email(email_html, results_pdf)
             else:
                 print(email_html)
             return
