@@ -504,6 +504,8 @@ class BioinfoDoc:
                 os.remove(os.path.join(file_path, f))
             if re.search("_service", f):
                 os.remove(os.path.join(file_path, f))
+            if re.search("images", f):
+                shutil.rmtree(os.path.join(file_path, f), ignore_errors=True)
 
     def sftp_tree(self):
         sftp_path = os.path.join(self.sftp_folder, self.service_folder)
