@@ -74,7 +74,7 @@ class BioinfoDoc:
             if len(resolution_info["resolutions"][0]["delivery"]) > 0:
                 print("Service delivery already exist.")
                 if bu_isciii.utils.prompt_yn_question(
-                    "Do you want to overwrite delivery info?"
+                    "Do you want to overwrite delivery info?",dflt=False
                 ):
                     self.post_delivery_info()
             else:
@@ -238,7 +238,7 @@ class BioinfoDoc:
         return
 
     def post_delivery_info(self):
-        delivery_notes = bu_isciii.utils.get_delivery_notes(
+        delivery_notes = bu_isciii.utils.ask_for_some_text(
             msg="Write some delivery notes:"
         )
 
@@ -520,9 +520,9 @@ class BioinfoDoc:
     def email_creation(self):
         email_data = {}
         if bu_isciii.utils.prompt_yn_question(
-            "Do you want to add some delivery notes to the e-mail?"
+            "Do you want to add some delivery notes to the e-mail?",dflt=False
         ):
-            email_data["email_notes"] = bu_isciii.utils.get_delivery_notes(
+            email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
                 msg="Write email notes"
             )
 
@@ -555,7 +555,7 @@ class BioinfoDoc:
             self.sftp_tree()
             email_html = self.email_creation()
             if bu_isciii.utils.prompt_yn_question(
-                "Do you want to send e-mail automatically?"
+                "Do you want to send e-mail automatically?",dflt=True
             ):
                 stderr.print(
                     "[red] This is not yet implemented. I'll print the e-mail HTML."

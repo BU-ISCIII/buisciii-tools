@@ -134,8 +134,8 @@ def prompt_path(msg):
     return source
 
 
-def prompt_yn_question(msg):
-    confirmation = questionary.confirm(msg).unsafe_ask()
+def prompt_yn_question(msg,dflt):
+    confirmation = questionary.confirm(msg, default=dflt).unsafe_ask()
     return confirmation
 
 
@@ -160,15 +160,14 @@ def get_service_ids(services_requested):
     return services_sel
 
 
-def get_delivery_notes(msg):
-    delivery_notes = questionary.text(msg).unsafe_ask()
-    return delivery_notes
+def ask_for_some_text(msg):
+    input_text = questionary.text(msg).unsafe_ask()
+    return input_text
 
 
-def ask_api_pass():
-    stderr.print("Write API password for logging")
-    api_token = questionary.password("API password: ").unsafe_ask()
-    return api_token
+def ask_password(msg):
+    password = questionary.password(msg).unsafe_ask()
+    return password
 
 
 def get_service_paths(resolution_info):
