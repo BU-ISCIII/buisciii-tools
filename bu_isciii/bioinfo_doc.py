@@ -434,6 +434,22 @@ class BioinfoDoc:
             stderr.print("traceback error %s" % e)
             sys.exit()
         return
+    def copy_images(self):
+        file_path = os.path.join(
+            self.service_folder,
+            self.service_result_folder,
+            self.delivery_sub_folder,
+            "images"
+        )
+        if not os.path.exists(file_path):
+            stderr.print(
+                "[green] Coping images folder temporarylly to "
+                + file_path
+            )
+            images_folder = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), "assets/reports/md/images"
+            )
+            shutil.copytree(images_folder, file_path, dirs_exist_ok=False)
 
     def create_results_doc(self, md_list, md_type):
         stderr.print(
@@ -553,6 +569,7 @@ class BioinfoDoc:
             return
         elif self.type == "delivery":
             doc_pdf = self.generate_documentation_files("delivery")
+            self.copy_images()
             result_pdf = self.create_results_doc(self.results_md_list, "results")
             service_pdf = self.create_results_doc(self.delivery_md_list, "service")
             self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
