@@ -69,7 +69,7 @@ class BioinfoDoc:
         )
         if self.type == "delivery":
             resolution_info = self.rest_api.get_request(
-                "serviceFullData", "resolution", self.resolution_id
+                request_info="serviceFullData", safe=False, resolution=self.resolution_id
             )
             if len(resolution_info["resolutions"][0]["delivery"]) > 0:
                 print("Service delivery already exist.")
@@ -80,7 +80,7 @@ class BioinfoDoc:
             else:
                 self.post_delivery_info()
         self.resolution_info = self.rest_api.get_request(
-            "serviceFullData", "resolution", self.resolution_id
+                request_info="serviceFullData", safe=False, resolution=self.resolution_id
         )
         self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"

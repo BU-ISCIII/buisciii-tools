@@ -54,7 +54,7 @@ class NewService:
             conf_api["server"], conf_api["api_url"], api_token
         )
         self.resolution_info = self.rest_api.get_request(
-            "serviceFullData", "resolution", self.resolution_id
+            request_info="serviceFullData", safe=False, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolutionFullNumber"
