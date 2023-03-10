@@ -140,7 +140,7 @@ def prompt_yn_question(msg):
 
 
 def prompt_skip_folder_creation():
-    stderr.print("Do you want to skip folder creation? (Y/N)")
+    stderr.print("Do you want to skip folder creation? (y/N)")
     confirmation = questionary.confirm("Skip?", default=False).unsafe_ask()
     return confirmation
 
