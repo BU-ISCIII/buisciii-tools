@@ -40,6 +40,7 @@ class BioinfoDoc:
         report_md=False,
         results_md=False,
         api_token=None,
+        email_psswd=None,
     ):
         if type is None:
             self.type = bu_isciii.utils.prompt_selection(
@@ -173,6 +174,12 @@ class BioinfoDoc:
             self.template_file = self.conf["delivery_template_path_file"]
         self.service_info_folder = self.conf["service_folder"][0]
         self.service_result_folder = self.conf["service_folder"][1]
+        if email_psswd is None and self.type == "delivery":
+            stderr.print("Write password for bioinformatica@isciii.es")
+            self.email_psswd = bu_isciii.utils.ask_password("E-mail password: ")
+        else:
+            self.email_psswd = email_psswd
+
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
