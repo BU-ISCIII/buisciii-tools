@@ -405,12 +405,20 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     default=None,
     help="Absolute path to markdown report to use instead of the one in config file",
 )
-def bioinfo_doc(type, resolution, path, ask_path, sftp_folder, report_md, results_md):
+@click.option(
+    "-e",
+    "--email_psswd",
+    help="Password for bioinformatica@isciii.es",
+    required=False,
+    default=None,
+)
+
+def bioinfo_doc(type, resolution, path, ask_path, sftp_folder, report_md, results_md, email_psswd):
     """
     Create the folder documentation structure in bioinfo_doc server
     """
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(
-        type, resolution, path, ask_path, sftp_folder, report_md, results_md, api_pass
+        type, resolution, path, ask_path, sftp_folder, report_md, results_md, api_pass, email_psswd
     )
     new_doc.create_documentation()
 
