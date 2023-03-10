@@ -134,7 +134,7 @@ def prompt_path(msg):
     return source
 
 
-def prompt_yn_question(msg,dflt):
+def prompt_yn_question(msg, dflt):
     confirmation = questionary.confirm(msg, default=dflt).unsafe_ask()
     return confirmation
 

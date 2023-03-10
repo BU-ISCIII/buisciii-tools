@@ -194,7 +194,7 @@ class NewService:
         )
         if len(self.service_samples) != len(samples_files):
             if not bu_isciii.utils.prompt_yn_question(
-                "Do you want to continue with the service creation?",dflt=True
+                "Do you want to continue with the service creation?", dflt=True
             ):
                 stderr.print("Bye!")
                 sys.exit()

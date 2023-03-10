@@ -277,7 +277,7 @@ class CleanUp:
         elements = ", ".join(to_find)
         # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?",dflt=True):
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?", dflt=True):
             stderr.print("You are the boss here.")
             sys.exit()
 
@@ -394,7 +394,7 @@ class CleanUp:
         self.show_removable()
 
         # Ask for confirmation
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?",dflt=True):
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?", dflt=True):
             stderr.print("You got it.")
             sys.exit()
 

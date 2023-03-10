@@ -76,18 +76,20 @@ class BioinfoDoc:
         )
         if self.type == "delivery":
             resolution_info = self.rest_api.get_request(
-                request_info="serviceFullData", safe=False, resolution=self.resolution_id
+                request_info="serviceFullData",
+                safe=False,
+                resolution=self.resolution_id,
             )
             if len(resolution_info["resolutions"][0]["delivery"]) > 0:
                 print("Service delivery already exist.")
                 if bu_isciii.utils.prompt_yn_question(
-                    "Do you want to overwrite delivery info?",dflt=False
+                    "Do you want to overwrite delivery info?", dflt=False
                 ):
                     self.post_delivery_info()
             else:
                 self.post_delivery_info()
         self.resolution_info = self.rest_api.get_request(
-                request_info="serviceFullData", safe=False, resolution=self.resolution_id
+            request_info="serviceFullData", safe=False, resolution=self.resolution_id
         )
         self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"
@@ -185,7 +187,6 @@ class BioinfoDoc:
             self.email_psswd = bu_isciii.utils.ask_password("E-mail password: ")
         else:
             self.email_psswd = email_psswd
-
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -447,13 +448,10 @@ class BioinfoDoc:
             self.service_folder,
             self.service_result_folder,
             self.delivery_sub_folder,
-            "images"
+            "images",
         )
         if not os.path.exists(file_path):
-            stderr.print(
-                "[green] Coping images folder temporarylly to "
-                + file_path
-            )
+            stderr.print("[green] Coping images folder temporarylly to " + file_path)
             images_folder = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "assets/reports/md/images"
             )
@@ -551,7 +549,7 @@ class BioinfoDoc:
     def email_creation(self):
         email_data = {}
         if bu_isciii.utils.prompt_yn_question(
-            "Do you want to add some delivery notes to the e-mail?",dflt=False
+            "Do you want to add some delivery notes to the e-mail?", dflt=False
         ):
             email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
                 msg="Write email notes"
@@ -587,7 +585,7 @@ class BioinfoDoc:
             server.ehlo()
             server.login(user=EMAIL_HOST_USER, password=EMAIL_HOST_PASSWORD)
         except Exception as e:
-            stderr.print("[red] Unable to send e-mail"+e)
+            stderr.print("[red] Unable to send e-mail" + e)
 
         msg = MIMEMultipart("alternative")
         msg["To"] = self.resolution_info["serviceUserId"]["email"]
@@ -601,12 +599,14 @@ class BioinfoDoc:
             + self.service_name.split("_", 5)[2]
         )
         if bu_isciii.utils.prompt_yn_question(
-            "Do you want to add any other sender? appart from "+self.resolution_info["serviceUserId"]["email"],dflt=False
+            "Do you want to add any other sender? appart from "
+            + self.resolution_info["serviceUserId"]["email"],
+            dflt=False,
         ):
-            stderr.print("[red] Write emails to be added in semicolon separated format: bioinformatica@isciii.es;icuesta@isciii.es")
-            msg["CC"] = bu_isciii.utils.ask_for_some_text(
-                msg="E-mails:"
+            stderr.print(
+                "[red] Write emails to be added in semicolon separated format: bioinformatica@isciii.es;icuesta@isciii.es"
             )
+            msg["CC"] = bu_isciii.utils.ask_for_some_text(msg="E-mails:")
             rcpt = msg["CC"].split(";") + [msg["To"]]
         else:
             rcpt = self.resolution_info["serviceUserId"]["email"]
@@ -614,8 +614,12 @@ class BioinfoDoc:
         html = MIMEText(html_text, "html")
         msg.attach(html)
         with open(results_pdf_file, "rb") as f:
-            attach = MIMEApplication(f.read(),_subtype="pdf")
-        attach.add_header('Content-Disposition','attachment',filename=str(os.path.basename(results_pdf_file)))
+            attach = MIMEApplication(f.read(), _subtype="pdf")
+        attach.add_header(
+            "Content-Disposition",
+            "attachment",
+            filename=str(os.path.basename(results_pdf_file)),
+        )
         msg.attach(attach)
 
         server.sendmail(
@@ -641,7 +645,7 @@ class BioinfoDoc:
             self.sftp_tree()
             email_html = self.email_creation()
             if bu_isciii.utils.prompt_yn_question(
-                "Do you want to send e-mail automatically?",dflt=True
+                "Do you want to send e-mail automatically?", dflt=True
             ):
                 self.send_email(email_html, results_pdf)
             else:
