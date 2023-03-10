@@ -581,7 +581,8 @@ class BioinfoDoc:
         try:
             server = SMTP(host=EMAIL_HOST, port=EMAIL_PORT)
             server.ehlo()
-            server.starttls(context=context)
+            if EMAIL_USE_TLS:
+                server.starttls(context=context)
             server.ehlo()
             server.login(user=EMAIL_HOST_USER, password=EMAIL_HOST_PASSWORD)
         except Exception as e:
