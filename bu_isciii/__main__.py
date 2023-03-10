@@ -137,7 +137,7 @@ def bu_isciii_cli(verbose, log_file, api_token):
     if api_token:
         api_pass = api_token
     else:
-        stderr.print("Write API password for logging")
+        print("Write API password for logging")
         api_pass = bu_isciii.utils.ask_password("API password: ")
 
 
