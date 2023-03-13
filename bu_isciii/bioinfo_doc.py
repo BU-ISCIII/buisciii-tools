@@ -571,26 +571,26 @@ class BioinfoDoc:
         return email_html
 
     def send_email(self, html_text, results_pdf_file):
-        EMAIL_HOST = self.conf["email_host"]
-        EMAIL_PORT = self.conf["email_port"]
-        EMAIL_HOST_USER = self.conf["email_host_user"]
-        EMAIL_HOST_PASSWORD = self.email_psswd
-        EMAIL_USE_TLS = self.conf["email_use_tls"]
+        email_host = self.conf["email_host"]
+        email_port = self.conf["email_port"]
+        email_host_user = self.conf["email_host_user"]
+        email_host_password = self.email_psswd
+        email_use_tls = self.conf["email_use_tls"]
 
         context = ssl.create_default_context()
         try:
-            server = SMTP(host=EMAIL_HOST, port=EMAIL_PORT)
+            server = SMTP(host=email_host, port=email_port)
             server.ehlo()
-            if EMAIL_USE_TLS:
+            if email_use_tls:
                 server.starttls(context=context)
             server.ehlo()
-            server.login(user=EMAIL_HOST_USER, password=EMAIL_HOST_PASSWORD)
+            server.login(user=email_host_user, password=email_host_password)
         except Exception as e:
             stderr.print("[red] Unable to send e-mail" + e)
 
         msg = MIMEMultipart("alternative")
         msg["To"] = self.resolution_info["serviceUserId"]["email"]
-        msg["From"] = EMAIL_HOST_USER
+        msg["From"] = email_host_user
         msg["Subject"] = (
             "Entrega "
             + self.delivery_number
@@ -624,7 +624,7 @@ class BioinfoDoc:
         msg.attach(attach)
 
         server.sendmail(
-            EMAIL_HOST_USER,
+            email_host_user,
             rcpt,
             msg.as_string(),
         )
