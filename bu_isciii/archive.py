@@ -214,32 +214,36 @@ class Archive:
     of a service
     """
 
-    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None):
+    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None,):
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
 
-        self.type = ser_type
-        self.option = option
-        self.services = {
-            service_id: {
+        dictionary_template = {
                 "found_in_system": "",
                 "archived_path": "",
                 "non_archived_path": "",
                 "archived_size": int(),
                 "non_archived_size": int(),
                 "found": [],
+                "md5" : "",
+                "compressed_successfully": None,
+                "moved_successfully": None,
+                "uncompressed_succesfully": None,
             }
+
+        self.type = ser_type
+        self.option = option
+
+        # deepcopy can be used here
+        # import copy 
+        #  service_id : copy.deepcopy(dictionary_template)
+        self.services = {
+            service_id: { key : value for key, value in dictionary_template.items() }
         }
 
-        # LOG 0: called the archive repository
-        log.info("Activated archive module of the bu-isciii tools") 
-
-        # Record of failed services in any of the steps
-        # self.service_info = {
-        #     "failed_compression": [],
-        #     "failed_movement": [],
-        #     "failed_uncompression": [],}
+        # LOG: called the archive repository
+        log.info("Activated archive module of the bu-isciii tools")
         
         # Get configuration params from configuration.json
         # Get data to connect to the API
@@ -276,53 +280,39 @@ class Archive:
             
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
-            stderr.print(
-                "Please state the final date for filtering (must be posterior or identical to the initial date)"
-            )
+            stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
 
             # LOG: dates chosen
             log.info(f"Starting date: {self.date_from} (chosen through prompt)")
             log.info(f"Ending date: {self.date_until} (chosen through prompt)")
-
             stderr.print(
                 f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
             )
 
             try:
-                self.services = {
-                    service["serviceRequestNumber"]: {"found_in_system": True}
-                    for service in rest_api.get_request(
-                        request_info="services",
-                        safe=False,
-                        state="delivered",
-                        date_from=str(self.date_from),
-                        date_until=str(self.date_until),
-                    )
-                }
+                for service in rest_api.get_request(request_info="services", safe=False, state="delivered", date_from=str(self.date_from), date_until=str(self.date_until),):
+                    self.services[service["serviceRequestNumber"]] = { key : value for key, value in dictionary_template.items() }
+                    self.services[service["serviceRequestNumber"]]["found_in_system"] = True
+
                 # LOG: found X services in the time interval
                 log.info(f"Services found in the time interval: {len(self.services)}")
                 log.info(f"Names of the services found in said interval: {','.join([service for service in self.services.keys()])}")
             except TypeError:
                 stderr.print(
-                    "Could not connect to the api (wrong password?)", style="red"
+                    "Could not connect to the API (wrong password?)", style="red"
                 )
                 
-                # LOG: error if the api didnt work
                 log.error("Connection to the API was not successful. Possible reasons: wrong API password, bad connection.")
                 sys.exit(1)
 
         else:
-            # list(self.services.keys())[0] is None should be more than enough but I dont trust anyone anymore   
-            
-            # LOG: chosen by ID
             log.info(f"Services chosen by: ServiceID")
 
             if len(self.services.keys()) == 1 and list(self.services.keys())[0] is None:
                 new_service = bu_isciii.utils.prompt_service_id()
-                self.services = {new_service: {}}
+                self.services = {new_service: {key : value for key, value in dictionary_template.items()}}
                 
-                # LOG: add service to the log
                 log.info(f"Chosen service: {new_service} (chosen through prompt)")
    
             # Ask if more services will be chosen
@@ -337,7 +327,7 @@ class Archive:
                     break
                 else:
                     new_service = bu_isciii.utils.prompt_service_id()
-                    self.services[new_service] = {}
+                    self.services[new_service] = {key : value for key, value in dictionary_template.items()}
                     
                     # LOG: add new service to the log
                     log.info(f"Chosen service: {new_service} (chosen through prompt)")
@@ -445,7 +435,7 @@ class Archive:
         Generates a log with said info
         """
 
-        log.info("Starting directory scouting")
+        log.info("STARTING: Directory scouting")
         log.info("Extracting size of involved directories")
 
         stderr.print("Extracting the size for the involved directories")
@@ -510,7 +500,7 @@ class Archive:
         Function created to make a .tar.gz file from a NON-archived directory
         Extracts the MD5 and size as well, to do it all in a single function (might regret later)
         """
-        log.info(f"Starting compression of services in the {('Archive' if direction == 'archive' else 'Data')} dir for {direction}.")
+        log.info(f"STARTING: Compression of services in the {('Archive' if direction == 'archive' else 'Data')} dir for {direction}.")
 
         total_initial_size = 0
         total_compressed_size = 0
@@ -622,7 +612,13 @@ class Archive:
             direction="retrieve": move service from "archived" to "non_archived"
         Make sure they are '.tar.gz' files
         """
-        for service in self.services.keys():
+
+        log.info(f"STARTING: Compressed service movement ({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir' )})")
+
+        moved_services = []
+
+        for service in self.services.keys():          
+
             (origin, destiny) = (
                 (
                     self.services[service]["non_archived_path"],
@@ -635,48 +631,35 @@ class Archive:
                 )
             )
 
-            # If origin cant be found, next
+            # If compressed origin cannot be found
+            # Check for uncompressed origin
+            # i
             if not (os.path.exists(origin + ".tar.gz")):
-                stderr.print(
-                    f"{origin.split('/')[-1] + 'tar.gz'} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])})"
-                )
-                continue
-
-            # If origin is found, but no compressed origin
-            if (os.path.exists(origin)) and not (os.path.exists(origin + ".tar.gz")):
-                if (
-                    self.option
-                    == "    Partial archive: archive NON-archived service (must be compressed first) and check md5"
-                ) or (
-                    self.option
-                    == "    Partial retrieve: retrieve archived service (must be compressed first) and check md5"
-                ):
-                    stderr.print(
-                        f"{archived_path.split('/')[-1] + '.tar.gz'} was not found in the origin directory ({archived_path.split('/')[:-1]}). You have chosen a partial process, make sure this file has been compressed beforehand"
-                    )
-                    if (
-                        bu_isciii.utils.prompt_selection(
-                            "Continue?", ["Yes, continue", "Hold up"]
-                        )
-                    ) == "Hold up":
-                        sys.exit()
-                continue
+                stderr.print(f"{origin.split('/')[-1] + 'tar.gz'} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])}")
+                if os.path.exists(origin):
+                    stderr.print(f"Origin path {origin} was found. Please make sure this directory has been compressed.")
+                    if (bu_isciii.utils.prompt_selection("What to do", ["Skip it", "Exit"]) == "Exit"):
+                        stderr.print("Exiting")
+                        log.info(f"Execution ended by user through prompt after service {service} compressed {origin + '.tar.gz'} file was not found in the {direction} process.")
+                        sys.exit(0)
+                    else:
+                        stderr.print(f"Skipping service {service}")
+                        log.info(f"Service {service}: compressed file {origin + '.tar.gz'} was not found. Skipped by user through prompt.")
+                        continue
+                else:
+                    stderr.print(f"Origin path {origin} was not found either. Skipping.")
+                    log.info(f"Service {service}: neither compressed path ({origin + '.tar.gz'}) or uncompressed path ({origin}) could be found. Skipping.")
+                    continue
 
             # If compresed destiny exists
             if os.path.exists(destiny + ".tar.gz"):
-                stderr.print(
-                    f"Seems like this service ({destiny.split('/')[-1]}) has already been {direction + 'd'}"
-                )
-                # SHOW SIZE OF ORIGINAL AND SIZE OF COMPRESSED FILE?
-                if (
-                    bu_isciii.utils.prompt_selection(
-                        "What to do?",
-                        [f"Remove it and {direction} it again", "Ignore this service"],
-                    )
-                ) == "Ignore this service":
+                stderr.print(f"Seems like service ({service}) has already been {direction + 'd'}.")
+                if (bu_isciii.utils.prompt_selection("What to do?",[f"Remove it and {direction} it again", "Ignore this service"],)) == "Ignore this service":
+                    log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. Transference skipped by user through prompt.")
                     continue
                 else:
                     os.remove(destiny + ".tar.gz")
+                    log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. File was removed by user instruction through prompt, with intention to be copied again.")
 
             origin_md5 = get_md5(origin + ".tar.gz")
 
@@ -789,9 +772,7 @@ class Archive:
             #   if direction = archive: origin is non-archived, and you are moving to archived
             #   if direction = retrieve: origin is archive, and you are moving to non-archived
             # [destiny, origin]
-            file_locations = (
-                [
-                    self.services[service]["non_archived_path"],
+            file_locations = (Starting"],
                     self.services[service]["archived_path"],
                 ]
                 if direction == "archive"
