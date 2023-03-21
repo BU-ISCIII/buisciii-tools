@@ -206,7 +206,7 @@ def get_md5(file):
         file_md5 = hashlib.md5(infile).hexdigest()
 
     return file_md5
-º
+
 
 class Archive:
     """
@@ -226,10 +226,12 @@ class Archive:
                 "archived_size": int(),
                 "non_archived_size": int(),
                 "found": [],
-                "md5" : "",
-                "compressed_successfully": None,
-                "moved_successfully": None,
-                "uncompressed_succesfully": None,
+                "md5_non_archived" : "",
+                "md5_archived" : "",
+                "compressed": "No compression performed",
+                "moved": "No movement performed",
+                "uncompressed": "No uncompression performed",
+                "deleted": "No deletion performed"
             }
 
         self.type = ser_type
@@ -251,31 +253,15 @@ class Archive:
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
 
         # Initiate API
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"],
-            conf_api["api_url"],
-            api_pass,
-        )
+        rest_api = bu_isciii.drylab_api.RestServiceApi(conf_api["server"], conf_api["api_url"],api_pass,)
 
         if self.type is None or self.type not in ["service_and_colaborations", "research"]:
             stderr.print("Working with a service, or a research resolution?")
-            self.type = bu_isciii.utils.prompt_selection(
-                "Type",
-                ["services_and_colaborations", "research"],
-            )
+            self.type = bu_isciii.utils.prompt_selection("Type",["services_and_colaborations", "research"],)
 
-        # LOG: type of service
         log.info(f"Service type chosen: {self.type}")
 
-        if (
-            bu_isciii.utils.prompt_selection(
-                "Search services by date, or by resolution ID?",
-                ["Search by date", "Resolution ID"],
-            )
-            == "Search by date"
-        ):
-
-            # LOG: chosen by date
+        if (bu_isciii.utils.prompt_selection("Search services by date, or by resolution ID?",["Search by date", "Resolution ID"],) == "Search by date"):
             log.info(f"Services chosen by: date")
             
             stderr.print("Please state the initial date for filtering")
@@ -283,26 +269,20 @@ class Archive:
             stderr.print("Please state the final date for filtering (must be posterior or identical to the initial date)")
             self.date_until = ask_date(previous_date=self.date_from)
 
-            # LOG: dates chosen
             log.info(f"Starting date: {self.date_from} (chosen through prompt)")
             log.info(f"Ending date: {self.date_until} (chosen through prompt)")
-            stderr.print(
-                f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
-            )
+            stderr.print(f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}")
 
             try:
                 for service in rest_api.get_request(request_info="services", safe=False, state="delivered", date_from=str(self.date_from), date_until=str(self.date_until),):
                     self.services[service["serviceRequestNumber"]] = { key : value for key, value in dictionary_template.items() }
                     self.services[service["serviceRequestNumber"]]["found_in_system"] = True
 
-                # LOG: found X services in the time interval
                 log.info(f"Services found in the time interval: {len(self.services)}")
                 log.info(f"Names of the services found in said interval: {','.join([service for service in self.services.keys()])}")
+            
             except TypeError:
-                stderr.print(
-                    "Could not connect to the API (wrong password?)", style="red"
-                )
-                
+                stderr.print("Could not connect to the API (wrong password?)", style="red")
                 log.error("Connection to the API was not successful. Possible reasons: wrong API password, bad connection.")
                 sys.exit(1)
 
@@ -317,81 +297,44 @@ class Archive:
    
             # Ask if more services will be chosen
             while True:
-                if (
-                    bu_isciii.utils.prompt_selection(
-                        "Would you like to add any other service?",
-                        ["Add more services", "Do not add more services"],
-                    )
-                    == "Do not add more services"
-                ):
+                if (bu_isciii.utils.prompt_selection("Would you like to add any other service?",["Add more services", "Do not add more services"],) == "Do not add more services"):
                     break
                 else:
                     new_service = bu_isciii.utils.prompt_service_id()
                     self.services[new_service] = {key : value for key, value in dictionary_template.items()}
-                    
-                    # LOG: add new service to the log
                     log.info(f"Chosen service: {new_service} (chosen through prompt)")
 
         stderr.print(f"Asking our trusty API about services:")
         
         for service in self.services.keys():
             stderr.print(service)
-            if isinstance(
-                (
-                    service_data := rest_api.get_request(
-                        request_info="serviceFullData",
-                        safe=False,
-                        service=service
-                    )
-                ),
-                int,
-            ):
-                stderr.print(
-                    f"No services named '{service}' were found. Connection seemed right though!"
-                )
+            if isinstance((service_data := rest_api.get_request(request_info="serviceFullData",safe=False,service=service)),int,):
+                stderr.print(f"No services named '{service}' were found. Connection seemed right though!")
                 self.services[service]["found_in_system"] = False
                 self.services[service]["archived_path"] = None
                 self.services[service]["non_archived_path"] = None
             else:
                 self.services[service]["found_in_system"] = True
-                (
-                    self.services[service]["archived_path"],
-                    self.services[service]["non_archived_path"],
-                ) = get_service_paths(self.conf, self.type, service_data)
+                (self.services[service]["archived_path"], self.services[service]["non_archived_path"],) = get_service_paths(self.conf, self.type, service_data)
 
-            self.services[service]["archived_size"] = None
-            self.services[service]["non_archived_size"] = None
             self.services[service]["found"] = []
 
         # Check on not-found services
-        not_found_services = [
-            service
-            for service in self.services.keys()
-            if self.services[service]["found_in_system"] is False
-        ]
+        not_found_services = [service for service in self.services.keys() if self.services[service]["found_in_system"] is False]
 
         if len(not_found_services) != 0:
             # if none of the services was found, exit
             if len(not_found_services) == len(self.services):
-                stderr.print(
-                    f"None of the specified services was found: {','.join(not_found_services)}"
-                )
-                # LOG: NONE of services were found
+                stderr.print(f"NONE of the specified services were found: {','.join(not_found_services)}")
                 log.warning(f"NONE of the services chosen has been found: {','.join(not_found_services)}")
                 log.info(f"Execution ended automatically due to none of the chosen services being found")
                 sys.exit(0)
             else:
-                stderr.print(
-                    f"The following services were not found on iSkyLIMS: {','.join(not_found_services)}"
-                )
+                stderr.print(f"The following services were not found on iSkyLIMS: {','.join(not_found_services)}")
                 # LOG: some services were not found
                 log.warning(f"{len(not_found_services)} services were not found: {','.join(not_found_services)}")
                 
-                if (
-                    bu_isciii.utils.prompt_selection(
-                        "Continue?", ["Yes, continue", "Hold up"]
-                    )
-                ) == "Hold up":
+                if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
                     log.info(f"Execution was ended by the user through prompt after some services were not found: {','.join(not_found_services)}")
                     sys.exit(0)
 
@@ -441,13 +384,9 @@ class Archive:
         stderr.print("Extracting the size for the involved directories")
         for service in self.services.keys():
             if "Data dir" in self.services[service]["found"]:
-                self.services[service]["non_archived_size"] = get_dir_size(
-                    self.services[service]["non_archived_path"]
-                ) / pow(1024, 3)
+                self.services[service]["non_archived_size"] = get_dir_size(self.services[service]["non_archived_path"]) / pow(1024, 3)
             if "Archive" in self.services[service]["found"]:
-                self.services[service]["archived_size"] = get_dir_size(
-                    self.services[service]["archived_path"]
-                ) / pow(1024, 3)
+                self.services[service]["archived_size"] = get_dir_size(self.services[service]["archived_path"]) / pow(1024, 3)
 
         # Generate table with the generated info
         size_table = rich.table.Table()
@@ -465,13 +404,8 @@ class Archive:
             if len(self.services[service]["found"]) == 0:
                 size = "-"
             elif len(self.services[service]["found"]) == 2:
-                if (
-                    self.services[service]["archived_size"]
-                    != self.services[service]["non_archived_size"]
-                ):
-                    stderr.print(
-                        f"For service {service}, archived size {self.services[service]['archived_size']} and non-archived size {self.services[service]['non_archived_size']} are equal"
-                    )
+                if (self.services[service]["archived_size"] != self.services[service]["non_archived_size"]):
+                    stderr.print(f"For service {service}, archived size {self.services[service]['archived_size']} and non-archived size {self.services[service]['non_archived_size']} are equal")
                 else:
                     size = self.services[service]["non_archived_size"]
             else:
@@ -487,8 +421,8 @@ class Archive:
             )
 
         stderr.print(size_table)
-        log.info("Generating table containing the service info")
-
+        log.info("FINISHED: Directory scouting")
+        
         return
 
     def targz_directory(self, direction):
@@ -504,7 +438,6 @@ class Archive:
 
         total_initial_size = 0
         total_compressed_size = 0
-        already_compressed_services = []
         newly_compressed_services = []
 
         # try:
@@ -515,11 +448,7 @@ class Archive:
                 log.info(f"Service {service}: not found on the '{location_check}' directory. Skipping")
                 continue
 
-            dir_to_tar = (
-                self.services[service]["non_archived_path"]
-                if direction == "archive"
-                else self.services[service]["archived_path"]
-            )
+            dir_to_tar = (self.services[service]["non_archived_path"] if direction == "archive" else self.services[service]["archived_path"])
 
             # If dir size has been obtained previously, get it
             # if dir could not be found, pass
@@ -530,22 +459,18 @@ class Archive:
                         initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
                         self.services[service]["non_archived_size"] = initial_size
                     else:
-                        stderr.print(
-                            f"Service {service} could not be found in the data directory"
-                        )
+                        stderr.print(f"Service {service} could not be found in the data directory")
                         continue
                 else:
                     initial_size = self.services[service]["non_archived_size"]
 
-            elif direction == "retrieve":
+            else:
                 if self.services[service]["archived_size"] is None:
                     if "Archive" in self.services[service]["found"]:
                         initial_size = get_dir_size(dir_to_tar) / pow(1024, 3)
                         self.services[service]["archived_size"] = initial_size
                     else:
-                        stderr.print(
-                            f"Service {service} could not be found in the archive directory"
-                        )
+                        stderr.print(f"Service {service} could not be found in the archive directory")
                         continue
                 else:
                     self.services[service]["archived_size"] = initial_size
@@ -553,87 +478,66 @@ class Archive:
             # Check if there is a prior ".tar.gz" file
             # NOTE: I find dir_to_tar + ".tar.gz" easier to mentally locate the compressed files
             if os.path.exists(dir_to_tar + ".tar.gz"):
+                
                 compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
-                stderr.print(
-                    f"Seems like service {service} has already been compressed in the {location_check} dir\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB"
-                )
-                if (
-                    bu_isciii.utils.prompt_selection(
-                        "What to do?",
-                        [
-                            "Just skip it",
-                            f"Delete previous {service + '.tar.gz'} and compress again",
-                        ],
-                    )
-                ) == "Just skip it":
+                stderr.print(f"Seems like service {service} has already been compressed in the {location_check} dir\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
+                
+                if (bu_isciii.utils.prompt_selection("What to do?",["Just skip it",f"Delete previous {service + '.tar.gz'} and compress again",],)) == "Just skip it":
                     log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt.")
                     total_initial_size += initial_size
                     total_compressed_size += compressed_size
-                    already_compressed_services.append(service)
+                    self.services[service]["compressed"] = "Found already compressed"
                     continue
                 else:
                     log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose to DELETE it through prompt. Compression process will be performed again.")
                     os.remove(dir_to_tar + ".tar.gz")
-
+            
             stderr.print(f"Compressing service {service}")
 
-            # try:
             targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
-            
             compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
+            
             total_initial_size += initial_size
             total_compressed_size += compressed_size
 
-            stderr.print(
-                f"Service {service} was compressed into {dir_to_tar + '.tar.gz'}\nInitial size: {initial_size:.3f} GB\nCompressed size: {compressed_size:.3f} GB\nSaved space: {initial_size - compressed_size:.3f} GB\n"
-            )
-            
+            stderr.print(f"Service {service} was compressed into {dir_to_tar + '.tar.gz'}")
+            stderr.print(f"Initial size: {initial_size:.3f} GB")
+            stderr.print(f"Compressed size: {compressed_size:.3f} GB")
+            stderr.print(f"Saved space: {initial_size - compressed_size:.3f} GB")
             log.info(f"Service {service}: compression into {dir_to_tar + '.tar.gz'} successful. Initial size: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. Saved space: {initial_size - compressed_size:.3f} GB.")
-            newly_compressed_services.append(service)
+            self.services[service]["compressed"] = "Successfuly compressed" 
 
-        stderr.print(
-            f"\nCompressed {len(newly_compressed_services)} services\nTotal initial size: {total_initial_size:.3f} GB\nTotal compressed size: {total_compressed_size:.3f} GB\nSaved space: {total_initial_size - total_compressed_size:.3f} GB.\n"
-        )
+        newly_compressed_services = [service for service in self.services.keys() if self.services[service]["compressed"] == "Successfully compressed"]
+        already_compressed_services = [service for service in self.services.keys() if self.services[service]["compressed"] == "Found already compressed"]        
 
-        log.info(f"Compression progress for {direction} finished: {len(newly_compressed_services)} services were compressed. Total initial size: {total_initial_size:.3f} GB. Total compressed size: {total_compressed_size:.3f} GB. Saved space: {total_initial_size - total_compressed_size:.3f} GB,")
-        log.info(f"Compressed services: {', '.join(newly_compressed_services)}")
-        if len(already_compressed_services) > 0:
-            stderr.print(
-                f"{len(already_compressed_services)} services were already compressed: {', '.join(already_compressed_services)}"
-            )
-            log.info(f"{len(already_compressed_services)} were already compressed: {', '.join(already_compressed_services)}")
+        stderr.print("Compression finished")
+        stderr.print(f"Compressed {len(newly_compressed_services + already_compressed_services)} services ({len(newly_compressed_services)} newly compressed, {len(already_compressed_services)} already compressed)")
+        stderr.print(f"Total initial size: {total_initial_size:.3f} GB")
+        stderr.print(f"Total compressed size: {total_compressed_size:.3f} GB")
+        stderr.print(f"Saved space: {total_initial_size - total_compressed_size:.3f} GB")
+        stderr.print(f"Newly compressed services: {', '.join(newly_compressed_services)}")
+        stderr.print(f"Already compressed services: {', ',join(already_compressed_services)}")
 
+        log.info(f"Compression progress for {direction} finished: {len(newly_compressed_services + already_compressed_services)} services were compressed ({len(newly_compressed_services)} newly compressed, {len(already_compressed_services)} already compressed). Total initial size: {total_initial_size:.3f} GB. Total compressed size: {total_compressed_size:.3f} GB. Saved space: {total_initial_size - total_compressed_size:.3f} GB.")
+        log.info(f"Newly compressed services: {', '.join(newly_compressed_services)}")
+        log.info(f"Already compressed services: {', ',join(already_compressed_services)}")
+        log.info(f"FINISHED: Compression of services in the {('Archive' if direction == 'archive' else 'Data')} dir for {direction}.")
         return
 
     def move_directory(self, direction):
         """
         Move chosen services from a place to another depending on the direction chosen:
-            direction="archive": move service from "non_archived" to "archived"
-            direction="retrieve": move service from "archived" to "non_archived"
+            direction = "archive": move service from "non_archived" to "archived"
+            direction = "retrieve": move service from "archived" to "non_archived"
         Make sure they are '.tar.gz' files
         """
-
         log.info(f"STARTING: Compressed service movement ({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir' )})")
 
-        moved_services = []
-
         for service in self.services.keys():          
-
-            (origin, destiny) = (
-                (
-                    self.services[service]["non_archived_path"],
-                    self.services[service]["archived_path"],
-                )
-                if direction == "archive"
-                else (
-                    self.services[service]["archived_path"],
-                    self.services[service]["non_archived_path"],
-                )
-            )
-
+            (origin, destiny) = ((self.services[service]["non_archived_path"], self.services[service]["archived_path"],) if direction == "archive" else (self.services[service]["archived_path"], self.services[service]["non_archived_path"]))
+            
             # If compressed origin cannot be found
             # Check for uncompressed origin
-            # i
             if not (os.path.exists(origin + ".tar.gz")):
                 stderr.print(f"{origin.split('/')[-1] + 'tar.gz'} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])}")
                 if os.path.exists(origin):
@@ -664,28 +568,13 @@ class Archive:
             origin_md5 = get_md5(origin + ".tar.gz")
 
             try:
-                sysrsync.run(
-                    source=origin + ".tar.gz",
-                    destination=destiny + ".tar.gz",
-                    options=self.conf["options"],
-                    sync_source_contents=False,
-                )
-
+                sysrsync.run(source=origin + ".tar.gz", destination=destiny + ".tar.gz", options=self.conf["options"], sync_source_contents=False,)
                 if origin_md5 == get_md5(destiny + ".tar.gz"):
-                    stderr.print(
-                        f"[green] Service {origin.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({origin}) to its destiny folder ({destiny}) (MD5: {origin_md5}; identical in both sides)",
-                        highlight=False,
-                    )
+                    stderr.print(f"[green] Service {origin.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({origin}) to its destiny folder ({destiny}) (MD5: {origin_md5}; identical in both sides)", highlight=False,)
 
             except OSError as e:
-                stderr.print(
-                    f"[red] ERROR: {origin.split('/')[-1] + '.tar.gz'} could not be copied to its destiny archive folder, {destiny}.",
-                    highlight=False,
-                )
-                log.error(
-                    f"Directory {origin} could not be archived to {archived_path}.\
-                        Reason: {e}"
-                )
+                stderr.print(f"[red] ERROR: {origin.split('/')[-1] + '.tar.gz'} could not be copied to its destiny archive folder, {destiny}.",highlight=False,)
+                log.error(f"Directory {origin} could not be archived to {archived_path}.Reason: {e}")
         return
 
     def uncompress_targz_directory(self, direction):
