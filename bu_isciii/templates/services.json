@@ -219,6 +219,22 @@
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "delivery_pdf": ""
+    },
+    "exometrio": {
+      "label": "",
+      "template": "exometrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates/{sample_name}"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
     }
-    
 }
