@@ -208,13 +208,75 @@ def get_md5(file):
     return file_md5
 
 
+def generate_tsv_table(indict, filename):
+
+    """
+    Create a csv file containing the info for each service
+    """
+
+    if os.path.exists(filename):
+        log.info(f"Updating {filename} TSV table.")
+    else:
+        log.info(f"Generating TSV table to: {filename}")
+    
+    with open(filename, "w") as infile:
+
+        csv_dict =  {
+                        "Service ID" : None,
+                        "Found on iSkyLIMS": None,
+                        "Path in archive": None,
+                        "Found on archive": None,
+                        "Uncompressed size in archive": None,
+                        "Compressed size in archive": None,
+                        "Compressed md5 in archive": None,
+                        "Path in data directory": None,
+                        "Found on data directory": None,
+                        "Uncompressed size in data directory": None,
+                        "Compressed size in data directory": None,
+                        "Compressed md5 in data dir": None,
+                        "Compressing process": None,
+                        "Moving process": None,
+                        "Uncompressing process": None,
+                        "Deletion process": None,
+                    }
+                
+        infile.write("\t".join(list(csv_dict.keys())))
+        
+        for service in indict.keys():
+            csv_dict["Service ID"] = service
+            csv_dict["Found on iSkyLIMS"] = "Found on iSkyLIMS" if indict[service]["found_in_system"] is True else "NOT found on iSkyLIMS"
+            
+            # Fields for archive
+            csv_dict["Path in archive"] = indict[service]["archived_path"] if indict[service]["archived_path"] is not None else "Archived path could not be generated"
+            csv_dict["Found in archive"] = "Yes" if "Archive" in indict[service]["found"] else "Not found in archive"
+            csv_dict["Uncompressed size in archive"] = indict[service]["archived_size"] if indict[service]["archived_size"] != 0 else "Not calculated"
+            csv_dict["Compressed size in archive"] = indict[service]["archived_compressed_size"] if indict[service]["archived_compressed_size"] != 0 else "Not calculated"
+            csv_dict["Compressed md5 in archive"] = indict[service]["md5_non_archived"] if indict[service]["md5_non_archived"] is not None else "Not obtained"
+            
+            # Fields for data directory
+            csv_dict["Path in data directory"] = indict[service]["non_archived_path"] if indict[service]["non_archived_path"] is not None else "Data path could not be generated"
+            csv_dict["Found on data directory"] = "Yes" if "Data dir" in indict[service]["found"] else "Not found in data dir"
+            csv_dict["Compressed size in data directory"] = indict[service]["non_archived_size"] if indict[service]["non_archived_size"] != 0 else "Not calculated"
+            csv_dict["Uncompressed size in data directory"] = indict[service]["non_archived_compressed_size"] if indict[service]["non_archived_compressed_size"] != 0 else "Not calculated"
+            csv_dict["Compressed md5 in data dir"] = indict[service]["md5_non_archived"] if indict[service]["md5_non_archived"] is not None else "Not obtained"
+            
+            # Fields for processes
+            csv_dict["Compressing process"] = indict[service]["compressed"]
+            csv_dict["Moving process"] = indict[service]["moved"]
+            csv_dict["Uncompressing process"] = indict[service]["uncompressed"]
+            csv_dict["Deletion process"] = indict[service]["deleted"]
+
+            infile.write("\t".join(list(indict.values())))
+
+    return
+
 class Archive:
     """
     Class to perform the storage and retrieval
     of a service
     """
 
-    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None,):
+    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None):
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
@@ -224,7 +286,9 @@ class Archive:
                 "archived_path": "",
                 "non_archived_path": "",
                 "archived_size": int(),
+                "archived_compressed_size" : int(),
                 "non_archived_size": int(),
+                "non_archived_compressed_size" : int(),
                 "found": [],
                 "md5_non_archived" : "",
                 "md5_archived" : "",
@@ -304,7 +368,7 @@ class Archive:
                     self.services[new_service] = {key : value for key, value in dictionary_template.items()}
                     log.info(f"Chosen service: {new_service} (chosen through prompt)")
 
-        stderr.print(f"Asking our trusty API about services:")
+        stderr.print(f"Asking our trusty API about services: {', '.join([service for service in self.services.keys()])}")
         
         for service in self.services.keys():
             stderr.print(service)
@@ -334,7 +398,7 @@ class Archive:
                 # LOG: some services were not found
                 log.warning(f"{len(not_found_services)} services were not found: {','.join(not_found_services)}")
                 
-                if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Hold up"])) == "Hold up":
+                if (bu_isciii.utils.prompt_selection("Continue?", ["Yes, continue", "Exit"])) == "Exit":
                     log.info(f"Execution was ended by the user through prompt after some services were not found: {','.join(not_found_services)}")
                     sys.exit(0)
 
@@ -363,6 +427,7 @@ class Archive:
                     "    Partial retrieve: compress archived service",
                     "    Partial retrieve: retrieve archived service (must be compressed first) and check md5",
                     "    Partial retrieve: uncompress retrieved service",
+                    "    Partial retrieve: remove compressed services from directories",
                     "Remove selected services from data dir (only if they are already in archive dir)",
                     "That should be all, thank you!",
                 ],
@@ -422,7 +487,7 @@ class Archive:
 
         stderr.print(size_table)
         log.info("FINISHED: Directory scouting")
-        
+
         return
 
     def targz_directory(self, direction):
@@ -483,10 +548,18 @@ class Archive:
                 stderr.print(f"Seems like service {service} has already been compressed in the {location_check} dir\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
                 
                 if (bu_isciii.utils.prompt_selection("What to do?",["Just skip it",f"Delete previous {service + '.tar.gz'} and compress again",],)) == "Just skip it":
-                    log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt.")
+                    
+                    if direction == "archive":
+                        self.services[service]["non_archived_compressed_size"] = compressed_size
+                        self.services[service]["compressed"] = "Found already compressed in the data directory"
+                        log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found in the data directory. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt.")                    
+                    else:
+                        self.services[service]["archived_compressed_size"] = compressed_size
+                        self.services[service]["compressed"] = "Found already compressed in the archive directory"
+                        log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found in the archive directory. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt.")   
+                    
                     total_initial_size += initial_size
-                    total_compressed_size += compressed_size
-                    self.services[service]["compressed"] = "Found already compressed"
+                    total_compressed_size += compressed size
                     continue
                 else:
                     log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose to DELETE it through prompt. Compression process will be performed again.")
@@ -497,6 +570,11 @@ class Archive:
             targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
             compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
             
+            if direction == "archive"
+                self.services[service]["non_archived_compressed_size"] = compressed_size
+            else:
+                self.services[service]["archived_compressed_size"] = compressed_size
+
             total_initial_size += initial_size
             total_compressed_size += compressed_size
 
@@ -507,6 +585,7 @@ class Archive:
             log.info(f"Service {service}: compression into {dir_to_tar + '.tar.gz'} successful. Initial size: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. Saved space: {initial_size - compressed_size:.3f} GB.")
             self.services[service]["compressed"] = "Successfuly compressed" 
 
+        # General revision of the compression process
         newly_compressed_services = [service for service in self.services.keys() if self.services[service]["compressed"] == "Successfully compressed"]
         already_compressed_services = [service for service in self.services.keys() if self.services[service]["compressed"] == "Found already compressed"]        
 
@@ -522,6 +601,7 @@ class Archive:
         log.info(f"Newly compressed services: {', '.join(newly_compressed_services)}")
         log.info(f"Already compressed services: {', ',join(already_compressed_services)}")
         log.info(f"FINISHED: Compression of services in the {('Archive' if direction == 'archive' else 'Data')} dir for {direction}.")
+        
         return
 
     def move_directory(self, direction):
@@ -566,15 +646,37 @@ class Archive:
                     log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. File was removed by user instruction through prompt, with intention to be copied again.")
 
             origin_md5 = get_md5(origin + ".tar.gz")
-
+            
+            # save origin md5
+            if direction == "archive":
+                self.services[service]["md5_non_archived"] = origin_md5
+            else:
+                self.services[service]["md5_archived"] = origin_md5
+            
             try:
                 sysrsync.run(source=origin + ".tar.gz", destination=destiny + ".tar.gz", options=self.conf["options"], sync_source_contents=False,)
-                if origin_md5 == get_md5(destiny + ".tar.gz"):
-                    stderr.print(f"[green] Service {origin.split('/')[-1] + 'tar.gz'}: Data copied successfully from its origin folder ({origin}) to its destiny folder ({destiny}) (MD5: {origin_md5}; identical in both sides)", highlight=False,)
+                destiny_md5 = get_md5(destiny + ".tar.gz")
 
+                # save destiny md5
+                if direction == "archive":
+                    self.services[service]["md5_archived"] = destiny_md5
+                else:
+                    self.services[service]["md5_non_archived"] = destiny_md5
+
+                # compare md5
+                if origin_md5 == destiny_md5:
+                    stderr.print(f"[green] Service {service}: Data copied successfully from its origin folder ({origin}) to its destiny folder ({destiny}) (MD5: {origin_md5}; identical in both sides)", highlight=False,)
+                    log.info(f"Service {service}: copied successfully from {origin}.tar.gz to {destiny}.tar.gz. MD5: {origin_md5}, identical in both sides.)")
+                    self.services[service]["moved"] = f"Successfully moved (direction: {direction}), with matching MD5"    
+                else:
+                    stderr.print(f"[red] ERROR: Service {service}: Data copied from its origin folder ({origin}) to its destiny folder ({destiny}), but MD5 did not match (Origin MD5: {origin_md5}; Destiny MD5: {destiny_md5}).")
+                    log.info(f"Service {service}: data copied from its origin folder ({origin}) to its destiny folder ({destiny}), but MD5 did not match (Origin MD5: {origin_md5}; Destiny MD5: {destiny_md5}).")
+                    self.services[service]["moved"] = f"Moved (direction: {direction}), MD5 NOT MATCHING."
             except OSError as e:
                 stderr.print(f"[red] ERROR: {origin.split('/')[-1] + '.tar.gz'} could not be copied to its destiny archive folder, {destiny}.",highlight=False,)
                 log.error(f"Directory {origin} could not be archived to {archived_path}.Reason: {e}")
+        
+        log.info(f"FINISHED: Compressed service movement ({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir' )})")
         return
 
     def uncompress_targz_directory(self, direction):
@@ -583,127 +685,157 @@ class Archive:
             When archiving, you untar to archived_path
             When retrieving, you untar to non_archived_path
         """
+
+        log.info(f"STARTING: Uncompressing services {('to Data dir for retrieval' if direction == 'retrieve' else 'to Archive dir for archive')}")
         already_uncompressed_services = []
+        not_found_compressed_services = []
+        successfully_uncompressed_services = []
 
         for service in self.services.keys():
-            dir_to_untar = (
-                self.services[service]["archived_path"]
-                if (direction == "archive")
-                else self.services[service]["non_archived_path"]
-            )
+            dir_to_untar = (self.services[service]["archived_path"] if (direction == "archive") else self.services[service]["non_archived_path"])
 
             # Check whether the compressed file is not there
             if not os.path.exists(dir_to_untar + ".tar.gz"):
-                stderr.print(
-                    f"The compressed service { dir_to_untar.split('/')[-1] + '.tar.gz'} could not be found"
-                )
+                stderr.print(f"The compressed service { service + '.tar.gz'} could not be found")
+                not_found_compressed_services.append(service)
 
                 # Check whether the uncompressed dir is already there
                 if os.path.exists(dir_to_untar):
-                    stderr.print(
-                        f"However, like this service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
-                    )
-                else:
-                    stderr.print(
-                        f"The uncompressed service, {dir_to_untar} could not be found either."
-                    )
+                    stderr.print(f"However, this service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
+                    self.services[service]["uncompressed"] = f"Could not be uncompressed, compressed file {service + '.tar.gz'} not found on destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}. However, the uncompressed service was found."
+                    log.info(f"Service {service}: not uncompressed because compressed file was not found. Uncompressed service was found.")
                     continue
+                else:
+                    stderr.print(f"The uncompressed service, {dir_to_untar} could not be found either.")
+                    self.services[service]["uncompressed"] = f"Could not be uncompressed, compressed file not found on destiny folder ({dir_to_untar + '.tar.gz'}). The uncompressed service was not found either."
+                    log.info(f"Service {service}: not uncompressed because compressed file was not found. Uncompressed service was NOT found either.")
+                    continue
+            
+            # Compressed file is there
             else:
                 if os.path.exists(dir_to_untar):
-                    stderr.print(
-                        f"This service is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
-                    )
-                    if (
-                        bu_isciii.utils.prompt_selection(
-                            "What to do?",
-                            [
-                                "Skip (dont uncompress)",
-                                f"Delete {dir_to_untar.split('/')[-1]} and uncompress again",
-                            ],
-                        )
-                        == "Skip (dont uncompress)"
-                    ):
-                        already_uncompressed_services.append(
-                            dir_to_untar.split("/")[-1]
-                        )
+                    stderr.print(f"Service {service} is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
+                    if (bu_isciii.utils.prompt_selection("What to do?",["Skip (dont uncompress)",f"Delete uncompressed {service} and uncompress again",],)== "Skip (dont uncompress)"):
+                        already_uncompressed_services.append(service)
+                        self.services[service]["uncompressed"] = f"Was not uncompressed due to the presence of a previously uncompressed directory"
+                        log.info(f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. User decided to skip uncompression through prompt.")
                         continue
                     else:
                         shutil.rmtree(dir_to_untar)
+                        log.info(f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. User decided to delete the uncompressed service through prompt to uncompress it again.")
 
                 stderr.print(f"Uncompressing {dir_to_untar.split('/')[-1] + '.tar.gz'}")
-                uncompress_targz_directory(dir_to_untar + ".tar.gz", dir_to_untar)
-                stderr.print(
-                    f"{dir_to_untar.split('/')[-1]} has been successfully uncompressed"
-                )
 
-        stderr.print(f"\nUncompressed all {len(self.services_to_move)} services")
+                uncompress_targz_directory(dir_to_untar + ".tar.gz", dir_to_untar)
+
+                stderr.print(f"Service {service} has been successfully uncompressed")
+                log.info(f"Service {service}: successfully uncompressed")
+                self.services[service]["uncompressed"] = "Uncompressed successfully"
+                successfully_uncompressed_services.append(service)
+
+        stderr.print(f"Uncompressed services: {len(successfully_uncompressed_services): {", ".join(successfully_uncompressed_services)}}.")
+        log.info(f"Uncompressed services: {len(successfully_uncompressed_services): {", ".join(successfully_uncompressed_services)}}.")
 
         if len(already_uncompressed_services) > 0:
-            stderr.print(
-                f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_uncompressed_services)}"
-            )
+            stderr.print(f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_uncompressed_services)}")
+            log.info(f"Already compressed services: {len(already_compressed_services)}: {", ".join(already_uncompressed_services)}")
+        
+        if len(not_found_compressed_services) > 0:
+            stderr.print(f"The following {len(not_found_compressed_services)} services could not be uncompressed because the compressed service could not be found: {', '.join(not_found_compressed_services)}")
+            stderr.print(f"Not found compressed services: {len(not_found_compressed_services)}: {', '.join(not_found_compressed_services)}")
 
+        log.info(f"FINISHED: Uncompressing services for {('to Data dir for retrieval' if direction == 'retrieve' else 'to Archive dir for archive')}")
         return
 
     def delete_targz_dirs(self, direction):
         """
         Delete the targz dirs when the original, uncompressed service is present
-        The origin directory will always be deleted last
-        This is:
-            Direction "archive": archived compressed dir will be deleted first bc the original dir is in non_archived
-            Direction "retrieve": non_archived compressed dir will be deleted first bc the original dir is in archive
+
+        if direction = archive: origin is non-archived, and you are moving to archived
+        if direction = retrieve: origin is archive, and you are moving to non-archived     
+        
         """
+        deleted_services = {
+                            "Only origin": [],
+                            "Only destiny": [],
+                            "Both": [],
+                            "None": [],
+                            }
 
-        non_deleted_services = []
+        file_locations = [[service, self.services[service]["non_archived_path"], self.services[service]["archived_path"]] for service in self.services.keys() if direction == 'archive' else [service, self.services[service]["archived_path"], self.services[service]["non_archived_path"]]  ]
+        origin_folder = "Data directory" if direction == "archive" else "Archive directory"
+        destiny_folder = "Archive directory" if direction == "archive" else "Data directory"
 
-        for service in self.services_to_move:
-            # Origin will always be deleted last
-            #   if direction = archive: origin is non-archived, and you are moving to archived
-            #   if direction = retrieve: origin is archive, and you are moving to non-archived
-            # [destiny, origin]
-            file_locations = (Starting"],
-                    self.services[service]["archived_path"],
-                ]
-                if direction == "archive"
-                else [
-                    self.services[service]["archived_path"],
-                    self.services[service]["non_archived_path"],
-                ]
-            )
+        for service, origin, destiny in file_locations:
 
-            # First we delete origin
-            # Check if there is a non-compressed
-            for place in file_locations:
-                if os.path.exists(place):
-                    stderr.print(
-                        f"Uncompressed service {place.split('/')[-1]} has been found in the destiny folder {'/'.join(place.split('/')[:-1])}, so there should be no problem deleting the compressed file {place.split('/')[-1] + '.tar.gz'}. Deleting.\n"
-                    )
-                    os.remove(place + ".tar.gz")
+            if (os.path.exists(origin + ".tar.gz")) and (os.path.exists(destiny + ".tar.gz")):
+                
+                # Both compressed exist, both uncompressed exist
+                if (os.path.exists(origin)) and (os.path.exists(destiny)):
+                    stderr.print(f"For service {service}, compressed and uncompressed directories were found in both {origin_folder} and {destiny_folder}. It is safe to delete the compressed files.")
+                    
+                    os.remove(origin + ".tar.gz")
+                    os.remove(destiny + ".tar.gz")
+                    
+                    log.info(f"Service {service}: both compressed and uncompressed service have been found in the {origin_folder} and the {destiny_folder}. Compressed files deleted.")
+                    stderr.print(f"Compressed files for service {service} (in both {origin_folder} and {destiny_folder}) were deleted.")
+                    deleted_services["Both"].append(service)
+
+                elif (os.path.exists(origin)) and not (os.path.exists(destiny)):
+                    stderr.print(f"For service {service}, compressed directories were found in both the {origin_folder} and the {destiny_folder}. However, the uncompressed directory was NOT found on the {destiny_folder} (therefore, the compressed file will not be deleted).")
+                    stderr.print(f"Therefore, it is safe to delete the compressed service in {origin_folder}, but not in the {destiny_folder}")
+                    
+                    os.remove(origin + ".tar.gz")
+                    
+                    log.info(f"Service {service}: compressed directory in {origin_folder} was deleted due to presence of the uncompressed directory. Compressed directory in {destiny_folder} was NOT deleted due to absence of the uncompressed directory.")
+                    stderr.print(f"Compressed service {service} in {origin_folder} was deleted")
+
+
+                elif not (os.path.exists(origin)) and (os.path.exists(destiny)):
+                    stderr.print(f"For service {service}, compressed directories were found in the {origin_folder} and the {destiny_folder}. However, the uncompressed directory was not found on the {origin_folder}.")
+                    stderr.print(f"Therefore, it is NOT safe to delete the compressed service in {origin_folder}, but it is in the {destiny_folder}")
+                    
+                    os.remove(destiny + ".tar.gz")
+                    
+                    log.info(f"Service {service}: compressed directory in {origin_folder} was NOT deleted due to absence of the uncompressed directory. Compressed directory in {destiny_folder} was deleted due to presence of the uncompressed directory.")
+                    stderr.print(f"Compressed service {service} in {destiny_folder} was deleted")
+                else:
+                    stderr.print(f"For service {service}, compressed directories were found in the {origin_folder} and the {destiny_folder}. However, the uncompressed directories were not found in the {dorigin_folder} or the {destiny_folder}. Please make sure these services have been uncompressed first.")
+                    stderr.print(f"Therefore, it is safe to delete the compressed service in {origin_folder}, but not in the {destiny_folder}")
+                    log.info(f"Service {service}: compressed directories in {origin_folder} were NOT deleted due to absence of uncompressed directories in both sides.")
+            
+            elif (os.path.exists(origin + ".tar.gz")) and not (os.path.exists(destiny + ".tar.gz")):
+                if os.path.exists(origin):
+                    stderr.print(f"For service {service}, the compressed directory was found in the {origin_folder}, but NOT in the {destiny_folder} (and therefore, it cannot be deleted). Uncompressed directory was found in the {origin_folder}, so it can be deleted.")
+                    
+                    os.remove(origin + ".tar.gz")
+
+                    log.info(f"Service {service}: compressed directory in {origin_folder} was found and deleted due to presence of the uncompressed directory. Compressed directory in {destiny_folder} could not be deleted because it was not found.")
+                    stderr.print(f"Compressed service {service} in {origin_folder} was deleted.")
 
                 else:
-                    stderr.print(
-                        f"Uncompressed service {place.split('/')[-1]} NOT FOUND in the folder {'/'.join(place.split('/')[:-1])}"
-                    )
+                    stderr.print(f"For service {service}, the compressed directory was found in the {origin_folder}, but NOT in the {destiny_folder} (and therefore, it cannot be deleted). Uncompressed directory was NOT found in {origin_folder}, so it should not be deleted either.")
+                    log.info(f"Service {service}: compressed directory in {origin_folder} was found, but NOT deleted, due to absence of the uncompressed directory. Compressed directory in {destiny_folder} could not be deleted because it was not found.")
+            elif not (os.path.exists(origin + ".tar.gz")) and (os.path.exists(destiny + ".tar.gz")):
+                if os.path.exists(destiny):
+                    stderr.print(f"For service {service}, the compressed directory was NOT found in the {origin_folder} (and therefore, it cannot be deleted), but it WAS FOUND in the {destiny_folder}. Uncompressed directory was found in the {destiny_folder}, so it can be deleted.")
+                    log.info(f"Service {service}: compressed directory in {origin_folder} was NOT found, and could not be deleted. Compressed directory in {destiny_folder} was FOUND and DELETED due to presence of the uncompressed directory.")
+               
+                else:
+                    stderr.print(f"For service {service}, the compressed directory was NOT found in the {origin_folder} (and therefore, it cannot be deleted), but it WAS FOUND in the {destiny_folder}. Uncompressed directory was NOT found in the {destiny_folder}, so it should not be deleted either.")
+                    log.info(f"Service {service}: compressed directory in {origin_folder} was NOT found, and could not be deleted. Compressed directory in {destiny_folder} was FOUND, but NOT DELETED due to absence of the uncompressed directory.")
+            else: 
+                stderr.print(f"For service {service}, NONE of the compressed directories was found (therefore, they cannot be deleted).")
+                log.info(f"Service {service}: neither of the compressed directories was found, and therefore they couldnt be deleted.")
+                deleted_services["None"].append(service)
 
-                    if (
-                        bu_isciii.utils.prompt_selection(
-                            "What to do?", ["Skip deletion", "Delete anyways"]
-                        )
-                        == "Skip deletion"
-                    ):
-                        non_deleted_services.append(place.split("/")[-1])
-                        continue
-                    else:
-                        os.remove(place + ".tar.gz")
 
-        stderr.print(
-            f"Deleted {2*len(self.services_to_move) - len(non_deleted_services)} compressed services."
-        )
-        if len(non_deleted_services) > 0:
-            stderr.print(
-                f"{len(non_deleted_services)} compressed services could not be deleted: {', '.join(non_deleted_services)}"
-            )
+        stderr.print(f"Deleted {len(deleted_services)} compressed services: {', '.join(deleted_services)}")
+        log.info(f"{len(deleted_services)} compressed services were deleted: {', '.join(deleted_services)}")
 
+        if len(non_deleted_services_not_found) > 0:
+            stderr.print(f"{len(non_deleted_services)} compressed services could not be deleted: {', '.join(non_deleted_services)}")
+            log.info(f"{len(non_deleted_services)} services were not deleted")
         return
 
     def delete_non_archived_dirs(self):
