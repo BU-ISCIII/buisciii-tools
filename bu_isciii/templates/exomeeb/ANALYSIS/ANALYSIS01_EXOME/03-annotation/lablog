@@ -1,47 +1,50 @@
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP_ENSG_gene_GRCh37.txt .
-mkdir vep
-mkdir exomiser
-mkdir logs
+mkdir -p vep
+mkdir -p exomiser
+mkdir -p logs
 
-#--------------------------------------------------------------------------------------------------------
-# 1. Lablog to modify VCF ID field before running VEP.
-cat ../../samples_id.txt | xargs -I @@ echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/@@_variants_fil.vcf > ./vep/@@_variants_fil_mod.vcf" > _01_vcfmod.sh
-cat ../../samples_id.txt | xargs -I @@ echo "sed -i 's/\t$//' ./vep/@@_variants_fil_mod.vcf" >> _01_vcfmod.sh
+# module load BCFtools/1.12-GCC-10.2.0
+# module load VEP/103.1-GCC-10.2.0
+# module load R/4.2.1
+# module load Java/1.8.0_281
+
+# 1 . Lablog to modify VCF ID field before running VEP.
+echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
+echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> _01_bcftools_query.sh
 
 # 2-3. Create variant table.
-#conda activate nf-core-sarek-2.7.1
-cat ../../samples_id.txt | xargs -I @@ echo "bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ./vep/@@_variants_fil_mod.vcf > ./vep/@@_variants.table" > _run_02_bcftools_query.sh
-cat ../../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.@@.%j.log --job-name BCFTOOLSQUERY bash _run_02_bcftools_query.sh &" > _02_bcftools_query.sh
-cat ../../samples_id.txt | xargs -I @@ echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/@@_variants.table;sed -i 's/:/_/g' ./vep/@@_variants.table;sed -i 's/ //g' ./vep/@@_variants.table;sed -i 's/\t*$//g' ./vep/@@_variants.table " > _03_variant_table.sh
+
+echo "bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ./vep/variants_fil_mod.vcf > ./vep/variants.table" >> _01_bcftools_query.sh
+echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table " >> _01_bcftools_query.sh
+
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
 
 ## 4-5. Lablog for annotating whole genome samples using Variant Effect Predictor (VEP).
-##conda activate vep
 
-cat ../../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --mem 100G --time 4:00:00 --chdir ${scratch_dir} --output logs/VEP.@@.%j.log --job-name VEP vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ./vep/@@_variants_fil_mod.vcf -o ./vep/@@_vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab --plugin dbNSFP,/data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP4.1a_grch37.gz,clinvar_id,clinvar_trait,clinvar_OMIM_id,clinvar_Orphanet_id,HGVSc_snpEff,HGVSp_snpEff,SIFT_score,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_pred,MutationTaster_score,MutationTaster_pred,MutationAssessor_score,MutationAssessor_pred,FATHMM_score,FATHMM_pred,PROVEAN_score,PROVEAN_pred,VEST4_score,MetaSVM_score,MetaSVM_pred,MetaLR_score,MetaLR_pred,CADD_raw,CADD_phred,CADD_raw_hg19,CADD_phred_hg19,GERP++_NR,GERP++_RS,phyloP100way_vertebrate,phastCons100way_vertebrate &" > _04_vep_annotation.sh
-cat ../../samples_id.txt | xargs -I @@ echo "grep -v '^##' ./vep/@@_vep_annot.vcf > ./vep/@@_vep_annot_head.txt" > _05_mod_vcf_vep.sh
-cat ../../samples_id.txt | xargs -I @@ echo "sed -i 's/#Uploaded_variation/ID/' ./vep/@@_vep_annot_head.txt" >> _05_mod_vcf_vep.sh
+echo "srun --partition short_idx --mem 100G --time 4:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ./vep/variants_fil_mod.vcf -o ./vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab --plugin dbNSFP,/data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP4.1a_grch37.gz,clinvar_id,clinvar_trait,clinvar_OMIM_id,clinvar_Orphanet_id,HGVSc_snpEff,HGVSp_snpEff,SIFT_score,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_pred,MutationTaster_score,MutationTaster_pred,MutationAssessor_score,MutationAssessor_pred,FATHMM_score,FATHMM_pred,PROVEAN_score,PROVEAN_pred,VEST4_score,MetaSVM_score,MetaSVM_pred,MetaLR_score,MetaLR_pred,CADD_raw,CADD_phred,CADD_raw_hg19,CADD_phred_hg19,GERP++_NR,GERP++_RS,phyloP100way_vertebrate,phastCons100way_vertebrate &" > _02_vep_annotation.sh
+
+echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" > _03_merge_data1.sh
+echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_merge_data1.sh
 
 # 6. Merge the output generated by VEP with dbNSFP_ENSG_gene_compl.txt
-cp /data/bi/services_and_colaborations/IIER/human_genetics/SRVIIER336_20210715_EXOMAEB30_bmartinezd_S/ANALYSIS/20210721_ANALYSIS01_EXOME/03-annotation/merge_dbNFSP.R .
-#conda activate nf-core-sarek-2.7.1
-cat ../../samples_id.txt | xargs -I % echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEDBNFSP.%.%j.log --job-name MERGEDBNFSP Rscript merge_dbNFSP.R ./vep/%_vep_annot_head.txt ./dbNSFP_ENSG_gene_GRCh37.txt &" > _06_merge_dbnsfp_R.sh
+
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEDBNFSP.log --job-name MERGEDBNSFP Rscript merge_dbNSFP.R ./vep/vep_annot_head.txt ./dbNSFP_ENSG_gene_GRCh37.txt &" >> _03_merge_data1.sh
 
 # 7. Once we have merged Vep output with gene notation from dbNSFP,we have to merge again with variants.table file.
-cp /data/bi/services_and_colaborations/IIER/human_genetics/SRVIIER336_20210715_EXOMAEB30_bmartinezd_S/ANALYSIS/20210721_ANALYSIS01_EXOME/03-annotation/merge_parse.R .
-#conda activate nf-core-sarek-2.6-fix-gatk
-cat ../../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.@@.%j.log --job-name MERGEPARSE.@@ Rscript merge_parse.R ./vep/@@_variants.table ./vep/vep_dbNSFP.txt &" > _07_merge_vcf_R.sh
 
-# 8. Consequence filtering
-echo 'grep -P "(HIGH|MODERATE)" ./vep/variants_annot_all.tab > ./vep/variants_annot_highModerate.tab ' > _08_conseq_filtering.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt &" >> _04_merge_data2.sh
 
 # 9. Running exomiser
-#module load Java/1.8.0_281
-cp /data/bi/pipelines/exomiser/exomiser-cli-12.1.0/exomiser_configfile_template.yml exomiser_configfile.yml
-OUTPUTPATH=$(cat ../samples_id.txt | xargs -I % echo "${scratch_dir}/exomiser/%_exomiser")
-VCFPATH=$(find ${scratch_dir}/../02-postprocessing -name "*_variants_fil.vcf")
-echo "sed -i \"s|##OUTPUTPATH##|${OUTPUTPATH}|g\" ./exomiser_configfile.yml" | bash
-echo "sed -i \"s|##VCF_PATH##|${VCFPATH}|g\" ./exomiser_configfile.yml" | bash
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+bed_file=$(realpath /data/bi/references/eukaria/homo_sapiens/hg19/Illumine_Exome_CEX_TargetedRegions/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed")
+output_folder=$(realpath ./exomiser/exomiser | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-echo "srun --partition short_idx --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-12.1.0 --output logs/EXOMISER.%j.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-12.1.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _09_exomiser_exome.sh
+sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
+sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile.yml
+sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
+sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile.yml
+sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
+
+echo "srun --partition short_idx --nodelist ideafix03 --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-12.1.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-12.1.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _05_exomiser_exome.sh
