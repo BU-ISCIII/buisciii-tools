@@ -232,7 +232,7 @@
         "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates/{sample_name}"],
         "files":[]
       },
-      "no_copy": ["RAW", "TMP", "00-reads"],
+      "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "delivery_pdf": ""
@@ -246,10 +246,10 @@
       "end": "",
       "description": "",
       "clean": {
-        "folders":["01-sarek/preprocessing/markduplicates/{sample_name}"],
+        "folders":["01-sarek/preprocessing/markduplicates/{sample_name}", "02-postprocessing"],
         "files":[]
       },
-      "no_copy": ["RAW", "TMP", "00-reads", "02-postprocessing"],
+      "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "delivery_pdf": ""
