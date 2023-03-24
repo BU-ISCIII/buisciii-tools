@@ -37,7 +37,7 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt &" >> _04_merge_data2.sh
 
 # 8. Consequence filtering
-echo 'grep -P "(HIGH|MODERATE)" ./vep/variants_annot_all.tab > ./vep/variants_annot_highModerate.tab ' > _05_conseq_filtering.sh
+echo 'grep -P "(HIGH|MODERATE)" ./variants_annot_all.tab > ./variants_annot_highModerate.tab ' > _05_conseq_filtering.sh
 
 # 9. Running exomiser
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
