@@ -117,4 +117,4 @@ outputOptions:
     # alternatively, specify a fully qualifed path only. e.g. /users/jules/exomes/analysis
     outputPrefix: OUTPUT_FOLDER
     #out-format options: HTML, JSON, TSV_GENE, TSV_VARIANT, VCF (default: HTML)
-    outputFormats: [HTML, JSON, TSV_GENE, TSV_VARIANT, VCF]
+    outputFormats: [HTML]
