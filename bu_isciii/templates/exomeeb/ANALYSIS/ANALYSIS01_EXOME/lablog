@@ -33,7 +33,6 @@ nextflow run /data/bi/pipelines/nf-core-sarek-3.1.1/workflow/main.nf \\
 	  --tools 'haplotypecaller' \\
           --save_reference \\
           --joint_germline \\
-          --save_mapped \\
 	  -resume
 EOF
 
