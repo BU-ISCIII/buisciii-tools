@@ -41,13 +41,9 @@ echo 'grep -P "(HIGH|MODERATE)" ./variants_annot_all.tab > ./variants_annot_high
 
 # 9. Running exomiser
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-bed_file=$(realpath /data/bi/references/eukaria/homo_sapiens/hg19/Illumine_Exome_CEX_TargetedRegions/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed")
 output_folder=$(realpath ./exomiser/exomiser | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
-sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile.yml
-sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
-sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
 echo "srun --partition short_idx --nodelist ideafix03 --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-12.1.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-12.1.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _06_exomiser_exome.sh
