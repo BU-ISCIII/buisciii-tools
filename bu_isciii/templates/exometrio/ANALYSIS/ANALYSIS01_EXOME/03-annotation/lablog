@@ -8,7 +8,7 @@ mkdir -p logs
 # module load BCFtools/1.12-GCC-10.2.0
 # module load VEP/103.1-GCC-10.2.0
 # module load R/4.2.1
-# module load Java/1.8.0_281
+# module load Java/17.0.2.lua
 
 # 1 . Lablog to modify VCF ID field before running VEP.
 echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
@@ -50,11 +50,11 @@ sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
 sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
-echo "srun --partition short_idx --nodelist ideafix03 --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-12.1.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-12.1.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _05_exomiser_exome.sh
+echo "srun --partition short_idx --nodelist ideafix03 --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _05_exomiser_exome.sh
 
 #---------------------------------------------------------------------------------------------------------
 
-## Lablog to modify the output reported by exomiser and create a final file with a personalized format. WGS
+## Lablog to modify the output reported by exomiser and create a final file with a personalized format.
 
 # Grep variant id for each inheritance model
 cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./id_%.txt " > _06_filter_heritance.sh
