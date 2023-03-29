@@ -43,7 +43,6 @@ echo 'grep -P "(HIGH|MODERATE)" ./variants_annot_all.tab > ./variants_annot_high
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 output_folder=$(realpath ./exomiser/exomiser | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
