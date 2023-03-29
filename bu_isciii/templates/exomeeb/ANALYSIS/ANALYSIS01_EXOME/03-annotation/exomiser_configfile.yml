@@ -6,8 +6,8 @@ analysis:
     # hg19 or hg38 - ensure that the application has been configured to run the specified assembly otherwise it will halt.
     genomeAssembly: hg19
     vcf: VCF_FILE
-    #ped: PED_FILE
-    #proband: PROBAND
+    ped: PED_FILE
+    proband: PROBAND
     hpoIds:
     # These are the default settings, with values representing the maximum minor allele frequency in percent (%) permitted for an
     # allele to be considered as a causative candidate under that mode of inheritance.
@@ -15,16 +15,16 @@ analysis:
     # or X_RECESSIVE ensure *both* relevant HOM_ALT and COMP_HET modes are present.
     # In cases where you do not want any cut-offs applied an empty map should be used e.g. inheritanceModes: {}
     inheritanceModes: {
-            AUTOSOMAL_DOMINANT: 0.1,
-            AUTOSOMAL_RECESSIVE_HOM_ALT: 0.1,
-            AUTOSOMAL_RECESSIVE_COMP_HET: 2.0,
-            X_DOMINANT: 0.1,
-            X_RECESSIVE_HOM_ALT: 0.1,
-            X_RECESSIVE_COMP_HET: 2.0,
-            MITOCHONDRIAL: 0.2
+            AUTOSOMAL_DOMINANT: 100.0,
+            AUTOSOMAL_RECESSIVE_HOM_ALT: 100.0,
+            AUTOSOMAL_RECESSIVE_COMP_HET: 100.0,
+            X_DOMINANT: 100.0,
+            X_RECESSIVE_HOM_ALT: 100.0,
+            X_RECESSIVE_COMP_HET: 100.0,
+            MITOCHONDRIAL: 100.0
     }
     #FULL or PASS_ONLY
-    analysisMode: FULL
+    analysisMode: PASS_ONLY
     #Possible frequencySources:
     #Thousand Genomes project http://www.1000genomes.org/
     #   THOUSAND_GENOMES,
