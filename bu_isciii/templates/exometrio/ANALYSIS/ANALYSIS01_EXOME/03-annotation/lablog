@@ -37,7 +37,6 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt &" >> _04_merge_data2.sh
 
 # 9. Running exomiser
-cp ./exomiser_configfile_template.yml ./exomiser_configfile.yml
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
