@@ -43,9 +43,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     lower_limit_year = initial_year if previous_date is None else previous_date.year
 
     # Range: lower_limit_year - current year
-    year = bu_isciii.utils.prompt_year(
-        lower_limit=lower_limit_year, upper_limit=datetime.date.today().year
-    )
+    year = bu_isciii.utils.prompt_year(lower_limit=lower_limit_year, upper_limit=datetime.date.today().year)
 
     # Limit the list to the current month if year = current year
     # This could be a one-liner:
@@ -54,9 +52,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     if year < datetime.date.today().year:
         month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:]
     else:
-        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][
-            1 : datetime.date.today().month + 1
-        ]
+        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1 : datetime.date.today().month + 1]
 
     # If there is a previous date
     # and year is the same as before, limit the quantity of months
@@ -72,7 +68,6 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
         .strip()
         .split(": ")
     )
-
     # For the day, use "calendar":
     # calendar.month(year, month) returns a string with the calendar
     # Use replace to move the "\n"
@@ -81,14 +76,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     # Do not get the 9 first elements bc they are:
     # "Month", "Year", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
 
-    day_list = list(
-        filter(
-            None,
-            calendar.month(year, int(chosen_month_number))
-            .replace("\n", " ")
-            .split(" "),
-        )
-    )[9:]
+    day_list = list(filter(None,calendar.month(year, int(chosen_month_number)).replace("\n", " ").split(" "),))[9:]
 
     # if current month and day, limit the options to the current day
     if (
@@ -98,23 +86,18 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
         day_list = day_list[: datetime.date.today().day]
 
     # if previous date  & same year & same month, limit days
-    if (
-        previous_date is not None
-        and year == previous_date.year
-        and chosen_month_number == previous_date.month
-    ):
+    if (previous_date is not None and year == previous_date.year and chosen_month_number == previous_date.month):
         day_list = day_list[previous_date.day - 1 :]
 
     # from the list, get the first and last item as limits for the function
-    day = bu_isciii.utils.prompt_day(
-        lower_limit=int(day_list[0]), upper_limit=int(day_list[-1])
-    )
+    day = bu_isciii.utils.prompt_day(lower_limit=int(day_list[0]), upper_limit=int(day_list[-1]))
 
     return datetime.date(int(year), int(chosen_month_number), int(day))
 
 
-def validate_date(date, previous_date=None):
-    pass
+def validate_date(date_previous, date_posterior):
+
+        
 
     return
 
@@ -208,22 +191,27 @@ def get_md5(file):
     return file_md5
 
 
-def generate_tsv_table(indict, filename):
+def generate_tsv_table(indict, chosen_filename):
 
     """
     Create a csv file containing the info for each service
     """
 
-    if os.path.exists(filename):
-        log.info(f"Updating {filename} TSV table.")
+    if os.path.exists(chosen_filename):
+        new_filename = filename.split(".")[0] + ".tsv"
+        stderr.print(f"A tsv file named {chosen_filename} has already been found. Changing name to {new_filename}.")
+        log.info(f"A tsv file named {chosen_filename} has already been found. Name changed to {new_filename}".)
     else:
-        log.info(f"Generating TSV table to: {filename}")
-    
+        stderr.print(f"Generating TSV table to: {chosen_filename}")
+        log.info(f"STARTING: Generation of TSV table to: {chosen_filename}")
+        filename = chosen_filename
+
     with open(filename, "w") as infile:
 
         csv_dict =  {
                         "Service ID" : None,
                         "Found on iSkyLIMS": None,
+                        "Delivery date": None,
                         "Path in archive": None,
                         "Found on archive": None,
                         "Uncompressed size in archive": None,
@@ -245,7 +233,8 @@ def generate_tsv_table(indict, filename):
         for service in indict.keys():
             csv_dict["Service ID"] = service
             csv_dict["Found on iSkyLIMS"] = "Found on iSkyLIMS" if indict[service]["found_in_system"] is True else "NOT found on iSkyLIMS"
-            
+            csv_dict["Delivery date"] = "" 
+
             # Fields for archive
             csv_dict["Path in archive"] = indict[service]["archived_path"] if indict[service]["archived_path"] is not None else "Archived path could not be generated"
             csv_dict["Found in archive"] = "Yes" if "Archive" in indict[service]["found"] else "Not found in archive"
@@ -267,6 +256,9 @@ def generate_tsv_table(indict, filename):
             csv_dict["Deletion process"] = indict[service]["deleted"]
 
             infile.write("\t".join(list(indict.values())))
+            stderr.print(f"Added service {service} to the TSV file")
+            log.info(f"Service {service} added successfully to TSV file named {filename}")
+    log.info(f"FINISHED: Generation of TSV table to: {filename}")
 
     return
 
@@ -276,13 +268,14 @@ class Archive:
     of a service
     """
 
-    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None):
+    def __init__(self, service_id=None, ser_type=None, option=None, api_pass=None, skipt_prompts=False, initial_date=None, final_date=None):
         # resolution_id = resolution name (SRVCNM656)
         # ser_type = services_and_colaborations // research
         # option = archive/retrieve
 
         dictionary_template = {
                 "found_in_system": "",
+                "delivery_date": "",
                 "archived_path": "",
                 "non_archived_path": "",
                 "archived_size": int(),
@@ -295,9 +288,24 @@ class Archive:
                 "compressed": "No compression performed",
                 "moved": "No movement performed",
                 "uncompressed": "No uncompression performed",
-                "deleted": "No deletion performed"
+                "deleted": "No deletion performed",
+                "error_status": "No errors detected",
             }
 
+        if ((initial_date is None) and (final_date is not None)) or ((initial_date is not None) and (final_date is None)):
+            stderr.print(f"Initial date was {("not" if initial_date is None else "")} set, but Final date was {("not" if final_date is None else "")}. Please provide both!")
+            sys.exit() 
+        
+        if ((initial_date is not None) and (final_date is not None) and (service_id is not None)):
+            stderr.print("Both a date and a service ID have been chosen. Which one would you like to keep?")
+            prompt_response = bu_isciii.utils.prompt_selection("Date or Service ID?",["Search by date", "Search by ID"],)
+            if (prompt_response) == "Search by date":
+                initial_date = None
+                final_date = None
+            else:
+                service_id = None
+
+        self.skip_prompts = skip_prompts
         self.type = ser_type
         self.option = option
 
@@ -306,7 +314,7 @@ class Archive:
         #  service_id : copy.deepcopy(dictionary_template)
         self.services = {
             service_id: { key : value for key, value in dictionary_template.items() }
-        }
+        } if service_id is not None else dict()
 
         # LOG: called the archive repository
         log.info("Activated archive module of the bu-isciii tools")
@@ -325,7 +333,8 @@ class Archive:
 
         log.info(f"Service type chosen: {self.type}")
 
-        if (bu_isciii.utils.prompt_selection("Search services by date, or by resolution ID?",["Search by date", "Resolution ID"],) == "Search by date"):
+        prompt_response = bu_isciii.utils.prompt_selection("Search services by date, or by resolution ID?",["Search by date", "Resolution ID"],)
+        if (prompt_response == "Search by date"):
             log.info(f"Services chosen by: date")
             
             stderr.print("Please state the initial date for filtering")
@@ -341,27 +350,26 @@ class Archive:
                 for service in rest_api.get_request(request_info="services", safe=False, state="delivered", date_from=str(self.date_from), date_until=str(self.date_until),):
                     self.services[service["serviceRequestNumber"]] = { key : value for key, value in dictionary_template.items() }
                     self.services[service["serviceRequestNumber"]]["found_in_system"] = True
+                    self.services[service["serviceRequestNumber"]]["delivery_date"] = service["serviceOnDeliveredDate"] 
 
                 log.info(f"Services found in the time interval: {len(self.services)}")
                 log.info(f"Names of the services found in said interval: {','.join([service for service in self.services.keys()])}")
-            
+                
             except TypeError:
                 stderr.print("Could not connect to the API (wrong password?)", style="red")
                 log.error("Connection to the API was not successful. Possible reasons: wrong API password, bad connection.")
                 sys.exit(1)
-
         else:
             log.info(f"Services chosen by: ServiceID")
-
-            if len(self.services.keys()) == 1 and list(self.services.keys())[0] is None:
+            if len(self.services.keys()) == 0:
                 new_service = bu_isciii.utils.prompt_service_id()
                 self.services = {new_service: {key : value for key, value in dictionary_template.items()}}
-                
                 log.info(f"Chosen service: {new_service} (chosen through prompt)")
    
             # Ask if more services will be chosen
             while True:
-                if (bu_isciii.utils.prompt_selection("Would you like to add any other service?",["Add more services", "Do not add more services"],) == "Do not add more services"):
+                prompt_response = bu_isciii.utils.prompt_selection("Would you like to add any other service?",["Add more services", "Do not add more services"],)
+                if (prompt_response == "Do not add more services"):
                     break
                 else:
                     new_service = bu_isciii.utils.prompt_service_id()
@@ -547,8 +555,14 @@ class Archive:
                 compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
                 stderr.print(f"Seems like service {service} has already been compressed in the {location_check} dir\nPath: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB\nFound compressed size: {compressed_size:.3f} GB")
                 
-                if (bu_isciii.utils.prompt_selection("What to do?",["Just skip it",f"Delete previous {service + '.tar.gz'} and compress again",],)) == "Just skip it":
-                    
+                prompt_response = bu_isciii.utils.prompt_selection("What to do?",["Just skip it",f"Delete previous {service + '.tar.gz'} and compress again",],)
+                if (prompt_response.startswith("Delete")) or (self.skip_prompts):
+                    if (self.skip_prompts):
+                        log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. Automatically chosen to DELETE it (no-prompt option activated). Compression process will be performed again.")
+                    else:
+                        log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose to DELETE it through prompt. Compression process will be performed again.")
+                        os.remove(dir_to_tar + ".tar.gz")
+                else:
                     if direction == "archive":
                         self.services[service]["non_archived_compressed_size"] = compressed_size
                         self.services[service]["compressed"] = "Found already compressed in the data directory"
@@ -559,18 +573,27 @@ class Archive:
                         log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found in the archive directory. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt.")   
                     
                     total_initial_size += initial_size
-                    total_compressed_size += compressed size
+                    total_compressed_size += compressed_size
                     continue
-                else:
-                    log.info(f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found. Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB. User chose to DELETE it through prompt. Compression process will be performed again.")
-                    os.remove(dir_to_tar + ".tar.gz")
-            
+
             stderr.print(f"Compressing service {service}")
 
-            targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
+            try:
+                targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
+            except Exception as e:
+                stderr.print(f"Compression of service {service} had an error and couldnt be ended. Deleting compressed file and skipping to the next one.")
+                
+                if os.path.exists(dir_to_tar + ".tar.gz"):
+                    os.remove(dir_to_tar + ".tar.gz")
+                
+                log.info(f"Service {service}: when compressing, a {e} error arised. Ending compression, deleting compressed file and skipping to the next service.")
+                self.services[service]["error_status"] = f"Error while compressing the directory: {e}"
+                
+                
+                continue
             compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
             
-            if direction == "archive"
+            if direction == "archive":
                 self.services[service]["non_archived_compressed_size"] = compressed_size
             else:
                 self.services[service]["archived_compressed_size"] = compressed_size
@@ -595,11 +618,11 @@ class Archive:
         stderr.print(f"Total compressed size: {total_compressed_size:.3f} GB")
         stderr.print(f"Saved space: {total_initial_size - total_compressed_size:.3f} GB")
         stderr.print(f"Newly compressed services: {', '.join(newly_compressed_services)}")
-        stderr.print(f"Already compressed services: {', ',join(already_compressed_services)}")
+        stderr.print(f"Already compressed services: {', '.join(already_compressed_services)}")
 
         log.info(f"Compression progress for {direction} finished: {len(newly_compressed_services + already_compressed_services)} services were compressed ({len(newly_compressed_services)} newly compressed, {len(already_compressed_services)} already compressed). Total initial size: {total_initial_size:.3f} GB. Total compressed size: {total_compressed_size:.3f} GB. Saved space: {total_initial_size - total_compressed_size:.3f} GB.")
         log.info(f"Newly compressed services: {', '.join(newly_compressed_services)}")
-        log.info(f"Already compressed services: {', ',join(already_compressed_services)}")
+        log.info(f"Already compressed services: {', '.join(already_compressed_services)}")
         log.info(f"FINISHED: Compression of services in the {('Archive' if direction == 'archive' else 'Data')} dir for {direction}.")
         
         return
@@ -622,14 +645,22 @@ class Archive:
                 stderr.print(f"{origin.split('/')[-1] + 'tar.gz'} was not found in the origin directory ({'/'.join(origin.split('/')[:-1])}")
                 if os.path.exists(origin):
                     stderr.print(f"Origin path {origin} was found. Please make sure this directory has been compressed.")
-                    if (bu_isciii.utils.prompt_selection("What to do", ["Skip it", "Exit"]) == "Exit"):
+
+                    prompt_response = bu_isciii.utils.prompt_selection("What to do", ["Skip it", "Exit"]
+                    if (prompt_response == "Skip it") or (self.skip_prompts):
+                        if (self.skip_prompts):
+                            stderr.print(f"Skipping service {service} automatically (option skip-prompts activated)")
+                            log.info(f"Service {service}: compressed file {origin + '.tar.gz'} was not found. Skipped automatically (option skip-prompts activated).")
+                        else:
+                            stderr.print(f"Skipping service {service}")
+                            log.info(f"Service {service}: compressed file {origin + '.tar.gz'} was not found. Skipped by user through prompt.")
+                        continue
+
+                    else:
                         stderr.print("Exiting")
                         log.info(f"Execution ended by user through prompt after service {service} compressed {origin + '.tar.gz'} file was not found in the {direction} process.")
                         sys.exit(0)
-                    else:
-                        stderr.print(f"Skipping service {service}")
-                        log.info(f"Service {service}: compressed file {origin + '.tar.gz'} was not found. Skipped by user through prompt.")
-                        continue
+
                 else:
                     stderr.print(f"Origin path {origin} was not found either. Skipping.")
                     log.info(f"Service {service}: neither compressed path ({origin + '.tar.gz'}) or uncompressed path ({origin}) could be found. Skipping.")
@@ -638,13 +669,21 @@ class Archive:
             # If compresed destiny exists
             if os.path.exists(destiny + ".tar.gz"):
                 stderr.print(f"Seems like service ({service}) has already been {direction + 'd'}.")
-                if (bu_isciii.utils.prompt_selection("What to do?",[f"Remove it and {direction} it again", "Ignore this service"],)) == "Ignore this service":
+                prompt_response = bu_isciii.utils.prompt_selection("What to do?",[f"Remove it and {direction} it again", "Ignore this service"],)
+                if ("Remove" in prompt_response) or (self.skip_prompts):
+                    if (self.skip_prompts):
+                        stderr.print(f"Removing {destiny + '.tar.gz'} automatically (option skip-prompts activated).")
+                        log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. File removed automatically (option skip-prompts activated), with intention to be copied again.")
+                    else:
+                        stderr.print(f"Removing {destiny + '.tar.gz'} automatically by user through prompt.")
+                        log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. File was removed by user instruction through prompt, with intention to be copied again.")
+                    
+                    os.remove(destiny + ".tar.gz")
+                    stderr.print(f"Removed successfully")
+                else:
                     log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. Transference skipped by user through prompt.")
                     continue
-                else:
-                    os.remove(destiny + ".tar.gz")
-                    log.info(f"Service {service}: already found in {destiny + '.tar.gz'}. File was removed by user instruction through prompt, with intention to be copied again.")
-
+            
             origin_md5 = get_md5(origin + ".tar.gz")
             
             # save origin md5
@@ -672,7 +711,7 @@ class Archive:
                     stderr.print(f"[red] ERROR: Service {service}: Data copied from its origin folder ({origin}) to its destiny folder ({destiny}), but MD5 did not match (Origin MD5: {origin_md5}; Destiny MD5: {destiny_md5}).")
                     log.info(f"Service {service}: data copied from its origin folder ({origin}) to its destiny folder ({destiny}), but MD5 did not match (Origin MD5: {origin_md5}; Destiny MD5: {destiny_md5}).")
                     self.services[service]["moved"] = f"Moved (direction: {direction}), MD5 NOT MATCHING."
-            except OSError as e:
+            except Exception as e:
                 stderr.print(f"[red] ERROR: {origin.split('/')[-1] + '.tar.gz'} could not be copied to its destiny archive folder, {destiny}.",highlight=False,)
                 log.error(f"Directory {origin} could not be archived to {archived_path}.Reason: {e}")
         
@@ -715,15 +754,24 @@ class Archive:
             else:
                 if os.path.exists(dir_to_untar):
                     stderr.print(f"Service {service} is already uncompressed in the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}")
-                    if (bu_isciii.utils.prompt_selection("What to do?",["Skip (dont uncompress)",f"Delete uncompressed {service} and uncompress again",],)== "Skip (dont uncompress)"):
+                    
+                    prompt_response = bu_isciii.utils.prompt_selection("What to do?",["Skip (dont uncompress)",f"Delete uncompressed {service} and uncompress again",],)
+                    
+                    if (prompt_response.startswith("Delete")) or (self.skip_prompts):
+                        if (self.skip_prompts):
+                            stderr.print(f"Deleting uncompressed service {service} automatically (option skip-prompts activated)")
+                            log.info(f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. Delete the uncompressed service automatically (option skip-prompt activated) to uncompress it again.")
+                        else:
+                            stderr.print(f"Deleting uncompressed service {service} by user choice through prompt")
+                            log.info(f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. User decided to delete the uncompressed service through prompt to uncompress it again.")
+                        shutil.rmtree(dir_to_untar)
+                        stderr.print("Deleted!")
+                    else:
                         already_uncompressed_services.append(service)
                         self.services[service]["uncompressed"] = f"Was not uncompressed due to the presence of a previously uncompressed directory"
                         log.info(f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. User decided to skip uncompression through prompt.")
                         continue
-                    else:
-                        shutil.rmtree(dir_to_untar)
-                        log.info(f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. User decided to delete the uncompressed service through prompt to uncompress it again.")
-
+                
                 stderr.print(f"Uncompressing {dir_to_untar.split('/')[-1] + '.tar.gz'}")
 
                 uncompress_targz_directory(dir_to_untar + ".tar.gz", dir_to_untar)
@@ -733,12 +781,12 @@ class Archive:
                 self.services[service]["uncompressed"] = "Uncompressed successfully"
                 successfully_uncompressed_services.append(service)
 
-        stderr.print(f"Uncompressed services: {len(successfully_uncompressed_services): {", ".join(successfully_uncompressed_services)}}.")
-        log.info(f"Uncompressed services: {len(successfully_uncompressed_services): {", ".join(successfully_uncompressed_services)}}.")
+        stderr.print(f"Uncompressed services: {len(successfully_uncompressed_services)}: {', '.join(successfully_uncompressed_services)}.")
+        log.info(f"Uncompressed services: {len(successfully_uncompressed_services)}: {', '.join(successfully_uncompressed_services)}.")
 
         if len(already_uncompressed_services) > 0:
             stderr.print(f"The following {len(already_uncompressed_services)} service directories were found compressed already: {', '.join(already_uncompressed_services)}")
-            log.info(f"Already compressed services: {len(already_compressed_services)}: {", ".join(already_uncompressed_services)}")
+            log.info(f"Already compressed services: {len(already_uncompressed_services)}: {', '.join(already_uncompressed_services)}")
         
         if len(not_found_compressed_services) > 0:
             stderr.print(f"The following {len(not_found_compressed_services)} services could not be uncompressed because the compressed service could not be found: {', '.join(not_found_compressed_services)}")
@@ -761,8 +809,8 @@ class Archive:
                             "Both": [],
                             "None": [],
                             }
-
-        file_locations = [[service, self.services[service]["non_archived_path"], self.services[service]["archived_path"]] for service in self.services.keys() if direction == 'archive' else [service, self.services[service]["archived_path"], self.services[service]["non_archived_path"]]  ]
+        
+        file_locations = [[service, self.services[service]["non_archived_path"], self.services[service]["archived_path"]] for service in self.services.keys()] if direction == 'archive' else [[service, self.services[service]["archived_path"], self.services[service]["non_archived_path"]] for service in self.services.keys()]
         origin_folder = "Data directory" if direction == "archive" else "Archive directory"
         destiny_folder = "Archive directory" if direction == "archive" else "Data directory"
 
@@ -869,67 +917,60 @@ class Archive:
         Handle archive class options
         """
 
-        if self.option == "Scout for service size":
+        if (self.option == "Scout for service size"):
             self.scout_directory_sizes()
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif self.option == "Full archive: compress and archive":
+        elif (self.option == "Full archive: compress and archive"):
             self.scout_directory_sizes()
             self.targz_directory(direction="archive")
             self.move_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
             self.delete_targz_dirs(direction="archive")
-            self.delete_non_archived_dirs()
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif self.option == "    Partial archive: compress NON-archived service":
+        elif (self.option.lstrip == "Partial archive: compress NON-archived service"):
             self.targz_directory(direction="archive")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif (
-            self.option
-            == "    Partial archive: archive NON-archived service (must be compressed first) and check md5"
-        ):
+        elif (self.option.lstrip() == "Partial archive: archive NON-archived service (must be compressed first) and check md5"):
             self.move_directory(direction="archive")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif (
-            self.option
-            == "    Partial archive: uncompress newly archived compressed service"
-        ):
+        elif (self.option.lstrip() == "Partial archive: uncompress newly archived compressed service"):
             self.uncompress_targz_directory(direction="archive")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif (
-            self.option
-            == "    Partial archive: remove compressed services from directories"
-        ):
+        elif (self.option.lstrip() == "Partial archive: remove compressed services from directories"):
             self.delete_targz_dirs(direction="archive")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif self.option == "Full retrieve: retrieve and uncompress":
+        elif (self.option == "Full retrieve: retrieve and uncompress"):
             self.targz_directory(direction="retrieve")
             self.move_directory(direction="retrieve")
             self.uncompress_targz_directory(direction="retrieve")
             self.delete_targz_dirs(direction="retrieve")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif self.option == "    Partial retrieve: compress archived service":
+        elif (self.option.lstrip() == "Partial retrieve: compress archived service"):
             self.targz_directory(direction="retrieve")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif (
-            self.option
-            == "    Partial retrieve: retrieve archived service (must be compressed first) and check md5"
-        ):
+        elif (self.option.lstrip() == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"):
             self.move_directory(direction="retrieve")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif self.option == "    Partial retrieve: uncompress retrieved service":
+        elif (self.option.lstrip() == "Partial retrieve: uncompress retrieved service"):
             self.uncompress_targz_directory(direction="retrieve")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif (
-            self.option
-            == "    Partial retrieve: remove compressed services from directories"
-        ):
+        elif (self.option.lstrip() == "Partial retrieve: remove compressed services from directories"):
             self.delete_targz_dirs(direction="retrieve")
+            generate_tsv_table(self.services, filename="prueba.txt")
 
-        elif (
-            self.option
-            == "Remove selected services from data dir (only if they are already in archive dir)"
-        ):
+        elif (self.option == "Remove selected services from data dir (only if they are already in archive dir)"):
             self.delete_non_archived_dirs()
+            generate_tsv_table(self.services, filename="prueba.txt")
 
         elif self.option == "That should be all, thank you!":
             sys.exit()
