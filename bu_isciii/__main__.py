@@ -120,12 +120,12 @@ class CustomHelpOrder(click.Group):
 )
 def bu_isciii_cli(verbose, log_file, api_token):
     # Set the base logger to output DEBUG
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
 
     # Set up logs to a file if we asked for one
     if log_file:
         log_fh = logging.FileHandler(log_file, encoding="utf-8")
-        log_fh.setLevel(logging.DEBUG)
+        log_fh.setLevel(logging.INFO)
         log_fh.setFormatter(
             logging.Formatter(
                 "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
@@ -447,11 +447,29 @@ def bioinfo_doc(
     type=click.Choice(["archive", "retrieve_from_archive"]),
     help="Select either you want to archive services or retrieve a service from archive.",
 )
+@click.option(
+    "-sp",
+    "--skip_prompts",
+    is_flag=True,
+    help="Avoid prompts (except on service choosing)"
+)
+@click.option(
+    "-id",
+    "--initial_date",
+    default=False,
+    help="The date from which start search (format 'YYYY-MM-DD')"
+)
+@click.option(
+    "-fd",
+    "--final_date",
+    default=False,
+    help="The date from which end search (format 'YYYY-MM-DD')"
+)
 def archive(resolution, type, option):
     """
     Archive services or retrieve services from archive
     """
-    archive_ser = bu_isciii.archive.Archive(resolution, type, option, api_pass)
+    archive_ser = bu_isciii.archive.Archive(resolution, type, option, api_pass, skip_prompts, initial_date, final_date)
     archive_ser.handle_archive()
 
 
