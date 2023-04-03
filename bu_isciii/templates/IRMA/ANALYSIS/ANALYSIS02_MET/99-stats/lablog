@@ -21,6 +21,4 @@ EOF
 
 echo "sbatch multiqc.sbatch" > _01_run_multiqc.sh
 
-cp /data/bi/services_and_colaborations/CNM/virology/SRVCNM585_20220223_SARSCOV279_icasas_S/ANALYSIS/20220223_ANALYSIS02_MET/99-stats/multiqc_config.yaml .
-
 echo "find -type l | while read in; do unlink \${in}; done" > _02_unlink.sh
