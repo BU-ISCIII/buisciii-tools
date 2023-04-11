@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Define fixed data variables
-RUN=$(ls -l ../../RAW/ | cut -d'/' -f4 | sort -u | grep -v 'total' | head -n1)
+RUN=$(ls -l ../../RAW/ | cut -d'/' -f4 | sort -u | grep -v 'total' | head -n1 | rev | cut -d " " -f 2- | rev)
 USER=$(pwd | cut -d '/' -f6 | cut -d '_' -f4)
 HOST=$(pwd | cut -d '/' -f8 | cut -d '_' -f4 | tr '[:upper:]' '[:lower:]' | sed 's/.*/\u&/')
 
 # Define header for output file
-HEADER="run\tuser\thost\tVirussequence\tsample\ttotalreads\treadshostR1\treadshost\t%readshost\treadsvirus\t%readsvirus\tunmappedreads\t%unmapedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\tVariantsinconsensusx10\tMissenseVariants\t%Ns10x\tLineage\tanalysis_date"
+HEADER="run\tuser\thost\tVirussequence\tsample\ttotalreads\treadshostR1\treadshost\t%readshost\treadsvirus\t%readsvirus\tunmappedreads\t%unmapedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\tVariantsinconsensusx10\tMissenseVariants\t%Ns10x\tLineage\tread_length\tanalysis_date"
 
 # Print header to output file
 echo -e $HEADER > mapping_illumina_$(date '+%Y%m%d').tab
@@ -42,8 +42,10 @@ do
     medianDPcov=$(echo "$metrics" | cut -d ',' -f8)
     cov10x=$(echo "$metrics" | cut -d ',' -f10)
 
+    read_length=$(cat ${arr[1]}*/multiqc/multiqc_data/multiqc_fastqc.yaml | grep -A5 "${arr[0]}_1:$" | grep "Sequence length:" | tr "-" " " | rev | cut -d " " -f1 | rev)
+
     analysis_date=$(date '+%Y%m%d')
 
     # Introduce data row into output file
-    echo -e "${RUN}\t${USER}\t${HOST}\t${arr[1]}\t${arr[0]}\t$total_reads\t$reads_hostR1\t$reads_host_x2\t$perc_mapped\t$reads_virus\t$reads_virus_perc\t$unmapped_reads\t$perc_unmapped\t$medianDPcov\t$cov10x\t$Ns_10x_perc\t$missense\t$n_count\t$lineage\t$analysis_date" >> mapping_illumina_$(date '+%Y%m%d').tab
+    echo -e "${RUN}\t${USER}\t${HOST}\t${arr[1]}\t${arr[0]}\t$total_reads\t$reads_hostR1\t$reads_host_x2\t$perc_mapped\t$reads_virus\t$reads_virus_perc\t$unmapped_reads\t$perc_unmapped\t$medianDPcov\t$cov10x\t$Ns_10x_perc\t$missense\t$n_count\t$lineage\t$read_length\t$analysis_date" >> mapping_illumina_$(date '+%Y%m%d').tab
 done
