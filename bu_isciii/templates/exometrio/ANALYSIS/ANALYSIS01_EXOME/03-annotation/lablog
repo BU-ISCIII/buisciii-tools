@@ -62,10 +62,6 @@ cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.v
 # Grep variants for each inheritance models from the full annotated variants file
 cat inheritance_types.txt | xargs -I % echo "grep -f ./id_%.txt ./variants_annot_all.tab > ./vep_annot_%.txt" >> _06_filter_heritance.sh
 
-# Copy the header template
-
-cp /data/bi/services_and_colaborations/IIER/human_genetics/SRVIIER267_20210312_WGSTRIO13_bmartinezd_S/ANALYSIS/20210312_ANALYSIS01_GENOME/05-annot_variants/header_vep_final_annot.txt .
-
 cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./vep_annot_%.txt > ./vep_annot_%_final.txt" >> _06_filter_heritance.sh
 
 echo "rm id_*" >> _06_filter_heritance.sh
