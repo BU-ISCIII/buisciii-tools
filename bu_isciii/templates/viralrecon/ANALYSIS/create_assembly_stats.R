@@ -51,7 +51,7 @@ for (i in 1:nrow(samples_ref)) {
     name_id <- as.character(samples_ref$id[i])
 
     # path outputfolder
-    directorios <- list.dirs()
+    directorios <- list.dirs(recursive = FALSE)
     patron_workdir <- paste0(name_sequence, "_", date_service)
     workdir <- directorios[grepl(patron_workdir, directorios)][1]
 
