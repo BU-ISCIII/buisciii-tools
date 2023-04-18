@@ -211,7 +211,7 @@ def generate_tsv_table(indict, chosen_filename):
     """
 
     if os.path.exists(chosen_filename):
-        new_filename = filename.split(".")[0] + ".tsv"
+        new_filename = chosen_filename.split(".")[0] + ".tsv"
         stderr.print(
             f"A tsv file named {chosen_filename} has already been found. Changing name to {new_filename}."
         )
@@ -337,7 +337,7 @@ class Archive:
         ser_type=None,
         option=None,
         api_pass=None,
-        skipt_prompts=False,
+        skip_prompts=False,
         initial_date=None,
         final_date=None,
     ):
@@ -435,7 +435,7 @@ class Archive:
             ["Search by date", "Resolution ID"],
         )
         if prompt_response == "Search by date":
-            log.info(f"Services chosen by: date")
+            log.info("Services chosen by: date")
 
             stderr.print("Please state the initial date for filtering")
             self.date_from = ask_date()
@@ -482,7 +482,7 @@ class Archive:
                 )
                 sys.exit(1)
         else:
-            log.info(f"Services chosen by: ServiceID")
+            log.info("Services chosen by: ServiceID")
             if len(self.services.keys()) == 0:
                 new_service = bu_isciii.utils.prompt_service_id()
                 self.services = {
@@ -553,7 +553,7 @@ class Archive:
                     f"NONE of the services chosen has been found: {','.join(not_found_services)}"
                 )
                 log.info(
-                    f"Execution ended automatically due to none of the chosen services being found"
+                    "Execution ended automatically due to none of the chosen services being found"
                 )
                 sys.exit(0)
             else:
@@ -644,22 +644,31 @@ class Archive:
 
         for service in self.services.keys():
             if len(self.services[service]["found"]) == 0:
-                size = "-"
+                stderr.print(
+                    f"For service {service}, no folders (archived: {self.services[service]['archived_path']} or non-archived: {self.services[service]['non_archived_path']}) could be found. Skipping"
+                )
+                continue
             elif len(self.services[service]["found"]) == 2:
                 if (
                     self.services[service]["archived_size"]
-                    != self.services[service]["non_archived_size"]
+                    == self.services[service]["non_archived_size"]
                 ):
                     stderr.print(
-                        f"For service {service}, archived size {self.services[service]['archived_size']} and non-archived size {self.services[service]['non_archived_size']} are equal"
+                        f"For service {service}, archived size ({self.services[service]['archived_size']} GB) and non-archived size ({self.services[service]['non_archived_size']} GB) are equal."
                     )
                 else:
-                    size = self.services[service]["non_archived_size"]
+                    stderr.print(
+                        f"For service {service}, archived size ({self.services[service]['archived_size']} GB) and non-archived size ({self.services[service]['non_archived_size']} GB) differ."
+                    )
             else:
                 if "Archive" in self.services[service]["found"]:
-                    size = self.services[service]["archived_size"]
+                    stderr.print(
+                        f"For service {service}, only archived was found, with size {self.services[service]['archived_size']} GB."
+                    )
                 elif "Data dir" in self.services[service]["found"]:
-                    size = self.services[service]["non_archived_size"]
+                    stderr.print(
+                        f"For service {service}, only non-archived was found, with size {self.services[service]['non_archived_size']} GB."
+                    )
 
             size_table.add_row(
                 str(service),
@@ -969,7 +978,7 @@ class Archive:
                         )
 
                     os.remove(destiny + ".tar.gz")
-                    stderr.print(f"Removed successfully")
+                    stderr.print("Removed successfully")
                 else:
                     log.info(
                         f"Service {service}: already found in {destiny + '.tar.gz'}. Transference skipped by user through prompt."
@@ -1027,7 +1036,7 @@ class Archive:
                     highlight=False,
                 )
                 log.error(
-                    f"Directory {origin} could not be archived to {archived_path}.Reason: {e}"
+                    f"Directory {origin} could not be archived to {destiny}.Reason: {e}"
                 )
 
         log.info(
@@ -1123,7 +1132,7 @@ class Archive:
                         already_uncompressed_services.append(service)
                         self.services[service][
                             "uncompressed"
-                        ] = f"Was not uncompressed due to the presence of a previously uncompressed directory"
+                        ] = "Was not uncompressed due to the presence of a previously uncompressed directory"
                         log.info(
                             f"Service {service}: service was already found uncompressed in the destiny folder {dir_to_untar}. User decided to skip uncompression through prompt."
                         )
@@ -1175,9 +1184,7 @@ class Archive:
 
         """
         deleted_services = {
-            "Only origin": [],
-            "Only destiny": [],
-            "Both": [],
+            "Deleted": [],
             "None": [],
         }
 
@@ -1226,7 +1233,7 @@ class Archive:
                     stderr.print(
                         f"Compressed files for service {service} (in both {origin_folder} and {destiny_folder}) were deleted."
                     )
-                    deleted_services["Both"].append(service)
+                    deleted_services["Deleted"].append(service)
 
                 elif (os.path.exists(origin)) and not (os.path.exists(destiny)):
                     stderr.print(
@@ -1263,7 +1270,7 @@ class Archive:
                     )
                 else:
                     stderr.print(
-                        f"For service {service}, compressed directories were found in the {origin_folder} and the {destiny_folder}. However, the uncompressed directories were not found in the {dorigin_folder} or the {destiny_folder}. Please make sure these services have been uncompressed first."
+                        f"For service {service}, compressed directories were found in the {origin_folder} and the {destiny_folder}. However, the uncompressed directories were not found in the {origin_folder} or the {destiny_folder}. Please make sure these services have been uncompressed first."
                     )
                     stderr.print(
                         f"Therefore, it is safe to delete the compressed service in {origin_folder}, but not in the {destiny_folder}"
@@ -1324,17 +1331,17 @@ class Archive:
                 deleted_services["None"].append(service)
 
         stderr.print(
-            f"Deleted {len(deleted_services)} compressed services: {', '.join(deleted_services)}"
+            f"Deleted {len(deleted_services['Deleted'])} compressed services: {', '.join(deleted_services['Deleted'])}"
         )
         log.info(
-            f"{len(deleted_services)} compressed services were deleted: {', '.join(deleted_services)}"
+            f"{len(deleted_services['Deleted'])} compressed services were deleted: {', '.join(deleted_services['Deleted'])}"
         )
 
-        if len(non_deleted_services_not_found) > 0:
+        if len(deleted_services["None"]) > 0:
             stderr.print(
-                f"{len(non_deleted_services)} compressed services could not be deleted: {', '.join(non_deleted_services)}"
+                f"{len(deleted_services['None'])} compressed services could not be deleted: {', '.join(deleted_services['None'])}"
             )
-            log.info(f"{len(non_deleted_services)} services were not deleted")
+            log.info(f"{len(deleted_services['None'])} services were not deleted")
         return
 
     def delete_non_archived_dirs(self):
@@ -1345,16 +1352,15 @@ class Archive:
         """
 
         for service in self.services.keys():
-            if not os.path.exists(self.services[service]["archived_path"]):
+            if not os.path.exists(self.services[service]["non_archived_path"]):
                 stderr.print(
-                    f"Service {archived_path.split('/')[-1]} has already been removed from {'/'.join(archived_path.split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n"
+                    f"Service {self.services[service]['non_archived_path'].split('/')[-1]} has already been removed from {'/'.join(self.services[service]['non_archived_path'].split('/')[:-1])[:-1]}. Nothing to delete so skipping.\n"
                 )
-                # this continue should not be necessary but I think its more efficient
                 continue
             else:
                 if not os.path.exists(self.services[service]["archived_path"]):
                     stderr.print(
-                        f"Archived path for service {self.services[service]['archived_path'].split('/')[-1]} NOT. Skipping.\n"
+                        f"Archived path for service {self.services[service]['archived_path'].split('/')[-1]} does NOT exist. Skipping.\n"
                     )
                 else:
                     stderr.print(
