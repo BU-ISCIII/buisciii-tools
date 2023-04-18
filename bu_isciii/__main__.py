@@ -451,25 +451,27 @@ def bioinfo_doc(
     "-sp",
     "--skip_prompts",
     is_flag=True,
-    help="Avoid prompts (except on service choosing)"
+    help="Avoid prompts (except on service choosing)",
 )
 @click.option(
     "-id",
     "--initial_date",
     default=False,
-    help="The date from which start search (format 'YYYY-MM-DD')"
+    help="The date from which start search (format 'YYYY-MM-DD')",
 )
 @click.option(
     "-fd",
     "--final_date",
     default=False,
-    help="The date from which end search (format 'YYYY-MM-DD')"
+    help="The date from which end search (format 'YYYY-MM-DD')",
 )
-def archive(resolution, type, option):
+def archive(resolution, type, option, skip_prompts, initial_date, final_date):
     """
     Archive services or retrieve services from archive
     """
-    archive_ser = bu_isciii.archive.Archive(resolution, type, option, api_pass, skip_prompts, initial_date, final_date)
+    archive_ser = bu_isciii.archive.Archive(
+        resolution, type, option, api_pass, skip_prompts, initial_date, final_date
+    )
     archive_ser.handle_archive()
 
 
