@@ -5,10 +5,7 @@ mkdir -p vep
 mkdir -p exomiser
 mkdir -p logs
 
-# module load BCFtools/1.12-GCC-10.2.0
-# module load VEP/103.1-GCC-10.2.0
-# module load R/4.2.1
-# module load Java/17.0.2.lua
+# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 R/4.2.1 Java/17.0.2.lua
 
 # 1 . Lablog to modify VCF ID field before running VEP.
 echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
@@ -34,10 +31,8 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 
 # 7. Once we have merged Vep output with gene notation from dbNSFP,we have to merge again with variants.table file.
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt &" > _04_merge_data2.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt" > _04_merge_data2.sh
 echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _04_merge_data2.sh
-echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _04_merge_data2.sh
-echo "rm variants_annot_filterAF.tab" >> _04_merge_data2.sh
 
 # 9. Running exomiser
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")

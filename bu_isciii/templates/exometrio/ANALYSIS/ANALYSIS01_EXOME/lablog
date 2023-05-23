@@ -52,9 +52,9 @@ nextflow run /data/bi/pipelines/nf-core-sarek-3.1.1/workflow/main.nf \\
           --intervals '../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed' \\
           --dbsnp '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz' \\
 	      --dbsnp_tbi '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz.tbi' \\
-	      --dbsnp_vqsr '--resource:dbsnp,known=false,training=true,truth=false,prior=2.0 dbsnp_138_mod.b37.vcf.gz' \\
+	      --igenomes_ignore \\
+	      --igenomes_base '/data/bi/references/igenomes/' \\
 	      --tools 'haplotypecaller' \\
-          --save_reference \\
           --joint_germline \\
 	  	  -resume
 EOF
@@ -62,3 +62,5 @@ EOF
 echo "sbatch sarek.sbatch" > _01_run_sarek.sh
 
 #nohup bash _00_sarek.sh &> $(date '+%Y%m%d')_sarek01.log &
+
+echo "srun --partition short_idx --chdir $scratch_dir rm -rf work 01-sarek/gatk4/ &" > _02_clean.sh
