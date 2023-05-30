@@ -1,0 +1,9 @@
+mkdir $(date '+%Y%m%d')_entrega01
+cd $(date '+%Y%m%d')_entrega01
+
+#Create directories depending on the analysis
+mkdir nohost_reads
+
+#Create symbolic links depending on the analysis
+#Folders
+cd nohost_reads;ln -s ../../../ANALYSIS/20230525_ANALYSIS06_SEEK_DESTROY/seek_destroy_results/Kraken2_host_removal/host_removed_reads/*.unclassified_*.fastq.gz .; cd -
