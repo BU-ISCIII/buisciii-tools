@@ -69,7 +69,7 @@
   },
     "plasmidid_assembly": {
       "label": "",
-      "template": "plasmidid_assembly",
+      "template": "plasmidid",
       "order": 1,
       "begin": "base",
       "end": "",
@@ -203,9 +203,9 @@
       "delivery_md": "",
       "delivery_pdf": ""
     },
-    "ariba_characterization": {
+    "characterization": {
       "label": "",
-      "template": "ARIBA_characterization",
+      "template": "characterization",
       "url": "",
       "order": 1,
       "begin": "",
