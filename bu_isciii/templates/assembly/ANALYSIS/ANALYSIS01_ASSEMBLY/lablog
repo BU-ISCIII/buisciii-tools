@@ -1,5 +1,3 @@
-# module load Nextflow/21.10.6 singularity
-
 echo "Do you want to save trimmed reads in outdir?"
 
 read -p 'Write y or n: ' trimmed
@@ -8,7 +6,7 @@ TRIMMED=$(echo "${trimmed}" | tr '[:upper:]' '[:lower:]')
 
 if [ "$TRIMMED" == "yes" ] || [ "$TRIMMED" == "y" ]
 then SAVETRIMMED="True"
-else SAVETRIMMED="FALSE"
+else SAVETRIMMED="False"
 fi
 
 echo "Is gram positive or negative?"
