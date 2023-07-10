@@ -123,6 +123,7 @@ for service_dir in os.listdir(sftp_path):
         dirs_toDelete.append(service_dir)
     else:
         continue
+
 print(dirs_toDelete)
 #removeObj = AutoremoveSftpService(sftp_path, ["service_test1", "service_test2"]) 
 #removeObj.remove_service()
