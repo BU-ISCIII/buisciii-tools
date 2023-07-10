@@ -112,11 +112,17 @@ else:
         "Path to the directory containing the service metadata"
         )
 
-finder = LastMofdificationFinder(sftp_path)
-last_modification_time = finder.find_last_modification()
-
-print(last_modification_time)
-print(f"The last modification time is: {last_modification_time}")
-
-removeObj = AutoremoveSftpService(sftp_path, ["service_test1", "service_test2"]) 
-removeObj.remove_service()
+dirs_toDelete = []
+time_window = timedelta(days=2)
+for service_dir in os.listdir(sftp_path):
+    service_fullPath = os.path.join(sftp_path, service_dir)
+    service_finder   = LastMofdificationFinder(service_fullPath)
+    service_last_modification = service_finder.find_last_modification()
+    delta = datetime.now() - service_last_modification
+    if delta > time_window:
+        dirs_toDelete.append(service_dir)
+    else:
+        continue
+print(dirs_toDelete)
+#removeObj = AutoremoveSftpService(sftp_path, ["service_test1", "service_test2"]) 
+#removeObj.remove_service()
