@@ -14,6 +14,7 @@
 
 # import
 import os
+import shutil
 import sys
 import logging
 import rich
@@ -49,7 +50,7 @@ def last_updated_file(datetime_list):
     latest_date = max(datetime_list)
     return latest_date
 
-class LastMofdificationFinder():
+class LastMofdificationFinder:
     def __init__(self, path):
         self.path = path
         self.last_modified_time = 0
@@ -71,6 +72,29 @@ class LastMofdificationFinder():
         if last_modified_time > self.last_modified_time:
                     self.last_modified_time = last_modified_time
 
+# TODO: add corner case: service list to be celaned, empty 
+class AutoremoveSftpService:
+    def __init__(self, path, services):
+        self.path     = path
+        self.services = services
+        self.action   = '' # promt to confirm service autoclean. 
+    
+    def remove_service(self): # prompt thing
+        service_elements='\n'.join(self.services)
+        print(f"The following services will be deleted:\n{service_elements}") # replace with isciii std err
+        confirm_sftp_delete = prompt_yn_question(
+            "Are you sure?:"
+            )
+        if confirm_sftp_delete:
+            for sftp_folder in self.services:
+                try:
+                    print(f"Deleting service {sftp_folder}: {os.path.join(self.path, sftp_folder)}") # replace with isciii std err
+                    #shutil.rmtree(os.path.join(self.path, sftp_folder))
+                    
+                except OSError as o:
+                    print(f"[ERROR] Cannot delete service folder {sftp_folder}: {os.path.join(self.path, sftp_folder)}") # replace with isciii std err
+
+
 use_default = prompt_yn_question( # replace with buisciii.utils.prompt_path after testing it
     "Do you want to use the default sftp path <var>?:" # get config_json keys
     )
@@ -90,4 +114,9 @@ else:
 
 finder = LastMofdificationFinder(sftp_path)
 last_modification_time = finder.find_last_modification()
+
+print(last_modification_time)
 print(f"The last modification time is: {last_modification_time}")
+
+removeObj = AutoremoveSftpService(sftp_path, ["service_test1", "service_test2"]) 
+removeObj.remove_service()
