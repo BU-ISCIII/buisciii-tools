@@ -40,21 +40,54 @@ def prompt_yn_question(msg):
     confirmation = questionary.confirm(msg).unsafe_ask()
     return confirmation
 
+# New functions(mv to utils)
+def timestamp_converter(timestamp): # import datetime
+    date_formated = datetime.fromtimestamp(timestamp)
+    return date_formated
+
+def last_updated_file(datetime_list):
+    latest_date = max(datetime_list)
+    return latest_date
+
+class LastMofdificationFinder():
+    def __init__(self, path):
+        self.path = path
+        self.last_modified_time = 0
+    
+    def find_last_modification(self):
+        self.get_last_modified(self.path)
+        return timestamp_converter(self.last_modified_time)
+
+    def get_last_modified(self, directory):
+        last_modified_time = os.path.getmtime(directory)
+
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                file_modified_time = os.path.getmtime(file_path)
+                if file_modified_time > last_modified_time:
+                        last_modified_time = file_modified_time
+
+        if last_modified_time > self.last_modified_time:
+                    self.last_modified_time = last_modified_time
 
 use_default = prompt_yn_question( # replace with buisciii.utils.prompt_path after testing it
     "Do you want to use the default sftp path <var>?:" # get config_json keys
     )
 
 if use_default:
-    sftp_path = "home/da.valle/work/bi/test/service/"
+    sftp_path = "/home/da.valle/work/bi/test/service/" # take it fron json
 else:
     sftp_path = prompt_path( # replace with buisciii.utils.prompt_path after testing it
     "Path to the directory containing the sftp directory: "
     )
-    # Validate user's dirif the directory path exists
     while sftp_path is None or not os.path.isdir(sftp_path):
         # TODO: this print must be replaced by stderr... to be homogenous to buisciii tools
         print("Invalid directory path. Please try again.")
         sftp_path = prompt_path( # replace with buisciii.utils.prompt_path after testing it
         "Path to the directory containing the service metadata"
         )
+
+finder = LastMofdificationFinder(sftp_path)
+last_modification_time = finder.find_last_modification()
+print(f"The last modification time is: {last_modification_time}")
