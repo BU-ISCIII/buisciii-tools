@@ -72,13 +72,28 @@ class LastMofdificationFinder:
         if last_modified_time > self.last_modified_time:
                     self.last_modified_time = last_modified_time
 
-# TODO: add corner case: service list to be celaned, empty 
+# TODO: add corner case: service list to be celaned, empty
+# TODO: If check_path_exist becomes more flexible, allow inheritance AutoremoveSftpService(bu_isciii.clean.CleanUp) + super()
 class AutoremoveSftpService:
-    def __init__(self, path, services):
-        self.path     = path
-        self.services = services
-        self.action   = '' # promt to confirm service autoclean. 
-    
+    def __init__(self, path):
+        if path is None:
+            # TODO: Replace with stderr() once implemented
+            print("Directory where the sftp site is allocated")
+            # TODO: Replace with bu_isciii.utils.prompt_path() once implemented
+            self.path = prompt_path(msg="Path")
+        else:
+            self.path = path
+       
+    # TODO: modify this. PR to make this method reusable outside the class
+    def check_path_exists(self):
+        # if the folder path is not found, then bye
+        if not os.path.exists(self.path):
+            print( # TODO: replace with stderr.print
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.."
+                % self.path
+            )
+            sys.exit()
+
     def remove_service(self): # prompt thing
         service_elements='\n'.join(self.services)
         print(f"The following services will be deleted:\n{service_elements}") # replace with isciii std err
@@ -93,37 +108,6 @@ class AutoremoveSftpService:
                     
                 except OSError as o:
                     print(f"[ERROR] Cannot delete service folder {sftp_folder}: {os.path.join(self.path, sftp_folder)}") # replace with isciii std err
-
-
-use_default = prompt_yn_question( # replace with buisciii.utils.prompt_path after testing it
-    "Do you want to use the default sftp path <var>?:" # get config_json keys
-    )
-
-if use_default:
-    sftp_path = "/home/da.valle/work/bi/test/service/" # take it fron json
-else:
-    sftp_path = prompt_path( # replace with buisciii.utils.prompt_path after testing it
-    "Path to the directory containing the sftp directory: "
-    )
-    while sftp_path is None or not os.path.isdir(sftp_path):
-        # TODO: this print must be replaced by stderr... to be homogenous to buisciii tools
-        print("Invalid directory path. Please try again.")
-        sftp_path = prompt_path( # replace with buisciii.utils.prompt_path after testing it
-        "Path to the directory containing the service metadata"
-        )
-
-dirs_toDelete = []
-time_window = timedelta(days=2)
-for service_dir in os.listdir(sftp_path):
-    service_fullPath = os.path.join(sftp_path, service_dir)
-    service_finder   = LastMofdificationFinder(service_fullPath)
-    service_last_modification = service_finder.find_last_modification()
-    delta = datetime.now() - service_last_modification
-    if delta > time_window:
-        dirs_toDelete.append(service_dir)
-    else:
-        continue
-
-print(dirs_toDelete)
-#removeObj = AutoremoveSftpService(sftp_path, ["service_test1", "service_test2"]) 
-#removeObj.remove_service()
+    
+sftp_site_autoclean = AutoremoveSftpService(None, True)
+sftp_site_autoclean.check_path_exists()
