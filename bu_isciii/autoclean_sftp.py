@@ -3,7 +3,8 @@
 #
 #   Gaol: automatically remove service from sftp after X days after the last update/access  
 #       Sub goals:
-#           1. Get service regex
+#           0. Connect to package adding handle in __main__.py
+#           1. add && custom stderr.prints + colors
 #           2. Get sftp service metadata from jsons
 #           3. Mark services that are stored for long period-time
 #           4. Provide a log-completition file. 
@@ -42,6 +43,9 @@ def last_updated_file(datetime_list):
     return latest_date
 
 class LastMofdificationFinder:
+    '''
+    Identifies the lates modification in a directory
+    '''
     def __init__(self, path):
         self.path = path
         self.last_modified_time = 0
@@ -65,6 +69,11 @@ class LastMofdificationFinder:
 
 # TODO: Add a handle method
 class AutoremoveSftpService:
+    '''
+    Identifies service's stored in an sftp directory 
+    and remove those that have not been updated/modified
+    within 14 days
+    '''
     def __init__(self, path):
         if path is None:
             # TODO: Replace with stderr() once implemented
@@ -84,6 +93,7 @@ class AutoremoveSftpService:
             )
             sys.exit()
     
+    # Uses regex to identify sftp-services & gets their lates modification
     def get_sftp_services(self):
         self.sftp_services = {} # {sftp-service_path : last_update}
         service_pattern = r'^[SRV][A-Z]+[0-9]+_\d{8}_[A-Z0-9]+_[a-zA-Z]+(?:\.[a-zA-Z]+)?_[a-zA-Z]$'
@@ -98,7 +108,8 @@ class AutoremoveSftpService:
                     service_finder = LastMofdificationFinder(sftp_service_fullPath)
                     service_last_modification = service_finder.find_last_modification()
                     self.sftp_services[sftp_service_fullPath] = service_last_modification
-        
+    
+    # Mark services older than $window    
     def mark_toDelete(self, window=14): # TODO: 14 days
         self.window = timedelta(days=window)
         self.marked_services = []
@@ -106,18 +117,19 @@ class AutoremoveSftpService:
         for key, value in self.sftp_services.items():
             if datetime.now() - value > self.window:
                 self.marked_services.append(key) 
-
-    def remove_oldservice(self): # prompt thing
+    
+    # Delete marked services 
+    def remove_oldservice(self):
         if len(self.marked_services) == 0:
             sys.exit(f"The sftp site has not service folders older than {self.window} days. Skiping autoclean_sftp...")
         else:
             service_elements='\n'.join(self.marked_services)
             print(f"The following services are going to be deleted from the sftp:\n{service_elements}") # replace with isciii std err
-            confirm_sftp_delete = prompt_yn_question("Are you sure? (Y/n): ")
+            confirm_sftp_delete = prompt_yn_question("Are you sure?: ")
             if confirm_sftp_delete:
                 for service in self.marked_services:
                     try:
-                        print(f"Deleting service {service}: {os.path.join(self.path, service)}") # replace with isciii std err
+                        print(f"Deleting service: {service}") # replace with isciii std err
                         #shutil.rmtree(os.path.join(self.path, sftp_folder))
                     
                     except OSError as o:
