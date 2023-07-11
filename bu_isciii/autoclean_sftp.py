@@ -3,14 +3,11 @@
 #
 #   Gaol: automatically remove service from sftp after X days after the last update/access  
 #       Sub goals:
-#           1. Get user confirmation --> yes/no [prompt]
-#           2. Agument -p [path] or default [resolution.id ftp path]
-#           1. Get sftp service metadata from jsons
-#           2. Get last access/modification date (this may be checked not only in the parent floder but also in all childrens)   
-#           3. Implement logic. I condition is met then, apply auto-cleanup
-#           4. Add a prortection property in order to avoid cleaning files that will be store in sftp for long-period time.
-#           5. Provide a log-completition file. 
-#           6. linting -- pep8 & black
+#           1. Get service regex
+#           2. Get sftp service metadata from jsons
+#           3. Mark services that are stored for long period-time
+#           4. Provide a log-completition file. 
+#           5. linting -- pep8 & black
 
 # import
 import os
@@ -20,13 +17,6 @@ import logging
 import rich
 import questionary
 from datetime import datetime, timedelta
-
-# import locals
-#import buisciii.utils
-
-# add loggin and colors
-
-# create class
 
 # =================================================================
 # Backbone and utils
@@ -72,8 +62,7 @@ class LastMofdificationFinder:
         if last_modified_time > self.last_modified_time:
                     self.last_modified_time = last_modified_time
 
-# TODO: add corner case: service list to be celaned, empty
-# TODO: If check_path_exist becomes more flexible, allow inheritance AutoremoveSftpService(bu_isciii.clean.CleanUp) + super()
+# TODO: Add a handle method
 class AutoremoveSftpService:
     def __init__(self, path):
         if path is None:
@@ -83,7 +72,6 @@ class AutoremoveSftpService:
             self.path = prompt_path(msg="Path")
         else:
             self.path = path
-        
 
     # TODO: modify this. PR to make this method reusable outside the class
     def check_path_exists(self):
@@ -95,7 +83,7 @@ class AutoremoveSftpService:
             )
             sys.exit()
     
-    def list_sftp_services(self):
+    def list_sftp_services(self): # TODO: dict_sftp_ **
         self.sftp_services = {}
         for service_dir in os.listdir(self.path):
             service_fullPath = os.path.join(self.path, service_dir)
@@ -103,7 +91,7 @@ class AutoremoveSftpService:
             service_last_modification = service_finder.find_last_modification()
             self.sftp_services[service_dir] = service_last_modification
     
-    def mark_toDelete(self, window=2):
+    def mark_toDelete(self, window=2): # TODO: 14 days
         self.window = timedelta(days=window)
         self.marked_services = []
 
@@ -111,14 +99,13 @@ class AutoremoveSftpService:
             if datetime.now() - value > self.window:
                 self.marked_services.append(key) 
 
-    # TODO: UPDATE THIS
     def remove_oldservice(self): # prompt thing
         if len(self.marked_services) == 0:
-            sys.exit(f"The sftp site has not service folders older than {self.window} days")
+            sys.exit(f"The sftp site has not service folders older than {self.window} days. Skiping autoclean_sftp...")
         else:
             service_elements='\n'.join(self.marked_services)
             print(f"The following services will be deleted:\n{service_elements}") # replace with isciii std err
-            confirm_sftp_delete = prompt_yn_question("Are you sure?:")
+            confirm_sftp_delete = prompt_yn_question("Are you sure? (Y/n): ")
             if confirm_sftp_delete:
                 for service in self.marked_services:
                     try:
@@ -126,7 +113,7 @@ class AutoremoveSftpService:
                         #shutil.rmtree(os.path.join(self.path, sftp_folder))
                     
                     except OSError as o:
-                        print(f"[ERROR] Cannot delete service folder {service}: {os.path.join(self.path, service)}") # replace with isciii std err
+                        print(f"[ERROR] Cannot delete service folder {service}: {os.path.join(self.path, service)}") # replace with isciii std err & import colors
     
 sftp_site_autoclean = AutoremoveSftpService(None)
 sftp_site_autoclean.check_path_exists()
