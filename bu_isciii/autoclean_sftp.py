@@ -84,7 +84,7 @@ class AutoremoveSftpService:
             )
             sys.exit()
     
-    def list_sftp_services(self): # TODO: dict_sftp_ **
+    def get_sftp_services(self):
         self.sftp_services = {}
 
         service_pattern = r'^[SRV][A-Z]+[0-9]+_\d{8}_[A-Z0-9]+_[a-zA-Z]+(?:\.[a-zA-Z]+)?_[a-zA-Z]$'
