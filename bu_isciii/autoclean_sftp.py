@@ -112,24 +112,24 @@ class AutoremoveSftpService:
                 self.marked_services.append(key) 
 
     # TODO: UPDATE THIS
-    def remove_service(self): # prompt thing
-    
-        service_elements='\n'.join(self.services)
-        print(f"The following services will be deleted:\n{service_elements}") # replace with isciii std err
-        confirm_sftp_delete = prompt_yn_question(
-            "Are you sure?:"
-            )
-        if confirm_sftp_delete:
-            for sftp_folder in self.services:
-                try:
-                    print(f"Deleting service {sftp_folder}: {os.path.join(self.path, sftp_folder)}") # replace with isciii std err
-                    #shutil.rmtree(os.path.join(self.path, sftp_folder))
+    def remove_oldservice(self): # prompt thing
+        if len(self.marked_services) == 0:
+            sys.exit(f"The sftp site has not service folders older than {self.window} days")
+        else:
+            service_elements='\n'.join(self.marked_services)
+            print(f"The following services will be deleted:\n{service_elements}") # replace with isciii std err
+            confirm_sftp_delete = prompt_yn_question("Are you sure?:")
+            if confirm_sftp_delete:
+                for service in self.marked_services:
+                    try:
+                        print(f"Deleting service {service}: {os.path.join(self.path, service)}") # replace with isciii std err
+                        #shutil.rmtree(os.path.join(self.path, sftp_folder))
                     
-                except OSError as o:
-                    print(f"[ERROR] Cannot delete service folder {sftp_folder}: {os.path.join(self.path, sftp_folder)}") # replace with isciii std err
+                    except OSError as o:
+                        print(f"[ERROR] Cannot delete service folder {service}: {os.path.join(self.path, service)}") # replace with isciii std err
     
 sftp_site_autoclean = AutoremoveSftpService(None)
 sftp_site_autoclean.check_path_exists()
 sftp_site_autoclean.list_sftp_services()
 sftp_site_autoclean.mark_toDelete()
-print(sftp_site_autoclean.marked_services)
+sftp_site_autoclean.remove_oldservice()
