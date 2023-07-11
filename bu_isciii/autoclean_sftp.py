@@ -83,7 +83,8 @@ class AutoremoveSftpService:
             self.path = prompt_path(msg="Path")
         else:
             self.path = path
-       
+        
+
     # TODO: modify this. PR to make this method reusable outside the class
     def check_path_exists(self):
         # if the folder path is not found, then bye
@@ -93,8 +94,26 @@ class AutoremoveSftpService:
                 % self.path
             )
             sys.exit()
+    
+    def list_sftp_services(self):
+        self.sftp_services = {}
+        for service_dir in os.listdir(self.path):
+            service_fullPath = os.path.join(self.path, service_dir)
+            service_finder   = LastMofdificationFinder(service_fullPath)
+            service_last_modification = service_finder.find_last_modification()
+            self.sftp_services[service_dir] = service_last_modification
+    
+    def mark_toDelete(self, window=2):
+        self.window = timedelta(days=window)
+        self.marked_services = []
 
+        for key, value in self.sftp_services.items():
+            if datetime.now() - value > self.window:
+                self.marked_services.append(key) 
+
+    # TODO: UPDATE THIS
     def remove_service(self): # prompt thing
+    
         service_elements='\n'.join(self.services)
         print(f"The following services will be deleted:\n{service_elements}") # replace with isciii std err
         confirm_sftp_delete = prompt_yn_question(
@@ -109,5 +128,8 @@ class AutoremoveSftpService:
                 except OSError as o:
                     print(f"[ERROR] Cannot delete service folder {sftp_folder}: {os.path.join(self.path, sftp_folder)}") # replace with isciii std err
     
-sftp_site_autoclean = AutoremoveSftpService(None, True)
+sftp_site_autoclean = AutoremoveSftpService(None)
 sftp_site_autoclean.check_path_exists()
+sftp_site_autoclean.list_sftp_services()
+sftp_site_autoclean.mark_toDelete()
+print(sftp_site_autoclean.marked_services)
