@@ -11,6 +11,7 @@
 
 # import
 import os
+import re
 import shutil
 import sys
 import logging
@@ -85,11 +86,18 @@ class AutoremoveSftpService:
     
     def list_sftp_services(self): # TODO: dict_sftp_ **
         self.sftp_services = {}
-        for service_dir in os.listdir(self.path):
-            service_fullPath = os.path.join(self.path, service_dir)
-            service_finder   = LastMofdificationFinder(service_fullPath)
-            service_last_modification = service_finder.find_last_modification()
-            self.sftp_services[service_dir] = service_last_modification
+
+        service_pattern = r'^[SRV][A-Z]+[0-9]+_\d{8}_[A-Z0-9]+_[a-zA-Z]+(?:\.[a-zA-Z]+)?_[a-zA-Z]$'
+        for root, dirs, files in os.walk(self.path):
+            for dir_name in dirs:
+                match = re.match(service_pattern, dir_name)
+                if match:
+                    sftp_service_fullPath = os.path.join(root,dir_name)
+                    
+                    # Get service last modification
+                    service_finder = LastMofdificationFinder(sftp_service_fullPath)
+                    service_last_modification = service_finder.find_last_modification()
+                    self.sftp_services[sftp_service_fullPath]= service_last_modification
     
     def mark_toDelete(self, window=2): # TODO: 14 days
         self.window = timedelta(days=window)
@@ -118,5 +126,5 @@ class AutoremoveSftpService:
 sftp_site_autoclean = AutoremoveSftpService(None)
 sftp_site_autoclean.check_path_exists()
 sftp_site_autoclean.list_sftp_services()
-sftp_site_autoclean.mark_toDelete()
-sftp_site_autoclean.remove_oldservice()
+#sftp_site_autoclean.mark_toDelete()
+#sftp_site_autoclean.remove_oldservice()
