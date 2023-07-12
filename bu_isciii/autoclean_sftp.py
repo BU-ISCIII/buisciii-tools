@@ -67,7 +67,6 @@ class LastMofdificationFinder:
         if last_modified_time > self.last_modified_time:
                     self.last_modified_time = last_modified_time
 
-# TODO: Add a handle method
 class AutoremoveSftpService:
     '''
     Identifies service's stored in an sftp directory 
@@ -92,6 +91,8 @@ class AutoremoveSftpService:
                 % self.path
             )
             sys.exit()
+        else: 
+            return True
     
     # Uses regex to identify sftp-services & gets their lates modification
     def get_sftp_services(self):
@@ -108,20 +109,22 @@ class AutoremoveSftpService:
                     service_finder = LastMofdificationFinder(sftp_service_fullPath)
                     service_last_modification = service_finder.find_last_modification()
                     self.sftp_services[sftp_service_fullPath] = service_last_modification
+        if len(self.sftp_services) == 0:
+            sys.exit(f"No services found in {self.path}")
     
     # Mark services older than $window    
-    def mark_toDelete(self, window=14): # TODO: 14 days
+    def mark_toDelete(self, window=14):
         self.window = timedelta(days=window)
         self.marked_services = []
 
         for key, value in self.sftp_services.items():
             if datetime.now() - value > self.window:
-                self.marked_services.append(key) 
+                self.marked_services.append(key)
     
     # Delete marked services 
     def remove_oldservice(self):
         if len(self.marked_services) == 0:
-            sys.exit(f"The sftp site has not service folders older than {self.window} days. Skiping autoclean_sftp...")
+            sys.exit(f"sftp-site up to date. There are no services  older than {self.window} days. Skiping autoclean_sftp...")
         else:
             service_elements='\n'.join(self.marked_services)
             print(f"The following services are going to be deleted from the sftp:\n{service_elements}") # replace with isciii std err
@@ -135,8 +138,9 @@ class AutoremoveSftpService:
                     except OSError as o:
                         print(f"[ERROR] Cannot delete service folder {service}: {os.path.join(self.path, service)}") # replace with isciii std err & import colors
     
-sftp_site_autoclean = AutoremoveSftpService(None)
-sftp_site_autoclean.check_path_exists()
-sftp_site_autoclean.get_sftp_services()
-sftp_site_autoclean.mark_toDelete()
-sftp_site_autoclean.remove_oldservice()
+    def handle_autoclean_sftp(self):
+        self.check_path_exists(self.path)
+        self.get_sftp_services(self.path)
+        self.mark_toDelete()
+        self.remove_oldservice()
+    
