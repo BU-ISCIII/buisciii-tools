@@ -15,6 +15,7 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
     * [copy_sfp](#copy_sftp)
     * [archive](#archive)
     * [bioinfo_doc](#bioinfo_doc)
+    * [autoclean_sftp](#autoclean_sftp)
 * [Aknowledgements](#aknowledgements)
 
 ## Installation
@@ -50,6 +51,8 @@ pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/buiscii
 #### archive
 
 #### bioinfo_doc
+
+#### autoclean_sftp
 
 
 ## Acknowledgements
