@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 # local import
 import bu_isciii 
 import bu_isciii.utils
+import bu_isciii.config_json
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
@@ -64,9 +65,8 @@ class AutoremoveSftpService:
         if path is None:
             use_default = bu_isciii.utils.prompt_yn_question("Use default path?: ")
             if use_default:
-                # TODO: add import json-api sftp  path
-                #self.path = bu_isciii.config_json.ConfigJson().get_configuration("PATHTO")
-                sys.exit('Still developing this...remove sys.exit once jsonApi is connected. Exiting')
+                data_path = bu_isciii.config_json.ConfigJson().get_configuration("archive")["data_path"]
+                self.path = os.path.join(data_path, "sftp")
             else:                             
                 self.path = bu_isciii.utils.prompt_path(msg="Directory where the sftp site is allocated:")
         else:
