@@ -60,7 +60,7 @@ class AutoremoveSftpService:
     and remove those that have not been updated/modified
     within 14 days
     '''
-    def __init__(self, path=None, window=14):
+    def __init__(self, path=None, days=14):
         # Parse input path
         if path is None:
             use_default = bu_isciii.utils.prompt_yn_question("Use default path?: ")
@@ -73,8 +73,11 @@ class AutoremoveSftpService:
         else:
             self.path = path
         
-        # Get window margin to determine old services
-        self.window = timedelta(days=window)
+        # Define the margin threshold of days to mark old services
+        self.days = timedelta(days=days)
+        stderr.print(
+            "Services older than " + str(self.days.days) + " days are going to be deleted from " + self.path
+        )
 
     # TODO: modify this. PR to make this method reusable outside the class
     def check_path_exists(self):
@@ -109,19 +112,19 @@ class AutoremoveSftpService:
         if len(self.sftp_services) == 0:
             sys.exit(f"No services found in {self.path}")
     
-    # Mark services older than $window    
+    # Mark services older than $days    
     def mark_toDelete(self):
         self.marked_services = []
 
         for key, value in self.sftp_services.items():
-            if datetime.now() - value > self.window:
+            if datetime.now() - value > self.days:
                 self.marked_services.append(key)
     
     # Delete marked services 
     def remove_oldservice(self):
         if len(self.marked_services) == 0:
             stderr.print(
-                "[yellow]sftp-site up to date. There are no services  older than " + str(self.window.days) + " days. Skiping autoclean-sftp... "
+                "[yellow]sftp-site up to date. There are no services  older than " + str(self.days.days) + " days. Skiping autoclean-sftp... "
             )
             sys.exit()
         else:
@@ -134,7 +137,7 @@ class AutoremoveSftpService:
                 for service in self.marked_services:
                     try:
                         stderr.print(
-                            "Deleting service:" + service
+                            "Deleting service: " + service
                         )
                         shutil.rmtree(service)
                     
