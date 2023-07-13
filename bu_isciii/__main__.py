@@ -381,6 +381,7 @@ def archive(resolution, type, year, option):
     archive_ser = bu_isciii.archive.Archive(resolution, year, type, option)
     archive_ser.handle_archive()
 
+
 # CLEAN OLD SFTP SERVICES
 @bu_isciii_cli.command(help_priority=8)
 @click.option(
@@ -401,6 +402,7 @@ def autoclean_sftp(sftp_folder, days):
     """Clean old sftp services"""
     sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(sftp_folder, days)
     sftp_clean.handle_autoclean_sftp()
+
 
 if __name__ == "__main__":
     run_bu_isciii()
