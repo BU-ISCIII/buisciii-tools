@@ -3,7 +3,6 @@
 #
 #   Gaol: automatically remove service from sftp after X days after the last update/access  
 #       Sub goals:
-#           0. Connect to package adding handle in __main__.py
 #           1. add && custom stderr.prints + colors
 #           2. Get sftp service metadata from jsons
 #           3. Mark services that are stored for long period-time
@@ -19,7 +18,6 @@ import logging
 import shutil
 import rich
 
-import questionary
 from datetime import datetime, timedelta
 
 # local import
@@ -34,27 +32,10 @@ stderr = rich.console.Console(
     force_terminal=bu_isciii.utils.rich_force_colors(),
 )
 
-# =================================================================
-# Backbone and utils
-# =================================================================
-
-# temp cp from utils
-def prompt_path(msg):
-    source = questionary.path(msg).unsafe_ask()
-    return source
-
-def prompt_yn_question(msg):
-    confirmation = questionary.confirm(msg).unsafe_ask()
-    return confirmation
-
-# New functions(mv to utils)
-def timestamp_converter(timestamp): # import datetime
+# TODO: add to utils.py?
+def timestamp_converter(timestamp):
     date_formated = datetime.fromtimestamp(timestamp)
     return date_formated
-
-def last_updated_file(datetime_list):
-    latest_date = max(datetime_list)
-    return latest_date
 
 class LastMofdificationFinder:
     '''
@@ -90,16 +71,14 @@ class AutoremoveSftpService:
     def __init__(self, path=None, window=14):
         # Parse input path
         if path is None:
-            use_default = prompt_yn_question("Use default path?: ")
+            use_default = bu_isciii.utils.prompt_yn_question("Use default path?: ")
             if use_default:
+                # TODO: add import json-api sftp  path
                 #self.path = bu_isciii.config_json.ConfigJson().get_configuration("PATHTO")
                 print("yes")
                 sys.exit()
-            else:             
-                # TODO: Replace with stderr() once implemented
-                
-                # TODO: Replace with bu_isciii.utils.prompt_path() once implemented
-                self.path = prompt_path(msg="Directory where the sftp site is allocated:")
+            else:                             
+                self.path = bu_isciii.utils.prompt_path(msg="Directory where the sftp site is allocated:")
         else:
             self.path = path
         
@@ -151,7 +130,7 @@ class AutoremoveSftpService:
         else:
             service_elements='\n'.join(self.marked_services)
             print(f"The following services are going to be deleted from the sftp:\n{service_elements}") # replace with isciii std err
-            confirm_sftp_delete = prompt_yn_question("Are you sure?: ")
+            confirm_sftp_delete = bu_isciii.utils.prompt_yn_question("Are you sure?: ")
             if confirm_sftp_delete:
                 for service in self.marked_services:
                     try:
