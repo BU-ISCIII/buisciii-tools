@@ -73,12 +73,18 @@ class AutoremoveSftpService:
     and remove those that have not been updated/modified
     within 14 days
     '''
-    def __init__(self, path):
+    def __init__(self, path=None):
         if path is None:
-            # TODO: Replace with stderr() once implemented
-            print("Directory where the sftp site is allocated")
-            # TODO: Replace with bu_isciii.utils.prompt_path() once implemented
-            self.path = prompt_path(msg="Path")
+            use_default = prompt_yn_question("Use default path?: ")
+            if use_default:
+                #self.path = bu_isciii.config_json.ConfigJson().get_configuration("PATHTO")
+                print("yes")
+                sys.exit()
+            else:             
+                # TODO: Replace with stderr() once implemented
+                
+                # TODO: Replace with bu_isciii.utils.prompt_path() once implemented
+                self.path = prompt_path(msg="Directory where the sftp site is allocated:")
         else:
             self.path = path
 
@@ -144,3 +150,5 @@ class AutoremoveSftpService:
         self.mark_toDelete()
         self.remove_oldservice()
     
+clean_path = AutoremoveSftpService()
+clean_path.handle_autoclean_sftp()
