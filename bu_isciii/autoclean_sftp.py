@@ -13,12 +13,26 @@
 # import
 import os
 import re
-import shutil
 import sys
 import logging
+
+import shutil
 import rich
+
 import questionary
 from datetime import datetime, timedelta
+
+# local import
+import bu_isciii 
+import bu_isciii.utils
+
+log = logging.getLogger(__name__)
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=bu_isciii.utils.rich_force_colors(),
+)
 
 # =================================================================
 # Backbone and utils
@@ -73,7 +87,8 @@ class AutoremoveSftpService:
     and remove those that have not been updated/modified
     within 14 days
     '''
-    def __init__(self, path=None):
+    def __init__(self, path=None, window=14):
+        # Parse input path
         if path is None:
             use_default = prompt_yn_question("Use default path?: ")
             if use_default:
@@ -87,6 +102,9 @@ class AutoremoveSftpService:
                 self.path = prompt_path(msg="Directory where the sftp site is allocated:")
         else:
             self.path = path
+        
+        # Get window margin to determine old services
+        self.window = timedelta(days=window)
 
     # TODO: modify this. PR to make this method reusable outside the class
     def check_path_exists(self):
@@ -119,8 +137,7 @@ class AutoremoveSftpService:
             sys.exit(f"No services found in {self.path}")
     
     # Mark services older than $window    
-    def mark_toDelete(self, window=14):
-        self.window = timedelta(days=window)
+    def mark_toDelete(self):
         self.marked_services = []
 
         for key, value in self.sftp_services.items():
@@ -145,10 +162,7 @@ class AutoremoveSftpService:
                         print(f"[ERROR] Cannot delete service folder {service}: {os.path.join(self.path, service)}") # replace with isciii std err & import colors
     
     def handle_autoclean_sftp(self):
-        self.check_path_exists(self.path)
-        self.get_sftp_services(self.path)
+        self.check_path_exists()
+        self.get_sftp_services()
         self.mark_toDelete()
         self.remove_oldservice()
-    
-clean_path = AutoremoveSftpService()
-clean_path.handle_autoclean_sftp()
