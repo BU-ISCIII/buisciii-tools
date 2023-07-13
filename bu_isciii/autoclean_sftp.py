@@ -1,13 +1,4 @@
 #!/usr/bin/env python
-#   sftp_autoclean.py
-#
-#   Gaol: automatically remove service from sftp after X days after the last update/access  
-#       Sub goals:
-#           1. add && custom stderr.prints + colors
-#           2. Get sftp service metadata from jsons
-#           3. Mark services that are stored for long period-time
-#           4. Provide a log-completition file. 
-#           5. linting -- pep8 & black
 
 # import
 import os
@@ -75,8 +66,7 @@ class AutoremoveSftpService:
             if use_default:
                 # TODO: add import json-api sftp  path
                 #self.path = bu_isciii.config_json.ConfigJson().get_configuration("PATHTO")
-                print("yes")
-                sys.exit()
+                sys.exit('Still developing this...remove sys.exit once jsonApi is connected. Exiting')
             else:                             
                 self.path = bu_isciii.utils.prompt_path(msg="Directory where the sftp site is allocated:")
         else:
@@ -89,8 +79,8 @@ class AutoremoveSftpService:
     def check_path_exists(self):
         # if the folder path is not found, then bye
         if not os.path.exists(self.path):
-            print( # TODO: replace with stderr.print
-                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.."
+            stderr.print(
+                "[red]ERROR: It seems like finding the correct path is beneath me. I apologise. The path:" + self.path + "does not exitst. Exiting.."
                 % self.path
             )
             sys.exit()
@@ -102,6 +92,9 @@ class AutoremoveSftpService:
         self.sftp_services = {} # {sftp-service_path : last_update}
         service_pattern = r'^[SRV][A-Z]+[0-9]+_\d{8}_[A-Z0-9]+_[a-zA-Z]+(?:\.[a-zA-Z]+)?_[a-zA-Z]$'
         
+        stderr.print(
+                "[blue]Scanning  " + self.path + "..."
+            )
         for root, dirs, files in os.walk(self.path):
             for dir_name in dirs:
                 match = re.match(service_pattern, dir_name)
@@ -126,19 +119,33 @@ class AutoremoveSftpService:
     # Delete marked services 
     def remove_oldservice(self):
         if len(self.marked_services) == 0:
-            sys.exit(f"sftp-site up to date. There are no services  older than {self.window} days. Skiping autoclean_sftp...")
+            stderr.print(
+                "[yellow]sftp-site up to date. There are no services  older than " + str(self.window.days) + " days. Skiping autoclean-sftp... "
+            )
+            sys.exit()
         else:
             service_elements='\n'.join(self.marked_services)
-            print(f"The following services are going to be deleted from the sftp:\n{service_elements}") # replace with isciii std err
+            stderr.print(
+                "The following services are going to be deleted from the sftp:\n" + service_elements
+            )
             confirm_sftp_delete = bu_isciii.utils.prompt_yn_question("Are you sure?: ")
             if confirm_sftp_delete:
                 for service in self.marked_services:
                     try:
-                        print(f"Deleting service: {service}") # replace with isciii std err
+                        stderr.print(
+                            "Deleting service:" + service
+                        )
                         #shutil.rmtree(os.path.join(self.path, sftp_folder))
                     
                     except OSError as o:
-                        print(f"[ERROR] Cannot delete service folder {service}: {os.path.join(self.path, service)}") # replace with isciii std err & import colors
+                        stderr.print(
+                            "[red]ERROR: Cannot delete service folder:" + service + os.path.join(self.path, service)
+                        )
+            else:
+                stderr.print(
+                    'Aborting ...'
+                )
+                sys.exit()
     
     def handle_autoclean_sftp(self):
         self.check_path_exists()
