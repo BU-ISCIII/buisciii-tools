@@ -157,7 +157,7 @@ class AutoremoveSftpService:
                         stderr.print("Deleting service: " + service)
                         shutil.rmtree(service)
 
-                    except OSError as o:
+                    except OSError:
                         stderr.print(
                             "[red]ERROR: Cannot delete service folder:" + service
                         )
