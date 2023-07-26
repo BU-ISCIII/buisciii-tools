@@ -1,0 +1,9 @@
+#module load picard
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+mkdir logs
+
+cat ../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir ${scratch_dir} --output logs/PICARDHSMETRICS.@@.%j.log --job-name PICARDHSMETRICS java -Xmx10g -jar \$EBROOTPICARD/picard.jar CollectHsMetrics R= /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37_decoy.fasta BI=../../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37.interval_list TI=../../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37.interval_list I=../01-sarek/preprocessing/recalibrated/@@/@@.recal.cram O=@@_hsMetrics.out VALIDATION_STRINGENCY='LENIENT' &" > _01_picardHsMetrics.sh
+
+echo "echo "\"SAMPLE\",\"MEAN TARGET COVERAGE\", \"PCT USABLE BASES ON TARGET\",\"FOLD ENRICHMENT\",\"PCT TARGET BASES 10X\",\"PCT TARGET BASES 20X\",\"PCT TARGET BASES 30X\",\"PCT TARGET BASES 40X\",\"PCT TARGET BASES 50X\"" > hsMetrics_all.out" > _02_hsMetrics_all.sh
+cat ../samples_id.txt | xargs -I % echo "grep '^Illumin' %_hsMetrics.out | awk 'BEGIN{FS=\"\\t\";OFS=\",\"}{print \"%\",\$34,\$12,\$13,\$48,\$49,\$50,\$51,\$52}' >> hsMetrics_all.out" >> _02_hsMetrics_all.sh
