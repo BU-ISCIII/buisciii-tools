@@ -20,13 +20,17 @@ samples_ref_files = {ref: str("ref_samples/samples_"+ref+".tmp") for ref in refe
 
 def concat_tables_and_write(csvs_in_folder: List[str], merged_csv_name: str):
     """Concatenate any tables that share the same header"""
+    if len(csvs_in_folder)==0:
+        print(f"Could not find tables to merge over {merged_csv_name}")
+        return
     with open (merged_csv_name, "wb") as merged_csv:
         with open(csvs_in_folder[0], "rb") as f:
             merged_csv.write(f.read()) # This is the fastest way to concatenate csv files
-        for file in csvs_in_folder[1:]:
-            with open(file, "rb") as f:
-                next(f) #this is used to skip the header
-                merged_csv.write(f.read()) 
+        if len(csvs_in_folder)>1:
+            for file in csvs_in_folder[1:]:
+                with open(file, "rb") as f:
+                    next(f) #this is used to skip the header
+                    merged_csv.write(f.read()) 
     return merged_csv
 
 def merge_lineage_tables(reference_folders: Dict[str,str], samples_ref_files: Dict[str,str]):
@@ -37,7 +41,7 @@ def merge_lineage_tables(reference_folders: Dict[str,str], samples_ref_files: Di
         if os.path.isdir(os.path.abspath(folder+"/pangolin")):
             pango_dir = os.path.join(folder,"pangolin")
             csvs_in_folder = [file.path for file in os.scandir(pango_dir) 
-                if os.path.basename(file).split("_")[0] in samples_for_ref]
+                if os.path.basename(file).strip(".pangolin.csv") in samples_for_ref]
             merged_csv_name = os.path.join(folder,str(ref+"_pangolin.csv"))
             concat_tables_and_write(csvs_in_folder=csvs_in_folder, merged_csv_name=merged_csv_name)
         else:
@@ -46,7 +50,7 @@ def merge_lineage_tables(reference_folders: Dict[str,str], samples_ref_files: Di
         if os.path.isdir(os.path.abspath(folder+"/nextclade")):
             nextcl_dir = os.path.join(folder,"nextclade")
             csvs_in_folder = [file.path for file in os.scandir(nextcl_dir) 
-                if os.path.splitext(os.path.basename(file))[0] in samples_for_ref]
+                if os.path.basename(file).strip(".csv") in samples_for_ref]
             merged_csv_name = os.path.join(folder,str(ref+"_nextclade.csv"))
             concat_tables_and_write(csvs_in_folder=csvs_in_folder, merged_csv_name=merged_csv_name)
         else:
