@@ -19,7 +19,7 @@ cat references.tmp | while read in; do cd excel_files_${in}; ln -s ../../../ANAL
 cat references.tmp | while read in; do cd excel_files_${in}; ln -s ../../../ANALYSIS/*/*${in}*/variants/ivar/consensus/bcftools/nextclade nextclade; cd -; done;
 
 #Create symbolic links to files that are going to be converted to excel
-cat references.tmp | while read in; do ln -s ../../ANALYSIS/*/*${in}*/variants/ivar/variants_long_table*.csv ${in}_variants_long_table.csv; done
+cat references.tmp | while read in; do ln -s ../../ANALYSIS/*/*${in}*/variants/ivar/variants_long_table.csv ${in}_variants_long_table.csv; done
 
 ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
 ln -s ../../ANALYSIS/*/mapping_illumina*.tab ./mapping_illumina.csv
