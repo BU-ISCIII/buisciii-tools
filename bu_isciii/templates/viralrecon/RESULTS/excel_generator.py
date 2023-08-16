@@ -17,7 +17,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 print(
-    f"Extracting references used for analysis and the samples associated with each reference\n"
+    "Extracting references used for analysis and the samples associated with each reference\n"
 )
 with open(args.reference_file, "r") as file:
     references = [line.rstrip() for line in file]
