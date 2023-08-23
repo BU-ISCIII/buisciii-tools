@@ -1,7 +1,7 @@
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_gene_GRCh37.txt
-ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_plugin.txt
+ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_plugin_hg19.txt
 mkdir -p vep
 mkdir -p exomiser
 mkdir -p logs
@@ -28,38 +28,39 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 
 # 3. Lablog for annotating whole genome samples using Variant Effect Predictor (VEP).
 
-echo "srun --partition short_idx --mem 100G --time 4:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ./vep/variants_fil_mod.vcf -o ./vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab 
+# Run Vep without the plugin columns
+
+echo "srun --partition short_idx --mem 100G --time 12:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ./vep/variants_fil_mod.vcf -o ./vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab &" > _02_vep_annotation.sh
 
 #-------------------------------------------------------------------------------------------------------
 
-## 4. Modify vep_annot.vcf in order to eliminate columns that start with ##, rename column #Uploaded_variation as Uploaded_variation
+# 4. Modify vep_annot.vcf in order to eliminate columns that start with ##, rename column #Uploaded_variation as ID
 
-echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" _03_Vep_plugin_dbNSFP_parse.sh
-echo "sed -i 's/#Uploaded_variation/Uploaded_variation/' ./vep/vep_annot_head.txt" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" > _03_Vep_plugin_dbNSFP_parse.sh
+echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_Vep_plugin_dbNSFP_parse.sh
 
-# 5. Merge four plugin columns in dbNSFP_ENSG_plugin.txt to obtain a column named "Uploaded_variation", delete the four columns, rename the file to dbNSFP_ENSG_plugin_Columns and merge it vep_annot_head.txt by the column "uploaded_variation". Save as vep_plugin.txt.
+# 5. Merge plugin columns in dbNSFP_ENSG_plugin.txt to obtain a column named "ID", delete the original columns, keep ID. 
+# Rename the file to dbNSFP_ENSG_plugin_Columns and merge it vep_annot_head.txt by the column "ID". 
+# Save as vep_plugin.txt. 
+# Merge vep_plugin.txt with dbNSFP_ENSG_gene_GRCh37.txt by "Gene" column, save as vep_dbNSFP.txt. 
+# Merge vep_dbNSFP.txt with variants.table by "ID" column, save as variants_annot_all.tab
 
-echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir /scratch/bi/20230426_TFM-FGOMEZ_IC-SM_T/SRVIIER286_20210602_WGSTRIO022_bmartinezd_S/ANALYSIS/20230511_ANALYSIS01_GENOME/03-annotation --output logs/MERGE_1.log --job-name MERGE_1 Rscript Merge_1.R" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir ${scratch_dir} --output logs/MERGE_ALL.log --job-name MERGE_ALL Rscript Merge_All.R" >> _03_Vep_plugin_dbNSFP_parse.sh
 
-# 6. Rename "Uploaded_variation" column to "ID"
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
 
-echo "sed -i 's/Uploaded_variation/ID/' ./vep/vep_plugin.txt" >> _03_Vep_plugin_dbNSFP_parse.sh
+# 6. Filter variants_annot_all.tab
 
-# 7. Merge vep_plugin.txt with dbNSFP_ENSG_gene_GRCh37.txt by "Gene" column, save as vep_dbNSFP.txt. Merge vep_dbNSFP.txt with variants.table by "ID" column, save as variants_annot_all.tab
+echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _03_awk.sh
 
-echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir /scratch/bi/20230426_TFM-FGOMEZ_IC-SM_T/SRVIIER286_20210602_WGSTRIO022_bmartinezd_S/ANALYSIS/20230511_ANALYSIS01_GENOME/03-annotation --output logs/MERGE_2.log --job-name MERGE_2 Rscript Merge_2.R" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _03_awk.sh
 
-# 8. Filter variants_annot_all.tab
-
-echo "awk 'NR>1 && $58 > 0.001 {print $0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _03_Vep_plugin_dbNSFP_parse.sh
-
-echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _03_Vep_plugin_dbNSFP_parse.sh
-
-echo "rm variants_annot_filterAF.tab" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "rm variants_annot_filterAF.tab" >> _03_awk.sh
 
 #-------------------------------------------------------------------------------------------------------
 
-# 9. Running exomiser
+# 7. Running exomiser
+
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
@@ -76,7 +77,7 @@ echo "srun --partition short_idx --nodelist ideafix03 --mem 100G --time 2:00:00 
 
 #---------------------------------------------------------------------------------------------------------
 
-## Lablog to modify the output reported by exomiser and create a final file with a personalized format.
+# 8. Lablog to modify the output reported by exomiser and create a final file with a personalized format.
 
 # Grep variant id for each inheritance model
 cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./id_%.txt " > _06_filter_heritance.sh
