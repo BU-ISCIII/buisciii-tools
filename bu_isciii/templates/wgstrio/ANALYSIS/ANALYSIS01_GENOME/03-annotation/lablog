@@ -51,6 +51,10 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 
 echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _03_awk.sh
 
+echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _03_awk.sh
+
+echo "rm variants_annot_filterAF.tab" >> _03_awk.sh
+
 #---------------------------------------------------------------------------------------------------------------------------------
 
 ## 7. Running exomiser
