@@ -62,4 +62,4 @@ echo "sbatch sarek.sbatch" > _01_run_sarek.sh
 
 #nohup bash _00_sarek.sh &> $(date '+%Y%m%d')_sarek01.log &
 
-
+echo "srun --partition short_idx --chdir $scratch_dir rm -rf work 01-sarek/gatk4/ &" > _02_clean.sh
