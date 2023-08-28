@@ -1,0 +1,132 @@
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_gene_GRCh37.txt
+ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_plugin_hg19.txt
+mkdir -p vep
+mkdir -p logs
+mkdir -p exomiser/{exomiser,exomiser_exome,exomiser_genes}
+mkdir -p filter_heritance/{filter_heritance,filter_heritance_genes,filter_heritance_exome}
+
+
+# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 R/4.2.1 Java/17.0.2.lua
+
+#------------------------------------------------------------------------------------------------------------------
+
+# 1 . Lablog to modify VCF ID field before running VEP.
+echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
+echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> _01_bcftools_query.sh
+
+# 2. Create variant table.
+
+echo "bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ./vep/variants_fil_mod.vcf > ./vep/variants.table" >> _01_bcftools_query.sh
+echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table " >> _01_bcftools_query.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
+
+#--------------------------------------------------------------------------------------------------------------------
+
+# 3. Lablog for annotating whole genome samples using Variant Effect Predictor (VEP).
+
+# Run Vep without the plugin columns
+
+echo "srun --partition short_idx --mem 100G --time 12:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ./vep/variants_fil_mod.vcf -o ./vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab &" > _02_vep_annotation.sh
+
+#--------------------------------------------------------------------------------------------------------------------
+
+# 4. Modify vep_annot.vcf in order to eliminate columns that start with ##, rename column #Uploaded_variation as ID
+
+echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" > _03_Vep_plugin_dbNSFP_parse.sh
+echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_Vep_plugin_dbNSFP_parse.sh
+
+# 5. Merge plugin columns in dbNSFP_ENSG_plugin.txt to obtain a column named "ID", delete the original columns, keep ID. 
+# Rename the file to dbNSFP_ENSG_plugin_Columns and merge it vep_annot_head.txt by the column "ID". 
+# Save as vep_plugin.txt. 
+# Merge vep_plugin.txt with dbNSFP_ENSG_gene_GRCh37.txt by "Gene" column, save as vep_dbNSFP.txt. 
+# Merge vep_dbNSFP.txt with variants.table by "ID" column, save as variants_annot_all.tab
+
+echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir ${scratch_dir} --output logs/MERGE_ALL.log --job-name MERGE_ALL Rscript Merge_All.R" >> _03_Vep_plugin_dbNSFP_parse.sh
+
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
+
+# 6. Filter variants_annot_all.tab
+
+echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _03_awk.sh
+
+echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _03_awk.sh
+
+echo "rm variants_annot_filterAF.tab" >> _03_awk.sh
+
+#---------------------------------------------------------------------------------------------------------------------------------
+
+## 7. Running exomiser
+
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
+output_folder=$(realpath ./exomiser/exomiser/exomiser | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
+sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile.yml
+sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
+#sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile.yml
+sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
+
+echo "srun --partition short_idx --nodelist ideafix04 --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _04_exomiser_ALL.sh
+
+## 8. Running exomiser_exome
+
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
+bed_file=$(realpath ../../../RAW/Exomiser_exome.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser_exome/exomiser_exome | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_exome.yml
+sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile_exome.yml
+sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile_exome.yml
+sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile_exome.yml
+sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile_exome.yml
+
+echo "srun --partition short_idx --nodelist ideafix06 --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_exome.log --job-name EXOMISER java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_exome.yml &" >> _04_exomiser_ALL.sh
+
+## 9. Running exomiser_genes
+
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
+bed_file=$(realpath ../../../RAW/Exomiser_genes.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser_genes/exomiser_genes | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_genes.yml
+sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile_genes.yml
+sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile_genes.yml
+sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile_genes.yml
+sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile_genes.yml
+
+echo "srun --partition short_idx --nodelist ideafix10 --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_genes.log --job-name EXOMISER java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_genes.yml &" >> _04_exomiser_ALL.sh
+
+#--------------------------------------------------------------------------------------------------------
+
+#10. Lablog to modify the output reported by exomiser and create a final file with a personalized format. For each exomiser analysis (whole genome, exome, genes)
+
+# Grep variant id for each inheritance model
+
+cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance/id_%.txt " > _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_genes/exomiser_genes_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance_genes/id_%_genes.txt " >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_exome/exomiser_exome_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance_exome/id_%_exome.txt " >> _05_filter_heritance_ALL.sh
+
+# Grep variants for each inheritance models from the full annotated variants file
+
+cat inheritance_types.txt | xargs -I % echo "grep -f ./filter_heritance/filter_heritance/id_%.txt ./variants_annot_all.tab > ./filter_heritance/filter_heritance/vep_annot_%.txt" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "grep -f ./filter_heritance/filter_heritance_genes/id_%_genes.txt ./variants_annot_all.tab > ./filter_heritance/filter_heritance_genes/vep_annot_%_genes.txt" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "grep -f ./filter_heritance/filter_heritance_exome/id_%_exome.txt ./variants_annot_all.tab > ./filter_heritance/filter_heritance_exome/vep_annot_%_exome.txt" >> _05_filter_heritance_ALL.sh
+
+cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./filter_heritance/filter_heritance/vep_annot_%.txt > ./filter_heritance/filter_heritance/vep_annot_%_final.txt" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./filter_heritance/filter_heritance_genes/vep_annot_%_genes.txt > ./filter_heritance/filter_heritance_genes/vep_annot_%_genes_final.txt" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./filter_heritance/filter_heritance_exome/vep_annot_%_exome.txt > ./filter_heritance/filter_heritance_exome/vep_annot_%_exome_final.txt" >> _05_filter_heritance_ALL.sh
+
+echo "rm ./filter_heritance/filter_heritance/id_*" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "rm ./filter_heritance/filter_heritance/vep_annot_%.txt" >> _05_filter_heritance_ALL.sh
+echo "rm ./filter_heritance/filter_heritance_genes/id_*" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "rm ./filter_heritance/filter_heritance_genes/vep_annot_%_genes.txt" >> _05_filter_heritance_ALL.sh
+echo "rm ./filter_heritance/filter_heritance_exome/id_*" >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "rm ./filter_heritance/filter_heritance_exome/vep_annot_%_exome.txt" >> _05_filter_heritance_ALL.sh
