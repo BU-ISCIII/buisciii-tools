@@ -1,0 +1,12 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+
+mkdir $DELIVERY_FOLDER
+mkdir "${DELIVERY_FOLDER}/assembly"
+
+# Assembly service
+cd $DELIVERY_FOLDER/assembly
+ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/MultiQC/multiqc_report.html .
+ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/kmerfinder.csv .
+ln -s ../../../ANALYSIS/*ASSEMBLY/03-assembly/unicycler assemblies
+ln -s ../../../ANALYSIS/*ASSEMBLY/03-assembly/quast_results/latest*/report.html quast_report.html
+cd -

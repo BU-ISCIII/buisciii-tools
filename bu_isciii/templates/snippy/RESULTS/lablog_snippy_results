@@ -1,0 +1,13 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+
+mkdir $DELIVERY_FOLDER
+mkdir "${DELIVERY_FOLDER}/snp"
+
+# SNIPPY service
+cd $DELIVERY_FOLDER/snp
+ln -s ../../../ANALYSIS/*SNIPPY/*snippy/*xlsx .
+ln -s ../../../ANALYSIS/*SNIPPY/*iqtree/phylo.iqtree.bootstrap.treefile phylo.iqtree.bootstrap.nwk
+ln -s ../../../ANALYSIS/*SNIPPY/99-stats/variants_stats.txt .
+ln -s ../../../ANALYSIS/*SNIPPY/99-stats/mapping_stats_summary.txt .
+ln -s ../../../ANALYSIS/*SNIPPY/99-stats/wgs_metrics_all_filtered.txt .
+cd -

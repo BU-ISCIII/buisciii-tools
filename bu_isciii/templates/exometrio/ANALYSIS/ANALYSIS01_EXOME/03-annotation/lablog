@@ -2,11 +2,17 @@ scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_gene_GRCh37.txt
 ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_plugin_hg19.txt
+
 mkdir -p vep
 mkdir -p exomiser
 mkdir -p logs
 
-# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 R/4.2.1 Java/17.0.2.lua
+# module load BCFtools/1.12-GCC-10.2.0
+# module load VEP/103.1-GCC-10.2.0
+# module load R/4.2.1
+# module load Java/17.0.2.lua
+
+#-----------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------
 
