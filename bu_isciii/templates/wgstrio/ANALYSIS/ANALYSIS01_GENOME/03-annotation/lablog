@@ -1,4 +1,4 @@
-# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 R/4.2.1 Java/17.0.2.lua
+
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
@@ -15,14 +15,14 @@ mkdir -p filter_heritance/{filter_heritance,filter_heritance_genes,filter_herita
 #------------------------------------------------------------------------------------------------------------------
 
 # 1 . Lablog to modify VCF ID field before running VEP.
-echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
-echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> _01_bcftools_query.sh
+echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > aux_01_bcftools_query.sh
+echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> aux_01_bcftools_query.sh
 
 # 2. Create variant table.
 
-echo "bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ./vep/variants_fil_mod.vcf > ./vep/variants.table" >> _01_bcftools_query.sh
-echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table " >> _01_bcftools_query.sh
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
+echo "bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ./vep/variants_fil_mod.vcf > ./vep/variants.table" >> aux_01_bcftools_query.sh
+echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table " >> aux_01_bcftools_query.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./aux_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
 
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -47,15 +47,15 @@ echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_Vep_pl
 
 echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir ${scratch_dir} --output logs/MERGE_ALL.log --job-name MERGE_ALL Rscript Merge_All.R" >> _03_Vep_plugin_dbNSFP_parse.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./aux_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
 
 # 6. Filter variants_annot_all.tab
 
-echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _03_awk.sh
+echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> aux_03_awk.sh
 
-echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _03_awk.sh
+echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> aux_03_awk.sh
 
-echo "rm variants_annot_filterAF.tab" >> _03_awk.sh
+echo "rm variants_annot_filterAF.tab" >> aux_03_awk.sh
 
 #---------------------------------------------------------------------------------------------------------------------------------
 
