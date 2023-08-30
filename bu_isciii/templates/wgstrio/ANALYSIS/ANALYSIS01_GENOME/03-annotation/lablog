@@ -145,3 +145,6 @@ echo "rm ./filter_heritance/filter_heritance_genes/id_*" >> _05_filter_heritance
 cat inheritance_types.txt | xargs -I % echo "rm ./filter_heritance/filter_heritance_genes/vep_annot_%_genes.txt" >> _05_filter_heritance_ALL.sh
 echo "rm ./filter_heritance/filter_heritance_exome/id_*" >> _05_filter_heritance_ALL.sh
 cat inheritance_types.txt | xargs -I % echo "rm ./filter_heritance/filter_heritance_exome/vep_annot_%_exome.txt" >> _05_filter_heritance_ALL.sh
+
+# annot_all table is huge, lets shrink it a little bit
+echo "srun --partition short_idx -chdir ${scratch_dir} --output logs/COMPRESS.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_heritance_ALL.sh
