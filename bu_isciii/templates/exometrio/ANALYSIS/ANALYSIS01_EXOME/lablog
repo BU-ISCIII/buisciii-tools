@@ -49,7 +49,7 @@ nextflow run /data/bi/pipelines/nf-core-sarek-3.1.1/workflow/main.nf \\
           --outdir 01-sarek \\
           --genome GATK.GRCh37 \\
 	  	  --wes \\
-          --intervals '../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed' \\
+          --intervals '../../REFERENCES/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed' \\
           --dbsnp '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz' \\
 	      --dbsnp_tbi '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz.tbi' \\
 	      --dbsnp_vqsr '--resource:dbsnp,known=false,training=true,truth=false,prior=2.0 dbsnp_138_mod.b37.vcf.gz' \\

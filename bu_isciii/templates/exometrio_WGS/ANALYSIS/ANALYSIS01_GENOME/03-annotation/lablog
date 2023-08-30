@@ -77,7 +77,7 @@ echo "srun --partition short_idx --nodelist ideafix04 --mem 350G --time 12:00:00
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../RAW/Exomiser286_genes.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+bed_file=$(realpath ../../../REFERENCES/Exomiser286_genes.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 output_folder=$(realpath ./exomiser/exomiser_genes/exomiser_genes | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_genes.yml
@@ -94,7 +94,7 @@ echo "srun --partition short_idx --nodelist ideafix04 --mem 350G --time 12:00:00
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../RAW/Exomiser286_exome.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+bed_file=$(realpath ../../../REFERENCES/Exomiser286_exome.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 output_folder=$(realpath ./exomiser/exomiser_exome/exomiser_exome | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_exome.yml
