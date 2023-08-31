@@ -1,4 +1,4 @@
-#module load picard
+# module load picard
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 mkdir logs
