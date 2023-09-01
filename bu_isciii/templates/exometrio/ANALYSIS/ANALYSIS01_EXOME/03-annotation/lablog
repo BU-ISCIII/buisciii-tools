@@ -1,4 +1,4 @@
-# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 load R/4.2.1 Java/17.0.2.lua
+# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 R/4.2.1 Java/17.0.2.lua
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
