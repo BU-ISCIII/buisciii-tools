@@ -53,3 +53,6 @@ sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 EXOMISER_NODE="ideafix03"
 echo "srun --partition short_idx --nodelist ${EXOMISER_NODE} --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _06_exomiser_exome.sh
 echo "srun --chdir /tmp --partition short_idx --nodelist ${EXOMISER_FULL_NODE} rm spring.log &" > _07_delete_springlog.sh
+
+# annot_all table is huge, lets shrink it a little bit
+echo "srun --partition short_idx -chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_heritance_ALL.sh
