@@ -77,7 +77,7 @@ echo "srun --partition short_idx --nodelist ${EXOMISER_NODE} --mem 100G --time 2
 #---------------------------------------------------------------------------------------------------------
 
 
-echo "srun --chdir /tmp --partition short_idx --nodelist ${EXOMISER_FULL_NODE} rm spring.log &" > _05_filter_heritance.sh
+echo "srun --chdir /tmp --partition short_idx --nodelist ${EXOMISER_NODE} rm spring.log &" > _05_filter_heritance.sh
 
 ## Lablog to modify the output reported by exomiser and create a final file with a personalized format.
 # Grep variant id for each inheritance model
