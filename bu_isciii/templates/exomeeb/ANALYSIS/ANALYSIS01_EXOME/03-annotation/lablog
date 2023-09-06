@@ -46,7 +46,6 @@ sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
 sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
-# CHANGE THE NODE FOR EXOMISER HERE
 # THE FILE "spring.log" MUST BE DELETED IN THE CORRESPONDING NODE
 echo "java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux_06_exomiser_exome.sh
 echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash aux_06_exomiser_exome.sh" > _06_exomiser_exome.sh
