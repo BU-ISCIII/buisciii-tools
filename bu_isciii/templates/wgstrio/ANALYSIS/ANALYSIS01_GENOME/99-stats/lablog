@@ -7,4 +7,4 @@ cat ../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --mem 100G 
 
 
 echo "echo "\"SAMPLE\",\"MEAN TARGET COVERAGE\", \"PCT USABLE BASES ON TARGET\",\"FOLD ENRICHMENT\",\"PCT TARGET BASES 10X\",\"PCT TARGET BASES 20X\",\"PCT TARGET BASES 30X\",\"PCT TARGET BASES 40X\",\"PCT TARGET BASES 50X\"" > hsMetrics_all.out" > _02_hsMetrics_all.sh
-cat ../samples_id.txt | xargs -I % echo "grep '^Illumin' %_hsMetrics.out | awk 'BEGIN{FS=\"\\t\";OFS=\",\"}{print \"%\",\$34,\$12,\$13,\$48,\$49,\$50,\$51,\$52}' >> hsMetrics_all.out" >> _02_hsMetrics_all.sh
+cat ../samples_id.txt | xargs -I % echo "grep '^exomiser' %_hsMetrics.out | awk 'BEGIN{FS=\"\\t\";OFS=\",\"}{print \"%\",\$34,\$12,\$13,\$48,\$49,\$50,\$51,\$52}' >> hsMetrics_all.out" >> _02_hsMetrics_all.sh
