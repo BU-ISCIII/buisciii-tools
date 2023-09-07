@@ -38,7 +38,7 @@ class RestServiceApi:
             if req.status_code > 201:
                 if safe:
                     log.info(
-                        "Resolution id does not exist. Status code: " + req.status_code
+                        f"Resolution id does not exist. Status code: {req.status_code}"
                     )
                     sys.exit()
                 else:
