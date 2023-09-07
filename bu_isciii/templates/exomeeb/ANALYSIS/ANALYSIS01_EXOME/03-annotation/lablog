@@ -1,3 +1,5 @@
+# module load BCFtools/1.12-GCC-10.2.0 VEP/103.1-GCC-10.2.0 R/4.2.1 Java/17.0.2.lua
+
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP_ENSG_gene_GRCh37.txt .
@@ -5,10 +7,6 @@ mkdir -p vep
 mkdir -p exomiser
 mkdir -p logs
 
-# module load BCFtools/1.12-GCC-10.2.0
-# module load VEP/103.1-GCC-10.2.0
-# module load R/4.2.1
-# module load Java/17.0.2.lua
 
 # 1 . Lablog to modify VCF ID field before running VEP.
 echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
@@ -41,13 +39,16 @@ echo 'grep -P "(HIGH|MODERATE)" ./variants_annot_all.tab > ./variants_annot_high
 
 # 9. Running exomiser
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
 output_folder=$(realpath ./exomiser/exomiser | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
-sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile.yml
 sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
-echo "srun --partition short_idx --nodelist ideafix03 --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _06_exomiser_exome.sh
+# THE FILE "spring.log" MUST BE DELETED IN THE CORRESPONDING NODE
+echo "java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux_06_exomiser_exome.sh
+echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash aux_06_exomiser_exome.sh" > _06_exomiser_exome.sh
+
+# annot_all table is huge, lets shrink it a little bit
+echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _07_gzip_table.sh
