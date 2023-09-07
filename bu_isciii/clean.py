@@ -152,7 +152,7 @@ class CleanUp:
         """
         if to_stdout:
             folders = ", ".join(self.delete_folders)
-            stderr.print(f"The following folders will be purge: {folders}")
+            stderr.print(f"The following folders will be purged: {folders}")
             files = ", ".join(self.delete_files)
             stderr.print(f"The following files will be deleted: {files}")
             return
