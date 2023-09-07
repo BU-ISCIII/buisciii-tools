@@ -83,7 +83,7 @@ class Scratch:
                 f.write("Origin service directory: " + self.service_dir + "\n")
                 f.close()
                 stderr.print(
-                    "[green]Successfully copyed the directory to %s"
+                    "[green]Successfully copied the directory to %s"
                     % self.scratch_path,
                     highlight=False,
                 )
@@ -118,7 +118,7 @@ class Scratch:
                 rsync_command = self.rsync_command + self.scratch_path + " " + dest_dir
                 subprocess.run(rsync_command, shell=True, check=True)
                 stderr.print(
-                    "[green]Successfully copyed the directory to %s" % dest_folder,
+                    "[green]Successfully copied the directory to %s" % dest_folder,
                     highlight=False,
                 )
             else:
