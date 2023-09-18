@@ -60,11 +60,8 @@ echo "rm variants_annot_filterAF.tab" >> aux_03_awk.sh
 #---------------------------------------------------------------------------------------------------------------------------------
 
 ## 7. Running exomiser
-## NOTE: CHANGE HERE THE NODES
-EXOMISER_FULL_NODE="ideafix04"
 EXOMISER_EXOME_NODE="ideafix06"
 EXOMISER_GENES_NODE="ideafix10"
-
 
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
@@ -77,7 +74,8 @@ sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
 #sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
-echo "srun --partition short_idx --nodelist ${EXOMISER_FULL_NODE} --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml &" > _04_exomiser_ALL.sh
+echo "java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux1_04_exomiser_ALL.sh
+echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${sratch_dir}/aux1_04_exomiser_ALL.sh &" > _04_exomiser_ALL.sh
 
 ## 8. Running exomiser_exome
 
@@ -93,7 +91,8 @@ sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile_exome.yml
 sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile_exome.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile_exome.yml
 
-echo "srun --partition short_idx --nodelist ${EXOMISER_EXOME_NODE} --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_exome.log --job-name EXOMISER java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_exome.yml &" >> _04_exomiser_ALL.sh
+echo "java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_exome.yml; rm /tmp/spring.log" > aux2_04_exomiser_exome.sh
+echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_exome.log --job-name EXOMISER bash ${sratch_dir}/aux2_04_exomiser_exome.sh &" >> _04_exomiser_ALL.sh
 
 ## 9. Running exomiser_genes
 
@@ -109,23 +108,16 @@ sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile_genes.yml
 sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile_genes.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile_genes.yml
 
-echo "srun --partition short_idx --nodelist ${EXOMISER_GENES_NODE} --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_genes.log --job-name EXOMISER java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_genes.yml &" >> _04_exomiser_ALL.sh
+echo "java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_genes.yml; rm /tmp/spring.log" > aux3_04_exomiser_genes.sh
+echo "srun --partition short_idx --nodelist ${EXOMISER_GENES_NODE} --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_genes.log --job-name EXOMISER bash ${sratch_dir}/aux3_04_exomiser_genes.sh &" >> _04_exomiser_ALL.sh
 
 #--------------------------------------------------------------------------------------------------------
-
-## 9.1 Exomiser leaves some ugly spring.log that must be deleted for other users to run exomizer
-## so we do that here
-
-echo "srun --chdir /tmp --partition short_idx --nodelist ${EXOMISER_FULL_NODE} rm spring.log &" > _05_filter_heritance_ALL.sh
-echo "srun --chdir /tmp --partition short_idx --nodelist ${EXOMISER_EXOME_NODE} rm spring.log &" >> _05_filter_heritance_ALL.sh
-echo "srun --chdir /tmp --partition short_idx --nodelist ${EXOMISER_GENES_NODE} rm spring.log &" >> _05_filter_heritance_ALL.sh
-
 
 #10. Lablog to modify the output reported by exomiser and create a final file with a personalized format. For each exomiser analysis (whole genome, exome, genes)
 
 # Grep variant id for each inheritance model
 
-cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance/id_%.txt " >> _05_filter_heritance_ALL.sh
+cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance/id_%.txt " > _05_filter_heritance_ALL.sh
 cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_genes/exomiser_genes_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance_genes/id_%_genes.txt " >> _05_filter_heritance_ALL.sh
 cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_exome/exomiser_exome_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./filter_heritance/filter_heritance_exome/id_%_exome.txt " >> _05_filter_heritance_ALL.sh
 
