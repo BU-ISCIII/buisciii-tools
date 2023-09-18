@@ -75,7 +75,7 @@ sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
 echo "java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux1_04_exomiser_ALL.sh
-echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${sratch_dir}/aux1_04_exomiser_ALL.sh &" > _04_exomiser_ALL.sh
+echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${scratch_dir}/aux1_04_exomiser_ALL.sh &" > _04_exomiser_ALL.sh
 
 ## 8. Running exomiser_exome
 
@@ -92,7 +92,7 @@ sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile_exome.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile_exome.yml
 
 echo "java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_exome.yml; rm /tmp/spring.log" > aux2_04_exomiser_exome.sh
-echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_exome.log --job-name EXOMISER bash ${sratch_dir}/aux2_04_exomiser_exome.sh &" >> _04_exomiser_ALL.sh
+echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_exome.log --job-name EXOMISER bash ${scratch_dir}/aux2_04_exomiser_exome.sh &" >> _04_exomiser_ALL.sh
 
 ## 9. Running exomiser_genes
 
@@ -109,7 +109,7 @@ sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile_genes.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile_genes.yml
 
 echo "java -Xms300g -Xmx300g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile_genes.yml; rm /tmp/spring.log" > aux3_04_exomiser_genes.sh
-echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_genes.log --job-name EXOMISER bash ${sratch_dir}/aux3_04_exomiser_genes.sh &" >> _04_exomiser_ALL.sh
+echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER_genes.log --job-name EXOMISER bash ${scratch_dir}/aux3_04_exomiser_genes.sh &" >> _04_exomiser_ALL.sh
 
 #--------------------------------------------------------------------------------------------------------
 
