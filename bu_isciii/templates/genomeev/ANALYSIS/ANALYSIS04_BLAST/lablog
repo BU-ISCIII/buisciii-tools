@@ -3,12 +3,24 @@
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 mkdir logs
 
-cat ../samples_id.txt | while read in; do mkdir ${in}; cp ../*/*/assembly/*/*/${in}.scaffolds.fa.gz ${in}; done 
-cat ./noscaffold.txt | while read in; do cp ../*/*/assembly/*/*/${in}.contigs.fa.gz ${in}/${in}.scaffolds.fa.gz; done 
+# if there are scaffolds, uncompress the scaffolds in its dir (zcat for decompression)
+# if there contigs and no scaffolds, uncompress the contigs as scaffolds in its dir
+echo "Samples that did not generate scaffolds:" > noscaffold.txt
+cat ../samples_id.txt | while read in; do
+    mkdir ${in}
+    # ls will return 0 if there are no scaffolds file
+    if [ $(ls ../*/*/assembly/*/*/${in}.scaffolds.fa.gz | wc -l) != 0 ]; then
+        zcat ../*/*/assembly/*/*/${in}.scaffolds.fa.gz > ${in}/${in}.scaffolds.fa
+    else
+        zcat ../*/*/assembly/*/*/${in}.contigs.fa.gz > ${in}/${in}.scaffolds.fa
+        echo ${in} >> noscaffold.txt
+    fi
+done 
 
-echo "gunzip */*.gz" > _01_gunzip.sh
+cat ../samples_id.txt | while read in; do echo "srun --chdir ${scratch_dir} --partition middle_idx--cpus-per-task 10 --output logs/BLASTN_${in}_%j.log --job-name BLASTN_${in} blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${in}/${in}.scaffolds.fa -out ${in}/${in}.blast.txt -outfmt '6 stitle std slen qlen qcovs' &"; done > _01_blast.sh
+cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}/${in}.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$1 !~ /phage/ {print \$0}' > ${in}/${in}.blast.filt.txt"; done > _02_filt_blast.sh
 
-cat ../samples_id.txt | while read in; do echo "srun --chdir ${scratch_dir} --partition middle_idx--cpus-per-task 10 --output logs/BLASTN_${in}_%j.log --job-name BLASTN_${in} blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${in}/${in}.scaffolds.fa -out ${in}/${in}.blast.txt -outfmt '6 stitle std slen qlen qcovs' &"; done > _02_blast.sh
-cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}/${in}.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$1 !~ /phage/ {print \$0}' > ${in}/${in}.blast.filt.txt"; done > _03_filt_blast.sh
-echo -e "stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered" > header
-cat ../samples_id.txt | while read in; do echo "cat header ${in}.blast.filt.txt > ${in}.blast.filt.header.txt";done > _04_header.sh
+echo "echo -e 'stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered' > header" > _03_add_header.sh
+
+cat ../samples_id.txt | while read in; do echo "cat header ${in}/${in}.blast.filt.txt > ${in}.blast.filt.header.txt"; done > _03_add_header.sh
+echo "rm header" >> _03_add_header.sh
