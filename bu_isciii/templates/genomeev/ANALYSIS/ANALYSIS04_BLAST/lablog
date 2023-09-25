@@ -1,0 +1,14 @@
+# module load BLAST+/2.11.0-gompi-2020b
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+mkdir logs
+
+cat ../samples_id.txt | while read in; do mkdir ${in}; cp ../*/*/assembly/*/*/${in}.scaffolds.fa.gz ${in}; done 
+cat ./noscaffold.txt | while read in; do cp ../*/*/assembly/*/*/${in}.contigs.fa.gz ${in}/${in}.scaffolds.fa.gz; done 
+
+echo "gunzip */*.gz" > _01_gunzip.sh
+
+cat ../samples_id.txt | while read in; do echo "srun --chdir ${scratch_dir} --partition middle_idx--cpus-per-task 10 --output logs/BLASTN_${in}_%j.log --job-name BLASTN_${in} blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${in}/${in}.scaffolds.fa -out ${in}/${in}.blast.txt -outfmt '6 stitle std slen qlen qcovs' &"; done > _02_blast.sh
+cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}/${in}.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$1 !~ /phage/ {print \$0}' > ${in}/${in}.blast.filt.txt"; done > _03_filt_blast.sh
+echo -e "stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered" > header
+cat ../samples_id.txt | while read in; do echo "cat header ${in}.blast.filt.txt > ${in}.blast.filt.header.txt";done > _04_header.sh
