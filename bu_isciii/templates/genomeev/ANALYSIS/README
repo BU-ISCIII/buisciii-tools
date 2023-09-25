@@ -1,0 +1,12 @@
+This document should be read as INSTRUCTIONS to perform the "genomeev" service, as created on 25 Sep 2023.
+The steps to follow to perform this service (which, by the way, can be done fairly quickly computationally speaking) are the following:
+
+- Load the samples into the RAW directory (manually or automatically using the BU-ISCIII tools)
+
+- Copy all files from this template (manually or automatically, make sure all files are there)
+
+- Copy the whole service folder to scratch_tmp (at least, we had to do that when this template was created)
+
+- First part is PikaVirus. Run PikaVirus by executing lablog_pikavirus, then enter the PikaVirus folder, execute the lablog, load the modules and do the thing. Feel free to change anything in PikaVirus through command or through the config (config is recommended so that any changes can be tracked).
+
+- Once PikaVirus has ended, we have to dive into the results, particularly the
