@@ -43,7 +43,13 @@
       "fastq_repo": "/srv/fastq_repo"
     },
     "scratch_copy": {
-      "command": "rsync -rlv --exclude 'service_info.txt' --exclude 'work' --exclude '*_NC' "
+      "protocol": "rsync",
+      "options": ["-rlpv"],
+      "exclusions": [
+        "'*_NC'",
+        "'service_info.txt'",
+        "'work'"
+      ]
     },
     "archive": {
       "data_path": "/data/bi",
