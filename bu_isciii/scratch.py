@@ -54,9 +54,7 @@ class Scratch:
             self.direction = direction
 
         # Load conf
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "api_settings"
-        )
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"],
@@ -94,7 +92,9 @@ class Scratch:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths("services_and_colaborations", self.resolution_info, "non_archived_path")
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
 
         self.full_path = os.path.join(self.path, self.service_folder)
 
