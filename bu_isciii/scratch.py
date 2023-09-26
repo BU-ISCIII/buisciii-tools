@@ -13,7 +13,7 @@ import shutil
 # Local imports
 import bu_isciii
 import bu_isciii.utils
-from bu_isciii.drylab_api import RestServiceApi
+import bu_isciii.drylab_api
 import bu_isciii.config_json
 
 log = logging.getLogger(__name__)
@@ -55,17 +55,22 @@ class Scratch:
 
         # Load conf
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
+            "api_settings"
         )
         # Obtain info from iskylims api
-        rest_api = RestServiceApi(conf_api["server"], conf_api["api_url"], api_token)
+        rest_api = bu_isciii.drylab_api.RestServiceApi(
+            conf_api["server"],
+            conf_api["api_url"],
+            api_token,
+        )
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
         self.rsync_command = self.conf["command"]
 
         self.resolution_info = rest_api.get_request(
-            request_info="serviceFullData", safe=False, resolution=self.resolution_id
+            request_info="resolutionFullData", safe=False, resolution=self.resolution_id
         )
-        self.service_folder = self.resolution_info["resolutions"][0][
+
+        self.service_folder = self.resolution_info["resolutions"][
             "resolutionFullNumber"
         ]
         self.scratch_path = os.path.join(self.tmp_dir, self.service_folder)
@@ -89,7 +94,7 @@ class Scratch:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(self.resolution_info)
+            self.path = bu_isciii.utils.get_service_paths("services_and_colaborations", self.resolution_info, "non_archived_path")
 
         self.full_path = os.path.join(self.path, self.service_folder)
 
