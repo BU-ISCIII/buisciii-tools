@@ -456,13 +456,13 @@ def bioinfo_doc(
 @click.option(
     "-id",
     "--initial_date",
-    default=False,
+    default=None,
     help="The date from which start search (format 'YYYY-MM-DD')",
 )
 @click.option(
     "-fd",
     "--final_date",
-    default=False,
+    default=None,
     help="The date from which end search (format 'YYYY-MM-DD')",
 )
 def archive(resolution, type, option, skip_prompts, initial_date, final_date):
