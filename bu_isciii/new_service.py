@@ -54,13 +54,13 @@ class NewService:
             conf_api["server"], conf_api["api_url"], api_token
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="serviceFullData", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
-            "resolutionFullNumber"
+            "resolution_full_number"
         ]
         self.services_requested = self.resolution_info["resolutions"][0][
-            "availableServices"
+            "available_services"
         ]
         self.service_samples = self.resolution_info["samples"]
 
@@ -167,18 +167,19 @@ class NewService:
                 "a",
                 encoding="utf-8",
             ) as f:
-                line = sample["sampleName"] + "\n"
+                line = sample["sample_name"] + "\n"
                 f.write(line)
 
     def create_symbolic_links(self):
         samples_files = []
         for sample in self.service_samples:
             regex = os.path.join(
-                self.conf["fastq_repo"], sample["projectName"], "{}*"
-            ).format(sample["sampleName"])
+                self.conf["fastq_repo"], sample["project_name"], "{}_*"
+            ).format(sample["sample_name"])
             sample_file = glob.glob(regex)
+
             if sample_file:
-                samples_files.appned(sample_file)
+                samples_files.append(sample_file)
             else:
                 stderr.print(
                     "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project."
@@ -198,19 +199,20 @@ class NewService:
             ):
                 stderr.print("Bye!")
                 sys.exit()
-        for file in samples_files:
-            try:
-                os.symlink(
-                    file,
-                    os.path.join(self.full_path, "RAW", os.path.basename(file)),
-                )
-            except OSError as e:
-                stderr.print(
-                    "[red]ERROR: Symbolic links creation failed for sample %s."
-                    % sample["sampleName"]
-                )
-                stderr.print("Traceback: %s" % e)
-                sys.exit()
+        for sample in samples_files:
+            for file in sample:
+                try:
+                    os.symlink(
+                        file,
+                        os.path.join(self.full_path, "RAW", os.path.basename(file)),
+                    )
+                except OSError as e:
+                    stderr.print(
+                        "[red]ERROR: Symbolic links creation failed for sample %s."
+                        % sample["sampleName"]
+                    )
+                    stderr.print("Traceback: %s" % e)
+                    sys.exit()
 
     def samples_json(self):
         json_samples = json.dumps(self.service_samples, indent=4)
@@ -229,7 +231,7 @@ class NewService:
         self.create_symbolic_links()
         self.samples_json()
         self.rest_api.put_request(
-            "updateState", "resolution", self.resolution_id, "state", "In%20Progress"
+            "update-state", "resolution", self.resolution_id, "state", "in_progress"
         )
 
     def get_resolution_id(self):
