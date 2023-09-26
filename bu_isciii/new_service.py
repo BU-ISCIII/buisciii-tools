@@ -80,8 +80,9 @@ class NewService:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(self.resolution_info)
-
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
         self.full_path = os.path.join(self.path, self.service_folder)
 
     def create_folder(self):
