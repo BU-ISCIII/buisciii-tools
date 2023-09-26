@@ -183,25 +183,25 @@ def get_service_paths(service_type, resolution_info, archived_status):
             service_path = os.path.join(
                 global_conf["archived_path"],
                 service_type,
-                resolution_info["serviceUserId"]["profile"]["profileCenter"],
-                resolution_info["serviceUserId"]["profile"][
-                    "profileClassificationArea"
+                resolution_info["service_user_id"]["profile"]["profile_center"],
+                resolution_info["service_user_id"]["profile"][
+                    "profile_classification_area"
                 ].lower(),
             )
         if archived_status == "non_archived_path":
             service_path = os.path.join(
                 global_conf["data_path"],
                 service_type,
-                resolution_info["Service"]["serviceUserId"]["profile"]["profileCenter"],
-                resolution_info["serviceUserId"]["profile"][
-                    "profileClassificationArea"
+                resolution_info["service_user_id"]["profile"]["profile_center"],
+                resolution_info["service_user_id"]["profile"][
+                    "profile_classification_area"
                 ].lower(),
             )
     return service_path
 
 
 def get_sftp_folder(resolution_info):
-    service_user = resolution_info["serviceUserId"]["username"]
+    service_user = resolution_info["service_user_id"]["username"]
     json_file = os.path.join(os.path.dirname(__file__), "templates", "sftp_user.json")
     user_sftp_file = open(json_file)
     json_data = json.load(user_sftp_file)
