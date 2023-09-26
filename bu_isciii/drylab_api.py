@@ -20,7 +20,7 @@ class RestServiceApi:
         self.request_url = server + url
         self.headers = {
             "content-type": "application/json",
-            "authorization": "Basic " + password,
+            "WWW-Authenticate": "Basic " + password,
         }
 
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
