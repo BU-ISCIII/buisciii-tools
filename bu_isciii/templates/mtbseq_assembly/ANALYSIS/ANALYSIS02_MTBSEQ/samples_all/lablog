@@ -14,7 +14,7 @@ cd GATK_Bam; ln -s ../../*/GATK_Bam/* . ; cd -
 cd Mpileup; ln -s ../../*/Mpileup/* . ; cd -
 cd Position_Tables; ln -s ../../*/Position_Tables/* . ; cd -
 
-##### Create join scrpts
+##### Create join scripts
 echo "srun --job-name MTBSEQ_JOIN  --output logs/MTBSEQ_JOIN.%j.log --partition middle_obx --mem 48G --chdir ${scratch_dir} --cpus-per-task 10 MTBseq --step TBjoin --threads 5 --samples samples.txt &" > _01_tb_join.sh
 echo "srun --job-name MTBSEQ_AMEND  --output logs/MTBSEQ_AMEND.%j.log --partition middle_obx --mem 48G --chdir ${scratch_dir} --cpus-per-task 10 MTBseq --step TBamend --threads 5 --samples samples.txt &" > _02_tb_amend.sh
 echo "srun --job-name MTBSEQ_GROUPS --output logs/MTBSEQ_GROUPS.%j.log --partition middle_obx --mem 48G --chdir ${scratch_dir} --cpus-per-task 10 MTBseq --step TBgroups --threads 5 --samples samples.txt &" > _03_tb_groups.sh
