@@ -55,7 +55,9 @@ class Scratch:
             self.direction = direction
 
         # Load conf
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("xtutatis_api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"],
@@ -169,7 +171,8 @@ class Scratch:
                             sync_source_contents=False,
                         )
                         stderr.print(
-                            "[green]Successfully copyed the directory to %s" % dest_folder,
+                            "[green]Successfully copyed the directory to %s"
+                            % dest_folder,
                             highlight=False,
                         )
                     else:
@@ -181,7 +184,8 @@ class Scratch:
                 except RsyncError as e:
                     stderr.print(e)
                     stderr.print(
-                        "[red]ERROR: Copy of the directory %s failed" % self.scratch_path,
+                        "[red]ERROR: Copy of the directory %s failed"
+                        % self.scratch_path,
                         highlight=False,
                     )
             else:
