@@ -58,13 +58,13 @@ class CleanUp:
             conf_api["server"], conf_api["api_url"], api_token
         )
         self.resolution_info = rest_api.get_request(
-            request_info="serviceFullData", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
-            "resolutionFullNumber"
+            "resolution_full_number"
         ]
         self.services_requested = self.resolution_info["resolutions"][0][
-            "availableServices"
+            "available_services"
         ]
         self.service_samples = self.resolution_info["samples"]
 
@@ -86,7 +86,9 @@ class CleanUp:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(self.resolution_info)
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
 
         self.full_path = os.path.join(self.path, self.service_folder)
 
@@ -323,7 +325,7 @@ class CleanUp:
         files_to_delete = []
         for sample_info in self.service_samples:
             for file in self.delete_files:
-                file_to_delete = file.replace("sample_name", sample_info["sampleName"])
+                file_to_delete = file.replace("sample_name", sample_info["sample_name"])
                 files_to_delete.append(file_to_delete)
         path_content = self.scan_dirs(to_find=files_to_delete)
         for file in path_content:
