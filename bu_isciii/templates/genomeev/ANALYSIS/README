@@ -22,4 +22,4 @@ The steps to follow to perform this service (which, by the way, can be done fair
 
 - Once it has ended, its time for MAG. Go to the ANALYSIS03 directory, execute the lablog, load the modules and run MAG with the specified params.
 
-- Last, but not least, go to the ANALYSIS04 directory and run the lablog, the lablog will check if during the assembly step in viralrecon, and will store the names of the samples that didnt assembly to the scaffold level in the noscaffold.txt file. Run normally the three scripts after loading the corresponding module, and that should be about everything there is to this service! 
+- Last, but not least, go to the ANALYSIS04 directory and run the lablog, the lablog will check the assembly step in viralrecon, and will store the names of the samples that didnt assembly to the scaffold level in the noscaffold.txt file. Run normally the three scripts after loading the corresponding module, and that should be about everything there is to this service! 
