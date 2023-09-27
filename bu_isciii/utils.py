@@ -1,11 +1,17 @@
 #!/usr/bin/env python
+import calendar
+import datetime
+import hashlib
+import json
 import os
-import rich
+import tarfile
+
 import questionary
+import rich
+
 import bu_isciii
 import bu_isciii.config_json
 import bu_isciii.service_json
-import json
 
 
 def rich_force_colors():
@@ -28,7 +34,8 @@ stderr = rich.console.Console(
 
 def prompt_resolution_id():
     stderr.print(
-        "Specify the name resolution id for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
+        "Specify the name resolution id for the service you want to create."
+        "You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
     )
     resolution_id = questionary.text("Resolution id").unsafe_ask()
     return resolution_id
@@ -36,7 +43,8 @@ def prompt_resolution_id():
 
 def prompt_service_id():
     stderr.print(
-        "Specify the name service ID for the service you want to create. You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
+        "Specify the name service ID for the service you want to create."
+        "You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
     )
     resolution_id = questionary.text("Service ID").unsafe_ask()
     return resolution_id
@@ -58,17 +66,20 @@ def prompt_year(lower_limit, upper_limit):
 
         except ValueError:
             stderr.print(
-                f"Ooops, seems like the answer '{year}' is not a year! Please specify the year for which you want to archive services."
+                f"Ooops, seems like the answer '{year}' is not a year!"
+                "Please specify the year for which you want to archive services."
             )
 
         # Check limits
         if year < lower_limit:
             stderr.print(
-                f"Sorry, but the year cant be earlier than {lower_limit}! That would cause a space-time rupture and the Doctor is nowhere to be found! Please, try again!"
+                f"Sorry, but the year cant be earlier than {lower_limit}!"
+                "That would cause a space-time rupture and the Doctor is nowhere to be found! Please, try again!"
             )
         elif year > upper_limit:
             stderr.print(
-                f"Sorry, but the time machine has not been invented... Yet. Year {year} is maybe too... Futuristic. Please, try again!"
+                f"Sorry, but the time machine has not been invented... Yet. Year {year} is maybe too..."
+                "Futuristic. Please, try again!"
             )
         else:
             return year
@@ -96,7 +107,8 @@ def prompt_day(lower_limit, upper_limit):
                 return day
         except ValueError:
             stderr.print(
-                f"Ooops, seems like the answer '{day}' is not a valid day! Please specify the day for which you want to archive services (from {lower_limit} to {upper_limit})."
+                f"Ooops, seems like the answer '{day}' is not a valid day!"
+                "Please specify the day for which you want to archive services (from {lower_limit} to {upper_limit})."
             )
 
 
@@ -242,3 +254,136 @@ def append_end_to_service_id_list(services_requested):
             )
 
     return service_ids_requested
+
+
+def get_dir_size(path):
+    """
+    Get the size in bytes of a given directory
+    """
+    size = 0
+
+    for path, dirs, files in os.walk(path):
+        for file in files:
+            size += os.path.getsize(os.path.join(path, file))
+
+    return size
+
+
+def targz_dir(tar_name, directory):
+    """
+    Generate a tar gz file with the contents of a directory
+    """
+    with tarfile.open(tar_name, "w:gz") as out_tar:
+        out_tar.add(directory, arcname=os.path.basename(directory))
+    return True
+
+
+def uncompress_targz_directory(tar_name, directory):
+    """
+    Untar GZ file
+    """
+    with tarfile.open(tar_name) as out_tar:
+        out_tar.extractall("/".join(directory.split("/")[:-1]))
+    return
+
+
+def get_md5(file):
+    """
+    Given a file, open it and digest to get the md5
+    NOTE: might be troublesome when infile is too big
+    Based on:
+    https://www.quickprogrammingtips.com/python/how-to-calculate-md5-hash-of-a-file-in-python.html
+    """
+    with open(file, "rb") as infile:
+        infile = infile.read()
+        file_md5 = hashlib.md5(infile).hexdigest()
+
+    return file_md5
+
+
+def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
+    """
+    Ask the year, then the month, then the day of the month
+    This choice is always dependent on wether the date is or not available
+    return a 3 items list
+    If given a "previous_date" argument, always check that the date is posterior
+    "previous_date" format is the same as this functions output:
+    [year [str], chosen_month_number [str], day [str]]
+    Stored like this so that its easier to manage later
+    """
+
+    lower_limit_year = initial_year if previous_date is None else previous_date.year
+
+    # Range: lower_limit_year - current year
+    year = bu_isciii.utils.prompt_year(
+        lower_limit=lower_limit_year, upper_limit=datetime.date.today().year
+    )
+
+    # Limit the list to the current month if year = current year
+    # This could be a one-liner:
+    # month_list = [[num, month] for num, month in enumerate(month_name)][1:] if year < date.today().year
+    # else month_list = [[num, month] for num, month in enumerate(month_name)][1:date.today().month+1]
+    # I found it easier the following way:
+    if year < datetime.date.today().year:
+        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:]
+    else:
+        month_list = [[num, month] for num, month in enumerate(calendar.month_name)][
+            1:datetime.date.today().month + 1
+        ]
+
+    # If there is a previous date
+    # and year is the same as before, limit the quantity of months
+    if previous_date is not None and year == previous_date.year:
+        month_list = month_list[previous_date.month - 1:]
+
+    chosen_month_number, chosen_month_name = (
+        bu_isciii.utils.prompt_selection(
+            f"Choose the month of {year} from which start counting",
+            [f"Month {num:02d}: {month}" for num, month in month_list],
+        )
+        .replace("Month", "")
+        .strip()
+        .split(": ")
+    )
+    # For the day, use "calendar":
+    # calendar.month(year, month) returns a string with the calendar
+    # Use replace to move the "\n"
+    # Use split " " to generate a list
+    # Use filter to remove empty strings that may appear
+    # Do not get the 9 first elements bc they are:
+    # "Month", "Year", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
+
+    day_list = list(
+        filter(
+            None,
+            calendar.month(year, int(chosen_month_number))
+            .replace("\n", " ")
+            .split(" "),
+        )
+    )[9:]
+
+    # if current month and day, limit the options to the current day
+    if (
+        year == datetime.date.today().year
+        and int(chosen_month_number) == datetime.date.today().month
+    ):
+        day_list = day_list[: datetime.date.today().day]
+
+    # if previous date  & same year & same month, limit days
+    if (
+        previous_date is not None
+        and year == previous_date.year
+        and chosen_month_number == previous_date.month
+    ):
+        day_list = day_list[previous_date.day - 1:]
+
+    # from the list, get the first and last item as limits for the function
+    day = bu_isciii.utils.prompt_day(
+        lower_limit=int(day_list[0]), upper_limit=int(day_list[-1])
+    )
+
+    return datetime.date(int(year), int(chosen_month_number), int(day))
+
+
+def validate_date(date_previous, date_posterior):
+    return
