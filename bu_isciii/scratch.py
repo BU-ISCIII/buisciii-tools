@@ -119,7 +119,7 @@ class Scratch:
                     )
                 else:
                     stderr.print(
-                        "[ref] This protocol is not allowd for the moment",
+                        "[ref] This protocol is not allowed at the moment",
                         highlight=False,
                     )
                     sys.exit()
@@ -177,7 +177,7 @@ class Scratch:
                         )
                     else:
                         stderr.print(
-                            "[ref] This protocol is not allowd for the moment",
+                            "[ref] This protocol is not allowed at the moment",
                             highlight=False,
                         )
                         sys.exit()
