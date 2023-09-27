@@ -31,17 +31,6 @@ class CleanUp:
         option=None,
         api_token=None,
     ):
-        """
-        Description:
-            Class to perform the cleaning.
-
-        Usage:
-
-        Attributes:
-
-        Methods:
-
-        """
         # access the api with the resolution name to obtain the data
         # ask away if no input given
         if resolution_id is None:
@@ -299,18 +288,6 @@ class CleanUp:
                     print(f"Renamed {directory_to_rename} to {newpath}.")
         return
 
-    def rename_nocopy(self, verbose=True):
-        """
-        Description:
-
-        Usage:
-
-        Params:
-
-        """
-        self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
-        return
-
     def purge_files(self):
         """
         Description:
@@ -444,7 +421,7 @@ class CleanUp:
         """
 
         self.delete_rename()
-        self.rename_nocopy()
+        self.rename(to_find=self.nocopy, add="_NC", verbose=True)
 
     def handle_clean(self):
         """
@@ -457,7 +434,7 @@ class CleanUp:
         if self.option == "full_clean":
             self.full_clean()
         if self.option == "rename_nocopy":
-            self.rename_nocopy()
+            self.rename(to_find=self.nocopy, add="_NC", verbose=True)
         if self.option == "clean":
             self.delete_rename()
         if self.option == "revert_renaming":
