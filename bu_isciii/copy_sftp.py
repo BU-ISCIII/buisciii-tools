@@ -33,18 +33,6 @@ class CopySftp:
         sftp_folder=None,
         api_token=None,
     ):
-        """
-        Description:
-            Class to perform the copy of the service to sftp folfer.
-
-        Usage:
-
-        Attributes:
-
-        Methods:
-
-        """
-
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
@@ -99,7 +87,9 @@ class CopySftp:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(self.resolution_info)
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
 
         self.full_path = os.path.join(self.path, self.service_folder)
 
