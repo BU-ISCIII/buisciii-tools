@@ -24,3 +24,23 @@ echo "echo -e 'stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqsta
 
 cat ../samples_id.txt | while read in; do echo "cat header ${in}/${in}.blast.filt.txt > ${in}.blast.filt.header.txt"; done >> _03_add_header.sh
 echo "rm header" >> _03_add_header.sh
+
+#  1: stitle
+#  2: qaccver
+#  3: saccver
+#  4: pident
+#  5: length
+#  6: ismatch
+#  7: gapopen
+#  8: qstart
+#  9: qend
+# 10: sstart
+# 11: send
+# 12: evalue
+# 13: bitscore
+# 14: slen
+# 15: qlen
+# 16: qcovs
+# 17: %cgAligned
+# 18: %refCovered
+# MORE INFO: https://www.metagenomics.wiki/tools/blast/blastn-output-format-6

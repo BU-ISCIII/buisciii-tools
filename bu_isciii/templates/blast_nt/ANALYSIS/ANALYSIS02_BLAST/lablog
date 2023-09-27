@@ -25,7 +25,37 @@ done
 
 # NOTE3: change the -query flag to meet your requirements
 cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_%%_%j.log --job-name BLASTN_%% blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025/nt -query %%/%%.scaffolds.fa -out %%/%%_blast.tsv -outfmt '6 qseqid stitle std slen qlen qcovs' &" > _01_blast.sh
-cat ../samples_id.txt | xargs -I %% echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$6/\$16,\$6/\$15}' %%/%%_blast.tsv | awk -v \"samplename=%%\" 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print samplename,\$0}' > %%/%%_blast_filt.tsv" > _02_filter_blast.sh
-echo -e "echo \"samplename\tcontigname\tstitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" > _03_gather_results.sh
-echo "cat header */*blast_filt.tab > all_samples_filtered_BLAST_results.tab" >> _03_gather_results.sh
-echo "rm header" >> _03_gather_results.sh
+
+# Filtering criteria:
+    # %refCovered > 0.7
+    # ref not a phage (stitle ~! /phage/)
+    # ref longer than 200 bp (slen > 200)
+
+cat ../samples_id.txt | xargs -I %% echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$16/\$6,\$15/\$6}' %%/%%_blast.tsv | awk -v \"samplename=%%\" 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$16 > 200 && \$17 > 0.7 && \$3 !~ /phage/ {print samplename,\$0}' > %%/%%_blast_filt.tsv" > _02_filter_blast.sh
+echo -e "echo \"samplename\tcontigname\tstitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" > _03_gather_results_add_header.sh
+echo "cat header */*blast_filt.tsv > all_samples_filtered_BLAST_results.tsv" >> _03_gather_results_add_header.sh
+cat ../samples_id.txt | xargs -I %% echo "cat header %%/%%_blast_filt.tsv > tmp; rm %%/%%_blast_filt.tsv; mv tmp %%/%%_blast_filt.tsv" >> _03_gather_results_add_header.sh
+echo "rm header" >> _03_gather_results_add_header.sh
+
+# NOTES FOR FILTERING
+#  1: samplename
+#  2: contigname
+#  3: stitle
+#  4: qaccver
+#  5: saccver
+#  6: pident
+#  7: length
+#  8: mismatch
+#  9: gapopen
+# 10: qstart
+# 11: qend
+# 12: sstart
+# 13: send
+# 14: evalue
+# 15: bitscore
+# 16: slen
+# 17: qlen
+# 18: qcovs
+# 19: %cgAligned
+# 20: %refCovered
+# MORE INFO: https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
