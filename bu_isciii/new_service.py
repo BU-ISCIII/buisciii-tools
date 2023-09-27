@@ -152,7 +152,8 @@ class NewService:
                 sys.exit()
         else:
             stderr.print(
-                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry! Please re-run and select one of the service ids."
+                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry!"
+                "Please re-run and select one of the service ids."
             )
             sys.exit()
             return False
@@ -183,8 +184,9 @@ class NewService:
                 samples_files.append(sample_file)
             else:
                 stderr.print(
-                    "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project."
-                    % regex
+                    "[red] This regex has not output any file: %s." % regex,
+                    "This maybe because the project is not yet in the fastq repo"
+                    "or because some of the samples are not in the project."
                 )
         stderr.print(
             "[blue] Service has %s number of selected samples in iSkyLIMS"
