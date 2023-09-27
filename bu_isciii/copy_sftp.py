@@ -62,7 +62,7 @@ class CopySftp:
         )
 
         self.resolution_info = rest_api.get_request(
-            request_info="serviceFullData", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
         if sftp_folder is None:
             self.sftp_folder = bu_isciii.utils.get_sftp_folder(self.resolution_info)[0]
@@ -70,16 +70,13 @@ class CopySftp:
             self.sftp_folder = sftp_folder
 
         self.service_folder = self.resolution_info["resolutions"][0][
-            "resolutionFullNumber"
+            "resolution_full_number"
         ]
         self.services_requested = self.resolution_info["resolutions"][0][
-            "availableServices"
+            "available_services"
         ]
         self.sftp_options = bu_isciii.config_json.ConfigJson().get_find(
             "sftp_copy", "options"
-        )
-        self.sftp_exclusions = bu_isciii.config_json.ConfigJson().get_find(
-            "sftp_copy", "exclusions"
         )
         self.services_to_copy = bu_isciii.utils.get_service_ids(self.services_requested)
 
