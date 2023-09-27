@@ -54,7 +54,7 @@ class Scratch:
             self.direction = direction
 
         # Load conf
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"],
@@ -65,11 +65,10 @@ class Scratch:
         self.rsync_command = self.conf["command"]
 
         self.resolution_info = rest_api.get_request(
-            request_info="resolutionFullData", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
-
-        self.service_folder = self.resolution_info["resolutions"][
-            "resolutionFullNumber"
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolution_full_number"
         ]
         self.scratch_path = os.path.join(self.tmp_dir, self.service_folder)
         self.out_file = os.path.join(
