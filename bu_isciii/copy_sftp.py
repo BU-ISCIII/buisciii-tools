@@ -134,17 +134,24 @@ class CopySftp:
             )
             self.sftp_options.append(log_command)
             try:
-                sysrsync.run(
-                    source=self.full_path,
-                    destination=self.sftp_folder,
-                    options=self.sftp_options,
-                    exclusions=self.sftp_exclusions,
-                    sync_source_contents=False,
-                )
-                stderr.print(
-                    "[green] Data copied to the sftp folder successfully",
-                    highlight=False,
-                )
+                if self.conf["protocol"] == "rsync":
+                    sysrsync.run(
+                        source=self.full_path,
+                        destination=self.sftp_folder,
+                        options=self.sftp_options,
+                        exclusions=self.conf["exclusions"],
+                        sync_source_contents=False,
+                    )
+                    stderr.print(
+                        "[green] Data copied to the sftp folder successfully",
+                        highlight=False,
+                    )
+                else:
+                    stderr.print(
+                        "[ref] This protocol is not allowd for the moment",
+                        highlight=False,
+                    )
+                    sys.exit()
             except RsyncError as e:
                 stderr.print(e)
                 stderr.print(
