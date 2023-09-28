@@ -21,6 +21,4 @@ EOF
 
 echo "sbatch multiqc.sbatch" > _01_run_multiqc.sh
 
-ln -s ../../../DOC/multiqc_config.yml .
-
 echo "find -type l | while read in; do unlink \${in}; done" > _02_unlink.sh
