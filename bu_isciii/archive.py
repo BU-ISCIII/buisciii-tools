@@ -25,7 +25,7 @@ stderr = rich.console.Console(
 
 class Archive:
     """
-    This class handles archive of active services and retrieval of archived services, from/to the 
+    This class handles archive of active services and retrieval of archived services, from/to the
     respectives folders / repositories
     """
 
@@ -52,6 +52,7 @@ class Archive:
             "non_archived_size": int(),
             "non_archived_compressed_size": int(),
             "found": [],
+            "same_size": bool,
             "md5_non_archived": "",
             "md5_archived": "",
             "compressed": "No compression performed",
@@ -193,9 +194,7 @@ class Archive:
                         "delivery_date"
                     ] = service["service_delivered_date"]
 
-                log.info(
-                    f"Services found in the time interval: {len(self.services)}"
-                )
+                log.info(f"Services found in the time interval: {len(self.services)}")
                 log.info(
                     "Names of the services found in said interval:"
                     f"{','.join([service for service in self.services.keys()])}"
@@ -227,15 +226,18 @@ class Archive:
                 self.services[service]["non_archived_path"] = None
             else:
                 self.services[service]["found_in_system"] = True
-                self.services[service][
-                    "archived_path"
-                ] = bu_isciii.utils.get_service_paths(
-                    self.ser_type, service_data, "archived_path"
+                self.services[service]["archived_path"] = os.path.join(
+                    bu_isciii.utils.get_service_paths(
+                        self.ser_type, service_data, "archived_path"
+                    ),
+                    service_data["resolutions"][0]["resolution_full_number"],
                 )
-                self.services[service][
-                    "non_archived_path"
-                ] = bu_isciii.utils.get_service_paths(
-                    self.ser_type, service_data, "non_archived_path"
+
+                self.services[service]["non_archived_path"] = os.path.join(
+                    bu_isciii.utils.get_service_paths(
+                        self.ser_type, service_data, "non_archived_path"
+                    ),
+                    service_data["resolutions"][0]["resolution_full_number"],
                 )
 
             self.services[service]["found"] = []
@@ -325,6 +327,13 @@ class Archive:
         log.info("Extracting size of involved directories")
 
         stderr.print("Extracting the size for the involved directories")
+
+        # Generate table with the generated info
+        size_table = rich.table.Table()
+        size_table.add_column("Service ID", justify="center")
+        size_table.add_column("Directory size (GB)", justify="center")
+        size_table.add_column("Found in", justify="center")
+
         for service in self.services.keys():
             if "Data dir" in self.services[service]["found"]:
                 self.services[service][
@@ -339,69 +348,34 @@ class Archive:
                     self.services[service]["archived_path"]
                 ) / pow(1024, 3)
 
-        # Generate table with the generated info
-        size_table = rich.table.Table()
-        size_table.add_column("Service ID", justify="center")
-        size_table.add_column("Directory size (GB)", justify="center")
-        size_table.add_column("Found in", justify="center")
-
-        # Different loop to allow for modifications
-        # Reasoning here:
-        #   len 0: not found, size "-"
-        #   len 2: found in both sides, compare sizes, if different, notify,
-        #   else, pick archived size (for instance, shouldn't matter)
-        #   len 1: if "Archive" in "found", size is archived size, else, non_archived
-
-        for service in self.services.keys():
-            if len(self.services[service]["found"]) == 0:
-                stderr.print(
-                    f"For service {service}, no folders (archived: {self.services[service]['archived_path']}"
-                    f"or non-archived: {self.services[service]['non_archived_path']}) could be found. Skipping"
-                )
-                continue
-            elif len(self.services[service]["found"]) == 2:
-                if (
-                    self.services[service]["archived_size"]
-                    == self.services[service]["non_archived_size"]
-                ):
-                    stderr.print(
-                        f"For service {service}, archived size ({self.services[service]['archived_size']} GB)"
-                        f"and non-archived size ({self.services[service]['non_archived_size']} GB) are equal."
-                    )
-                else:
-                    stderr.print(
-                        f"For service {service}, archived size ({self.services[service]['archived_size']} GB)"
-                        f"and non-archived size ({self.services[service]['non_archived_size']} GB) differ."
-                    )
+            if (
+                self.services[service]["archived_size"]
+                == self.services[service]["non_archived_size"]
+            ):
+                self.services[service]["same_size"] = True
             else:
-                if "Archive" in self.services[service]["found"]:
-                    stderr.print(
-                        "For service {service}, only archived was found, with size"
-                        f"{self.services[service]['archived_size']} GB."
-                    )
-                elif "Data dir" in self.services[service]["found"]:
-                    stderr.print(
-                        f"For service {service}, only non-archived was found,"
-                        f"with size {self.services[service]['non_archived_size']} GB."
-                    )
+                self.services[service]["same_size"] = False
 
-            size_table.add_row(
-                str(service),
-                (
-                    "-"
-                    if self.services[service]["non_archived_size"] is None
-                    else str(self.services[service]["non_archived_size"])
-                ),
-                (
-                    ",".join(self.services[service]["found"])
-                    if len(self.services[service]["found"]) > 0
-                    else "Not found in Archive or Data dir"
-                ),
-            )
+            if size_table.row_count < 10:
+                size_table.add_row(
+                    str(service),
+                    (
+                        "-"
+                        if self.services[service]["non_archived_size"] is None
+                        else str(self.services[service]["non_archived_size"])
+                    ),
+                    (
+                        ",".join(self.services[service]["found"])
+                        if len(self.services[service]["found"]) > 0
+                        else "Not found in Archive or Data dir"
+                    ),
+                )
 
+        stderr.print(
+            "Only the first 10 lines of the table will be shown here. Please check the csv for the complete info."
+        )
         stderr.print(size_table)
         log.info("FINISHED: Directory scouting")
-
         return
 
     def targz_directory(self, direction):
@@ -1200,23 +1174,23 @@ class Archive:
                     shutil.rmtree(self.services[service]["non_archived_path"])
         return
 
-    def generate_tsv_table(indict, chosen_filename):
+    def generate_tsv_table(self, filename):
         """
         Create a csv file containing the info for each service
         """
 
-        if os.path.exists(chosen_filename):
-            new_filename = chosen_filename.split(".")[0] + ".tsv"
+        if os.path.exists(filename):
+            new_filename = filename.split(".")[0] + ".1.tsv"
             stderr.print(
-                f"A tsv file named {chosen_filename} has already been found. Changing name to {new_filename}."
+                f"A tsv file named {filename} has already been found. Changing name to {new_filename}."
             )
             log.info(
-                f"A tsv file named {chosen_filename} has already been found. Name changed to {new_filename}."
+                f"A tsv file named {filename} has already been found. Name changed to {new_filename}."
             )
+            filename = new_filename
         else:
-            stderr.print(f"Generating TSV table to: {chosen_filename}")
-            log.info(f"STARTING: Generation of TSV table to: {chosen_filename}")
-            filename = chosen_filename
+            stderr.print(f"Generating TSV table to: {filename}")
+            log.info(f"STARTING: Generation of TSV table to: {filename}")
 
         with open(filename, "w") as infile:
             csv_dict = {
@@ -1239,79 +1213,82 @@ class Archive:
                 "Deletion process": None,
             }
 
-            infile.write("\t".join(list(csv_dict.keys())))
+            infile.write("\t".join(list(csv_dict.keys())) + "\n")
 
-            for service in indict.keys():
+            for service in self.services.keys():
                 csv_dict["Service ID"] = service
                 csv_dict["Found on iSkyLIMS"] = (
                     "Found on iSkyLIMS"
-                    if indict[service]["found_in_system"] is True
+                    if self.services[service]["found_in_system"]
                     else "NOT found on iSkyLIMS"
                 )
                 csv_dict["Delivery date"] = ""
 
                 # Fields for archive
                 csv_dict["Path in archive"] = (
-                    indict[service]["archived_path"]
-                    if indict[service]["archived_path"] is not None
+                    self.services[service]["archived_path"]
+                    if self.services[service]["archived_path"] is not None
                     else "Archived path could not be generated"
                 )
                 csv_dict["Found in archive"] = (
                     "Yes"
-                    if "Archive" in indict[service]["found"]
+                    if "Archive" in self.services[service]["found"]
                     else "Not found in archive"
                 )
                 csv_dict["Uncompressed size in archive"] = (
-                    indict[service]["archived_size"]
-                    if indict[service]["archived_size"] != 0
+                    self.services[service]["archived_size"]
+                    if self.services[service]["archived_size"] != 0
                     else "Not calculated"
                 )
                 csv_dict["Compressed size in archive"] = (
-                    indict[service]["archived_compressed_size"]
-                    if indict[service]["archived_compressed_size"] != 0
+                    self.services[service]["archived_compressed_size"]
+                    if self.services[service]["archived_compressed_size"] != 0
                     else "Not calculated"
                 )
                 csv_dict["Compressed md5 in archive"] = (
-                    indict[service]["md5_non_archived"]
-                    if indict[service]["md5_non_archived"] is not None
+                    self.services[service]["md5_non_archived"]
+                    if self.services[service]["md5_non_archived"] is not None
                     else "Not obtained"
                 )
 
                 # Fields for data directory
                 csv_dict["Path in data directory"] = (
-                    indict[service]["non_archived_path"]
-                    if indict[service]["non_archived_path"] is not None
+                    self.services[service]["non_archived_path"]
+                    if self.services[service]["non_archived_path"] is not None
                     else "Data path could not be generated"
                 )
                 csv_dict["Found on data directory"] = (
                     "Yes"
-                    if "Data dir" in indict[service]["found"]
+                    if "Data dir" in self.services[service]["found"]
                     else "Not found in data dir"
                 )
                 csv_dict["Compressed size in data directory"] = (
-                    indict[service]["non_archived_size"]
-                    if indict[service]["non_archived_size"] != 0
+                    self.services[service]["non_archived_size"]
+                    if self.services[service]["non_archived_size"] != 0
                     else "Not calculated"
                 )
                 csv_dict["Uncompressed size in data directory"] = (
-                    indict[service]["non_archived_compressed_size"]
-                    if indict[service]["non_archived_compressed_size"] != 0
+                    self.services[service]["non_archived_compressed_size"]
+                    if self.services[service]["non_archived_compressed_size"] != 0
                     else "Not calculated"
                 )
                 csv_dict["Compressed md5 in data dir"] = (
-                    indict[service]["md5_non_archived"]
-                    if indict[service]["md5_non_archived"] is not None
+                    self.services[service]["md5_non_archived"]
+                    if self.services[service]["md5_non_archived"] is not None
                     else "Not obtained"
                 )
 
                 # Fields for processes
-                csv_dict["Compressing process"] = indict[service]["compressed"]
-                csv_dict["Moving process"] = indict[service]["moved"]
-                csv_dict["Uncompressing process"] = indict[service]["uncompressed"]
-                csv_dict["Deletion process"] = indict[service]["deleted"]
+                csv_dict["Compressing process"] = self.services[service]["compressed"]
+                csv_dict["Moving process"] = self.services[service]["moved"]
+                csv_dict["Uncompressing process"] = self.services[service][
+                    "uncompressed"
+                ]
+                csv_dict["Deletion process"] = self.services[service]["deleted"]
 
-                infile.write("\t".join(list(indict.values())))
-                stderr.print(f"Added service {service} to the TSV file")
+                infile.write(
+                    "\t".join([str(item) for item in list(csv_dict.values())]) + "\n"
+                )
                 log.info(
                     f"Service {service} added successfully to TSV file named {filename}"
                 )
@@ -1326,7 +1303,7 @@ class Archive:
 
         if self.option == "Scout for service size":
             self.scout_directory_sizes()
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option == "Full archive: compress and archive":
             self.scout_directory_sizes()
@@ -1334,68 +1311,68 @@ class Archive:
             self.move_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
             self.delete_targz_dirs(direction="archive")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option.lstrip == "Partial archive: compress NON-archived service":
             self.targz_directory(direction="archive")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
             self.option.lstrip()
             == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
         ):
             self.move_directory(direction="archive")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
             self.option.lstrip()
             == "Partial archive: uncompress newly archived compressed service"
         ):
             self.uncompress_targz_directory(direction="archive")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
             self.option.lstrip()
             == "Partial archive: remove compressed services from directories"
         ):
             self.delete_targz_dirs(direction="archive")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.targz_directory(direction="retrieve")
             self.move_directory(direction="retrieve")
             self.uncompress_targz_directory(direction="retrieve")
             self.delete_targz_dirs(direction="retrieve")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option.lstrip() == "Partial retrieve: compress archived service":
             self.targz_directory(direction="retrieve")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
             self.option.lstrip()
             == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
         ):
             self.move_directory(direction="retrieve")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option.lstrip() == "Partial retrieve: uncompress retrieved service":
             self.uncompress_targz_directory(direction="retrieve")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
             self.option.lstrip()
             == "Partial retrieve: remove compressed services from directories"
         ):
             self.delete_targz_dirs(direction="retrieve")
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
             self.option
             == "Remove selected services from data dir (only if they are already in archive dir)"
         ):
             self.delete_non_archived_dirs()
-            self.generate_tsv_table(self.services, filename="prueba.txt")
+            self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option == "That should be all, thank you!":
             sys.exit()
