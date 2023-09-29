@@ -437,7 +437,7 @@ def bioinfo_doc(
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-t",
-    "--type",
+    "--ser_type",
     type=click.Choice(["services_and_colaborations", "research"]),
     help="Select which folder you want to archive.",
 )
@@ -454,23 +454,23 @@ def bioinfo_doc(
     help="Avoid prompts (except on service choosing)",
 )
 @click.option(
-    "-id",
-    "--initial_date",
+    "-df",
+    "--date_from",
     default=None,
     help="The date from which start search (format 'YYYY-MM-DD')",
 )
 @click.option(
-    "-fd",
-    "--final_date",
+    "-du",
+    "--date_until",
     default=None,
     help="The date from which end search (format 'YYYY-MM-DD')",
 )
-def archive(resolution, type, option, skip_prompts, initial_date, final_date):
+def archive(resolution, ser_type, option, skip_prompts, date_from, date_until):
     """
     Archive services or retrieve services from archive
     """
     archive_ser = bu_isciii.archive.Archive(
-        resolution, type, option, api_pass, skip_prompts, initial_date, final_date
+        resolution, ser_type, option, api_pass, skip_prompts, date_from, date_until
     )
     archive_ser.handle_archive()
 

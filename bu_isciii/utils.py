@@ -182,30 +182,29 @@ def ask_password(msg):
     return password
 
 
-def get_service_paths(service_type, resolution_info, archived_status):
+def get_service_paths(type, info, archived_status):
     """
     Given a service, a conf and a type,
     get the path it would have service
     """
     global_conf = bu_isciii.config_json.ConfigJson().get_configuration("global")
     service_path = None
-
-    if service_type == "services_and_colaborations":
+    if type == "services_and_colaborations":
         if archived_status == "archived_path":
             service_path = os.path.join(
                 global_conf["archived_path"],
-                service_type,
-                resolution_info["service_user_id"]["profile"]["profile_center"],
-                resolution_info["service_user_id"]["profile"][
+                type,
+                info["service_user_id"]["profile"]["profile_center"],
+                info["service_user_id"]["profile"][
                     "profile_classification_area"
                 ].lower(),
             )
         if archived_status == "non_archived_path":
             service_path = os.path.join(
                 global_conf["data_path"],
-                service_type,
-                resolution_info["service_user_id"]["profile"]["profile_center"],
-                resolution_info["service_user_id"]["profile"][
+                type,
+                info["service_user_id"]["profile"]["profile_center"],
+                info["service_user_id"]["profile"][
                     "profile_classification_area"
                 ].lower(),
             )
