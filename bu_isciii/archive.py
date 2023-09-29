@@ -25,8 +25,8 @@ stderr = rich.console.Console(
 
 class Archive:
     """
-    Class to perform the storage and retrieval
-    of a service
+    This class handles archive of active services and retrieval of archived services, from/to the 
+    respectives folders / repositories
     """
 
     def __init__(
@@ -36,12 +36,11 @@ class Archive:
         option=None,
         api_token=None,
         skip_prompts=False,
-        initial_date=None,
-        final_date=None,
+        date_from=None,
+        date_until=None,
     ):
-        # resolution_id = resolution name (SRVCNM656)
-        # ser_type = services_and_colaborations // research
-        # option = archive/retrieve
+        # LOG: called the archive repository
+        log.info("Activated archive module of the bu-isciii tools")
 
         dictionary_template = {
             "found_in_system": "",
@@ -62,49 +61,6 @@ class Archive:
             "error_status": "No errors detected",
         }
 
-        if ((initial_date is None) and (final_date is not None)) or (
-            (initial_date is not None) and (final_date is None)
-        ):
-            stderr.print(
-                f"Initial date was {('not' if initial_date is None else '')} set, "
-                f"but Final date was {('not' if final_date is None else '')}. Please provide both!"
-            )
-            sys.exit()
-
-        if (
-            (initial_date is not None)
-            and (final_date is not None)
-            and (service_id is not None)
-        ):
-            stderr.print(
-                "Both a date and a service ID have been chosen. Which one would you like to keep?"
-            )
-            prompt_response = bu_isciii.utils.prompt_selection(
-                "Date or Service ID?",
-                ["Search by date", "Search by ID"],
-            )
-            if (prompt_response) == "Search by date":
-                initial_date = None
-                final_date = None
-            else:
-                service_id = None
-
-        self.skip_prompts = skip_prompts
-        self.type = ser_type
-        self.option = option
-
-        # deepcopy can be used here
-        # import copy
-        #  service_id : copy.deepcopy(dictionary_template)
-        self.services = (
-            {service_id: {key: value for key, value in dictionary_template.items()}}
-            if service_id is not None
-            else dict()
-        )
-
-        # LOG: called the archive repository
-        log.info("Activated archive module of the bu-isciii tools")
-
         # Get configuration params from configuration.json
         # Get data to connect to the API
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
@@ -117,38 +73,108 @@ class Archive:
             api_token,
         )
 
-        if self.type is None or self.type not in [
-            "service_and_colaborations",
+        self.skip_prompts = skip_prompts
+        self.option = option
+        if ser_type is None or ser_type not in [
+            "services_and_colaborations",
             "research",
         ]:
             stderr.print("Working with a service, or a research resolution?")
-            self.type = bu_isciii.utils.prompt_selection(
+            self.ser_type = bu_isciii.utils.prompt_selection(
                 "Type",
                 ["services_and_colaborations", "research"],
             )
+        else:
+            self.ser_type = ser_type
 
-        log.info(f"Service type chosen: {self.type}")
+        log.info(f"Service type chosen: {self.ser_type}")
 
-        prompt_response = bu_isciii.utils.prompt_selection(
-            "Search services by date, or by resolution ID?",
-            ["Search by date", "Resolution ID"],
+        if ((date_from is None) and (date_until is not None)) or (
+            (date_from is not None) and (date_until is None)
+        ):
+            stderr.print(
+                f"Initial date was {('not' if date_from is None else '')} set, "
+                f"but Final date was {('not' if date_until is None else '')}. Please provide both!"
+            )
+            sys.exit()
+
+        if (
+            (date_from is not None)
+            and (date_until is not None)
+            and (service_id is not None)
+        ):
+            stderr.print(
+                "Both a date and a service ID have been chosen. Which one would you like to keep?"
+            )
+            prompt_response = bu_isciii.utils.prompt_selection(
+                "Date or Service ID?",
+                ["Search by date", "Search by ID"],
+            )
+            if (prompt_response) == "Search by date":
+                service_id = None
+            else:
+                date_from = None
+                date_until = None
+
+        if (date_from is None) and (date_until is None) and (service_id is None):
+            prompt_response = bu_isciii.utils.prompt_selection(
+                "Search services by date, or by service ID?",
+                ["Search by date", "Service ID"],
+            )
+            log.info("Services chosen by: " + prompt_response)
+            if prompt_response == "Search by date":
+                stderr.print("Please state the initial date for filtering")
+                self.date_from = bu_isciii.utils.ask_date()
+                stderr.print(
+                    "Please state the final date for filtering (must be posterior or identical to the initial date)"
+                )
+                self.date_until = bu_isciii.utils.ask_date(previous_date=self.date_from)
+
+                log.info(f"Starting date: {self.date_from} (chosen through prompt)")
+                log.info(f"Ending date: {self.date_until} (chosen through prompt)")
+                stderr.print(
+                    f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
+                )
+            elif prompt_response == "Service ID":
+                if not self.services.keys():
+                    new_service = bu_isciii.utils.prompt_service_id()
+                    self.services = {
+                        new_service: {
+                            key: value for key, value in dictionary_template.items()
+                        }
+                    }
+                    log.info(f"Chosen service: {new_service} (chosen through prompt)")
+
+                # Ask if more services will be chosen
+                while True:
+                    prompt_response = bu_isciii.utils.prompt_selection(
+                        "Would you like to add any other service?",
+                        ["Add more services", "Do not add more services"],
+                    )
+                    if prompt_response == "Do not add more services":
+                        break
+                    else:
+                        new_service = bu_isciii.utils.prompt_service_id()
+                        self.services[new_service] = {
+                            key: value for key, value in dictionary_template.items()
+                        }
+                        log.info(
+                            f"Chosen service: {new_service} (chosen through prompt)"
+                        )
+        else:
+            self.date_from = date_from
+            self.date_until = date_until
+            self.services = (
+                {service_id: {key: value for key, value in dictionary_template.items()}}
+                if service_id is not None
+                else dict()
+            )
+
+        stderr.print(
+            f"Asking our trusty API about services: {', '.join([service for service in self.services.keys()])}"
         )
-        if prompt_response == "Search by date":
-            log.info("Services chosen by: date")
 
-            stderr.print("Please state the initial date for filtering")
-            self.date_from = bu_isciii.utils.ask_date()
-            stderr.print(
-                "Please state the final date for filtering (must be posterior or identical to the initial date)"
-            )
-            self.date_until = bu_isciii.utils.ask_date(previous_date=self.date_from)
-
-            log.info(f"Starting date: {self.date_from} (chosen through prompt)")
-            log.info(f"Ending date: {self.date_until} (chosen through prompt)")
-            stderr.print(
-                f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
-            )
-
+        if (self.date_from is not None) and (self.date_until is not None):
             try:
                 for service in rest_api.get_request(
                     request_info="services",
@@ -157,22 +183,23 @@ class Archive:
                     date_from=str(self.date_from),
                     date_until=str(self.date_until),
                 ):
-                    self.services[service["serviceRequestNumber"]] = {
+                    self.services[service["service_request_number"]] = {
                         key: value for key, value in dictionary_template.items()
                     }
-                    self.services[service["serviceRequestNumber"]][
+                    self.services[service["service_request_number"]][
                         "found_in_system"
                     ] = True
-                    self.services[service["serviceRequestNumber"]][
+                    self.services[service["service_request_number"]][
                         "delivery_date"
-                    ] = service["serviceOnDeliveredDate"]
+                    ] = service["service_delivered_date"]
 
-                log.info(f"Services found in the time interval: {len(self.services)}")
+                log.info(
+                    f"Services found in the time interval: {len(self.services)}"
+                )
                 log.info(
                     "Names of the services found in said interval:"
                     f"{','.join([service for service in self.services.keys()])}"
                 )
-
             except TypeError:
                 stderr.print(
                     "Could not connect to the API (wrong password?)", style="red"
@@ -181,42 +208,13 @@ class Archive:
                     "Connection to the API was not successful. Possible reasons: wrong API password, bad connection."
                 )
                 sys.exit(1)
-        else:
-            log.info("Services chosen by: ServiceID")
-            if len(self.services.keys()) == 0:
-                new_service = bu_isciii.utils.prompt_service_id()
-                self.services = {
-                    new_service: {
-                        key: value for key, value in dictionary_template.items()
-                    }
-                }
-                log.info(f"Chosen service: {new_service} (chosen through prompt)")
-
-            # Ask if more services will be chosen
-            while True:
-                prompt_response = bu_isciii.utils.prompt_selection(
-                    "Would you like to add any other service?",
-                    ["Add more services", "Do not add more services"],
-                )
-                if prompt_response == "Do not add more services":
-                    break
-                else:
-                    new_service = bu_isciii.utils.prompt_service_id()
-                    self.services[new_service] = {
-                        key: value for key, value in dictionary_template.items()
-                    }
-                    log.info(f"Chosen service: {new_service} (chosen through prompt)")
-
-        stderr.print(
-            f"Asking our trusty API about services: {', '.join([service for service in self.services.keys()])}"
-        )
 
         for service in self.services.keys():
             stderr.print(service)
             if isinstance(
                 (
                     service_data := rest_api.get_request(
-                        request_info="serviceFullData", safe=False, service=service
+                        request_info="service-data", safe=False, service=service
                     )
                 ),
                 int,
@@ -229,10 +227,16 @@ class Archive:
                 self.services[service]["non_archived_path"] = None
             else:
                 self.services[service]["found_in_system"] = True
-                (
-                    self.services[service]["archived_path"],
-                    self.services[service]["non_archived_path"],
-                ) = bu_isciii.utils.get_service_paths(self.conf, self.type, service_data)
+                self.services[service][
+                    "archived_path"
+                ] = bu_isciii.utils.get_service_paths(
+                    self.ser_type, service_data, "archived_path"
+                )
+                self.services[service][
+                    "non_archived_path"
+                ] = bu_isciii.utils.get_service_paths(
+                    self.ser_type, service_data, "non_archived_path"
+                )
 
             self.services[service]["found"] = []
 
@@ -243,7 +247,7 @@ class Archive:
             if self.services[service]["found_in_system"] is False
         ]
 
-        if len(not_found_services) != 0:
+        if not_found_services:
             # if none of the services was found, exit
             if len(not_found_services) == len(self.services):
                 stderr.print(
@@ -264,17 +268,17 @@ class Archive:
                 log.warning(
                     f"{len(not_found_services)} services were not found: {','.join(not_found_services)}"
                 )
-
-                if (
-                    bu_isciii.utils.prompt_selection(
-                        "Continue?", ["Yes, continue", "Exit"]
-                    )
-                ) == "Exit":
-                    log.info(
-                        "Execution was ended by the user through prompt after some services were not found:"
-                        f"{','.join(not_found_services)}"
-                    )
-                    sys.exit(0)
+                if not self.skip_prompts:
+                    if (
+                        bu_isciii.utils.prompt_selection(
+                            "Continue?", ["Yes, continue", "Exit"]
+                        )
+                    ) == "Exit":
+                        log.info(
+                            "Execution was ended by the user through prompt after some services were not found:"
+                            f"{','.join(not_found_services)}"
+                        )
+                        sys.exit(0)
 
         # Check on the directories to get location and whether or not it was found
         stderr.print("Finding the services in the directory tree")
@@ -323,9 +327,13 @@ class Archive:
         stderr.print("Extracting the size for the involved directories")
         for service in self.services.keys():
             if "Data dir" in self.services[service]["found"]:
-                self.services[service]["non_archived_size"] = bu_isciii.utils.get_dir_size(
+                self.services[service][
+                    "non_archived_size"
+                ] = bu_isciii.utils.get_dir_size(
                     self.services[service]["non_archived_path"]
-                ) / pow(1024, 3)
+                ) / pow(
+                    1024, 3
+                )
             if "Archive" in self.services[service]["found"]:
                 self.services[service]["archived_size"] = bu_isciii.utils.get_dir_size(
                     self.services[service]["archived_path"]
@@ -435,7 +443,9 @@ class Archive:
             if direction == "archive":
                 if self.services[service]["non_archived_size"] is None:
                     if "Data dir" in self.services[service]["found"]:
-                        initial_size = bu_isciii.utils.get_dir_size(dir_to_tar) / pow(1024, 3)
+                        initial_size = bu_isciii.utils.get_dir_size(dir_to_tar) / pow(
+                            1024, 3
+                        )
                         self.services[service]["non_archived_size"] = initial_size
                     else:
                         stderr.print(
@@ -448,7 +458,9 @@ class Archive:
             else:
                 if self.services[service]["archived_size"] is None:
                     if "Archive" in self.services[service]["found"]:
-                        initial_size = bu_isciii.utils.get_dir_size(dir_to_tar) / pow(1024, 3)
+                        initial_size = bu_isciii.utils.get_dir_size(dir_to_tar) / pow(
+                            1024, 3
+                        )
                         self.services[service]["archived_size"] = initial_size
                     else:
                         stderr.print(
@@ -465,7 +477,7 @@ class Archive:
                 stderr.print(
                     f"Seems like service {service} has already been compressed in the {location_check} dir",
                     f"Path: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB",
-                    f"Found compressed size: {compressed_size:.3f} GB"
+                    f"Found compressed size: {compressed_size:.3f} GB",
                 )
 
                 prompt_response = bu_isciii.utils.prompt_selection(
@@ -830,9 +842,7 @@ class Archive:
                         f"However, this service is already uncompressed in"
                         f"the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
                     )
-                    self.services[service][
-                        "uncompressed"
-                    ] = (
+                    self.services[service]["uncompressed"] = (
                         f"Could not be uncompressed, compressed file {service + '.tar.gz'} not found on destiny "
                         "folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}."
                         "However, the uncompressed service was found."
@@ -846,9 +856,7 @@ class Archive:
                     stderr.print(
                         f"The uncompressed service, {dir_to_untar} could not be found either."
                     )
-                    self.services[service][
-                        "uncompressed"
-                    ] = (
+                    self.services[service]["uncompressed"] = (
                         f"Could not be uncompressed, compressed file not found on destiny "
                         f"folder ({dir_to_untar + '.tar.gz'}). The uncompressed service was not found either."
                     )
@@ -908,7 +916,9 @@ class Archive:
 
                 stderr.print(f"Uncompressing {dir_to_untar.split('/')[-1] + '.tar.gz'}")
 
-                bu_isciii.utils.uncompress_targz_directory(dir_to_untar + ".tar.gz", dir_to_untar)
+                bu_isciii.utils.uncompress_targz_directory(
+                    dir_to_untar + ".tar.gz", dir_to_untar
+                )
 
                 stderr.print(f"Service {service} has been successfully uncompressed")
                 log.info(f"Service {service}: successfully uncompressed")
