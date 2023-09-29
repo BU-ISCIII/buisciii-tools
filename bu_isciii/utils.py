@@ -263,7 +263,10 @@ def get_dir_size(path):
 
     for path, dirs, files in os.walk(path):
         for file in files:
-            size += os.path.getsize(os.path.join(path, file))
+            if os.path.islink(os.path.join(path, file)):
+                size += os.lstat(os.path.join(path, file)).st_size
+            else:
+                size += os.path.getsize(os.path.join(path, file))
 
     return size
 
