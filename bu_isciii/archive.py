@@ -42,6 +42,7 @@ class Archive:
     ):
         log.info("Activated archive module of the bu-isciii tools")
 
+        self.services = {}
         dictionary_template = {
             "found_in_system": "",
             "delivery_date": "",
@@ -106,25 +107,42 @@ class Archive:
             (date_from is not None)
             and (date_until is not None)
             and (service_id is not None)
+        ) or (
+            (date_from is not None)
+            and (date_until is not None)
+            and (services_file is not None)
+        ) or (
+            (services_file) is not None
+            and (service_id) is not None
         ):
             stderr.print(
-                "Both a date and a service ID have been chosen. Which one would you like to keep?"
+                "Both a date and a service ID or service list have been chosen. "
             )
             prompt_response = bu_isciii.utils.prompt_selection(
-                "Date or Service ID?",
-                ["Search by date", "Search by ID"],
+                "Which one would you like to keep?",
+                ["Search by date", "Search by ID", "Search using file"],
             )
             if (prompt_response) == "Search by date":
                 service_id = None
-            else:
+                services_file = None
+            elif (prompt_response) == "Search by ID":
                 date_from = None
                 date_until = None
+                services_file = None
+            elif (prompt_response) == "Search using file":
+                date_from = None
+                date_until = None
+                service_id = None
 
-        if (date_from is None) and (date_until is None) and (service_id is None):
-            prompt_response = bu_isciii.utils.prompt_selection(
-                "Search services by date, or by service ID?",
-                ["Search by date", "Service ID"],
-            )
+        if (date_from is None) and (date_until is None) and (service_id is None) and (services_file is None):
+            if self.ser_type == "services_and_colaborations":
+                prompt_response = bu_isciii.utils.prompt_selection(
+                    "Search services by date, or by service ID?",
+                    ["Search by date", "Service ID"],
+                )
+            else:
+                prompt_response = "Service ID"
+
             log.info("Services chosen by: " + prompt_response)
             if prompt_response == "Search by date":
                 stderr.print("Please state the initial date for filtering")
@@ -140,13 +158,13 @@ class Archive:
                     f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
                 )
             elif prompt_response == "Service ID":
-                new_service = bu_isciii.utils.prompt_service_id()
+                service_id = bu_isciii.utils.prompt_service_id()
                 self.services = {
-                    new_service: {
+                    service_id: {
                         key: value for key, value in dictionary_template.items()
                     }
                 }
-                log.info(f"Chosen service: {new_service} (chosen through prompt)")
+                log.info(f"Chosen service: {service_id} (chosen through prompt)")
 
                 # Ask if more services will be chosen
                 while True:
@@ -167,17 +185,21 @@ class Archive:
         else:
             self.date_from = date_from
             self.date_until = date_until
-            self.services = (
-                {service_id: {key: value for key, value in dictionary_template.items()}}
-                if service_id is not None
-                else dict()
-            )
-
-        stderr.print(
-            f"Asking our trusty API about services: {', '.join([service for service in self.services.keys()])}"
-        )
+            if service_id:
+                self.services = (
+                    {service_id: {key: value for key, value in dictionary_template.items()}}
+                    if service_id is not None
+                    else dict()
+                )
+            elif services_file:
+                with open(services_file) as file:
+                    for s_id in file:
+                        self.services[s_id] = {key: value for key, value in dictionary_template.items()}
 
         if (self.date_from is not None) and (self.date_until is not None):
+            stderr.print(
+                "Asking our trusty API about selected services"
+            )
             try:
                 for service in rest_api.get_request(
                     request_info="services",
@@ -212,34 +234,52 @@ class Archive:
 
         for service in self.services.keys():
             stderr.print(service)
-            if isinstance(
-                (
-                    service_data := rest_api.get_request(
-                        request_info="service-data", safe=False, service=service
+            if self.ser_type == "services_and_colaborations":
+                if isinstance(
+                    (
+                        service_data := rest_api.get_request(
+                            request_info="service-data", safe=False, service=service
+                        )
+                    ),
+                    int,
+                ):
+                    stderr.print(
+                        f"No services named '{service}' were found. Connection seemed right though!"
                     )
-                ),
-                int,
-            ):
-                stderr.print(
-                    f"No services named '{service}' were found. Connection seemed right though!"
-                )
-                self.services[service]["found_in_system"] = False
-                self.services[service]["archived_path"] = None
-                self.services[service]["non_archived_path"] = None
+                    self.services[service]["found_in_system"] = False
+                    self.services[service]["archived_path"] = None
+                    self.services[service]["non_archived_path"] = None
+                else:
+                    self.services[service]["found_in_system"] = True
+                    self.services[service]["archived_path"] = os.path.join(
+                        bu_isciii.utils.get_service_paths(
+                            self.ser_type, service_data, "archived_path"
+                        ),
+                        service_data["resolutions"][0]["resolution_full_number"],
+                    )
+
+                    self.services[service]["non_archived_path"] = os.path.join(
+                        bu_isciii.utils.get_service_paths(
+                            self.ser_type, service_data, "non_archived_path"
+                        ),
+                        service_data["resolutions"][0]["resolution_full_number"],
+                    )
             else:
                 self.services[service]["found_in_system"] = True
+                import pdb; pdb.set_trace()
                 self.services[service]["archived_path"] = os.path.join(
-                    bu_isciii.utils.get_service_paths(
-                        self.ser_type, service_data, "archived_path"
-                    ),
-                    service_data["resolutions"][0]["resolution_full_number"],
+                    bu_isciii.config_json.ConfigJson().get_configuration("global")[
+                        "archived_path"
+                    ],
+                    self.ser_type,
+                    service_id,
                 )
-
                 self.services[service]["non_archived_path"] = os.path.join(
-                    bu_isciii.utils.get_service_paths(
-                        self.ser_type, service_data, "non_archived_path"
-                    ),
-                    service_data["resolutions"][0]["resolution_full_number"],
+                    bu_isciii.config_json.ConfigJson().get_configuration("global")[
+                        "data_path"
+                    ],
+                    self.ser_type,
+                    service_id,
                 )
 
             self.services[service]["found"] = []
@@ -699,9 +739,7 @@ class Archive:
                         "copied"
                     ] = f"Successfully copied (direction: {direction}), with matching MD5"
                     os.remove(origin + ".tar.gz")
-                    log.info(
-                        f"Service {service}: deleted {origin}.tar.gz"
-                    )
+                    log.info(f"Service {service}: deleted {origin}.tar.gz")
                 else:
                     stderr.print(
                         f"[red] ERROR: Service {service}: Data copied from its origin folder ({origin}) "
@@ -722,9 +760,7 @@ class Archive:
                         "error_status"
                     ] = "Copy error md5sum not matching"
                     os.remove(destiny + ".tar.gz")
-                    log.info(
-                        f"Service {service}: deleted {destiny}.tar.gz"
-                    )
+                    log.info(f"Service {service}: deleted {destiny}.tar.gz")
 
             except Exception as e:
                 stderr.print(
@@ -786,12 +822,12 @@ class Archive:
                 )
                 not_found_compressed_services.append(service)
 
-                self.services[service]["uncompressed"] = (
-                    "Could not be uncompressed, compressed file not found on destiny "
-                )
-                self.services[service]["error_status"] = (
-                    "Error uncompressing, compressed file not found."
-                )
+                self.services[service][
+                    "uncompressed"
+                ] = "Could not be uncompressed, compressed file not found on destiny "
+                self.services[service][
+                    "error_status"
+                ] = "Error uncompressing, compressed file not found."
 
                 continue
             # Compressed file is there
@@ -804,8 +840,12 @@ class Archive:
 
                     prompt_response = ""
                     if self.skip_prompts:
-                        prompt_response = f"Delete uncompressed {service} and uncompress again"
-                        message = "(automatically delete and uncompress, --skip-prompts)"
+                        prompt_response = (
+                            f"Delete uncompressed {service} and uncompress again"
+                        )
+                        message = (
+                            "(automatically delete and uncompress, --skip-prompts)"
+                        )
                     else:
                         prompt_response = bu_isciii.utils.prompt_selection(
                             "What to do?",
@@ -816,7 +856,7 @@ class Archive:
                         )
                         message = "(delete and uncompress selected throught prompt)"
 
-                    if (prompt_response.startswith("Delete")):
+                    if prompt_response.startswith("Delete"):
                         stderr.print(
                             f"Deleting uncompressed service {service} automatically"
                             f"{message}"
@@ -848,9 +888,7 @@ class Archive:
                 stderr.print(f"Service {service} has been successfully uncompressed")
                 log.info(f"Service {service}: successfully uncompressed")
                 os.remove(dir_to_untar + ".tar.gz")
-                log.info(
-                        f"Service {service}: deleted {dir_to_untar}.tar.gz"
-                    )
+                log.info(f"Service {service}: deleted {dir_to_untar}.tar.gz")
                 self.services[service]["uncompressed"] = "Uncompressed successfully"
                 successfully_uncompressed_services.append(service)
 
