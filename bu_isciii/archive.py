@@ -312,7 +312,6 @@ class Archive:
                     "That should be all, thank you!",
                 ],
             )
-
         # LOG: chosen option
         log.info(f"Chosen option for archive: {self.option.lstrip()}")
 
@@ -382,10 +381,7 @@ class Archive:
         """
         For all chosen services:
         Check no prior .tar.gz file has been created
-
         Creates the .tar.gz file for all chosen services
-        Function created to make a .tar.gz file from a NON-archived directory
-        Extracts the MD5 and size as well, to do it all in a single function (might regret later)
         """
         log.info(
             f"STARTING: Compression of services in the {('Archive' if direction == 'archive' else 'Data')} dir "
@@ -415,106 +411,53 @@ class Archive:
             # if dir could not be found, pass
             # This could very much be a function on its own
             if direction == "archive":
-                if self.services[service]["non_archived_size"] is None:
-                    if "Data dir" in self.services[service]["found"]:
-                        initial_size = bu_isciii.utils.get_dir_size(dir_to_tar) / pow(
-                            1024, 3
-                        )
-                        self.services[service]["non_archived_size"] = initial_size
-                    else:
-                        stderr.print(
-                            f"Service {service} could not be found in the data directory"
-                        )
-                        continue
-                else:
-                    initial_size = self.services[service]["non_archived_size"]
-
+                initial_size = self.services[service]["non_archived_size"]
             else:
-                if self.services[service]["archived_size"] is None:
-                    if "Archive" in self.services[service]["found"]:
-                        initial_size = bu_isciii.utils.get_dir_size(dir_to_tar) / pow(
-                            1024, 3
-                        )
-                        self.services[service]["archived_size"] = initial_size
-                    else:
-                        stderr.print(
-                            f"Service {service} could not be found in the archive directory"
-                        )
-                        continue
-                else:
-                    self.services[service]["archived_size"] = initial_size
+                initial_size = self.services[service]["archived_size"]
 
             # Check if there is a prior ".tar.gz" file
             # NOTE: I find dir_to_tar + ".tar.gz" easier to mentally locate the compressed files
+            prompt_response = ""
             if os.path.exists(dir_to_tar + ".tar.gz"):
-                compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
                 stderr.print(
                     f"Seems like service {service} has already been compressed in the {location_check} dir",
-                    f"Path: {dir_to_tar + '.tar.gz'}\nUncompressed size: {initial_size:.3f} GB",
-                    f"Found compressed size: {compressed_size:.3f} GB",
+                    f"Path: {dir_to_tar + '.tar.gz'}\n"
                 )
-
-                prompt_response = bu_isciii.utils.prompt_selection(
-                    "What to do?",
-                    [
-                        "Just skip it",
-                        f"Delete previous {service + '.tar.gz'} and compress again",
-                    ],
-                )
-                if (prompt_response.startswith("Delete")) or (self.skip_prompts):
-                    if self.skip_prompts:
-                        log.info(
-                            f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found."
-                            f" Initial size of the dir: {initial_size:.3f} GB."
-                            f"Compressed size: {compressed_size:.3f} GB."
-                            "Automatically chosen to DELETE it (no-prompt option activated)."
-                            "Compression process will be performed again."
-                        )
-                    else:
-                        log.info(
-                            f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found."
-                            f"Initial size of the dir: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB"
-                            ". User chose to DELETE it through prompt. Compression process will be performed again."
-                        )
-                        os.remove(dir_to_tar + ".tar.gz")
+                if self.skip_prompts:
+                    prompt_response = f"Delete previous {service + '.tar.gz'} and compress again"
+                    message = "automatically selected due to --skip-prompts"
                 else:
-                    if direction == "archive":
-                        self.services[service][
-                            "non_archived_compressed_size"
-                        ] = compressed_size
-                        self.services[service][
-                            "compressed"
-                        ] = "Found already compressed in the data directory"
-                        log.info(
-                            f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found"
-                            f"in the data directory. Initial size of the dir: {initial_size:.3f} GB."
-                            f"Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt."
-                        )
-                    else:
-                        self.services[service][
-                            "archived_compressed_size"
-                        ] = compressed_size
-                        self.services[service][
-                            "compressed"
-                        ] = "Found already compressed in the archive directory"
-                        log.info(
-                            f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already"
-                            f"found in the archive directory. Initial size of the dir: {initial_size:.3f} GB."
-                            f"Compressed size: {compressed_size:.3f} GB. User chose NOT to delete it through prompt."
-                        )
-
-                    total_initial_size += initial_size
-                    total_compressed_size += compressed_size
-                    continue
-
-            stderr.print(f"Compressing service {service}")
+                    message = "selected throught prompt"
+                    prompt_response = bu_isciii.utils.prompt_selection(
+                        "What to do?",
+                        [
+                            "Just skip it",
+                            f"Delete previous {service + '.tar.gz'} and compress again",
+                        ],
+                    )
 
             try:
-                bu_isciii.utils.targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
+                if prompt_response:
+                    if (prompt_response.startswith("Delete")):
+                        log.info(
+                                f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found."
+                                f"Option chosen is to DELETE it ({message})"
+                                "Compression process will be performed again."
+                            )
+                        os.remove(dir_to_tar + ".tar.gz")
+                    else:
+                        self.services[service]["compressed"] = "Found already compressed"
+
+                if not self.services[service]["compressed"] == "Found already compressed":
+                    stderr.print(f"Compressing service {service}")
+                    bu_isciii.utils.targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
+                    self.services[service]["compressed"] = "Successfully compressed"
+
             except Exception as e:
                 stderr.print(
                     f"Compression of service {service} had an error and couldnt be ended."
-                    "Deleting compressed file and skipping to the next one."
+                    "Deleting compressed file and skipping to the next one\n."
+                    f"{e}"
                 )
 
                 if os.path.exists(dir_to_tar + ".tar.gz"):
@@ -529,6 +472,7 @@ class Archive:
                 ] = f"Error while compressing the directory: {e}"
 
                 continue
+
             compressed_size = os.path.getsize(dir_to_tar + ".tar.gz") / pow(1024, 3)
 
             if direction == "archive":
@@ -540,17 +484,13 @@ class Archive:
             total_compressed_size += compressed_size
 
             stderr.print(
-                f"Service {service} was compressed into {dir_to_tar + '.tar.gz'}"
+                f"Service {service} is compressed into {dir_to_tar + '.tar.gz'}"
             )
-            stderr.print(f"Initial size: {initial_size:.3f} GB")
-            stderr.print(f"Compressed size: {compressed_size:.3f} GB")
-            stderr.print(f"Saved space: {initial_size - compressed_size:.3f} GB")
             log.info(
                 f"Service {service}: compression into {dir_to_tar + '.tar.gz'} successful."
                 f"Initial size: {initial_size:.3f} GB. Compressed size: {compressed_size:.3f} GB."
                 f"Saved space: {initial_size - compressed_size:.3f} GB."
             )
-            self.services[service]["compressed"] = "Successfuly compressed"
 
         # General revision of the compression process
         newly_compressed_services = [
@@ -602,7 +542,7 @@ class Archive:
 
         return
 
-    def move_directory(self, direction):
+    def sync_directory(self, direction):
         """
         Move chosen services from a place to another depending on the direction chosen:
             direction = "archive": move service from "non_archived" to "archived"
@@ -1211,6 +1151,7 @@ class Archive:
                 "Moving process": None,
                 "Uncompressing process": None,
                 "Deletion process": None,
+                "Error": None
             }
 
             infile.write("\t".join(list(csv_dict.keys())) + "\n")
@@ -1285,6 +1226,7 @@ class Archive:
                     "uncompressed"
                 ]
                 csv_dict["Deletion process"] = self.services[service]["deleted"]
+                csv_dict["Deletion process"] = self.services[service]["error_status"]
 
                 infile.write(
                     "\t".join([str(item) for item in list(csv_dict.values())]) + "\n"
@@ -1300,7 +1242,6 @@ class Archive:
         """
         Handle archive class options
         """
-
         if self.option == "Scout for service size":
             self.scout_directory_sizes()
             self.generate_tsv_table(filename="archive_info.tsv")
@@ -1308,12 +1249,13 @@ class Archive:
         elif self.option == "Full archive: compress and archive":
             self.scout_directory_sizes()
             self.targz_directory(direction="archive")
-            self.move_directory(direction="archive")
+            self.sync_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
             self.delete_targz_dirs(direction="archive")
             self.generate_tsv_table(filename="archive_info.tsv")
 
-        elif self.option.lstrip == "Partial archive: compress NON-archived service":
+        elif self.option.lstrip() == "Partial archive: compress NON-archived service":
+            self.scout_directory_sizes()
             self.targz_directory(direction="archive")
             self.generate_tsv_table(filename="archive_info.tsv")
 
@@ -1321,7 +1263,7 @@ class Archive:
             self.option.lstrip()
             == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
         ):
-            self.move_directory(direction="archive")
+            self.sync_directory(direction="archive")
             self.generate_tsv_table(filename="archive_info.tsv")
 
         elif (
@@ -1340,7 +1282,7 @@ class Archive:
 
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.targz_directory(direction="retrieve")
-            self.move_directory(direction="retrieve")
+            self.sync_directory(direction="retrieve")
             self.uncompress_targz_directory(direction="retrieve")
             self.delete_targz_dirs(direction="retrieve")
             self.generate_tsv_table(filename="archive_info.tsv")
@@ -1353,7 +1295,7 @@ class Archive:
             self.option.lstrip()
             == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
         ):
-            self.move_directory(direction="retrieve")
+            self.sync_directory(direction="retrieve")
             self.generate_tsv_table(filename="archive_info.tsv")
 
         elif self.option.lstrip() == "Partial retrieve: uncompress retrieved service":
