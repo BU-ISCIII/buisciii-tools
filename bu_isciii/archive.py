@@ -104,16 +104,17 @@ class Archive:
             sys.exit()
 
         if (
-            (date_from is not None)
-            and (date_until is not None)
-            and (service_id is not None)
-        ) or (
-            (date_from is not None)
-            and (date_until is not None)
-            and (services_file is not None)
-        ) or (
-            (services_file) is not None
-            and (service_id) is not None
+            (
+                (date_from is not None)
+                and (date_until is not None)
+                and (service_id is not None)
+            )
+            or (
+                (date_from is not None)
+                and (date_until is not None)
+                and (services_file is not None)
+            )
+            or ((services_file) is not None and (service_id) is not None)
         ):
             stderr.print(
                 "Both a date and a service ID or service list have been chosen. "
@@ -134,7 +135,12 @@ class Archive:
                 date_until = None
                 service_id = None
 
-        if (date_from is None) and (date_until is None) and (service_id is None) and (services_file is None):
+        if (
+            (date_from is None)
+            and (date_until is None)
+            and (service_id is None)
+            and (services_file is None)
+        ):
             if self.ser_type == "services_and_colaborations":
                 prompt_response = bu_isciii.utils.prompt_selection(
                     "Search services by date, or by service ID?",
@@ -187,19 +193,23 @@ class Archive:
             self.date_until = date_until
             if service_id:
                 self.services = (
-                    {service_id: {key: value for key, value in dictionary_template.items()}}
+                    {
+                        service_id: {
+                            key: value for key, value in dictionary_template.items()
+                        }
+                    }
                     if service_id is not None
                     else dict()
                 )
             elif services_file:
                 with open(services_file) as file:
                     for s_id in file:
-                        self.services[s_id] = {key: value for key, value in dictionary_template.items()}
+                        self.services[s_id] = {
+                            key: value for key, value in dictionary_template.items()
+                        }
 
         if (self.date_from is not None) and (self.date_until is not None):
-            stderr.print(
-                "Asking our trusty API about selected services"
-            )
+            stderr.print("Asking our trusty API about selected services")
             try:
                 for service in rest_api.get_request(
                     request_info="services",
@@ -266,7 +276,9 @@ class Archive:
                     )
             else:
                 self.services[service]["found_in_system"] = True
-                import pdb; pdb.set_trace()
+                import pdb
+
+                pdb.set_trace()
                 self.services[service]["archived_path"] = os.path.join(
                     bu_isciii.config_json.ConfigJson().get_configuration("global")[
                         "archived_path"

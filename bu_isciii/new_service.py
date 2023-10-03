@@ -186,7 +186,7 @@ class NewService:
                 stderr.print(
                     "[red] This regex has not output any file: %s." % regex,
                     "This maybe because the project is not yet in the fastq repo"
-                    "or because some of the samples are not in the project."
+                    "or because some of the samples are not in the project.",
                 )
         stderr.print(
             "[blue] Service has %s number of selected samples in iSkyLIMS"
