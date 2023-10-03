@@ -330,13 +330,13 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
         month_list = [[num, month] for num, month in enumerate(calendar.month_name)][1:]
     else:
         month_list = [[num, month] for num, month in enumerate(calendar.month_name)][
-            1:datetime.date.today().month + 1
+            1 : datetime.date.today().month + 1
         ]
 
     # If there is a previous date
     # and year is the same as before, limit the quantity of months
     if previous_date is not None and year == previous_date.year:
-        month_list = month_list[previous_date.month - 1:]
+        month_list = month_list[previous_date.month - 1 :]
 
     chosen_month_number, chosen_month_name = (
         bu_isciii.utils.prompt_selection(
@@ -377,7 +377,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
         and year == previous_date.year
         and chosen_month_number == previous_date.month
     ):
-        day_list = day_list[previous_date.day - 1:]
+        day_list = day_list[previous_date.day - 1 :]
 
     # from the list, get the first and last item as limits for the function
     day = bu_isciii.utils.prompt_day(
