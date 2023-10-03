@@ -480,8 +480,14 @@ def bioinfo_doc(
     default=None,
     help="The date from which end search (format 'YYYY-MM-DD')",
 )
+@click.option(
+    "-f",
+    "--output_name",
+    default=None,
+    help="Tsv output path + filename with archive stats and info",
+)
 def archive(
-    service_id, service_file, ser_type, option, skip_prompts, date_from, date_until
+    service_id, service_file, ser_type, option, skip_prompts, date_from, date_until, output_name
 ):
     """
     Archive services or retrieve services from archive
@@ -495,6 +501,7 @@ def archive(
         skip_prompts,
         date_from,
         date_until,
+        output_name
     )
     archive_ser.handle_archive()
 
