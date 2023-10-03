@@ -56,7 +56,7 @@ class Archive:
             "md5_non_archived": "",
             "md5_archived": "",
             "compressed": "No compression performed",
-            "moved": "No movement performed",
+            "copied": "No movement performed",
             "uncompressed": "No uncompression performed",
             "deleted": "No deletion performed",
             "error_status": "No errors detected",
@@ -557,11 +557,22 @@ class Archive:
         Make sure they are '.tar.gz' files
         """
         log.info(
-            f"STARTING: Compressed service movement "
+            f"STARTING: Compressed service copy "
             f"({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir' )})"
         )
 
         for service in self.services.keys():
+            # check if errors, skip
+            location_check = "Data dir" if direction == "archive" else "Archive"
+            if (
+                location_check not in self.services[service]["found"]
+                or self.services[service]["error_status"] != "No errors detected"
+            ):
+                log.info(
+                    f"Service {service}: not found on the '{location_check}' directory or has errors. Skipping."
+                )
+                continue
+
             (origin, destiny) = (
                 (
                     self.services[service]["non_archived_path"],
@@ -574,91 +585,80 @@ class Archive:
                 )
             )
 
-            # If compressed origin cannot be found
-            # Check for uncompressed origin
             if not (os.path.exists(origin + ".tar.gz")):
                 stderr.print(
                     f"{origin.split('/')[-1] + 'tar.gz'} was not found "
-                    "in the origin directory ({'/'.join(origin.split('/')[:-1])}"
+                    f"in the origin directory ({'/'.join(origin.split('/')[:-1])}"
                 )
-                if os.path.exists(origin):
-                    stderr.print(
-                        f"Origin path {origin} was found. Please make sure this directory has been compressed."
-                    )
 
+                self.services[service][
+                    "error_status"
+                ] = "Compressed directory not found"
+
+                prompt_response = ""
+                if self.skip_prompts:
+                    stderr.print(
+                        f"Skipping service {service} automatically (option skip-prompts activated)"
+                    )
+                    log.info(
+                        f"Service {service}: compressed file {origin + '.tar.gz'} was not found. "
+                        "Skipped automatically (option skip-prompts activated)."
+                    )
+                    continue
+                else:
                     prompt_response = bu_isciii.utils.prompt_selection(
                         "What to do", ["Skip it", "Exit"]
                     )
-                    if (prompt_response == "Skip it") or (self.skip_prompts):
-                        if self.skip_prompts:
-                            stderr.print(
-                                f"Skipping service {service} automatically (option skip-prompts activated)"
-                            )
-                            log.info(
-                                f"Service {service}: compressed file {origin + '.tar.gz'} was not found. "
-                                "Skipped automatically (option skip-prompts activated)."
-                            )
-                        else:
-                            stderr.print(f"Skipping service {service}")
-                            log.info(
-                                f"Service {service}: compressed file {origin + '.tar.gz'} was not found. "
-                                "Skipped by user through prompt."
-                            )
+                    if prompt_response == "Skip it":
+                        stderr.print(f"Skipping service {service}")
+                        log.info(
+                            f"Service {service}: compressed file {origin + '.tar.gz'} was not found. "
+                            "Skipped by user through prompt."
+                        )
                         continue
-
                     else:
                         stderr.print("Exiting")
                         log.info(
                             f"Execution ended by user through prompt after service {service} "
-                            "compressed {origin + '.tar.gz'} "
+                            f"compressed {origin + '.tar.gz'} "
                             f"file was not found in the {direction} process."
                         )
                         sys.exit(0)
 
-                else:
-                    stderr.print(
-                        f"Origin path {origin} was not found either. Skipping."
-                    )
-                    log.info(
-                        f"Service {service}: neither compressed path ({origin + '.tar.gz'}) "
-                        f"or uncompressed path ({origin}) could be found. Skipping."
-                    )
-                    continue
-
-            # If compresed destiny exists
+            # If compressed destiny exists
+            prompt_response = ""
             if os.path.exists(destiny + ".tar.gz"):
                 stderr.print(
                     f"Seems like service ({service}) has already been {direction + 'd'}."
                 )
-                prompt_response = bu_isciii.utils.prompt_selection(
-                    "What to do?",
-                    [f"Remove it and {direction} it again", "Ignore this service"],
-                )
-                if ("Remove" in prompt_response) or (self.skip_prompts):
-                    if self.skip_prompts:
-                        stderr.print(
-                            f"Removing {destiny + '.tar.gz'} automatically (option skip-prompts activated)."
-                        )
-                        log.info(
-                            f"Service {service}: already found in {destiny + '.tar.gz'}. File removed automatically "
-                            "(option skip-prompts activated), with intention to be copied again."
-                        )
-                    else:
-                        stderr.print(
-                            f"Removing {destiny + '.tar.gz'} automatically by user through prompt."
-                        )
-                        log.info(
-                            f"Service {service}: already found in {destiny + '.tar.gz'}. "
-                            "File was removed by user instruction through prompt, with intention to be copied again."
-                        )
+                if self.skip_prompts:
+                    prompt_response = f"Remove it and {direction} it again"
+                    message = "(automatically option skip-prompts activated)"
+                else:
+                    prompt_response = bu_isciii.utils.prompt_selection(
+                        "What to do?",
+                        [f"Remove it and {direction} it again", "Ignore this service"],
+                    )
+                    message = "(remove option selected throught prompt)"
 
+                if "Remove" in prompt_response:
+                    stderr.print(
+                        f"Removing {destiny + '.tar.gz'} automatically {message}."
+                    )
+                    log.info(
+                        f"Service {service}: already found in {destiny + '.tar.gz'}."
+                        f"File recopied {message}, with intention to be copied again."
+                    )
                     os.remove(destiny + ".tar.gz")
-                    stderr.print("Removed successfully")
+                    stderr.print("Recopied successfully")
                 else:
                     log.info(
                         f"Service {service}: already found in {destiny + '.tar.gz'}. "
                         "Transference skipped by user through prompt."
                     )
+                    self.services[service][
+                        "error_status"
+                    ] = "Compressed directory found in destiny. Skipped."
                     continue
 
             origin_md5 = bu_isciii.utils.get_md5(origin + ".tar.gz")
@@ -696,8 +696,8 @@ class Archive:
                         f" MD5: {origin_md5}, identical in both sides.)"
                     )
                     self.services[service][
-                        "moved"
-                    ] = f"Successfully moved (direction: {direction}), with matching MD5"
+                        "copied"
+                    ] = f"Successfully copied (direction: {direction}), with matching MD5"
                 else:
                     stderr.print(
                         f"[red] ERROR: Service {service}: Data copied from its origin folder ({origin}) "
@@ -709,9 +709,15 @@ class Archive:
                         f"destiny folder ({destiny}), but MD5 did not match "
                         f"(Origin MD5: {origin_md5}; Destiny MD5: {destiny_md5})."
                     )
+
                     self.services[service][
-                        "moved"
-                    ] = f"Moved (direction: {direction}), MD5 NOT MATCHING."
+                        "copied"
+                    ] = f"Copied (direction: {direction}), MD5 NOT MATCHING."
+
+                    self.services[service][
+                        "error_status"
+                    ] = "Copy error md5sum not matching"
+
             except Exception as e:
                 stderr.print(
                     f"[red] ERROR: {origin.split('/')[-1] + '.tar.gz'} "
@@ -744,6 +750,17 @@ class Archive:
         successfully_uncompressed_services = []
 
         for service in self.services.keys():
+            # check if errors, skip
+            location_check = "Data dir" if direction == "archive" else "Archive"
+            if (
+                location_check not in self.services[service]["found"]
+                or self.services[service]["error_status"] != "No errors detected"
+            ):
+                log.info(
+                    f"Service {service}: not found on the '{location_check}' directory or has errors. Skipping."
+                )
+                continue
+
             dir_to_untar = (
                 self.services[service]["archived_path"]
                 if (direction == "archive")
@@ -755,38 +772,20 @@ class Archive:
                 stderr.print(
                     f"The compressed service { service + '.tar.gz'} could not be found"
                 )
+                log.info(
+                    f"Service {service}: not uncompressed because compressed file was not found."
+                    "Uncompressed service was found."
+                )
                 not_found_compressed_services.append(service)
 
-                # Check whether the uncompressed dir is already there
-                if os.path.exists(dir_to_untar):
-                    stderr.print(
-                        f"However, this service is already uncompressed in"
-                        f"the destiny folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
-                    )
-                    self.services[service]["uncompressed"] = (
-                        f"Could not be uncompressed, compressed file {service + '.tar.gz'} not found on destiny "
-                        "folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}."
-                        "However, the uncompressed service was found."
-                    )
-                    log.info(
-                        f"Service {service}: not uncompressed because compressed file was not found."
-                        "Uncompressed service was found."
-                    )
-                    continue
-                else:
-                    stderr.print(
-                        f"The uncompressed service, {dir_to_untar} could not be found either."
-                    )
-                    self.services[service]["uncompressed"] = (
-                        f"Could not be uncompressed, compressed file not found on destiny "
-                        f"folder ({dir_to_untar + '.tar.gz'}). The uncompressed service was not found either."
-                    )
-                    log.info(
-                        f"Service {service}: not uncompressed because compressed file was not found."
-                        "Uncompressed service was NOT found either."
-                    )
-                    continue
+                self.services[service]["uncompressed"] = (
+                    "Could not be uncompressed, compressed file not found on destiny "
+                )
+                self.services[service]["error_status"] = (
+                    "Error uncompressing, compressed file not found."
+                )
 
+                continue
             # Compressed file is there
             else:
                 if os.path.exists(dir_to_untar):
@@ -795,33 +794,30 @@ class Archive:
                         f"folder {'/'.join(dir_to_untar.split('/')[:-1])[:-1]}"
                     )
 
-                    prompt_response = bu_isciii.utils.prompt_selection(
-                        "What to do?",
-                        [
-                            "Skip (dont uncompress)",
-                            f"Delete uncompressed {service} and uncompress again",
-                        ],
-                    )
+                    prompt_response = ""
+                    if self.skip_prompts:
+                        prompt_response = f"Delete uncompressed {service} and uncompress again"
+                        message = "(automatically delete and uncompress, --skip-prompts)"
+                    else:
+                        prompt_response = bu_isciii.utils.prompt_selection(
+                            "What to do?",
+                            [
+                                "Skip (dont uncompress)",
+                                f"Delete uncompressed {service} and uncompress again",
+                            ],
+                        )
+                        message = "(delete and uncompress selected throught prompt)"
 
-                    if (prompt_response.startswith("Delete")) or (self.skip_prompts):
-                        if self.skip_prompts:
-                            stderr.print(
-                                f"Deleting uncompressed service {service} automatically (option skip-prompts activated)"
-                            )
-                            log.info(
-                                f"Service {service}: service was already found uncompressed in the destiny"
-                                f"folder {dir_to_untar}. Delete the uncompressed service automatically"
-                                " (option skip-prompt activated) to uncompress it again."
-                            )
-                        else:
-                            stderr.print(
-                                f"Deleting uncompressed service {service} by user choice through prompt"
-                            )
-                            log.info(
-                                f"Service {service}: service was already found uncompressed in the destiny "
-                                f"folder {dir_to_untar}."
-                                "User decided to delete the uncompressed service through prompt to uncompress it again."
-                            )
+                    if (prompt_response.startswith("Delete")):
+                        stderr.print(
+                            f"Deleting uncompressed service {service} automatically"
+                            f"{message}"
+                        )
+                        log.info(
+                            f"Service {service}: service was already found uncompressed in the destiny"
+                            f"folder {dir_to_untar}. Delete the uncompressed service automatically"
+                            f" {message} to uncompress it again."
+                        )
                         shutil.rmtree(dir_to_untar)
                         stderr.print("Deleted!")
                     else:
@@ -831,7 +827,7 @@ class Archive:
                         ] = "Was not uncompressed due to the presence of a previously uncompressed directory"
                         log.info(
                             f"Service {service}: service was already found uncompressed in the destiny "
-                            f"folder {dir_to_untar}. User decided to skip uncompression through prompt."
+                            f"folder {dir_to_untar}. User decided to skip uncompression {message}"
                         )
                         continue
 
@@ -861,7 +857,7 @@ class Archive:
                 f"{', '.join(already_uncompressed_services)}"
             )
             log.info(
-                f"Already compressed services: {len(already_uncompressed_services)}: "
+                f"The following {len(already_uncompressed_services)} service directories were found compressed already:"
                 f"{', '.join(already_uncompressed_services)}"
             )
 
@@ -870,9 +866,9 @@ class Archive:
                 f"The following {len(not_found_compressed_services)} services could not be uncompressed "
                 f"because the compressed service could not be found: {', '.join(not_found_compressed_services)}"
             )
-            stderr.print(
-                f"Not found compressed services: {len(not_found_compressed_services)}: "
-                f"{', '.join(not_found_compressed_services)}"
+            log.info(
+                f"The following {len(not_found_compressed_services)} services could not be uncompressed "
+                f"because the compressed service could not be found: {', '.join(not_found_compressed_services)}"
             )
 
         log.info(
@@ -1102,7 +1098,7 @@ class Archive:
         for service in self.services.keys():
             if not os.path.exists(self.services[service]["non_archived_path"]):
                 stderr.print(
-                    f"Service {self.services[service]['non_archived_path'].split('/')[-1]} has already been removed "
+                    f"Service {self.services[service]['non_archived_path'].split('/')[-1]} has already been recopied "
                     f"from {'/'.join(self.services[service]['non_archived_path'].split('/')[:-1])[:-1]}. "
                     "Nothing to delete so skipping.\n"
                 )
@@ -1228,7 +1224,7 @@ class Archive:
 
                 # Fields for processes
                 csv_dict["Compressing process"] = self.services[service]["compressed"]
-                csv_dict["Moving process"] = self.services[service]["moved"]
+                csv_dict["Moving process"] = self.services[service]["copied"]
                 csv_dict["Uncompressing process"] = self.services[service][
                     "uncompressed"
                 ]
