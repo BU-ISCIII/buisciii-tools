@@ -44,7 +44,7 @@ def prompt_resolution_id():
 def prompt_service_id():
     stderr.print(
         "Specify the name service ID for the service you want to create."
-        "You can obtain this from iSkyLIMS. eg. SRVCNM564.1"
+        "You can obtain this from iSkyLIMS. eg. SRVCNM564"
     )
     resolution_id = questionary.text("Service ID").unsafe_ask()
     return resolution_id
