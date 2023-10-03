@@ -276,9 +276,6 @@ class Archive:
                     )
             else:
                 self.services[service]["found_in_system"] = True
-                import pdb
-
-                pdb.set_trace()
                 self.services[service]["archived_path"] = os.path.join(
                     bu_isciii.config_json.ConfigJson().get_configuration("global")[
                         "archived_path"
