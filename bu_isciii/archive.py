@@ -39,8 +39,16 @@ class Archive:
         skip_prompts=False,
         date_from=None,
         date_until=None,
+        output_name=None,
     ):
         log.info("Activated archive module of the bu-isciii tools")
+
+        if output_name:
+            self.output_name = output_name
+        else:
+            self.output_name = bu_isciii.utils.prompt_path(
+                "Write output path with filename for tsv output:"
+            )
 
         self.services = {}
         dictionary_template = {
@@ -696,10 +704,9 @@ class Archive:
                     )
                     log.info(
                         f"Service {service}: already found in {destiny + '.tar.gz'}."
-                        f"File recopied {message}, with intention to be copied again."
+                        f"File removed {message}, with intention to be copied again."
                     )
                     os.remove(destiny + ".tar.gz")
-                    stderr.print("Recopied successfully")
                 else:
                     log.info(
                         f"Service {service}: already found in {destiny + '.tar.gz'}. "
@@ -1079,7 +1086,7 @@ class Archive:
                     if self.services[service]["non_archived_compressed_size"] != 0
                     else "Not calculated"
                 )
-                csv_dict["Compressed md5 in data dir"] = (
+                csv_dict["Compressed md5 in data directory"] = (
                     self.services[service]["md5_non_archived"]
                     if self.services[service]["md5_non_archived"] is not None
                     else "Not obtained"
@@ -1110,61 +1117,61 @@ class Archive:
         """
         if self.option == "Scout for service size":
             self.scout_directory_sizes()
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif self.option == "Full archive: compress and archive":
             self.scout_directory_sizes()
             self.targz_directory(direction="archive")
             self.sync_directory(direction="archive")
             self.uncompress_targz_directory(direction="archive")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif self.option.lstrip() == "Partial archive: compress NON-archived service":
             self.scout_directory_sizes()
             self.targz_directory(direction="archive")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif (
             self.option.lstrip()
             == "Partial archive: archive NON-archived service (must be compressed first) and check md5"
         ):
             self.sync_directory(direction="archive")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif (
             self.option.lstrip()
             == "Partial archive: uncompress newly archived compressed service"
         ):
             self.uncompress_targz_directory(direction="archive")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif self.option == "Full retrieve: retrieve and uncompress":
             self.targz_directory(direction="retrieve")
             self.sync_directory(direction="retrieve")
             self.uncompress_targz_directory(direction="retrieve")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif self.option.lstrip() == "Partial retrieve: compress archived service":
             self.targz_directory(direction="retrieve")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif (
             self.option.lstrip()
             == "Partial retrieve: retrieve archived service (must be compressed first) and check md5"
         ):
             self.sync_directory(direction="retrieve")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif self.option.lstrip() == "Partial retrieve: uncompress retrieved service":
             self.uncompress_targz_directory(direction="retrieve")
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif (
             self.option
             == "Remove selected services from data dir (only if they are already in archive dir)"
         ):
             self.delete_non_archived_dirs()
-            self.generate_tsv_table(filename="archive_info.tsv")
+            self.generate_tsv_table(filename=self.output_name)
 
         elif self.option == "That should be all, thank you!":
             sys.exit()
