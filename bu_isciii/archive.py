@@ -421,10 +421,12 @@ class Archive:
             if os.path.exists(dir_to_tar + ".tar.gz"):
                 stderr.print(
                     f"Seems like service {service} has already been compressed in the {location_check} dir",
-                    f"Path: {dir_to_tar + '.tar.gz'}\n"
+                    f"Path: {dir_to_tar + '.tar.gz'}\n",
                 )
                 if self.skip_prompts:
-                    prompt_response = f"Delete previous {service + '.tar.gz'} and compress again"
+                    prompt_response = (
+                        f"Delete previous {service + '.tar.gz'} and compress again"
+                    )
                     message = "automatically selected due to --skip-prompts"
                 else:
                     message = "selected throught prompt"
@@ -438,17 +440,22 @@ class Archive:
 
             try:
                 if prompt_response:
-                    if (prompt_response.startswith("Delete")):
+                    if prompt_response.startswith("Delete"):
                         log.info(
-                                f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found."
-                                f"Option chosen is to DELETE it ({message})"
-                                "Compression process will be performed again."
-                            )
+                            f"Service {service}: compressed service {dir_to_tar + '.tar.gz'} was already found."
+                            f"Option chosen is to DELETE it ({message})"
+                            "Compression process will be performed again."
+                        )
                         os.remove(dir_to_tar + ".tar.gz")
                     else:
-                        self.services[service]["compressed"] = "Found already compressed"
+                        self.services[service][
+                            "compressed"
+                        ] = "Found already compressed"
 
-                if not self.services[service]["compressed"] == "Found already compressed":
+                if (
+                    not self.services[service]["compressed"]
+                    == "Found already compressed"
+                ):
                     stderr.print(f"Compressing service {service}")
                     bu_isciii.utils.targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
                     self.services[service]["compressed"] = "Successfully compressed"
@@ -1151,7 +1158,7 @@ class Archive:
                 "Moving process": None,
                 "Uncompressing process": None,
                 "Deletion process": None,
-                "Error": None
+                "Error": None,
             }
 
             infile.write("\t".join(list(csv_dict.keys())) + "\n")
