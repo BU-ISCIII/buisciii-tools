@@ -215,7 +215,11 @@ def new_service(resolution, path, no_create_folder, ask_path):
     "--direction",
     type=click.Choice(["Service_to_scratch", "Scratch_to_service", "Remove_scratch"]),
     multiple=False,
-    help="Direction of the rsync command. Service_to_scratch from /data/bi/service to /data/bi/scratch_tmp/bi/. Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service",
+    help=(
+            "Direction of the rsync command. Service_to_scratch "
+            "from /data/bi/service to /data/bi/scratch_tmp/bi/."
+            "Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service"
+        ),
 )
 def scratch(resolution, path, tmp_dir, direction, ask_path):
     """
@@ -258,11 +262,19 @@ def scratch(resolution, path, tmp_dir, direction, ask_path):
         ]
     ),
     multiple=False,
-    help="Select what to do inside the cleanning step: full_clean: delete files and folders to clean, rename no copy and deleted folders, rename_nocopy: just rename no copy folders, clean: delete files and folders to clean, revert_renaming: remove no_copy and delete tags, show_removable: list folders and files to remove and show_nocopy: show folders to rename with no_copy tag.",
+    help=(
+        "Select what to do inside the cleanning step: full_clean: delete files and folders to clean,"
+        " rename no copy and deleted folders, rename_nocopy: just rename no copy folders, clean: "
+        "delete files and folders to clean,"
+        "revert_renaming: remove no_copy and delete tags,"
+        "show_removable: list folders and files to remove "
+        "and show_nocopy: show folders to rename with no_copy tag."
+    ),
 )
 def clean(resolution, path, ask_path, option):
     """
-    Service cleaning. It will either remove big files, rename folders before copy, revert this renaming, show removable files or show folders for no copy.
+    Service cleaning. It will either remove big files, rename folders before copy, revert this renaming,
+    show removable files or show folders for no copy.
     """
     clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option, api_pass)
     clean.handle_clean()
@@ -434,7 +446,10 @@ def bioinfo_doc(
 
 # ARCHIVE SERVICES
 @bu_isciii_cli.command(help_priority=7)
-@click.argument("resolution", required=False, default=None, metavar="<resolution id>")
+@click.option("-s", "--service_id", default=None, help="service id, pe SRVCNM787")
+@click.option(
+    "-sf", "--service_file", default=None, help="file with services ids, one per line"
+)
 @click.option(
     "-t",
     "--ser_type",
@@ -442,7 +457,7 @@ def bioinfo_doc(
     help="Select which folder you want to archive.",
 )
 @click.option(
-    "-s",
+    "-o",
     "--option",
     type=click.Choice(["archive", "retrieve_from_archive"]),
     help="Select either you want to archive services or retrieve a service from archive.",
@@ -465,12 +480,21 @@ def bioinfo_doc(
     default=None,
     help="The date from which end search (format 'YYYY-MM-DD')",
 )
-def archive(resolution, ser_type, option, skip_prompts, date_from, date_until):
+def archive(
+    service_id, service_file, ser_type, option, skip_prompts, date_from, date_until
+):
     """
     Archive services or retrieve services from archive
     """
     archive_ser = bu_isciii.archive.Archive(
-        resolution, ser_type, option, api_pass, skip_prompts, date_from, date_until
+        service_id,
+        service_file,
+        ser_type,
+        option,
+        api_pass,
+        skip_prompts,
+        date_from,
+        date_until,
     )
     archive_ser.handle_archive()
 
