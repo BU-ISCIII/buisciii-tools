@@ -487,7 +487,14 @@ def bioinfo_doc(
     help="Tsv output path + filename with archive stats and info",
 )
 def archive(
-    service_id, service_file, ser_type, option, skip_prompts, date_from, date_until, output_name
+    service_id,
+    service_file,
+    ser_type,
+    option,
+    skip_prompts,
+    date_from,
+    date_until,
+    output_name,
 ):
     """
     Archive services or retrieve services from archive
@@ -501,7 +508,7 @@ def archive(
         skip_prompts,
         date_from,
         date_until,
-        output_name
+        output_name,
     )
     archive_ser.handle_archive()
 
