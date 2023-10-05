@@ -1,6 +1,10 @@
-mkdir -p 00-reads
+rm create_summary_report_sars.sh; mv create_summary_report_metagenomic.sh create_summary_report.sh
+ANALYSIS_TYPE=METAGENOMIC
+CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
+PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
+
 cat samples_ref.txt | cut -f3 | sort -u | while read in; do echo ${in^^}; done > host_list.tmp
-i=1; cat host_list.tmp | while read in
+i=2; cat host_list.tmp | while read in
 do
     FOLDER_NAME=$(echo $(date '+%Y%m%d')_ANALYSIS0${i}_${ANALYSIS_TYPE}_${in})
     mkdir ${FOLDER_NAME}
@@ -10,7 +14,7 @@ do
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
-    echo "#module load Nextflow singularity" >> ${FOLDER_NAME}/lablog
+    echo "# module load Nextflow/21.10.6 singularity" >> ${FOLDER_NAME}/lablog
     echo "" >> ${FOLDER_NAME}/lablog
     printf 'scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")\n\n' >> ${FOLDER_NAME}/lablog
     cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | while read ref
@@ -34,6 +38,7 @@ do
         printf 'export NXF_OPTS="-Xms500M -Xmx4G"\n\n' >> ${FOLDER_NAME}/lablog
         echo "nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.5/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
         echo "          -c ${CONFIG_FILE} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -params-file ${PARAMS_FILE} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --input samplesheet_${ref}.csv \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
@@ -42,12 +47,12 @@ do
         printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
     done
-  echo "#conda activate python3" >> ${FOLDER_NAME}/lablog
+  echo "# conda activate python3" >> ${FOLDER_NAME}/lablog
 
   cp _02_create_run_percentage_Ns.sh ${FOLDER_NAME}/
   printf 'echo "bash create_summary_report.sh" > _04_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
   cp create_assembly_stats.R ${FOLDER_NAME}/
-  echo "#module load R/4.1.0-foss-2021a" >> ${FOLDER_NAME}/lablog
+  echo "# module load R/4.2.1" >> ${FOLDER_NAME}/lablog
   printf 'echo "Rscript create_assembly_stats.R" > _05_create_stats_assembly.sh\n\n' >> ${FOLDER_NAME}/lablog
   printf 'echo "bash deduplicate_long_table.sh" > _06_deduplicate_long_table.sh\n\n' >> ${FOLDER_NAME}/lablog
 
@@ -58,8 +63,7 @@ rm create_summary_report.sh
 rm deduplicate_long_table.sh
 rm percentajeNs.py
 rm _02_create_run_percentage_Ns.sh
-cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
 
-# Exclusive of genomeev service, if you see this anywhere else, somebody has copied without reading (https://youtu.be/AgGtGORPHcM?t=4)
+# Exclusive of genomeev and viral_discovery service, if you see this anywhere else, somebody has copied without reading (https://youtu.be/AgGtGORPHcM?t=4)
 mv ANALYSIS03_MAG $(date '+%Y%m%d')_ANALYSIS03_MAG
 mv ANALYSIS04_BLAST $(date '+%Y%m%d')_ANALYSIS04_BLAST
