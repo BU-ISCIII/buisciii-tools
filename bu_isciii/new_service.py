@@ -61,7 +61,7 @@ class NewService:
         self.services_requested = self.resolution_info["Resolutions"][
             "availableServices"
         ]
-        self.service_samples = self.resolution_info["Samples"]
+        self.service_samples = self.resolution_info.get("Samples", None)
         self.full_path = os.path.join(self.path, self.service_folder)
         #
         # resolutionFullData example
@@ -227,10 +227,19 @@ class NewService:
                 stderr.print("Traceback: %s" % e)
 
     def create_new_service(self):
-        self.create_folder()
-        self.copy_template()
-        self.create_samples_id()
-        self.create_symbolic_links()
+        if self.service_samples is not None:
+            self.create_folder()
+            self.copy_template()
+            self.create_samples_id()
+            self.create_symbolic_links()
+        else:
+            stderr.print(
+                "[yellow]WARN: No samples recorded in service: "
+                + self.resolution_id
+            )
+            bu_isciii.utils.prompt_yn_question("Do you want to proceed?: ")
+            self.create_folder()
+            self.copy_template()
 
     def get_resolution_id(self):
         return self.resolution_id
