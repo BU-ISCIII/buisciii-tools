@@ -193,7 +193,7 @@ class BioinfoDoc:
         markdown_data["user_data"] = self.user_data
         samples_in_service = {}
 
-        if self.samples is not None: 
+        if self.samples is not None:
             for sample_data in self.samples:
                 if sample_data["runName"] not in samples_in_service:
                     samples_in_service[sample_data["runName"]] = {}
@@ -208,7 +208,7 @@ class BioinfoDoc:
                     sample_data["projectName"]
                 ].append(sample_data["sampleName"])
         else:
-            samples_in_service = {' N/A': {' N/A' : ['No recorded samples']}}
+            samples_in_service = {" N/A": {" N/A": ["No recorded samples"]}}
 
         markdown_data["samples"] = samples_in_service
 
