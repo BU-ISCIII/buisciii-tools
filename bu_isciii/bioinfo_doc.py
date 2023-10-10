@@ -105,7 +105,7 @@ class BioinfoDoc:
         self.service_folder = os.path.join(
             self.path, self.doc_conf["services_path"], year, self.resolution_folder
         )
-        self.samples = resolution_info["Samples"]
+        self.samples = resolution_info.get("Samples", None)
         self.user_data = resolution_info["Service"]["serviceUserId"]
         self.service = resolution_info["Service"]
         self.handled_services = None
@@ -192,19 +192,24 @@ class BioinfoDoc:
         markdown_data["service"] = self.service
         markdown_data["user_data"] = self.user_data
         samples_in_service = {}
-        for sample_data in self.samples:
-            if sample_data["runName"] not in samples_in_service:
-                samples_in_service[sample_data["runName"]] = {}
-            if (
-                sample_data["projectName"]
-                not in samples_in_service[sample_data["runName"]]
-            ):
+
+        if self.samples is not None: 
+            for sample_data in self.samples:
+                if sample_data["runName"] not in samples_in_service:
+                    samples_in_service[sample_data["runName"]] = {}
+                if (
+                    sample_data["projectName"]
+                    not in samples_in_service[sample_data["runName"]]
+                ):
+                    samples_in_service[sample_data["runName"]][
+                        sample_data["projectName"]
+                    ] = []
                 samples_in_service[sample_data["runName"]][
                     sample_data["projectName"]
-                ] = []
-            samples_in_service[sample_data["runName"]][
-                sample_data["projectName"]
-            ].append(sample_data["sampleName"])
+                ].append(sample_data["sampleName"])
+        else:
+            samples_in_service = {' N/A': {' N/A' : ['No recorded samples']}}
+
         markdown_data["samples"] = samples_in_service
 
         # Resolution related information
