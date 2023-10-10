@@ -234,8 +234,7 @@ class NewService:
             self.create_symbolic_links()
         else:
             stderr.print(
-                "[yellow]WARN: No samples recorded in service: "
-                + self.resolution_id
+                "[yellow]WARN: No samples recorded in service: " + self.resolution_id
             )
             bu_isciii.utils.prompt_yn_question("Do you want to proceed?: ")
             self.create_folder()

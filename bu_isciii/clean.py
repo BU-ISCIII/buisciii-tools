@@ -305,7 +305,9 @@ class CleanUp:
             files_to_delete = []
             for sample_info in self.service_samples:
                 for file in self.delete_files:
-                    file_to_delete = file.replace("sample_name", sample_info["sampleName"])
+                    file_to_delete = file.replace(
+                        "sample_name", sample_info["sampleName"]
+                    )
                     files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
             for file in path_content:
