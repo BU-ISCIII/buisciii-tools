@@ -1,4 +1,3 @@
-rm create_summary_report_sars.sh; mv create_summary_report_metagenomic.sh create_summary_report.sh
 ANALYSIS_TYPE=METAGENOMIC
 CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
 PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
