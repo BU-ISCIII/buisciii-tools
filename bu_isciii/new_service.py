@@ -32,7 +32,8 @@ class NewService:
         path=None,
         no_create_folder=None,
         ask_path=False,
-        api_token=None,
+        api_user=None,
+        api_password=None
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -51,7 +52,7 @@ class NewService:
         )
         # Obtain info from iskylims api
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_token
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
             request_info="service-data", safe=False, resolution=self.resolution_id
@@ -155,7 +156,7 @@ class NewService:
                 "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry!"
                 "Please re-run and select one of the service ids."
             )
-            sys.exit()
+            sys.exit(1)
             return False
         return True
 
