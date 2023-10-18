@@ -45,7 +45,8 @@ class BioinfoDoc:
         sftp_folder=False,
         report_md=False,
         results_md=False,
-        api_token=None,
+        api_user=None,
+        api_password=None,
         email_psswd=None,
     ):
         if type is None:
@@ -72,15 +73,16 @@ class BioinfoDoc:
             self.resolution_id = resolution_id
         conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_token
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
+        self.resolution_info = self.rest_api.get_request(
+            request_info="serviceFullData", safe=False, resolution=self.resolution_id
+        )
+        if self.resolution_info == 404:
+            print("Received Error 404 from Iskylims API. Aborting")
+            sys.exit(1)
         if self.type == "delivery":
-            resolution_info = self.rest_api.get_request(
-                request_info="serviceFullData",
-                safe=False,
-                resolution=self.resolution_id,
-            )
-            if len(resolution_info["resolutions"][0]["delivery"]) > 0:
+            if len(self.resolution_info["resolutions"][0]["delivery"]) > 0:
                 print("Service delivery already exist.")
                 if bu_isciii.utils.prompt_yn_question(
                     "Do you want to overwrite delivery info?", dflt=False
@@ -88,9 +90,6 @@ class BioinfoDoc:
                     self.post_delivery_info()
             else:
                 self.post_delivery_info()
-        self.resolution_info = self.rest_api.get_request(
-            request_info="serviceFullData", safe=False, resolution=self.resolution_id
-        )
         self.services_requested = self.resolution_info["resolutions"][0][
             "availableServices"
         ]
