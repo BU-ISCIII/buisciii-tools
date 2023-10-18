@@ -29,7 +29,8 @@ class CleanUp:
         path=None,
         ask_path=False,
         option=None,
-        api_token=None,
+        api_user=None,
+        api_password=None,
     ):
         # access the api with the resolution name to obtain the data
         # ask away if no input given
@@ -44,7 +45,7 @@ class CleanUp:
             "xtutatis_api_settings"
         )
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"], api_token
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = rest_api.get_request(
             request_info="service-data", safe=False, resolution=self.resolution_id
@@ -273,19 +274,24 @@ class CleanUp:
             sys.exit()
 
         path_content = self.scan_dirs(to_find=to_find)
-
+        unfiltered_path_content = [f.path for f in os.scandir(self.full_path)]
         for directory_to_rename in path_content:
-            if add in directory_to_rename:
+            renamed_directory = str(directory_to_rename+add)
+            if renamed_directory in unfiltered_path_content:
                 stderr.print(
-                    "[orange]WARNING: Directory %s already renamed"
-                    % directory_to_rename
+                    "[orange]WARNING: Directory %s already renamed to %s Omitting..."
+                    % (directory_to_rename, renamed_directory)
                 )
                 continue
             else:
                 newpath = directory_to_rename + add
-                os.replace(directory_to_rename, newpath)
-                if verbose:
-                    print(f"Renamed {directory_to_rename} to {newpath}.")
+                try:
+                    os.replace(directory_to_rename, newpath)
+                    if verbose:
+                        print(f"Renamed {directory_to_rename} to {newpath}.")
+                except PermissionError as e:
+                    print(f"Error moving {directory_to_rename} to {newpath}: {e}")
+                    sys.exit()
         return
 
     def purge_files(self):
