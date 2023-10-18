@@ -35,7 +35,8 @@ class Archive:
         services_file=None,
         ser_type=None,
         option=None,
-        api_token=None,
+        api_user=None,
+        api_password=None,
         skip_prompts=False,
         date_from=None,
         date_until=None,
@@ -80,7 +81,8 @@ class Archive:
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"],
             conf_api["api_url"],
-            api_token,
+            api_user,
+            api_password,
         )
 
         self.skip_prompts = skip_prompts
