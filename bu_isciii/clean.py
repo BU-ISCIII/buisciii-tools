@@ -276,7 +276,7 @@ class CleanUp:
         path_content = self.scan_dirs(to_find=to_find)
         unfiltered_path_content = [f.path for f in os.scandir(self.full_path)]
         for directory_to_rename in path_content:
-            renamed_directory = str(directory_to_rename+add)
+            renamed_directory = str(directory_to_rename + add)
             if renamed_directory in unfiltered_path_content:
                 stderr.print(
                     "[orange]WARNING: Directory %s already renamed to %s Omitting..."
