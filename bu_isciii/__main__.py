@@ -112,16 +112,32 @@ class CustomHelpOrder(click.Group):
     "-l", "--log-file", help="Save a verbose log to a file.", metavar="<filename>"
 )
 @click.option(
-    "-t",
-    "--api-token",
+    "-u",
+    "--api_user",
+    help="User for the API logging",
+    required=False,
+    default=None,
+)
+@click.option(
+    "-p",
+    "--api_password",
     help="Password for the API logging",
     required=False,
     default=None,
 )
-def bu_isciii_cli(verbose, log_file, api_token):
+@click.option(
+    "-c",
+    "--cred_file",
+    help="Config file with API logging credentials",
+    required=False,
+    default=None,
+)
+@click.pass_context
+def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file):
     # Set the base logger to output DEBUG
     log.setLevel(logging.INFO)
-
+    # Initialize context
+    ctx.obj = {}
     # Set up logs to a file if we asked for one
     if log_file:
         log_fh = logging.FileHandler(log_file, encoding="utf-8")
@@ -133,18 +149,25 @@ def bu_isciii_cli(verbose, log_file, api_token):
         )
         log.addHandler(log_fh)
 
-    global api_pass
-    if api_token:
-        api_pass = api_token
+    ctx.obj = bu_isciii.utils.get_yaml_config()
+    if bu_isciii.utils.validate_api_credentials(ctx.obj):
+        print("API credentials successfully extracted from yaml config file")
     else:
-        print("Write API password for logging")
-        api_pass = bu_isciii.utils.ask_password("API password: ")
+        if api_user:
+            ctx.obj["api_user"] = api_user
+        else:
+            ctx.obj["api_user"] = bu_isciii.utils.ask_for_some_text("API user: ")
+        if api_password:
+            ctx.obj["api_password"] = api_password
+        else:
+            ctx.obj["api_password"] = bu_isciii.utils.ask_password("API password: ")
 
 
 # SERVICE LIST
 @bu_isciii_cli.command(help_priority=1)
 @click.argument("service", required=False, default=None, metavar="<service>")
-def list(service):
+@click.pass_context
+def list(ctx, service):
     """
     List available bu-isciii services.
     """
@@ -176,12 +199,13 @@ def list(service):
     default=False,
     help="Please ask for path.",
 )
-def new_service(resolution, path, no_create_folder, ask_path):
+@click.pass_context
+def new_service(ctx, resolution, path, no_create_folder, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
     new_ser = bu_isciii.new_service.NewService(
-        resolution, path, no_create_folder, ask_path, api_pass
+        resolution, path, no_create_folder, ask_path, ctx.obj["api_user"], ctx.obj["api_password"]
     )
     new_ser.create_new_service()
 
@@ -221,12 +245,13 @@ def new_service(resolution, path, no_create_folder, ask_path):
         "Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service"
     ),
 )
-def scratch(resolution, path, tmp_dir, direction, ask_path):
+@click.pass_context
+def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     """
     Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, direction, ask_path, api_pass
+        resolution, path, tmp_dir, direction, ask_path, ctx.obj["api_user"], ctx.obj["api_password"]
     )
     scratch_copy.handle_scratch()
 
@@ -271,12 +296,13 @@ def scratch(resolution, path, tmp_dir, direction, ask_path):
         "and show_nocopy: show folders to rename with no_copy tag."
     ),
 )
-def clean(resolution, path, ask_path, option):
+@click.pass_context
+def clean(ctx, resolution, path, ask_path, option):
     """
     Service cleaning. It will either remove big files, rename folders before copy, revert this renaming,
     show removable files or show folders for no copy.
     """
-    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option, api_pass)
+    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option, ctx.obj["api_user"], ctx.obj["api_password"])
     clean.handle_clean()
 
 
@@ -304,12 +330,13 @@ def clean(resolution, path, ask_path, option):
     default=None,
     help="Absolute path to directory to which the files will be transfered",
 )
-def copy_sftp(resolution, path, ask_path, sftp_folder):
+@click.pass_context
+def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
     """
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
     new_del = bu_isciii.copy_sftp.CopySftp(
-        resolution, path, ask_path, sftp_folder, api_pass
+        resolution, path, ask_path, sftp_folder, ctx.obj["api_user"], ctx.obj["api_password"]
     )
     new_del.copy_sftp()
 
@@ -345,28 +372,29 @@ def copy_sftp(resolution, path, ask_path, sftp_folder):
     default="/data/bi/scratch_tmp/bi/",
     help="Absolute path to the scratch directory containing the service.",
 )
-def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
+@click.pass_context
+def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
     print("Starting cleaning scratch directory: " + tmp_dir)
     clean_scratch = bu_isciii.clean.CleanUp(
-        resolution, tmp_dir, ask_path, "clean", api_pass
+        resolution, tmp_dir, ask_path, "clean", ctx.obj["api_user"], ctx.obj["api_password"]
     )
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
     copy_scratch2service = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, "Scratch_to_service", ask_path, api_pass
+        resolution, path, tmp_dir, "Scratch_to_service", ask_path, ctx.obj["api_user"], ctx.obj["api_password"]
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
     rename_databi = bu_isciii.clean.CleanUp(
-        resolution, path, ask_path, "rename_nocopy", api_pass
+        resolution, path, ask_path, "rename_nocopy", ctx.obj["api_user"], ctx.obj["api_password"]
     )
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
     copy_sftp = bu_isciii.copy_sftp.CopySftp(
-        resolution, path, ask_path, sftp_folder, api_pass
+        resolution, path, ask_path, sftp_folder, ctx.obj["api_user"], ctx.obj["api_password"]
     )
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
@@ -424,8 +452,9 @@ def finish(resolution, path, ask_path, sftp_folder, tmp_dir):
     required=False,
     default=None,
 )
+@click.pass_context
 def bioinfo_doc(
-    type, resolution, path, ask_path, sftp_folder, report_md, results_md, email_psswd
+    ctx, type, resolution, path, ask_path, sftp_folder, report_md, results_md, email_psswd
 ):
     """
     Create the folder documentation structure in bioinfo_doc server
@@ -438,7 +467,8 @@ def bioinfo_doc(
         sftp_folder,
         report_md,
         results_md,
-        api_pass,
+        ctx.obj["api_user"], 
+        ctx.obj["api_password"],
         email_psswd,
     )
     new_doc.create_documentation()
@@ -487,6 +517,7 @@ def bioinfo_doc(
     help="Tsv output path + filename with archive stats and info",
 )
 def archive(
+    ctx,
     service_id,
     service_file,
     ser_type,
@@ -504,7 +535,8 @@ def archive(
         service_file,
         ser_type,
         option,
-        api_pass,
+        ctx.obj["api_user"], 
+        ctx.obj["api_password"],
         skip_prompts,
         date_from,
         date_until,
