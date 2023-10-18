@@ -16,12 +16,16 @@ stderr = rich.console.Console(
 
 
 class RestServiceApi:
-    def __init__(self, server, url, password):
+    def __init__(self, server, url, user, password):
         self.request_url = server + url
         self.headers = {
-            "content-type": "application/json",
-            "WWW-Authenticate": "Basic " + password,
+            "accept": "application/json",
+            "Content-Type": "application/json"
         }
+        if not user or not password:
+            stderr.print("[red]Missing credentials for api request")
+        else:
+            self.auth = (user, password)
 
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
     # by Guille: I used an f-string instead of all the + stuff, I think thats cleaner?
@@ -34,12 +38,13 @@ class RestServiceApi:
                 if safe:
                     log.info(f"Query does not exist. Status code: {req.status_code}")
                     stderr.print("Query not found")
-                    sys.exit()
+                    sys.exit(1)
                 else:
                     return req.status_code
             return json.loads(req.text)
         except requests.ConnectionError:
-            log.error("Unable to open connection towards iSkyLIMS")
+            log.error("Unable to open connection towards iSkyLIMS, aborting")
+            sys.exit(1)
             return False
 
     def put_request(
@@ -58,7 +63,7 @@ class RestServiceApi:
             + value2
         )
         try:
-            req = requests.put(url_http, headers=self.headers)
+            req = requests.put(url_http, headers=self.headers, auth=self.auth)
             if req.status_code > 201:
                 if safe:
                     log.error(
@@ -72,12 +77,13 @@ class RestServiceApi:
             return True
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS")
+            sys.exit(1)
             return False
 
     def post_request(self, request_info, data, safe=True):
         url_http = self.request_url + request_info
         try:
-            req = requests.post(url_http, data=data, headers=self.headers)
+            req = requests.post(url_http, data=data, headers=self.headers, auth=self.auth)
             if req.status_code > 201:
                 if safe:
                     log.error(
@@ -90,9 +96,21 @@ class RestServiceApi:
             return True
 
         except requests.ConnectionError:
-            log.error("Unable to open connection towards iSkyLIMS")
+            log.error("Unable to open connection towards iSkyLIMS, aborting")
+            sys.exit(1)
             return False
-
+ 
+    def basic_authentication(self):
+        # Pseudo-code for credentials validation, returns error 404 right now
+        from requests.auth import HTTPBasicAuth
+        user, password = self.auth[0], self.auth[1]
+        url_http = (self.request_url)
+        response = requests.get(url_http, auth=HTTPBasicAuth(user, password))
+        print("Response status code", response.status_code)
+        if response.status_code <= 200:
+            return True
+        else:
+            return False
 
 """ Example usage
     rest_api = RestServiceApi("http://localhost:8000/", "drylab/api/")
