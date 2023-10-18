@@ -8,6 +8,7 @@ import tarfile
 
 import questionary
 import rich
+import yaml
 
 import bu_isciii
 import bu_isciii.config_json
@@ -217,13 +218,16 @@ def get_sftp_folder(resolution_info):
     user_sftp_file = open(json_file)
     json_data = json.load(user_sftp_file)
     user_sftp_file.close()
+    sftp_folders_list = []
     for user_sftp in json_data:
         if user_sftp == service_user:
             sftp_folders_list = json_data[user_sftp]
     data_path = bu_isciii.config_json.ConfigJson().get_configuration("global")[
         "data_path"
     ]
-
+    if not sftp_folders_list:
+        print(f"User {service_user} does not have an assigned sftp folder. Aborting...")
+        exit()
     if len(sftp_folders_list) == 1:
         sftp_folder = os.path.join(data_path, "sftp", sftp_folders_list[0])
         sftp_final_folder = sftp_folders_list[0]
@@ -385,6 +389,55 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     )
 
     return datetime.date(int(year), int(chosen_month_number), int(day))
+
+
+def get_yaml_config():
+    """Extract the fields from the config yaml file described in configuration.json"""
+    yaml_path = bu_isciii.config_json.ConfigJson().get_find("global", "yaml_conf_path")
+    try:
+        yaml_file = os.path.expanduser(yaml_path)
+    except Exception:
+        print("Yaml file path could not be resolved")
+        return {}
+    yaml_fields = process_yaml_file(yaml_file)
+    if yaml_fields:
+        return yaml_fields
+    else:
+        print("Could not extract fields from config file", yaml_file)
+        return {}
+
+
+def validate_api_credentials(cred_fields):
+    """Validate that API credentials are present in dictionary"""
+    user, password = cred_fields.get("api_user"), cred_fields.get("api_password")
+    if user and password:
+        return True
+        # This could include a test to the API to check that the credentials are correct
+        """
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
+        rest_api = bu_isciii.drylab_api.RestServiceApi(
+            conf_api["server"], conf_api["api_url"], user, password,
+        )
+        # This doesn't work, returns error 404
+        status = rest_api.basic_authentication()
+        return status
+        """
+    else:
+        print("Missing credentials in yaml file given")
+        return
+
+
+def process_yaml_file(yaml_file):
+    """Read the yaml file and return a dictionary with key/value pairs"""
+    if os.path.exists(yaml_file):
+        with open(yaml_file, "r") as cred_file:
+            yaml_fields = yaml.safe_load(cred_file)
+        return yaml_fields
+    else:
+        print(f"Config file {yaml_file} does not exist")
+        return
 
 
 def validate_date(date_previous, date_posterior):
