@@ -20,7 +20,7 @@ class RestServiceApi:
         self.request_url = server + url
         self.headers = {
             "accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         if not user:
             stderr.print("[red]Missing user for api request")
@@ -87,7 +87,9 @@ class RestServiceApi:
     def post_request(self, request_info, data, safe=True):
         url_http = self.request_url + request_info
         try:
-            req = requests.post(url_http, data=data, headers=self.headers, auth=self.auth)
+            req = requests.post(
+                url_http, data=data, headers=self.headers, auth=self.auth
+            )
             if req.status_code > 201:
                 if safe:
                     log.error(
@@ -103,18 +105,20 @@ class RestServiceApi:
             log.error("Unable to open connection towards iSkyLIMS, aborting")
             sys.exit(1)
             return False
- 
+
     def basic_authentication(self):
         # Pseudo-code for credentials validation, returns error 404 right now
         from requests.auth import HTTPBasicAuth
+
         user, password = self.auth[0], self.auth[1]
-        url_http = (self.request_url)
+        url_http = self.request_url
         response = requests.get(url_http, auth=HTTPBasicAuth(user, password))
         print("Response status code", response.status_code)
         if response.status_code <= 200:
             return True
         else:
             return False
+
 
 """ Example usage
     rest_api = RestServiceApi("http://localhost:8000/", "drylab/api/")

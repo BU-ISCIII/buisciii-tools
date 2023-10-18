@@ -205,7 +205,12 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
     Create new service, it will create folder and copy template depending on selected service.
     """
     new_ser = bu_isciii.new_service.NewService(
-        resolution, path, no_create_folder, ask_path, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        no_create_folder,
+        ask_path,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     new_ser.create_new_service()
 
@@ -251,7 +256,13 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     Copy service folder to scratch directory for execution.
     """
     scratch_copy = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, direction, ask_path, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        tmp_dir,
+        direction,
+        ask_path,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     scratch_copy.handle_scratch()
 
@@ -302,7 +313,9 @@ def clean(ctx, resolution, path, ask_path, option):
     Service cleaning. It will either remove big files, rename folders before copy, revert this renaming,
     show removable files or show folders for no copy.
     """
-    clean = bu_isciii.clean.CleanUp(resolution, path, ask_path, option, ctx.obj["api_user"], ctx.obj["api_password"])
+    clean = bu_isciii.clean.CleanUp(
+        resolution, path, ask_path, option, ctx.obj["api_user"], ctx.obj["api_password"]
+    )
     clean.handle_clean()
 
 
@@ -336,7 +349,12 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
     new_del = bu_isciii.copy_sftp.CopySftp(
-        resolution, path, ask_path, sftp_folder, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        ask_path,
+        sftp_folder,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     new_del.copy_sftp()
 
@@ -379,22 +397,43 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     print("Starting cleaning scratch directory: " + tmp_dir)
     clean_scratch = bu_isciii.clean.CleanUp(
-        resolution, tmp_dir, ask_path, "clean", ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        tmp_dir,
+        ask_path,
+        "clean",
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
     copy_scratch2service = bu_isciii.scratch.Scratch(
-        resolution, path, tmp_dir, "Scratch_to_service", ask_path, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        tmp_dir,
+        "Scratch_to_service",
+        ask_path,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
     rename_databi = bu_isciii.clean.CleanUp(
-        resolution, path, ask_path, "rename_nocopy", ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        ask_path,
+        "rename_nocopy",
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
     copy_sftp = bu_isciii.copy_sftp.CopySftp(
-        resolution, path, ask_path, sftp_folder, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        ask_path,
+        sftp_folder,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
     )
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
@@ -454,7 +493,15 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
 )
 @click.pass_context
 def bioinfo_doc(
-    ctx, type, resolution, path, ask_path, sftp_folder, report_md, results_md, email_psswd
+    ctx,
+    type,
+    resolution,
+    path,
+    ask_path,
+    sftp_folder,
+    report_md,
+    results_md,
+    email_psswd,
 ):
     """
     Create the folder documentation structure in bioinfo_doc server
@@ -467,7 +514,7 @@ def bioinfo_doc(
         sftp_folder,
         report_md,
         results_md,
-        ctx.obj["api_user"], 
+        ctx.obj["api_user"],
         ctx.obj["api_password"],
         email_psswd,
     )
@@ -535,7 +582,7 @@ def archive(
         service_file,
         ser_type,
         option,
-        ctx.obj["api_user"], 
+        ctx.obj["api_user"],
         ctx.obj["api_password"],
         skip_prompts,
         date_from,
