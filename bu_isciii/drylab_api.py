@@ -22,8 +22,12 @@ class RestServiceApi:
             "accept": "application/json",
             "Content-Type": "application/json"
         }
-        if not user or not password:
-            stderr.print("[red]Missing credentials for api request")
+        if not user:
+            stderr.print("[red]Missing user for api request")
+            bu_isciii.utils.ask_for_some_text("API user: ")
+        if not password:
+            stderr.print("[red]Missing password for api request")
+            bu_isciii.utils.ask_password("User password: ")
         else:
             self.auth = (user, password)
 
