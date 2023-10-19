@@ -392,7 +392,16 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
 
 
 def get_yaml_config():
-    """Extract the fields from the config yaml file described in configuration.json"""
+    """Search the config yaml file described in configuration.json and extract fields
+
+    Returns:
+    -------
+        yaml_fields = {
+            "api_user": "User for Iskylims API" (str) ,
+            "api_credentials": "Password to API user" (str) ,
+            "Other keys": "values"
+        }
+    """
     yaml_path = bu_isciii.config_json.ConfigJson().get_find("global", "yaml_conf_path")
     try:
         yaml_file = os.path.expanduser(yaml_path)
@@ -408,7 +417,15 @@ def get_yaml_config():
 
 
 def validate_api_credentials(cred_fields):
-    """Validate that API credentials are present in dictionary"""
+    """Validate that API credentials are present in dictionary
+
+    Parameters:
+    ----------
+        cred_fields (dict): Dictionary containing the fields from yaml config file
+
+    Returns:
+        Bool: True if api_user and api_password are present in the dictionary
+    """
     user, password = cred_fields.get("api_user"), cred_fields.get("api_password")
     if user and password:
         return True
@@ -430,7 +447,14 @@ def validate_api_credentials(cred_fields):
 
 
 def process_yaml_file(yaml_file):
-    """Read the yaml file and return a dictionary with key/value pairs"""
+    """Read a yaml file and return a dictionary with key/value pairs
+
+    Args:
+        yaml_file (str): Path to the file in yaml format
+
+    Returns:
+        dict: Dictionary containing the fields in the yaml file
+    """
     if os.path.exists(yaml_file):
         with open(yaml_file, "r") as cred_file:
             yaml_fields = yaml.safe_load(cred_file)
