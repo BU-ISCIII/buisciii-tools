@@ -119,7 +119,7 @@ class Scratch:
                         exclusions=self.conf["exclusions"],
                         sync_source_contents=False,
                     )
-                    srun_rsync = self.srun_command(self.srun_settings, rsync_command)
+                    self.srun_command(self.srun_settings, rsync_command)
                     stderr.print(
                         "[green] Data copied to the sftp folder successfully",
                         highlight=False,
@@ -180,9 +180,7 @@ class Scratch:
                             exclusions=self.conf["exclusions"],
                             sync_source_contents=False,
                         )
-                        srun_rsync = self.srun_command(
-                            self.srun_settings, rsync_command
-                        )
+                        self.srun_command(self.srun_settings, rsync_command)
                         stderr.print(
                             "[green]Successfully copied the directory to %s"
                             % dest_folder,
