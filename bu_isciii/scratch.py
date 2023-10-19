@@ -5,8 +5,8 @@ import sys
 import os
 import logging
 import re
+import subprocess
 import sysrsync
-from sysrsync.exceptions import RsyncError
 
 import rich
 import shutil
@@ -35,7 +35,7 @@ class Scratch:
         direction=None,
         ask_path=False,
         api_user=None,
-        api_password=None
+        api_password=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -60,10 +60,7 @@ class Scratch:
         )
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"],
-            conf_api["api_url"],
-            api_user,
-            api_password
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
 
@@ -73,11 +70,13 @@ class Scratch:
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
         ]
-        self.scratch_path = os.path.join(self.tmp_dir, self.service_folder)
+        self.scratch_tmp_path = os.path.join(self.tmp_dir, self.service_folder)
         self.out_file = os.path.join(
-            self.tmp_dir, self.scratch_path, "DOC", "service_info.txt"
+            self.tmp_dir, self.scratch_tmp_path, "DOC", "service_info.txt"
         )
-
+        # params like --chdir, --partition and --time
+        srun_params = self.conf["srun_settings"].items()
+        self.srun_settings = [arg for param in srun_params for arg in param]
         if ask_path and path is None:
             stderr.print("Directory where service folder is located.")
             self.path = bu_isciii.utils.prompt_path(msg="Path")
@@ -100,20 +99,27 @@ class Scratch:
 
         self.full_path = os.path.join(self.path, self.service_folder)
 
+    def srun_command(self, srun_settings, command):
+        command_list = [["srun"], srun_settings, command]
+        srun_command = [arg for command in command_list for arg in command]
+        subprocess.run(srun_command, check=True, shell=True)
+        return
+
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.full_path)
-        stderr.print("[blue]to %s" % self.scratch_path)
+        stderr.print("[blue]to %s" % self.scratch_tmp_path)
         if self.service_folder in self.full_path:
             protocol = self.conf["protocol"]
             try:
                 if protocol == "rsync":
-                    sysrsync.run(
+                    rsync_command = sysrsync.get_rsync_command(
                         source=self.full_path,
-                        destination=self.tmp_dir,
+                        destination="/scratch/bi/",
                         options=self.conf["options"],
                         exclusions=self.conf["exclusions"],
                         sync_source_contents=False,
                     )
+                    srun_rsync = self.srun_command(self.srun_settings, rsync_command)
                     stderr.print(
                         "[green] Data copied to the sftp folder successfully",
                         highlight=False,
@@ -125,20 +131,21 @@ class Scratch:
                     )
                     sys.exit()
                 f = open(self.out_file, "w")
-                f.write("Temporal directory: " + self.scratch_path + "\n")
+                f.write("Temporal directory: " + self.scratch_tmp_path + "\n")
                 f.write("Origin service directory: " + self.full_path + "\n")
                 f.close()
                 stderr.print(
-                    "[green]Successfully copyed the directory to %s"
-                    % self.scratch_path,
+                    "[green]Successfully copied the directory to %s"
+                    % self.scratch_tmp_path,
                     highlight=False,
                 )
-            except RsyncError as e:
+            except Exception as e:
                 stderr.print(e)
                 stderr.print(
                     "[red]ERROR: Copy of the directory %s failed" % self.full_path,
                     highlight=False,
                 )
+                sys.exit(1)
         else:
             log.error(
                 f"Directory path not the same as service resolution. Skip folder copy '{self.full_path}'"
@@ -153,7 +160,7 @@ class Scratch:
         return True
 
     def revert_copy_scratch(self):
-        stderr.print("[blue]I will copy back the service from %s" % self.scratch_path)
+        stderr.print(f"[blue]I will copy back the service from {self.scratch_tmp_path}")
         try:
             f = open(self.out_file, "r")
             for line in f:
@@ -164,15 +171,20 @@ class Scratch:
             if self.service_folder in dest_folder:
                 try:
                     if self.conf["protocol"] == "rsync":
-                        sysrsync.run(
-                            source=self.scratch_path,
+                        # /scratch/bi/ is used due to permission issues
+                        scratch_bi_path = "".join("/scratch/bi/", self.service_folder)
+                        rsync_command = sysrsync.get_rsync_command(
+                            source=scratch_bi_path,
                             destination=dest_dir,
                             options=self.conf["options"],
                             exclusions=self.conf["exclusions"],
                             sync_source_contents=False,
                         )
+                        srun_rsync = self.srun_command(
+                            self.srun_settings, rsync_command
+                        )
                         stderr.print(
-                            "[green]Successfully copyed the directory to %s"
+                            "[green]Successfully copied the directory to %s"
                             % dest_folder,
                             highlight=False,
                         )
@@ -182,13 +194,14 @@ class Scratch:
                             highlight=False,
                         )
                         sys.exit()
-                except RsyncError as e:
+                except Exception as e:
                     stderr.print(e)
                     stderr.print(
                         "[red]ERROR: Copy of the directory %s failed"
-                        % self.scratch_path,
+                        % self.scratch_tmp_path,
                         highlight=False,
                     )
+                    sys.exit(1)
             else:
                 log.error(
                     f"Directory path not the same as service resolution. Skip folder copy '{dest_folder}'"
@@ -208,7 +221,7 @@ class Scratch:
         return True
 
     def remove_scratch(self):
-        stderr.print("[blue]I will remove the folder %s" % self.scratch_path)
+        stderr.print("[blue]I will remove the folder %s" % self.scratch_tmp_path)
         try:
             f = open(self.out_file, "r")
             for line in f:
@@ -235,7 +248,7 @@ class Scratch:
                 "[red]ERROR: Directory "
                 + scratch_folder
                 + " not the same as "
-                + self.scratch_path,
+                + self.scratch_tmp_path,
                 highlight=False,
             )
         return True
