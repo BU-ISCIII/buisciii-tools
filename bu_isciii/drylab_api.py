@@ -74,7 +74,7 @@ class RestServiceApi:
                         "Resolution id does not exist. Status code: "
                         + str(req.status_code)
                     )
-                    sys.exit()
+                    sys.exit(1)
                 else:
                     return req.status_code
             # return json.loads(req.text)
@@ -106,7 +106,8 @@ class RestServiceApi:
             sys.exit(1)
             return False
 
-    def basic_authentication(self):
+
+""" def basic_authentication(self):
         # Pseudo-code for credentials validation, returns error 404 right now
         from requests.auth import HTTPBasicAuth
 
@@ -118,7 +119,7 @@ class RestServiceApi:
             return True
         else:
             return False
-
+"""
 
 """ Example usage
     rest_api = RestServiceApi("http://localhost:8000/", "drylab/api/")
