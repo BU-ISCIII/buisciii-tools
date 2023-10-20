@@ -114,7 +114,7 @@ class Scratch:
                 if protocol == "rsync":
                     rsync_command = sysrsync.get_rsync_command(
                         source=self.full_path,
-                        destination="/scratch/bi/",
+                        destination=self.conf["scratch_path"],
                         options=self.conf["options"],
                         exclusions=self.conf["exclusions"],
                         sync_source_contents=False,
@@ -171,8 +171,10 @@ class Scratch:
             if self.service_folder in dest_folder:
                 try:
                     if self.conf["protocol"] == "rsync":
-                        # /scratch/bi/ is used due to permission issues
-                        scratch_bi_path = "".join("/scratch/bi/", self.service_folder)
+                        # scratch_tmp cannot be used due to permission issues
+                        scratch_bi_path = "".join(
+                            self.conf["scratch_path"], self.service_folder
+                        )
                         rsync_command = sysrsync.get_rsync_command(
                             source=scratch_bi_path,
                             destination=dest_dir,
