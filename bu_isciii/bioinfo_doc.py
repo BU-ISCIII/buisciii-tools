@@ -90,8 +90,11 @@ class BioinfoDoc:
                     self.post_delivery_info()
             else:
                 self.post_delivery_info()
+        self.resolution_info = self.rest_api.get_request(
+            request_info="service-data", safe=False, resolution=self.resolution_id
+        )
         self.services_requested = self.resolution_info["resolutions"][0][
-            "availableServices"
+            "available_services"
         ]
         if self.type == "delivery":
             self.delivery_md_list = []
@@ -159,13 +162,13 @@ class BioinfoDoc:
             )
             sys.exit(1)
         self.service_name = self.resolution_info["resolutions"][0][
-            "resolutionFullNumber"
+            "resolution_full_number"
         ]
         self.resolution_number = self.resolution_info["resolutions"][0][
-            "resolutionNumber"
+            "resolution_number"
         ]
         self.delivery_number = self.resolution_number.partition(".")[2]
-        resolution_date = self.resolution_info["serviceCreatedOnDate"]
+        resolution_date = self.resolution_info["service_created_date"]
         self.resolution_datetime = datetime.strptime(resolution_date, "%Y-%m-%d")
         year = datetime.strftime(self.resolution_datetime, "%Y")
         self.service_folder = os.path.join(
@@ -271,9 +274,9 @@ class BioinfoDoc:
         # "temporaryUsedSpace" : ""
         # }
 
-        self.rest_api.post_request("createDelivery", json.dumps(delivery_dict))
+        self.rest_api.post_request("create-delivery", json.dumps(delivery_dict))
         self.rest_api.put_request(
-            "updateState", "resolution", self.resolution_id, "state", "Delivery"
+            "update-state", "resolution", self.resolution_id, "state", "delivered"
         )
 
     def create_markdown(self, file_path):
@@ -291,31 +294,31 @@ class BioinfoDoc:
         markdown_data = {}
         # service related information
         markdown_data["service"] = self.resolution_info
-        markdown_data["user_data"] = self.resolution_info["serviceUserId"]
+        markdown_data["user_data"] = self.resolution_info["service_user_id"]
         samples_in_service = {}
         for sample_data in self.samples:
-            if sample_data["runName"] not in samples_in_service:
-                samples_in_service[sample_data["runName"]] = {}
+            if sample_data["run_name"] not in samples_in_service:
+                samples_in_service[sample_data["run_name"]] = {}
             if (
-                sample_data["projectName"]
-                not in samples_in_service[sample_data["runName"]]
+                sample_data["project_name"]
+                not in samples_in_service[sample_data["run_name"]]
             ):
-                samples_in_service[sample_data["runName"]][
-                    sample_data["projectName"]
+                samples_in_service[sample_data["run_name"]][
+                    sample_data["project_name"]
                 ] = []
-            samples_in_service[sample_data["runName"]][
-                sample_data["projectName"]
-            ].append(sample_data["sampleName"])
+            samples_in_service[sample_data["run_name"]][
+                sample_data["project_name"]
+            ].append(sample_data["sample_name"])
         markdown_data["samples"] = samples_in_service
 
         # Resolution related information
         markdown_data["resolution"] = self.resolution_info["resolutions"][0]
         markdown_data["resolution_serviceIDs"] = []
         for available_service in self.resolution_info["resolutions"][0][
-            "availableServices"
+            "available_services"
         ]:
             markdown_data["resolution_serviceIDs"].append(
-                available_service["availServiceDescription"]
+                available_service["avail_service_description"]
             )
 
         if self.type == "delivery":
@@ -554,7 +557,7 @@ class BioinfoDoc:
                 msg="Write email notes"
             )
 
-        email_data["user_data"] = self.resolution_info["serviceUserId"]
+        email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
         email_data["service_acronym"] = self.service_name.split("_", 5)[2]
         email_data["delivery_number"] = self.delivery_number
@@ -588,7 +591,7 @@ class BioinfoDoc:
             stderr.print("[red] Unable to send e-mail" + e)
 
         msg = MIMEMultipart("alternative")
-        msg["To"] = self.resolution_info["serviceUserId"]["email"]
+        msg["To"] = self.resolution_info["service_user_id"]["email"]
         msg["From"] = email_host_user
         msg["Subject"] = (
             "Entrega "
@@ -600,7 +603,7 @@ class BioinfoDoc:
         )
         if bu_isciii.utils.prompt_yn_question(
             "Do you want to add any other sender? appart from "
-            + self.resolution_info["serviceUserId"]["email"],
+            + self.resolution_info["service_user_id"]["email"],
             dflt=False,
         ):
             stderr.print(
@@ -609,7 +612,7 @@ class BioinfoDoc:
             msg["CC"] = bu_isciii.utils.ask_for_some_text(msg="E-mails:")
             rcpt = msg["CC"].split(";") + [msg["To"]]
         else:
-            rcpt = self.resolution_info["serviceUserId"]["email"]
+            rcpt = self.resolution_info["service_user_id"]["email"]
 
         html = MIMEText(html_text, "html")
         msg.attach(html)
