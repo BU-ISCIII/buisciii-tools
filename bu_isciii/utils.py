@@ -244,7 +244,7 @@ def get_sftp_folder(resolution_info):
 def append_end_to_service_id_list(services_requested):
     service_ids_requested = []
     for service_id in services_requested:
-        service_ids_requested.append(service_id["serviceId"])
+        service_ids_requested.append(service_id["service_id"])
 
     for service_id in service_ids_requested:
         if (
