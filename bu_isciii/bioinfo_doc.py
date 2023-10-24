@@ -417,10 +417,10 @@ class BioinfoDoc:
             delivery_pdf_name,
         )
         try:
-            mergeFile = PyPDF2.PdfFileMerger()
-            mergeFile.append(PyPDF2.PdfFileReader(documentation_pdf, "rb"))
-            mergeFile.append(PyPDF2.PdfFileReader(results_pdf, "rb"))
-            mergeFile.append(PyPDF2.PdfFileReader(service_pdf, "rb"))
+            mergeFile = PyPDF2.PdfMerger()
+            mergeFile.append(PyPDF2.PdfReader(documentation_pdf, "rb"))
+            mergeFile.append(PyPDF2.PdfReader(results_pdf, "rb"))
+            mergeFile.append(PyPDF2.PdfReader(service_pdf, "rb"))
             mergeFile.write(delivery_pdf_file)
             stderr.print(
                 "[green]Successfully merged the PDFs %s, %s and %s to the directory %s"
