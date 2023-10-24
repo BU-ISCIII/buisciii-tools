@@ -33,7 +33,7 @@ class NewService:
         no_create_folder=None,
         ask_path=False,
         api_user=None,
-        api_password=None
+        api_password=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
