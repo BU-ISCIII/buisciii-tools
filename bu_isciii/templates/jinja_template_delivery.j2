@@ -5,16 +5,16 @@
 <br>
 # Service results report from the Bioinformatics Unit (BU-ISCIII)
 
-## {{ service.serviceRequestNumber }} service information:
+## {{ service.service_request_number }} service information:
 
 Here we describe the information about the service request:
 
-* Service ID: {{ service.serviceRequestNumber }}
-* Request date: {{ service.serviceCreatedOnDate }}
-* Center Requested service : {{service.serviceSeqCenter}}
-* Service status : {{service.serviceStatus}}
+* Service ID: {{ service.service_request_number }}
+* Request date: {{ service.service_created_date }}
+* Center Requested service : {{service.service_center}}
+* Service status : {{service.service_state}}
 * Requested services:
-{% for a_service in service.serviceAvailableService %}
+{% for a_service in service.service_available_service %}
 {{ a_service }}
 {% endfor %}
 * Service Notes : {{service_notes}}
@@ -31,46 +31,46 @@ Here we describe the information about the user requesting the service.
 
 Here we describe information about the requested resolution.
 
-* Resolution: {{ resolution.resolutionNumber }}
-* Resolution full name: {{ resolution.resolutionFullNumber }}
-* Resolution date: {{ resolution.resolutionDate }}
-{% if resolution.resolutionEstimatedDate -%}
-* Resolution estimated delivery date: {{ resolution.resolutionEstimatedDate }}
+* Resolution: {{ resolution.resolution_number }}
+* Resolution full name: {{ resolution.resolution_full_number }}
+* Resolution date: {{ resolution.resolution_date }}
+{% if resolution.resolution_estimated_date -%}
+* Resolution estimated delivery date: {{ resolution.resolution_estimated_date }}
 {%- endif %}
-* Resolution on Queued date: {{ resolution.resolutionOnQueuedDate }}
-{% if resolution.resolutionOnInProgressDate -%}
-* Resolution in Progress date: {{ resolution.resolutionOnInProgressDate }}
+* Resolution on Queued date: {{ resolution.resolution_queued_date }}
+{% if resolution.resolution_in_progress_date -%}
+* Resolution in Progress date: {{ resolution.resolution_in_progress_date }}
 {%- endif %}
 * Requested services handle in this resoution:
 {% for a_service in resolution_serviceIDs %}
     - {{ a_service }}
 {% endfor %}
-* Resolution Notes: {{ resolution.resolutionNotes }}
+* Resolution Notes: {{ resolution.resolution_notes }}
 
 ## Delivery information
 
 Here we describe information about the resolution delivery.
 
-{% if resolution.resolutionDeliveryDate %}
-* Resolution Delivery date: {{ resolution.resolutionDeliveryDate }}
+{% if resolution.resolution_delivery_date %}
+* Resolution Delivery date: {{ resolution.resolution_delivery_date }}
 {% endif %}
-{% if delivery.deliveryNotes %}
-* Resolution Delivery notes: {{ delivery.deliveryNotes }}
+{% if delivery.delivery_notes %}
+* Resolution Delivery notes: {{ delivery.delivery_notes }}
 {% endif %}
-{% if delivery.pipelinesInDelivery %}
-* Pipelines in delivery: {{ delivery.pipelinesInDelivery }}
+{% if delivery.pipelines_in_delivery %}
+* Pipelines in delivery: {{ delivery.pipelines_in_delivery }}
 {% endif %}
-{% if delivery.executionStartDate %}
-* Execution start date: {{ delivery.executionStartDate }}
+{% if delivery.execution_start_date %}
+* Execution start date: {{ delivery.execution_start_date }}
 {% endif %}
-{% if delivery.executionEndDate %}
-* Execution end date: {{ delivery.executionEndDate }}
+{% if delivery.execution_end_date %}
+* Execution end date: {{ delivery.execution_end_date }}
 {% endif %}
-{% if delivery.permanentUsedSpace %}
-* Permanent used space: {{ delivery.permanentUsedSpace }}
+{% if delivery.permanent_used_space %}
+* Permanent used space: {{ delivery.permanent_used_space }}
 {% endif %}
-{% if delivery.temporaryUsedSpace %}
-* Temporary used space: {{ delivery.temporaryUsedSpace }}
+{% if delivery.temporary_used_space %}
+* Temporary used space: {{ delivery.temporary_used_space }}
 {% endif %}
 
 ## Samples sequenced at iSCIII:
