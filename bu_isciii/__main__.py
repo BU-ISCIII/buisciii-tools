@@ -314,12 +314,7 @@ def clean(ctx, resolution, path, ask_path, option):
     show removable files or show folders for no copy.
     """
     clean = bu_isciii.clean.CleanUp(
-        resolution,
-        path,
-        ask_path,
-        option,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"]
+        resolution, path, ask_path, option, ctx.obj["api_user"], ctx.obj["api_password"]
     )
     clean.handle_clean()
 
