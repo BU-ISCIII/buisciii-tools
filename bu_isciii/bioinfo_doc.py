@@ -76,7 +76,7 @@ class BioinfoDoc:
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="serviceFullData", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
         if self.resolution_info == 404:
             print("Received Error 404 from Iskylims API. Aborting")
@@ -228,7 +228,7 @@ class BioinfoDoc:
                         self.service_folder, self.service_result_folder
                     )
                     delivery_date = self.resolution_info["resolutions"][0][
-                        "resolutionDeliveryDate"
+                        "resolution_delivery_date"
                     ]
                     delivery_datetime = datetime.strptime(delivery_date, "%Y-%m-%d")
                     delivery_date_folder = datetime.strftime(
@@ -259,19 +259,19 @@ class BioinfoDoc:
         )
 
         delivery_dict = {
-            "resolutionNumber": self.resolution_id,
-            "deliveryNotes": delivery_notes,
+            "resolution_number": self.resolution_id,
+            "delivery_notes": delivery_notes,
         }
 
         # How json should be fully formatted:
         # delivery_dict = {
-        # "resolutionNumber": "SRVSGAFI005.1",
-        # "pipelinesInDelivery": ["viralrecon"],
-        # "deliveryNotes" : delivery_notes,
-        # "executionStartDate" : "YYYY-MM-DD",
-        # "executionEndDate" : "YYYY-MM-DD",
-        # "permanentUsedSpace" : "",
-        # "temporaryUsedSpace" : ""
+        # "resolution_number": "SRVSGAFI005.1",
+        # "pipelines_in_delivery": ["viralrecon"],
+        # "delivery_notes" : delivery_notes,
+        # "execution_start_date" : "YYYY-MM-DD",
+        # "execution_end_date" : "YYYY-MM-DD",
+        # "permanent_used_space" : "",
+        # "temporary_used_space" : ""
         # }
 
         self.rest_api.post_request("create-delivery", json.dumps(delivery_dict))
