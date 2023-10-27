@@ -650,11 +650,25 @@ class BioinfoDoc:
             if self.results_md_list:
                 result_pdf = self.create_results_doc(self.results_md_list, "results")
             else:
-                result_pdf = None
+                stderr.print("Results markdown does not exist.")
+                if bu_isciii.utils.prompt_yn_question(
+                    "Do you want to continue without it?", dflt=True
+                ):
+                    result_pdf = None
+                else:
+                    stderr.print("Bye.")
+                    sys.exit(1)
             if self.delivery_md_list:
                 service_pdf = self.create_results_doc(self.delivery_md_list, "service")
             else:
-                service_pdf = None
+                stderr.print("Delivery markdown does not exist.")
+                if bu_isciii.utils.prompt_yn_question(
+                    "Do you want to continue without it?", dflt=True
+                ):
+                    service_pdf = None
+                else:
+                    stderr.print("Bye.")
+                    sys.exit(1)
             results_pdf = self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
             self.clean_files()
             self.sftp_tree()
