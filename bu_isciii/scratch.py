@@ -50,7 +50,7 @@ class Scratch:
         if direction is None:
             self.direction = bu_isciii.utils.prompt_selection(
                 "Select:",
-                ["Service_to_scratch", "Scratch_to_service", "Remove_scratch"],
+                ["service_to_scratch", "scratch_to_service", "remove_scratch"],
             )
         else:
             self.direction = direction
@@ -254,9 +254,9 @@ class Scratch:
         return True
 
     def handle_scratch(self):
-        if self.direction == "Service_to_scratch":
+        if self.direction == "service_to_scratch":
             self.copy_scratch()
-        elif self.direction == "Scratch_to_service":
+        elif self.direction == "scratch_to_service":
             self.revert_copy_scratch()
-        elif self.direction == "Remove_scratch":
+        elif self.direction == "remove_scratch":
             self.remove_scratch()

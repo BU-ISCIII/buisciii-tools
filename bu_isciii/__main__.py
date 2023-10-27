@@ -242,12 +242,12 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
 @click.option(
     "-d",
     "--direction",
-    type=click.Choice(["Service_to_scratch", "Scratch_to_service", "Remove_scratch"]),
+    type=click.Choice(["service_to_scratch", "scratch_to_service", "remove_scratch"]),
     multiple=False,
     help=(
-        "Direction of the rsync command. Service_to_scratch "
+        "Direction of the rsync command. service_to_scratch "
         "from /data/bi/service to /data/bi/scratch_tmp/bi/."
-        "Scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service"
+        "scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service"
     ),
 )
 @click.pass_context
@@ -410,7 +410,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         resolution,
         path,
         tmp_dir,
-        "Scratch_to_service",
+        "scratch_to_service",
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
