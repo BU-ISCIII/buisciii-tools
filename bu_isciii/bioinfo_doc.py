@@ -117,9 +117,11 @@ class BioinfoDoc:
                         bu_isciii.service_json.ServiceJson().get_find(
                             service_id_requested, "delivery_md"
                         )
-                        not in self.delivery_md_list and bu_isciii.service_json.ServiceJson().get_find(
+                        not in self.delivery_md_list
+                        and bu_isciii.service_json.ServiceJson().get_find(
                             service_id_requested, "delivery_md"
-                        ) != ""
+                        )
+                        != ""
                     ):
                         self.delivery_md_list.append(
                             bu_isciii.service_json.ServiceJson().get_find(
@@ -142,9 +144,11 @@ class BioinfoDoc:
                         bu_isciii.service_json.ServiceJson().get_find(
                             service_id_requested, "results_md"
                         )
-                        not in self.results_md_list and bu_isciii.service_json.ServiceJson().get_find(
+                        not in self.results_md_list
+                        and bu_isciii.service_json.ServiceJson().get_find(
                             service_id_requested, "results_md"
-                        ) != ""
+                        )
+                        != ""
                     ):
                         self.results_md_list.append(
                             bu_isciii.service_json.ServiceJson().get_find(
