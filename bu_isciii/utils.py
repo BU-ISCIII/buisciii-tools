@@ -244,8 +244,8 @@ def get_sftp_folder(resolution_info):
 def append_end_to_service_id_list(services_requested):
     service_ids_requested = []
     for service_id in services_requested:
-        service_ids_requested.append(service_id["service_id"])
-
+        if service_id["service_id"] is not None:
+            service_ids_requested.append(service_id["service_id"])
     for service_id in service_ids_requested:
         if (
             bu_isciii.service_json.ServiceJson().get_find(service_id, "end") != ""

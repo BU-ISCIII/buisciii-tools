@@ -117,7 +117,9 @@ class BioinfoDoc:
                         bu_isciii.service_json.ServiceJson().get_find(
                             service_id_requested, "delivery_md"
                         )
-                        not in self.delivery_md_list
+                        not in self.delivery_md_list and bu_isciii.service_json.ServiceJson().get_find(
+                            service_id_requested, "delivery_md"
+                        ) != ""
                     ):
                         self.delivery_md_list.append(
                             bu_isciii.service_json.ServiceJson().get_find(
@@ -140,7 +142,9 @@ class BioinfoDoc:
                         bu_isciii.service_json.ServiceJson().get_find(
                             service_id_requested, "results_md"
                         )
-                        not in self.results_md_list
+                        not in self.results_md_list and bu_isciii.service_json.ServiceJson().get_find(
+                            service_id_requested, "results_md"
+                        ) != ""
                     ):
                         self.results_md_list.append(
                             bu_isciii.service_json.ServiceJson().get_find(
@@ -419,8 +423,10 @@ class BioinfoDoc:
         try:
             mergeFile = PyPDF2.PdfMerger()
             mergeFile.append(PyPDF2.PdfReader(documentation_pdf, "rb"))
-            mergeFile.append(PyPDF2.PdfReader(results_pdf, "rb"))
-            mergeFile.append(PyPDF2.PdfReader(service_pdf, "rb"))
+            if results_pdf is not None:
+                mergeFile.append(PyPDF2.PdfReader(results_pdf, "rb"))
+            if service_pdf is not None:
+                mergeFile.append(PyPDF2.PdfReader(service_pdf, "rb"))
             mergeFile.write(delivery_pdf_file)
             stderr.print(
                 "[green]Successfully merged the PDFs %s, %s and %s to the directory %s"
@@ -641,8 +647,14 @@ class BioinfoDoc:
         elif self.type == "delivery":
             doc_pdf = self.generate_documentation_files("delivery")
             self.copy_images()
-            result_pdf = self.create_results_doc(self.results_md_list, "results")
-            service_pdf = self.create_results_doc(self.delivery_md_list, "service")
+            if self.results_md_list:
+                result_pdf = self.create_results_doc(self.results_md_list, "results")
+            else:
+                result_pdf = None
+            if self.delivery_md_list:
+                service_pdf = self.create_results_doc(self.delivery_md_list, "service")
+            else:
+                service_pdf = None
             results_pdf = self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
             self.clean_files()
             self.sftp_tree()
