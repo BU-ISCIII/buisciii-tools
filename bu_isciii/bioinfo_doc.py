@@ -522,7 +522,7 @@ class BioinfoDoc:
                 shutil.rmtree(os.path.join(file_path, f), ignore_errors=True)
 
     def sftp_tree(self):
-        sftp_path = os.path.join(self.sftp_folder, self.service_folder)
+        sftp_path = os.path.join(self.sftp_folder, self.service_name)
         try:
             tree_result = subprocess.run(
                 ["tree", sftp_path], capture_output=True, text=True, check=True
