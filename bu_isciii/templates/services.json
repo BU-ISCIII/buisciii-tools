@@ -14,7 +14,7 @@
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "results_md": "assets/reports/pdf/report_bacterial_assembly.pdf"
+        "results_md": ""
     },
     "mtbseq_assembly": {
         "label": "",
