@@ -50,6 +50,7 @@ Here we describe information about the requested resolution.
 * Resolution Notes: {{ resolution.resolution_notes }}
 {% endif %}
 
+{% if samples %}
 ## Samples sequenced at ISCIII:
 
 Here we describe information about the project associated to the service:
@@ -62,6 +63,7 @@ Here we describe information about the project associated to the service:
         {% set comma = joiner(", ") %}{% for samples_in_project in samples_in_project %}{{ comma() }}{{ samples_in_project }}{% endfor %}
     {% endfor %}
 {% endfor %}
+{% endif %}
 
 <!---
 ### TODO
