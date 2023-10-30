@@ -1,4 +1,0 @@
-# conda activate ariba
-
-mkdir run summary
-cp /data/bi/references/ariba/databases.txt .

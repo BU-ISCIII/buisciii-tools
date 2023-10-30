@@ -63,7 +63,7 @@ class NewService:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.service_samples = self.resolution_info["samples"]
+        self.service_samples = self.resolution_info.get("samples", None)
 
         if ask_path and path is None:
             stderr.print("Directory where you want to create the service folder.")
@@ -229,14 +229,28 @@ class NewService:
         f.close()
 
     def create_new_service(self):
-        self.create_folder()
-        self.copy_template()
-        self.create_samples_id()
-        self.create_symbolic_links()
-        self.samples_json()
-        self.rest_api.put_request(
-            "update-state", "resolution", self.resolution_id, "state", "in_progress"
-        )
+        if self.service_samples is not None:
+            self.create_folder()
+            self.copy_template()
+            self.create_samples_id()
+            self.create_symbolic_links()
+            self.samples_json()
+            self.rest_api.put_request(
+                "update-state", "resolution", self.resolution_id, "state", "in_progress"
+            )
+        else:
+            stderr.print(
+                "[yellow]WARN: No samples recorded in service: " + self.resolution_id
+            )
+            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
+                self.create_folder()
+                self.copy_template()
+                self.rest_api.put_request(
+                "update-state", "resolution", self.resolution_id, "state", "in_progress"
+                )
+            else:
+                stderr.print("Directory not created. Bye!")
+                sys.exit(1)
 
     def get_resolution_id(self):
         return self.resolution_id

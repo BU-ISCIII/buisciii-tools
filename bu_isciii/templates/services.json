@@ -69,7 +69,7 @@
   },
     "plasmidid_assembly": {
       "label": "",
-      "template": "plasmidid_assembly",
+      "template": "plasmidid",
       "order": 1,
       "begin": "base",
       "end": "",
@@ -203,9 +203,9 @@
       "delivery_md": "",
       "delivery_pdf": ""
     },
-    "ariba_characterization": {
+    "characterization": {
       "label": "",
-      "template": "ARIBA_characterization",
+      "template": "characterization",
       "url": "",
       "order": 1,
       "begin": "",
@@ -236,6 +236,56 @@
       "last_folder":"RESULTS",
       "delivery_md": "assets/reports/md/mag.md",
       "results_md": "assets/reports/results/mag.md"
+    },
+    "exometrio": {
+      "label": "",
+      "template": "exometrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates/{sample_name}","03-annotation/vep", "03-annotation/exomiser"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "exomeeb": {
+      "label": "",
+      "template": "exomeeb",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-sarek/preprocessing/markduplicates/{sample_name}", "02-postprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "wgstrio": {
+      "label": "",
+      "template": "wgstrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-sarek/preprocessing/markduplicates/{sample_name}", "02-postprocessing", "01-sarek/preprocessing/markduplicates/{sample_name}","03-annotation/vep", "03-annotation/exomiser"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
     }
-    
 }

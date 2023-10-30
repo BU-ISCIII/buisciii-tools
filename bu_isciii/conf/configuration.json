@@ -9,7 +9,7 @@
         "options": ["-rlpv", "--update", "-L", "--inplace"],
         "exclusions": [
             "'*_NC'",
-            "'lablog'",
+            "'*lablog*'",
             "'work'",
             "'00-reads'",
             "'*.sh'",

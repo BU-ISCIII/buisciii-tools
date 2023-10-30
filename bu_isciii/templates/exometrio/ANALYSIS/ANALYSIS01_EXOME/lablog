@@ -1,3 +1,5 @@
+# module load Nextflow singularity
+
 ln -s ../00-reads/ .
 ln -s ../samples_id.txt .
 
@@ -22,11 +24,9 @@ do
 
 done < ./samples_id.txt
 
-
-echo -e "patient,sex,status,sample,lane,fastq_1,fastq_2" > samples.csv
-cat samples_id.txt | xargs -I % echo -e "%,XY,0,%,1,00-reads/%_R1.fastq.gz,00-reads/%_R2.fastq.gz" >> samples.csv
-
-#module load Nextflow singularity
+echo -e "patient,sex,status,sample,lane,fastq_1,fastq_2" > samplesheet.csv
+cat samples_id.txt | xargs -I % echo -e "%,XY,0,%,1,00-reads/%_R1.fastq.gz,00-reads/%_R2.fastq.gz" >> samplesheet.csv
+mkdir -p 02-postprocessing 03-annotation 99-stats
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
@@ -44,17 +44,19 @@ export NXF_OPTS="-Xms500M -Xmx4G"
 
 nextflow run /data/bi/pipelines/nf-core-sarek-3.1.1/workflow/main.nf \\
           -c ../../DOC/hpc_slurm_sarek.config \\
-          --input 'samples.csv' \\
+          --input 'samplesheet.csv' \\
           --outdir 01-sarek \\
           --genome GATK.GRCh37 \\
 	  	  --wes \\
-          --intervals '../../RAW/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed' \\
+          --intervals '../../REFERENCES/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed' \\
           --dbsnp '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz' \\
 	      --dbsnp_tbi '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz.tbi' \\
 	      --dbsnp_vqsr '--resource:dbsnp,known=false,training=true,truth=false,prior=2.0 dbsnp_138_mod.b37.vcf.gz' \\
 	      --tools 'haplotypecaller' \\
           --save_reference \\
           --joint_germline \\
+		  --igenomes_ignore \\
+		  --igenomes_base '/data/bi/references/igenomes/' \\
 	  	  -resume
 EOF
 
