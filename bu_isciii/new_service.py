@@ -246,7 +246,11 @@ class NewService:
                 self.create_folder()
                 self.copy_template()
                 self.rest_api.put_request(
-                "update-state", "resolution", self.resolution_id, "state", "in_progress"
+                    "update-state",
+                    "resolution",
+                    self.resolution_id,
+                    "state",
+                    "in_progress",
                 )
             else:
                 stderr.print("Directory not created. Bye!")
