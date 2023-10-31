@@ -92,6 +92,7 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
+        self.service_samples = self.resolution_info.get("Samples", None)
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -162,7 +163,7 @@ class CleanUp:
         """
         if to_stdout:
             folders = ", ".join(self.delete_folders)
-            stderr.print(f"The following folders will be purge: {folders}")
+            stderr.print(f"The following folders will be purged: {folders}")
             files = ", ".join(self.delete_files)
             stderr.print(f"The following files will be deleted: {files}")
             return
@@ -305,15 +306,18 @@ class CleanUp:
         Params:
 
         """
-        files_to_delete = []
-        for sample_info in self.service_samples:
-            for file in self.delete_files:
-                file_to_delete = file.replace("sample_name", sample_info["sample_name"])
-                files_to_delete.append(file_to_delete)
-        path_content = self.scan_dirs(to_find=files_to_delete)
-        for file in path_content:
-            os.remove(file)
-            stderr.print("[green]Successfully removed " + file)
+        if self.service_samples is not None:
+            files_to_delete = []
+            for sample_info in self.service_samples:
+                for file in self.delete_files:
+                    file_to_delete = file.replace(
+                        "sample_name", sample_info["sample_name"]
+                    )
+                    files_to_delete.append(file_to_delete)
+            path_content = self.scan_dirs(to_find=files_to_delete)
+            for file in path_content:
+                os.remove(file)
+                stderr.print("[green]Successfully removed " + file)
         return
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):

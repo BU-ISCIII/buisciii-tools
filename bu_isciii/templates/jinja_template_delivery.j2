@@ -73,6 +73,7 @@ Here we describe information about the resolution delivery.
 * Temporary used space: {{ delivery.temporary_used_space }}
 {% endif %}
 
+{% if samples %}
 ## Samples sequenced at iSCIII:
 
 Here we describe information about the project associated to the service:
@@ -85,6 +86,7 @@ Here we describe information about the project associated to the service:
         {% set comma = joiner(", ") %}{% for samples_in_project in samples_in_project %}{{ comma() }}{{ samples_in_project }}{% endfor %}
     {% endfor %}
 {% endfor %}
+{% endif %}
 
 <!---
 ### TODO

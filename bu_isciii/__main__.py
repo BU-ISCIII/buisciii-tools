@@ -17,6 +17,7 @@ import bu_isciii.bioinfo_doc
 import bu_isciii.clean
 import bu_isciii.archive
 import bu_isciii.copy_sftp
+import bu_isciii.autoclean_sftp
 
 log = logging.getLogger()
 
@@ -590,6 +591,28 @@ def archive(
         output_name,
     )
     archive_ser.handle_archive()
+
+
+# CLEAN OLD SFTP SERVICES
+@bu_isciii_cli.command(help_priority=8)
+@click.option(
+    "-s",
+    "--sftp_folder",
+    type=click.Path(),
+    default=None,
+    help="Absolute path to sftp folder",
+)
+@click.option(
+    "-d",
+    "--days",
+    type=int,
+    default=14,
+    help="Integer, remove files older than a window of `-d [int]` days. Default 14 days.",
+)
+def autoclean_sftp(sftp_folder, days):
+    """Clean old sftp services"""
+    sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(sftp_folder, days)
+    sftp_clean.handle_autoclean_sftp()
 
 
 if __name__ == "__main__":

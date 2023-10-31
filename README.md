@@ -21,6 +21,7 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
         - [copy\_sftp](#copy_sftp)
       - [bioinfo\_doc](#bioinfo_doc)
       - [archive](#archive)
+      - [autoclean\_sftp](#autoclean_sftp)
   - [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -352,6 +353,28 @@ Options:
   -f, --output_name TEXT          Tsv output path + filename with archive
                                   stats and info
   --help                          Show this message and exit.
+```
+
+#### autoclean_sftp
+
+Example of usage:
+
+```bash
+bu-isciii autoclean-sftp
+```
+
+Help:
+
+```bash
+Usage: bu-isciii autoclean-sftp [OPTIONS]
+
+  Clean old sftp services
+
+Options:
+  -s, --sftp_folder PATH  Absolute path to sftp folder
+  -d, --days INTEGER      Integer, remove files older than a window of `-d
+                          [int]` days. Default 14 days.
+  --help                  Show this message and exit.
 ```
 
 ## Acknowledgements

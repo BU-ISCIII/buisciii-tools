@@ -182,7 +182,7 @@ class BioinfoDoc:
         self.service_folder = os.path.join(
             self.path, self.conf["services_path"], year, self.service_name
         )
-        self.samples = self.resolution_info["samples"]
+        self.samples = self.resolution_info.get("samples", None)
         self.handled_services = None
         path_to_wkhtmltopdf = os.path.normpath(self.conf["wkhtmltopdf_path"])
         self.config_pdfkit = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
@@ -304,19 +304,24 @@ class BioinfoDoc:
         markdown_data["service"] = self.resolution_info
         markdown_data["user_data"] = self.resolution_info["service_user_id"]
         samples_in_service = {}
-        for sample_data in self.samples:
-            if sample_data["run_name"] not in samples_in_service:
-                samples_in_service[sample_data["run_name"]] = {}
-            if (
-                sample_data["project_name"]
-                not in samples_in_service[sample_data["run_name"]]
-            ):
+
+        if self.samples is not None:
+            for sample_data in self.samples:
+                if sample_data["run_name"] not in samples_in_service:
+                    samples_in_service[sample_data["run_name"]] = {}
+                if (
+                    sample_data["project_name"]
+                    not in samples_in_service[sample_data["run_name"]]
+                ):
+                    samples_in_service[sample_data["run_name"]][
+                        sample_data["project_name"]
+                    ] = []
                 samples_in_service[sample_data["run_name"]][
                     sample_data["project_name"]
-                ] = []
-            samples_in_service[sample_data["run_name"]][
-                sample_data["project_name"]
-            ].append(sample_data["sample_name"])
+                ].append(sample_data["sample_name"])
+        else:
+            samples_in_service = {" N/A": {" N/A": ["No recorded samples"]}}
+
         markdown_data["samples"] = samples_in_service
 
         # Resolution related information
