@@ -23,7 +23,7 @@ analysis:
             MITOCHONDRIAL: 100.0
     }
     #FULL or PASS_ONLY
-    analysisMode: PASS_ONLY
+    #analysisMode: PASS_ONLY
     #Possible frequencySources:
     #Thousand Genomes project http://www.1000genomes.org/
     #   THOUSAND_GENOMES,
@@ -83,7 +83,7 @@ analysis:
         #intervalFilter: {intervals: ['chr10:123256200-123256300', 'chr10:123256290-123256350']},
         # or using a BED file - NOTE this should be 0-based, Exomiser otherwise uses 1-based coordinates in line with VCF
         #intervalFilter: {bed: BED_FILE},
-        genePanelFilter: {geneSymbols: ['COL7A1', 'KRT5', 'KRT14', 'PLEC', 'ITGB4', 'LAMC2', 'LAMB3', 'LAMA3', 'COL17A1', 'FERMT1', 'KLHL24', 'DST', 'EXPH5', 'CD151', 'TGM5', 'PKP1', 'DSP', 'JUP', 'LAMA3A', 'ITGA6', 'ITGA3', 'PLOD3.TGM5', 'CSTA', 'CTSB', 'SERPINB8', 'FLG2', 'CDSN', 'CAST', 'DSG1', 'SPINK5', 'DSC3', 'DSG3', 'KRT1', 'KRT10', 'KRT2', 'KRT6A', 'KRT6B', 'KRT6C', 'KRT16', 'KRT17']},
+        genePanelFilter: {geneSymbols: ['COL7A1', 'KRT5', 'KRT14', 'PLEC', 'ITGB4', 'LAMC2', 'LAMB3', 'LAMA3', 'COL17A1', 'FERMT1', 'KLHL24', 'DST', 'EXPH5', 'CD151', 'TGM5', 'PKP1', 'DSP', 'JUP', 'LAMA3A', 'ITGA6', 'ITGA3', 'PLOD', 'TGM5', 'CSTA', 'CTSB', 'SERPINB8', 'FLG2', 'CDSN', 'CAST', 'DSG1', 'SPINK5', 'DSC3', 'DSG3', 'KRT1', 'KRT10', 'KRT2', 'KRT6A', 'KRT6B', 'KRT6C', 'KRT16', 'KRT17']},
         failedVariantFilter: {},
         #qualityFilter: {minQuality: 50.0},
         #variantEffectFilter: {},
