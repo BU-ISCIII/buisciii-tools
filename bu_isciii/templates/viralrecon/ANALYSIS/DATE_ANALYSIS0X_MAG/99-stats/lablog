@@ -15,7 +15,7 @@ cat <<EOF > multiqc.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-multiqc -d . --config multiqc_config.yaml
+multiqc -d . --config multiqc_config.yml
 
 EOF
 
