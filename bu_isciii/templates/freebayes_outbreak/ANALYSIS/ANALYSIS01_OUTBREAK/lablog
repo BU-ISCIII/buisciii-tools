@@ -1,0 +1,8 @@
+ln -s ../samples_id.txt .
+ln -s ../00-reads .
+
+echo "Write the path to the reference genome's fasta file for mapping"
+
+read -p 'Path to fasta: ' reference
+
+sed -i 's/REFERENCE_GENOME/\${reference}/g' 04-Alignment/lablog 06-freebayes/lablog 99-stats/lablog

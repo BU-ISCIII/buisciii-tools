@@ -1,0 +1,24 @@
+# conda activate freebayes
+
+mkdir -p logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > freebayes.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 1
+#SBATCH --mem 251346M
+#SBATCH --array 1
+#SBATCH --partition long_idx
+#SBATCH --output logs/freebayes.log
+#SBATCH --chdir $scratch_dir
+
+freebayes -f REFERENCE_GENOME --bam-list bam_list.txt --pooled-continuous -F 0.1 -C 1 | vcffilter -f "QUAL > 20" > all_samples.vcf
+
+EOF
+
+echo "sbatch freebayes.sbatch" > _02_run_freebayes.sh
+echo "Done"
+
+echo 'cat ../samples_id.txt | while read in; do echo "../05-mark_dups/${in}/${in}_sorted_rg.bam"; done > bam_list.txt' > _01_create_bam_list.txt
