@@ -287,5 +287,22 @@
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "results_md": ""
+    },
+    "freebayes_outbreak": {
+      "label": "",
+      "template": "freebayes_outbreak",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"RESULTS",
+      "delivery_md": "",
+      "results_md": ""
     }
 }
