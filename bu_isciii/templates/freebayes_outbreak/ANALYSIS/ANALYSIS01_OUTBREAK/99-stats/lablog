@@ -1,0 +1,43 @@
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+mkdir -p logs
+mkdir samtools_flagstats
+mkdir picard
+
+echo "Use bash lablog ../samples_id.txt"
+
+samples_file=$1
+cat <<EOF > samtools_flagstats.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 2:00:00
+#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
+#SBATCH --partition short_idx
+#SBATCH --output logs/samtools_flagstats_%A_%a.log
+#SBATCH --chdir $scratch_dir
+
+module load SAMtools
+
+SAMPLE_LIST=(\$(<$samples_file))
+echo \$SAMPLE_LIST
+SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
+echo \$SAMPLE
+
+samtools flagstat ../04-Alignment/\${SAMPLE}/\${SAMPLE}_sorted_rg.bam > samtools_flagstats/\${SAMPLE}_flagstats.txt
+
+EOF
+
+echo "sbatch samtools_flagstats.sbatch" > _01_samtools_flagstats.sh
+echo "Done"
+
+# module load picard
+
+cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 java -jar \$EBROOTPICARD/picard.jar CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ../04-Alignment/@@/@@_sorted_rg.bam -O picard/@@_collect_wgs_metrics.txt -R REFERENCE_GENOME &" > _02_wgsmetrics.sh
+
+echo "printf \"SAMPLENAME\t\$(grep \"GENOME_TERRITORY\" */*collect_wgs_metrics.txt | cut -d\":\" -f2 | sed 's/ /_/g'| sort -u)\n\" > wgs_metrics_all.txt" > _03_gather_wgs_metrics.sh
+
+echo "cat ../samples_id.txt | xargs -I % echo \"printf '%\t' %; head -n 8 picard/%_collect_wgs_metrics.txt | grep '^[0-9]'\" | bash >> wgs_metrics_all.txt" >> _03_gather_wgs_metrics.sh
+
+echo "cut -f 1,2,3,14,17 wgs_metrics_all.txt > wgs_metrics_all_filtered.txt" >> _03_gather_wgs_metrics.sh
