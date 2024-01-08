@@ -1,0 +1,35 @@
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+echo "Use bash lablog ../samples_id.txt"
+
+samples_file=$1
+cat <<EOF > bwa.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 16384
+#SBATCH --time 8:00:00
+#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
+#SBATCH --partition middle_idx
+#SBATCH --output logs/bwa_%A_%a.log
+#SBATCH --chdir $scratch_dir
+
+module load BWA/0.7.17-foss-2018b SAMtools/1.12-GCC-10.2.0
+
+SAMPLE_LIST=(\$(<$samples_file))
+echo \$SAMPLE_LIST
+SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
+echo \$SAMPLE
+
+mkdir \$SAMPLE
+bwa mem -t 4 /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ../02-preprocessing/\$SAMPLE/\${SAMPLE}_R1_filtered.fastq.gz ../02-preprocessing/\$SAMPLE/\${SAMPLE}_R2_filtered.fastq.gz | samtools view -bS -o \$SAMPLE/\${SAMPLE}.bam -
+samtools sort \${SAMPLE}/\${SAMPLE}.bam -T \${SAMPLE}_sorted -o \${SAMPLE}/\${SAMPLE}_sorted.bam
+samtools index \${SAMPLE}/\${SAMPLE}_sorted.bam
+rm \${SAMPLE}/\${SAMPLE}.bam
+
+EOF
+
+echo "sbatch bwa.sbatch" > _01_bwa.sh
+echo "Done"

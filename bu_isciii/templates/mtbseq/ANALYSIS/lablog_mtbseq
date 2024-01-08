@@ -1,0 +1,4 @@
+mkdir -p 00-reads
+mv ANALYSIS01_MTBSEQ $(date '+%Y%m%d')_ANALYSIS01_MTBSEQ
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cd -
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -

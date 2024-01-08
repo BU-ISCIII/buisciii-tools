@@ -1,0 +1,5 @@
+mkdir -p 00-reads
+
+mv DATE_ANALYSIS01_RNASEQ $(date '+%Y%m%d')_ANALYSIS01_RNASEQ
+
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -

@@ -1,0 +1,1 @@
+i=1; find */variants/ivar/consensus/ -type d -name 'bcftools' | while read in;  do echo "python ./percentajeNs.py ${in} %Ns_${i}.tab"; i=$((i+1)); done > _03_run_percentage_Ns.sh; echo "cat %Ns_* > %Ns.tab" >> _03_run_percentage_Ns.sh; echo "rm %Ns_*" >> _03_run_percentage_Ns.sh

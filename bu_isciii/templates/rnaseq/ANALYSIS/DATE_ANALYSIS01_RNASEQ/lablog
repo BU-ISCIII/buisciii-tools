@@ -1,0 +1,33 @@
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+echo "sample,fastq_1,fastq_2,strandedness" > samplesheet.csv
+cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,reverse"; done >> samplesheet.csv
+
+#module load Nextflow singularity
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > rnaseq.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 24:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_rnaseq01.log
+#SBATCH --chdir $scratch_dir
+
+export NXF_OPTS="-Xms500M -Xmx4G"
+
+/data/bi/pipelines/nf-core-rnaseq-3.10.1/workflow/main.nf \\
+          -c ../../DOC/hpc_slurm_rnaseq.config \\
+          -params-file ../../DOC/hg38_ensmbl_rnaseq.yml \\
+          --input samplesheet.csv \\
+          --outdir 01-$(date '+%Y%m%d')_rnaseq \\
+          --save_align_intermeds \\
+          --skip_markduplicates \\
+          --pseudo_aligner salmon \\
+          -resume
+EOF
+
+echo "sbatch rnaseq.sbatch" > _01_run_rnaseq.sh

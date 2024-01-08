@@ -1,0 +1,274 @@
+{
+    "assembly_annotation": {
+        "label": "",
+        "template": "assembly",
+        "url": "",
+        "order": 1,
+        "begin": "",
+        "end": "",
+        "description": "Nextflow assembly pipeline to assemble bacterial genomes",
+        "clean": {
+          "folders":["01-preprocessing/trimmed_sequences"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP", "latest"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf"
+    },
+    "mtbseq_assembly": {
+        "label": "",
+        "template": "mtbseq",
+        "order": 1,
+        "begin": "base",
+        "end": "mag_met",
+        "url": "https://github.com/ngs-fzb/MTBseq_source",
+        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
+        "clean": {
+          "folders":["01-preprocessing/trimmed_sequences", "Bam", "Mpileup"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": ""
+    },
+    "mtbseq": {
+        "label": "",
+        "template": "mtbseq",
+        "order": 1,
+        "begin": "base",
+        "end": "mag_met",
+        "url": "https://github.com/ngs-fzb/MTBseq_source",
+        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
+        "clean": {
+          "folders":["01-preprocessing", "Bam", "Mpileup"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": ""
+    },
+    "pikavirus": {
+      "label": "",
+      "template": "pikavirus",
+      "order": 1,
+      "begin": "base",
+      "end": "mag_met",
+      "url": "https://github.com/BU-ISCIII/PikaVirus",
+      "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus.",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+  },
+    "plasmidid_assembly": {
+      "label": "",
+      "template": "plasmidid",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/BU-ISCIII/plasmidID",
+      "description": "Plasmid identification tool based on mapping and assisted by assembly",
+      "clean": {
+        "folders":["01-preprocessing/trimmed_sequences"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+  },
+    "wgmlst_taranis": {
+        "label": "",
+        "template": "taranis",
+        "order": 1,
+        "begin": "base",
+        "end": "mag_met",
+        "url": "https://github.com/BU-ISCIII/taranis",
+        "description": "Multilocus sequence typing (MLST) using Taranis",
+        "depends_on": "assembly_annotation",
+        "clean": {
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": ""
+    },
+    "wgmlst_chewbbaca": {
+        "label": "",
+        "template": "chewbbaca",
+        "order": 1,
+        "begin": "base",
+        "end": "mag_met",
+        "url": "https://github.com/B-UMMI/chewBBACA",
+        "description": "Multilocus sequence typing (MLST) using chewBBACA",
+        "depends_on": "assembly_annotation",
+        "clean": {
+          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": ""
+    },
+    "viralrecon": {
+        "label": "",
+        "template": "viralrecon",
+        "url": "https://github.com/BU-ISCIII/viralrecon",
+        "order": 1,
+        "begin": "",
+        "end": "mag_met",
+        "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
+        "clean": {
+          "folders":[],
+          "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
+        "delivery_md": "",
+        "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf"
+    },
+    "rnaseq": {
+        "label": "",
+        "template": "rnaseq",
+        "url": "https://github.com/nf-core/rnaseq",
+        "order": 1,
+        "begin": "",
+        "end": "mag_met",
+        "description": "RNA-seq analysis",
+        "clean": {
+          "folders":[],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
+        "delivery_md": "",
+        "delivery_pdf": "assets/reports/pdf/rnaseq.pdf"
+    },
+    "lowfreq_panel": {
+        "label": "",
+        "template": "lowfreq_panel",
+        "url": "",
+        "order": 1,
+        "begin": "",
+        "end": "",
+        "description": "Low frequency variant calling from enrichment panel.",
+        "clean": {
+          "folders":["02-preprocessing", "05-samtools"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP", "00-reads"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "delivery_pdf": ""
+    },
+    "snippy": {
+      "label": "",
+      "template": "snippy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/tseemann/snippy",
+      "description": "Rapid haploid variant calling and core genome alignment",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "seek_and_destroy": {
+      "label": "",
+      "template": "seek_and_destroy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/GuilleGorines/Seek-Destroy",
+      "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "characterization": {
+      "label": "",
+      "template": "characterization",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "exometrio": {
+      "label": "",
+      "template": "exometrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates", "03-annotation/vep", "03-annotation/exomiser"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "exomeeb": {
+      "label": "",
+      "template": "exomeeb",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "wgstrio": {
+      "label": "",
+      "template": "wgstrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "delivery_pdf": ""
+    }
+}

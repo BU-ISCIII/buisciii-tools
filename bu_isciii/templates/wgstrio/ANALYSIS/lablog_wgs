@@ -1,0 +1,5 @@
+mkdir 00-reads
+ls ../RAW/*.gz | cut -d "/" -f3 | cut -d "_" -f 1 | sort -u | grep -v "md5" > samples_id.txt
+mv ANALYSIS01_GENOME $(date '+%Y%m%d')_ANALYSIS01_GENOME
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cd -
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
