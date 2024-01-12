@@ -106,7 +106,7 @@ cat <<EOF > assembly.sbatch
 #SBATCH --chdir $scratch_dir
 
 #module load Nextflow/23.10.0 singularity
-export NXF_OPTS="-Xms500M -Xmx4G"
+export NXF_OPTS="-Xms500M -Xmx8G"
 
 nextflow run /data/bi/pipelines/nf-core-bacass-2.0.0/main.nf \\
         -c ../../DOC/hpc_slurm_assembly.config \\
@@ -128,6 +128,6 @@ nextflow run /data/bi/pipelines/nf-core-bacass-2.0.0/main.nf \\
 EOF
 
 echo "sbatch assembly.sbatch" > _01_nf_assembly.sh
-# TODO: unable to add '--prokka_args "--gram -/+"'. Fix dependency is required. See: ../../DOC/hpc_slurm_assembly.config. 
-# TODO: implement a method that saves the identified references by nf-core/bacass (*.fna & *.gff) in the ../../REFERECES folder.
+
+# TODO:  store the recognized references from nf-core/bacass (*.fna & *.gff) in the ../../REFERENCES directory.
 
