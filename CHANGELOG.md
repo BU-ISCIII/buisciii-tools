@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [2.0.0] - 2024-0X-0X
+## [2.0.0dev] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.0.0
 
 ### Credits
 
@@ -38,6 +38,25 @@ Code contributions to the release:
 ### Requirements
 
 - Added PyYAML
+
+## [1.0.1hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.1
+
+### Credits
+
+Code contributions to the hotfix:
+
+- [Pablo Mata](https://github.com/Shettland)
+- [Jaime Ozaez](https://github.com/jaimeozaez)
+
+### Added enhancements
+
+### Fixes
+
+### Changed
+
+### Removed
+
+### Requirements
 
 ## [1.0.0] - 2024-01-08 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.0
 
