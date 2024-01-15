@@ -70,9 +70,8 @@ class AutoremoveSftpService:
         if path is None:
             use_default = bu_isciii.utils.prompt_yn_question("Use default path?: ")
             if use_default:
-                # TODO: repalce 'archive' with 'global' once iskylims_iscides branch has bene merged
                 data_path = bu_isciii.config_json.ConfigJson().get_configuration(
-                    "archive"
+                    "global"
                 )["data_path"]
                 self.path = os.path.join(data_path, "sftp")
             else:

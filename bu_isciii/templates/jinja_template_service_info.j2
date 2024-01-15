@@ -3,23 +3,23 @@
 </p>
 <br>
 <br>
-## Service requested to  Bioinformatics Unit (BU-ISCIII)
+# Service requested to  Bioinformatics Unit (BU-ISCIII)
 
-### {{ service.serviceRequestNumber }} service information:
+## {{ service.service_request_number }} service information:
 
 Here we describe the information about the service request:
 
-* Service ID: {{ service.serviceRequestNumber }}
-* Request date: {{ service.serviceCreatedOnDate }}
-* Center Requested service : {{service.serviceSeqCenter}}
-* Service status : {{service.serviceStatus}}
+* Service ID: {{ service.service_request_number }}
+* Request date: {{ service.service_created_date }}
+* Center Requested service : {{service.service_center}}
+* Service status : {{service.service_state}}
 * Requested services:
-{% for a_service in service.serviceAvailableService %}
+{% for a_service in service.service_available_service %}
 {{ a_service }}
 {% endfor %}
-* Service Notes : {{service_notes}}
+* Service Notes : {{service.service_notes}}
 
-### User information:
+## User information:
 
 Here we describe the information about the user requesting the service.
 
@@ -29,28 +29,29 @@ Here we describe the information about the user requesting the service.
 
 
 {% if resolution %}
-### Resolution information
+## Resolution information
 
 Here we describe information about the requested resolution.
 
-* Resolution: {{ resolution.resolutionNumber }}
-* Resolution full name: {{ resolution.resolutionFullNumber }}
-* Resolution date: {{ resolution.resolutionDate }}
-{% if resolution.resolutionEstimatedDate -%}
-* Resolution estimated delivery date: {{ resolution.resolutionEstimatedDate }}
+* Resolution: {{ resolution.resolution_number }}
+* Resolution full name: {{ resolution.resolution_full_number }}
+* Resolution date: {{ resolution.resolution_date }}
+{% if resolution.resolution_estimated_date -%}
+* Resolution estimated delivery date: {{ resolution.resolution_estimated_date }}
 {%- endif %}
-* Resolution on Queued date: {{ resolution.resolutionOnQueuedDate }}
-{% if resolution.resolutionOnInProgressDate -%}
-* Resolution in Progress date: {{ resolution.resolutionOnInProgressDate }}
+* Resolution on Queued date: {{ resolution.resolution_queued_date }}
+{% if resolution.resolution_in_progress_date -%}
+* Resolution in Progress date: {{ resolution.resolution_in_progress_date }}
 {%- endif %}
 * Requested services handle in this resoution:
-{% for a_service in resolution.availableServices %}
-    {{ a_service }}
+{% for a_service in resolution_serviceIDs %}
+    - {{ a_service }}
 {% endfor %}
-* Resolution Notes: {{ resolution.resolutionNotes }}
+* Resolution Notes: {{ resolution.resolution_notes }}
 {% endif %}
 
-### Samples sequenced at ISCIII:
+{% if samples %}
+## Samples sequenced at ISCIII:
 
 Here we describe information about the project associated to the service:
 {% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }}{% endif %}
@@ -62,6 +63,7 @@ Here we describe information about the project associated to the service:
         {% set comma = joiner(", ") %}{% for samples_in_project in samples_in_project %}{{ comma() }}{{ samples_in_project }}{% endfor %}
     {% endfor %}
 {% endfor %}
+{% endif %}
 
 <!---
 ### TODO

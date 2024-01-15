@@ -10,7 +10,7 @@ ls ${scratch_dir}/../../../REFERENCES | xargs -I %% snippy-multi input.tab --min
 
 head -n -1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" | awk '{print $0" &"}' > _00_snippy.sh
 tail -n 1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY_CORE.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" | awk '{print $0" &"}' > _01_snippy_core.sh
- 
+
 
 
 # Execute core genome SNIPPY
@@ -23,4 +23,9 @@ echo "snp-sites -b -c -o phylo.aln core.full.aln" > _02_phylo_aln.sh
 
 # awk 'BEGIN{FS="[> ]"} /^>/{val=$2;next}  {print val,length($0)}' phylo.aln
 
-
+## GUBBINS commands
+echo "snippy-clean_full_aln core.full.aln > clean.full.aln" > _03_gubbins.sh
+echo "run_gubbins.py --threads 20 -p gubbins clean.full.aln" >> _03_gubbins.sh
+echo "snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln" >> _03_gubbins.sh
+# Run gubbins
+echo "srun --chdir ${scratch_dir} --output logs/GUBBINS.%j.log --job-name GUBBINS --cpus-per-task 20 --mem 49152 --partition short_idx --time 02:00:00 bash _03_gubbins.sh &" > _03_run_gubbins.sh
