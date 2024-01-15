@@ -11,7 +11,7 @@ PRs should be made against the dev branch, unless you're preparing a pipeline re
 ## PR checklist
 
 - [ ] This comment contains a description of changes (with reason).
-- [ ] Make sure your code lints (`nf-core lint`).
+- [ ] Make sure your code lints (`black and flake8`).
 - If a new tamplate was added make sure:
     - [ ] Template's schema is added in `templates/services.json`.
     - [ ] Template's pipeline's documentation in `assets/reports/md/template.md` is added.
