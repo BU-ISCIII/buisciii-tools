@@ -50,6 +50,8 @@ Code contributions to the hotfix:
 
 - [Pablo Mata](https://github.com/Shettland)
 - [Jaime Ozaez](https://github.com/jaimeozaez)
+- [Sara Monzón](https://github.com/saramonzon)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Added enhancements
 
@@ -78,3 +80,4 @@ Code contributions to the inital release:
 - [Alberto Lema](https://github.com/Alema91)
 - [Daniel Valle](https://github.com/Daniel-VM)
 - [Fernando Gomez](https://github.com/FGomez-Aldecoa)
+
