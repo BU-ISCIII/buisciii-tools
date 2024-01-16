@@ -8,7 +8,6 @@ mkdir mapping_consensus
 mkdir variants_annot
 mkdir assembly_spades
 mkdir abacas_assembly
-mkdir blast
 mkdir ref_samples
 
 #Setting up folder and files required for excel_generator.py
@@ -46,4 +45,4 @@ cd mapping_consensus; cat ../../../ANALYSIS/*/samples_ref.txt | while read in; d
 cd variants_annot; cat ../../../ANALYSIS/*/samples_ref.txt | while read in; do arr=($in); ln -s ../../../ANALYSIS/*/*${arr[1]}*/variants/ivar/snpeff/${arr[0]}.snpsift.txt ./${arr[0]}_${arr[1]}.snpsift.txt; done; cd -
 cd assembly_spades; rsync -rlv ../../../ANALYSIS/*/*/assembly/spades/rnaviral/*.scaffolds.fa.gz .; gunzip *.scaffolds.fa.gz; cd -
 cd abacas_assembly; cat ../../../ANALYSIS/*/samples_ref.txt | while read in; do arr=($in); ln -s ../../../ANALYSIS/*/*${arr[1]}*/assembly/spades/rnaviral/abacas/${arr[0]}.abacas.fasta ./${arr[0]}_${arr[1]}.abacas.fasta; done; cd -
-cd blast; ln -s ../../../ANALYSIS/*/all_samples_filtered_BLAST_results.xlsx . ; cd -
+ln -s ../../ANALYSIS/*/all_samples_filtered_BLAST_results.xlsx .
