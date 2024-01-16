@@ -22,9 +22,12 @@ Code contributions to the release:
 - Added credential parameters: --api_user, --api_password and --cred_file
 - Make modules to create folder's paths automatically from DB
 - Added finish module
-- Added templates: freebayes
 - Added json files: sftp_user.json
 - Added delivery jinja templates
+
+### Template changes
+- Added templates:
+    - freebayes
 
 ### Fixes
 
@@ -49,6 +52,8 @@ Code contributions to the hotfix:
 - [Jaime Ozaez](https://github.com/jaimeozaez)
 
 ### Added enhancements
+
+### Template changes 
 
 ### Fixes
 
