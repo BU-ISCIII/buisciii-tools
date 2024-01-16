@@ -20,10 +20,18 @@ parser.add_argument(
     "--single_csv",
     type=str,
     default="",
-    help="Transform a single csv file to excel format. Omit rest of processes"
+    help="Transform a single csv file to excel format. Omit rest of processes",
+)
+parser.add_argument(
+    "-l",
+    "--merge_lineage_files",
+    type=str,
+    default="",
+    help="Merge pangolin and nextclade lineage tables",
 )
 
 args = parser.parse_args()
+
 
 def concat_tables_and_write(csvs_in_folder: List[str], merged_csv_name: str):
     """Concatenate any tables that share the same header"""
@@ -99,21 +107,30 @@ def excel_generator(csv_files: List[str]):
         elif "assembly" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
         else:
-            table = pd.read_csv(file)
+            try:
+                table = pd.read_csv(file)
+            except pd.errors.EmptyDataError:
+                print("Could not parse table from ", str(file))
+                continue
         table.drop(["index"], axis=1, errors="ignore")
         table.to_excel(output_name, index=False)
     return
 
-def single_csv_to_excel(csv_file):
-    excel_generator([csv_file])
+
+def single_csv_to_excel(csv_file: str):
+    try:
+        excel_generator([csv_file])
+    except FileNotFoundError as e:
+        print(f"Could not find file {e}")
+
 
 def main(args):
     if args.single_csv:
         # If single_csv is called, just convert target csv to excel and skip the rest
-        print(f"Single file convertion selected. Skipping main process...")
+        print("Single file convertion selected. Skipping main process...")
         single_csv_to_excel(args.single_csv)
         exit(0)
-    
+
     print(
         "Extracting references used for analysis and the samples associated with each reference\n"
     )
@@ -126,26 +143,37 @@ def main(args):
         ref: str("ref_samples/samples_" + ref + ".tmp") for ref in references
     }
 
-    # Merge pangolin and nextclade csv files separatedly and create excel files for them
-    merge_lineage_tables(reference_folders, samples_ref_files)
-    for reference, folder in reference_folders.items():
-        print(f"Creating excel files for reference {reference}")
-        csv_files = [file.path for file in os.scandir(folder) if file.path.endswith(".csv")]
-        excel_generator(csv_files)
+    if args.merge_lineage_files:
+        # Merge pangolin and nextclade csv files separatedly and create excel files for them
+        merge_lineage_tables(reference_folders, samples_ref_files)
+        for reference, folder in reference_folders.items():
+            print(f"Creating excel files for reference {reference}")
+            csv_files = [
+                file.path for file in os.scandir(folder) if file.path.endswith(".csv")
+            ]
+            excel_generator(csv_files)
 
     # Merge all the variant long tables into one and convert to excel format
     variants_tables = [
         table.path for table in os.scandir(".") if "variants_long_table" in table.path
     ]
-    concat_tables_and_write(
-        csvs_in_folder=variants_tables, merged_csv_name="variants_long_table.csv"
-    )
+    try:
+        concat_tables_and_write(
+            csvs_in_folder=variants_tables, merged_csv_name="variants_long_table.csv"
+        )
+    except FileNotFoundError as e:
+        print("Not variants_long_table found for ", str(e))
     # Create excel files for individual tables
     valid_extensions = [".csv", ".tsv", ".tab"]
     rest_of_csvs = [
-        file.path for file in os.scandir(".") if any(file.path.endswith(ext) for ext in valid_extensions)
+        file.path
+        for file in os.scandir(".")
+        if any(file.path.endswith(ext) for ext in valid_extensions)
     ]
-    excel_generator(rest_of_csvs)
+    link_csvs = [file for file in rest_of_csvs if os.path.islink(file)]
+    broken_links = [file for file in link_csvs if not os.path.exists(os.readlink(file))]
+    valid_csvs = [file for file in rest_of_csvs if file not in broken_links]
+    excel_generator(valid_csvs)
 
 
 if __name__ == "__main__":
