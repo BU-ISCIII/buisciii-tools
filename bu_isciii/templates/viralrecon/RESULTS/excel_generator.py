@@ -99,12 +99,12 @@ def excel_generator(csv_files: List[str]):
         # workbook = openpyxl.Workbook(output_name)
         if "nextclade" in str(file):
             table = pd.read_csv(file, sep=";", header=0)
-        elif "illumina" in str(file) or ".tsv" in str(file):
+        elif "illumina" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
             table["analysis_date"] = pd.to_datetime(
                 table["analysis_date"].astype(str), format="%Y%m%d"
             )
-        elif "assembly" in str(file):
+        elif "assembly" in str(file) or "tsv" in str(file) or "tab" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
         else:
             try:
