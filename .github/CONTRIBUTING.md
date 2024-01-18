@@ -9,7 +9,7 @@ If you'd like to write or modify some code for buisciii-tools, the standard work
 3. Make the necessary changes / additions within your forked repository following the [code style guidelines](#code-style-guidelines)
 4. Modify the `CHANGELOG` file according to your changes.
 5. Update any documentation as needed.
-6. [Submit a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) against the `develop` or `hotfix` branch and sent the url to the #pipelines-dev channel in slack (if you are not in the slack channel just wait fot the PR to be reviewed and rebased).
+6. [Submit a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) against the `develop` or `hotfix` branch and send the url to the #pipelines-dev channel in slack (if you are not in the slack channel just wait fot the PR to be reviewed and rebased).
 
 If you're not used to this workflow with git, you can start with:
 
@@ -37,7 +37,7 @@ There are typically two types of tests that run:
 
 ### Lint tests
 
-We use black and flake8 linting based on PEP8 guidelines. You can check more information [here](https://github.com/BU-ISCIII/BU-ISCIII/wiki/Python#linting)
+We use black and flake8 linting based on PEP8 guidelines for python coding. You can check more information [here](https://github.com/BU-ISCIII/BU-ISCIII/wiki/Python#linting)
 
 ### Code tests
 
