@@ -5,7 +5,7 @@ Based on nf-core/viralrecon pull request template
 
 Fill in the appropriate checklist below and delete whatever is not relevant.
 
-PRs should be made against the dev branch, unless you're preparing a pipeline release.
+PRs should be made against the develop of hotfix branch, unless you're preparing a software release.
 -->
 
 ## PR checklist
