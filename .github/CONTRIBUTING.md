@@ -4,9 +4,9 @@
 
 If you'd like to write or modify some code for buisciii-tools, the standard workflow is as follows:
 
-1. Check that there isn't already an issue about your idea in the [buisciii-tools issues](https://github.com/BU-ISCIII/buisciii-tools/issues) to avoid duplicating work. **If there isn't one already, please create one so that others know you're working on this**
+1. Check that there isn't already an issue about your idea in the [buisciii-tools issues](https://github.com/BU-ISCIII/buisciii-tools/issues) to avoid duplicating work. **If there isn't one already, please create one so that others know you're working on this**.
 2. [Fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) the [buisciii-tools repository](https://github.com/BU-ISCIII/buisciii-tools/) to your GitHub account.
-3. Make the necessary changes / additions within your forked repository following the [code style guidelines](#code-style-guidelines)
+3. Make the necessary changes / additions within your forked repository following the [code style guidelines](#code-style-guidelines).
 4. Modify the [`CHANGELOG`](../CHANGELOG.md) file according to your changes in the appropiate section ([X.X.Xhot] or [X.X.Xdev]), you should register your changes regarding:
    1. Added enhancements
    2. Template changes
