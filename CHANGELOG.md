@@ -54,6 +54,10 @@ Code contributions to the hotfix:
 - [Sarai Varona](https://github.com/svarona)
 
 ### Added enhancements
+- Added CHANGELOG
+- Added template for Pull Request
+- Added Contributing guidelines
+- Added github action to sync branches
 
 ### Template changes 
 
