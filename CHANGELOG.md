@@ -17,7 +17,15 @@ Code contributions to the release:
 - [Pablo Mata](https://github.com/Shettland)
 - [Guillermo Gorines](https://github.com/GuilleGorines)
 
-### Added enhancements
+
+### Template fixes and updates
+- Added templates:
+    - freebayes
+
+
+### Modules
+
+#### Added enhancements
 
 - Added credential parameters: --api_user, --api_password and --cred_file
 - Make modules to create folder's paths automatically from DB
@@ -25,22 +33,20 @@ Code contributions to the release:
 - Added json files: sftp_user.json
 - Added delivery jinja templates
 
-### Template changes
-- Added templates:
-    - freebayes
+#### Fixes
 
-### Fixes
-
-### Changed
+#### Changed
 
 - Fixed API requests to fit in the new database format
 - Updated README
 
-### Removed
+#### Removed
+
 
 ### Requirements
 
 - Added PyYAML
+
 
 ## [1.0.1hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.1
 
@@ -53,26 +59,29 @@ Code contributions to the hotfix:
 - [Sara Monzón](https://github.com/saramonzon)
 - [Sarai Varona](https://github.com/svarona)
 
-### Added enhancements
+
+### Template fixes and updates
+
+- Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+
+
+### Modules
+
+#### Added enhancements
 - Added CHANGELOG
 - Added template for Pull Request
 - Added Contributing guidelines
 - Added github action to sync branches
 
-## Template fixes and updates
+#### Fixes
 
-- Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+#### Changed
 
+#### Removed
 
-## Modules
-
-### Fixes
-
-### Changed
-
-### Removed
 
 ### Requirements
+
 
 ## [1.0.0] - 2024-01-08 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.0
 
