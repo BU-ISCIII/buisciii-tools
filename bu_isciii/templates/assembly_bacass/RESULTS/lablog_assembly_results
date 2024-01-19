@@ -10,7 +10,7 @@ cd $DELIVERY_FOLDER/assembly
 ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/multiqc/multiqc_report.html .
 ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/summary_assembly_metrics_mqc.csv .
 ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/kmerfinder_summary.csv .
-ln -s ../../../ANALYSIS/*ASSEMBLY/03-assembly/quast/*/report.html .
+ln -s ../../../ANALYSIS/*ASSEMBLY/03-assembly/quast/*/report.html quast_report.html
 
 # Links to assemblies
 assembly_dirs=(unicycler dragonflye canu miniasm)

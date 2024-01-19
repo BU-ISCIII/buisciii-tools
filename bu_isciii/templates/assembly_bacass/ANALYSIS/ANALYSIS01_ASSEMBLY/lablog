@@ -129,5 +129,4 @@ EOF
 
 echo "sbatch assembly.sbatch" > _01_nf_assembly.sh
 
-# TODO:  store the recognized references from nf-core/bacass (*.fna & *.gff) in the ../../REFERENCES directory.
 
