@@ -64,7 +64,7 @@ Code contributions to the hotfix:
 - Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
 
 
-# Modules
+## Modules
 
 ### Fixes
 
