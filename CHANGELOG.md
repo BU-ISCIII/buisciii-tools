@@ -58,11 +58,13 @@ Code contributions to the hotfix:
 - [Jaime Ozaez](https://github.com/jaimeozaez)
 - [Sara Monzón](https://github.com/saramonzon)
 - [Sarai Varona](https://github.com/svarona)
+- [Daniel Valle](https://github.com/Daniel-VM)
 
 
 ### Template fixes and updates
 
 - Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+- [#187](https://github.com/BU-ISCIII/buisciii-tools/pull/187) - Added new template for bacterial assembly. Allowing for short, long and hybrid assembly.
 
 
 ### Modules
