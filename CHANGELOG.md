@@ -59,11 +59,14 @@ Code contributions to the hotfix:
 - Added Contributing guidelines
 - Added github action to sync branches
 
-### Template changes 
+## Template fixes and updates
+
+- Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+
+
+#Modules
 
 ### Fixes
-
-- Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically renamey `ANALYSIS0X_MAG` directory with the current date.
 
 ### Changed
 
