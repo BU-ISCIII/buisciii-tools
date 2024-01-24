@@ -64,8 +64,11 @@ Code contributions to the hotfix:
 ### Template fixes and updates
 
 - Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+- Introduced handling of flu-C in `buisciii_tools/bu_isciii/templates/IRMA/ANALYSIS/ANALYSIS01_FLU_IRMA/04-irma/` `lablog` and `create_irma_stats.sh`
+- Small changes to `buisciii_tools/bu_isciii/templates/viralrecon/RESULTS/viralrecon_results` for blast and new excel_generator.py
+- Introduced better error handling in excel_generator.py. Now it can also be used for single files
+- Brought back `PASS_ONLY` to exometrio's `exomiser_configfile.yml`
 - [#187](https://github.com/BU-ISCIII/buisciii-tools/pull/187) - Added new template for bacterial assembly. Allowing for short, long and hybrid assembly.
-
 
 ### Modules
 
