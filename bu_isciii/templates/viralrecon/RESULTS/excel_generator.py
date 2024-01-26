@@ -104,7 +104,7 @@ def excel_generator(csv_files: List[str]):
             table["analysis_date"] = pd.to_datetime(
                 table["analysis_date"].astype(str), format="%Y%m%d"
             )
-        elif "assembly" in str(file) or "tsv" in str(file) or "tab" in str(file):
+        elif "assembly" in str(file) or ".tsv" in str(file) or ".tab" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
         else:
             try:
@@ -163,6 +163,7 @@ def main(args):
         )
     except FileNotFoundError as e:
         print("Not variants_long_table found for ", str(e))
+
     # Create excel files for individual tables
     valid_extensions = [".csv", ".tsv", ".tab"]
     rest_of_csvs = [
