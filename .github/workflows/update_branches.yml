@@ -1,0 +1,30 @@
+name: Create Pull Request from main to develop and/or hotfix
+
+on:
+  push:
+    branches:
+      - main
+
+env: 
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # setting GH_TOKEN for the entire workflow
+
+jobs:
+  create-and-auto-merge-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install GitHub CLI
+      run: |
+        sudo apt update
+        sudo apt install gh
+
+    - name: Create Pull Request to develop
+      run: |
+        gh pr create --base develop --head main --title "Merge changes from main into develop" --body "Automatically created pull request to merge changes from main into develop."
+
+    - name: Create Pull Request to hotfix
+      run: |
+        gh pr create --base hotfix --head main --title "Merge changes from main into hotfix" --body "Automatically created pull request to merge changes from main into hotfix."

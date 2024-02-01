@@ -6,7 +6,7 @@
         "order": 1,
         "begin": "",
         "end": "",
-        "description": "Nextflow assembly pipeline to assemble bacterial genomes",
+        "description": "nf-core/bacass:  Simple bacterial assembly and annotation pipeline",
         "clean": {
           "folders":["01-preprocessing/trimmed_sequences"],
           "files":[]
