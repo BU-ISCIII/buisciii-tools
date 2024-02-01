@@ -88,6 +88,7 @@ Code contributions to the hotfix:
 - Brought back `PASS_ONLY` to exometrio's `exomiser_configfile.yml`
 - [#187](https://github.com/BU-ISCIII/buisciii-tools/pull/187) - Added new template for bacterial assembly. Allowing for short, long and hybrid assembly.
 - [#190](https://github.com/BU-ISCIII/buisciii-tools/pull/190) - renamed some variables in create-summary_report from viralrecon template as their name was misleading and fixed a small typo in regex finding in excel_generator.py
+- [#192](https://github.com/BU-ISCIII/buisciii-tools/pull/192) - Small changes in excel_generator.py to automatically merge pangolin/nextclade tables when more than 1 reference is found
 
 ### Modules
 
