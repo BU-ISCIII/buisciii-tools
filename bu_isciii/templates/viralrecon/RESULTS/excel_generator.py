@@ -4,8 +4,8 @@ import pandas as pd
 from typing import List, Dict
 
 # conda activate viralrecon_report
-"""Usage: python excel_generator.py ./reference.tmp"""
-"""Single csv to excel Usage: python excel_generator.py -s csv_file.csv"""
+"""Standard usage: python excel_generator.py -r ./reference.tmp"""
+"""Single csv to excel usage: python excel_generator.py -s csv_file.csv"""
 parser = argparse.ArgumentParser(
     description="Generate excel files from viralrecon results"
 )
@@ -22,16 +22,7 @@ parser.add_argument(
     default="",
     help="Transform a single csv file to excel format. Omit rest of processes",
 )
-parser.add_argument(
-    "-l",
-    "--merge_lineage_files",
-    type=str,
-    default="",
-    help="Merge pangolin and nextclade lineage tables",
-)
-
 args = parser.parse_args()
-
 
 def concat_tables_and_write(csvs_in_folder: List[str], merged_csv_name: str):
     """Concatenate any tables that share the same header"""
@@ -112,7 +103,7 @@ def excel_generator(csv_files: List[str]):
             except pd.errors.EmptyDataError:
                 print("Could not parse table from ", str(file))
                 continue
-        table.drop(["index"], axis=1, errors="ignore")
+        table = table.drop(["index"], axis=1, errors="ignore")
         table.to_excel(output_name, index=False)
     return
 
@@ -143,7 +134,7 @@ def main(args):
         ref: str("ref_samples/samples_" + ref + ".tmp") for ref in references
     }
 
-    if args.merge_lineage_files:
+    if len(references) > 1:
         # Merge pangolin and nextclade csv files separatedly and create excel files for them
         merge_lineage_tables(reference_folders, samples_ref_files)
         for reference, folder in reference_folders.items():
@@ -162,7 +153,8 @@ def main(args):
             csvs_in_folder=variants_tables, merged_csv_name="variants_long_table.csv"
         )
     except FileNotFoundError as e:
-        print("Not variants_long_table found for ", str(e))
+        print(str(e))
+        print("Merged variants_long_table.csv might be empty")
 
     # Create excel files for individual tables
     valid_extensions = [".csv", ".tsv", ".tab"]
