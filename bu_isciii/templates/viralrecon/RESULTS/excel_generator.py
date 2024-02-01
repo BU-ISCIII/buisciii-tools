@@ -24,6 +24,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+
 def concat_tables_and_write(csvs_in_folder: List[str], merged_csv_name: str):
     """Concatenate any tables that share the same header"""
     if len(csvs_in_folder) == 0:
