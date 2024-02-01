@@ -121,9 +121,9 @@ class AutoremoveSftpService:
                     # Get sftp-service last modification
                     service_finder = LastMofdificationFinder(sftp_service_fullPath)
                     service_last_modification = service_finder.find_last_modification()
-                    self.sftp_services[
-                        sftp_service_fullPath
-                    ] = service_last_modification
+                    self.sftp_services[sftp_service_fullPath] = (
+                        service_last_modification
+                    )
         if len(self.sftp_services) == 0:
             sys.exit(f"No services found in {self.path}")
 

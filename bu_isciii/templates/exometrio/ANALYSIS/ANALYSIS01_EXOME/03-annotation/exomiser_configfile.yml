@@ -24,7 +24,7 @@ analysis:
             MITOCHONDRIAL: 100.0
     }
     #FULL or PASS_ONLY
-    analysisMode: PASS_ONLY
+    #analysisMode: PASS_ONLY
     #Possible frequencySources:
     #Thousand Genomes project http://www.1000genomes.org/
     #   THOUSAND_GENOMES,

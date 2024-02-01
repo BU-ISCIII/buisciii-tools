@@ -4,29 +4,25 @@ import pandas as pd
 from typing import List, Dict
 
 # conda activate viralrecon_report
-"""Usage: python excel_generator.py ./reference.tmp"""
+"""Standard usage: python excel_generator.py -r ./reference.tmp"""
+"""Single csv to excel usage: python excel_generator.py -s csv_file.csv"""
 parser = argparse.ArgumentParser(
     description="Generate excel files from viralrecon results"
 )
 parser.add_argument(
-    "reference_file",
+    "-r",
+    "--reference_file",
     type=str,
     help="File containing the references used in the analysis",
 )
-
-args = parser.parse_args()
-
-print(
-    "Extracting references used for analysis and the samples associated with each reference\n"
+parser.add_argument(
+    "-s",
+    "--single_csv",
+    type=str,
+    default="",
+    help="Transform a single csv file to excel format. Omit rest of processes",
 )
-with open(args.reference_file, "r") as file:
-    references = [line.rstrip() for line in file]
-    print(f"\nFound {len(references)} references: {str(references).strip('[]')}")
-
-reference_folders = {ref: str("excel_files_" + ref) for ref in references}
-samples_ref_files = {
-    ref: str("ref_samples/samples_" + ref + ".tmp") for ref in references
-}
+args = parser.parse_args()
 
 
 def concat_tables_and_write(csvs_in_folder: List[str], merged_csv_name: str):
@@ -91,39 +87,88 @@ def excel_generator(csv_files: List[str]):
             print(f"File {file} does not exist, omitting...")
             continue
         print(f"Generating excel file for {file}")
-        output_name = str(file.split(".csv")[0] + ".xlsx")
+        output_name = os.path.splitext(os.path.basename(file))[0] + ".xlsx"
         # workbook = openpyxl.Workbook(output_name)
         if "nextclade" in str(file):
-            pd.read_csv(file, sep=";", header=0).to_excel(output_name, index=False)
+            table = pd.read_csv(file, sep=";", header=0)
         elif "illumina" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
             table["analysis_date"] = pd.to_datetime(
                 table["analysis_date"].astype(str), format="%Y%m%d"
             )
-            table.to_excel(output_name, index=False)
-        elif "assembly" in str(file):
-            pd.read_csv(file, sep="\t", header=0).to_excel(output_name, index=False)
+        elif "assembly" in str(file) or ".tsv" in str(file) or ".tab" in str(file):
+            table = pd.read_csv(file, sep="\t", header=0)
         else:
-            pd.read_csv(file).to_excel(output_name, index=False)
-    return file
+            try:
+                table = pd.read_csv(file)
+            except pd.errors.EmptyDataError:
+                print("Could not parse table from ", str(file))
+                continue
+        table = table.drop(["index"], axis=1, errors="ignore")
+        table.to_excel(output_name, index=False)
+    return
 
 
-# Merge pangolin and nextclade csv files separatedly and create excel files for them
-merge_lineage_tables(reference_folders, samples_ref_files)
-for reference, folder in reference_folders.items():
-    print(f"Creating excel files for reference {reference}")
-    csv_files = [file.path for file in os.scandir(folder) if file.path.endswith(".csv")]
-    excel_generator(csv_files)
+def single_csv_to_excel(csv_file: str):
+    try:
+        excel_generator([csv_file])
+    except FileNotFoundError as e:
+        print(f"Could not find file {e}")
 
-# Merge all the variant long tables into one and convert to excel format
-variants_tables = [
-    table.path for table in os.scandir(".") if "variants_long_table" in table.path
-]
-concat_tables_and_write(
-    csvs_in_folder=variants_tables, merged_csv_name="variants_long_table.csv"
-)
-pd.read_csv("variants_long_table.csv").to_excel("variants_long_table.xlsx", index=False)
 
-# Create excel files for individual tables
-result_tables = ["mapping_illumina.csv", "assembly_stats.csv", "pikavirus_table.csv"]
-excel_generator(result_tables)
+def main(args):
+    if args.single_csv:
+        # If single_csv is called, just convert target csv to excel and skip the rest
+        print("Single file convertion selected. Skipping main process...")
+        single_csv_to_excel(args.single_csv)
+        exit(0)
+
+    print(
+        "Extracting references used for analysis and the samples associated with each reference\n"
+    )
+    with open(args.reference_file, "r") as file:
+        references = [line.rstrip() for line in file]
+        print(f"\nFound {len(references)} references: {str(references).strip('[]')}")
+
+    reference_folders = {ref: str("excel_files_" + ref) for ref in references}
+    samples_ref_files = {
+        ref: str("ref_samples/samples_" + ref + ".tmp") for ref in references
+    }
+
+    if len(references) > 1:
+        # Merge pangolin and nextclade csv files separatedly and create excel files for them
+        merge_lineage_tables(reference_folders, samples_ref_files)
+        for reference, folder in reference_folders.items():
+            print(f"Creating excel files for reference {reference}")
+            csv_files = [
+                file.path for file in os.scandir(folder) if file.path.endswith(".csv")
+            ]
+            excel_generator(csv_files)
+
+    # Merge all the variant long tables into one and convert to excel format
+    variants_tables = [
+        table.path for table in os.scandir(".") if "variants_long_table" in table.path
+    ]
+    try:
+        concat_tables_and_write(
+            csvs_in_folder=variants_tables, merged_csv_name="variants_long_table.csv"
+        )
+    except FileNotFoundError as e:
+        print(str(e))
+        print("Merged variants_long_table.csv might be empty")
+
+    # Create excel files for individual tables
+    valid_extensions = [".csv", ".tsv", ".tab"]
+    rest_of_csvs = [
+        file.path
+        for file in os.scandir(".")
+        if any(file.path.endswith(ext) for ext in valid_extensions)
+    ]
+    link_csvs = [file for file in rest_of_csvs if os.path.islink(file)]
+    broken_links = [file for file in link_csvs if not os.path.exists(os.readlink(file))]
+    valid_csvs = [file for file in rest_of_csvs if file not in broken_links]
+    excel_generator(valid_csvs)
+
+
+if __name__ == "__main__":
+    main(args)
