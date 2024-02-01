@@ -19,6 +19,7 @@ Code contributions to the release:
 
 
 ### Template fixes and updates
+
 - Added templates:
     - freebayes
 
@@ -42,13 +43,31 @@ Code contributions to the release:
 
 #### Removed
 
-
 ### Requirements
 
 - Added PyYAML
 
+## [1.0.2hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.2
 
-## [1.0.1hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.1
+### Credits
+
+Code contributions to the hotfix:
+
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [1.0.1] - 2024-02-01 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.1
 
 ### Credits
 
@@ -60,7 +79,6 @@ Code contributions to the hotfix:
 - [Sarai Varona](https://github.com/svarona)
 - [Daniel Valle](https://github.com/Daniel-VM)
 
-
 ### Template fixes and updates
 
 - Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
@@ -69,6 +87,7 @@ Code contributions to the hotfix:
 - Introduced better error handling in excel_generator.py. Now it can also be used for single files
 - Brought back `PASS_ONLY` to exometrio's `exomiser_configfile.yml`
 - [#187](https://github.com/BU-ISCIII/buisciii-tools/pull/187) - Added new template for bacterial assembly. Allowing for short, long and hybrid assembly.
+- [#190](https://github.com/BU-ISCIII/buisciii-tools/pull/190) - renamed some variables in create-summary_report from viralrecon template as their name was misleading and fixed a small typo in regex finding in excel_generator.py
 
 ### Modules
 
