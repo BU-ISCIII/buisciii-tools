@@ -87,6 +87,33 @@ Code contributions to the release:
 
 - Added PyYAML
 
+## [1.0.2hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.2
+
+### Credits
+
+Code contributions to the hotfix:
+
+- [Jaime Ozáez](https://github.com/jaimeozaez)
+
+### Template fixes and updates
+
+- Increased reserved memory for task in IRMA nextflow srun (from 35000M to 350000) in order to prevent out-of-memory performance issues.
+- Correction of 'DATE_entrega' directory numbering in assembly results lablog.
+- Minor fixes in `buisciii_tools/bu_isciii/templates/IRMA/ANALYSIS/ANALYSIS01_FLU_IRMA/04-irma/` `lablog`.
+- Automation of viralrecon service setup. Modification of `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon` file.
+
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
 
 ## [1.0.1] - 2024-02-01 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.1
 
@@ -110,10 +137,7 @@ Code contributions to the hotfix:
 - [#187](https://github.com/BU-ISCIII/buisciii-tools/pull/187) - Added new template for bacterial assembly. Allowing for short, long and hybrid assembly.
 - [#190](https://github.com/BU-ISCIII/buisciii-tools/pull/190) - renamed some variables in create-summary_report from viralrecon template as their name was misleading and fixed a small typo in regex finding in excel_generator.py
 - [#192](https://github.com/BU-ISCIII/buisciii-tools/pull/192) - Small changes in excel_generator.py to automatically merge pangolin/nextclade tables when more than 1 reference is found
-- Increased reserved memory for task in IRMA nextflow srun (from 35000M to 350000) in order to prevent out-of-memory performance issues.
-- Correction of 'DATE_entrega' directory numbering in assembly results lablog.
-- Minor fixes in `buisciii_tools/bu_isciii/templates/IRMA/ANALYSIS/ANALYSIS01_FLU_IRMA/04-irma/` `lablog`.
-- Automation of viralrecon service setup. Modification of `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon` file.
+
 
 ### Modules
 
