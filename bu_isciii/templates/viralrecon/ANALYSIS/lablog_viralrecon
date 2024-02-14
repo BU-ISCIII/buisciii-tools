@@ -59,9 +59,11 @@ if [ "$test_ref" == "NC_045512.2" ]; then
 
     # Set datadir
     echo "Updating and setting Pangolin database --datadir..."
-    bash /data/bi/references/pangolin/lablog
-    bash /data/bi/references/pangolin/_01_update_pangolin_$(date '+%Y%m%d').sh
+    cd /data/bi/references/pangolin/
+    bash lablog
+    bash _01_update_pangolin_$(date '+%Y%m%d').sh
     echo "Pangolin database UPDATED."
+    cd -
     sed -i "s|--datadir XXXX|--datadir /data/bi/references/pangolin/$(date '+%Y%m%d')|" "../DOC/viralrecon_sars.config"
     echo "DATADIR in file ../DOC/viralrecon_sars.config UPDATED."
 
@@ -74,6 +76,8 @@ if [ "$test_ref" == "NC_045512.2" ]; then
         echo "WARNING! Error during tag extraction. Please, set the tag manually (https://github.com/nextstrain/nextclade_data/releases) and consider fixing json_parser.py if needed." >> warnings.log
     else
         echo "Latest SARS-CoV-2 dataset version TAG: $nextclade_tag."
+
+    fi
 
     # Update viralrecon_sars_params.yml file
     sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "../DOC/viralrecon_sars_params.yml"
