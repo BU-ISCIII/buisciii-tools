@@ -29,22 +29,21 @@ if [ "$test_ref" == "NC_045512.2" ]; then
     echo "Latest version available of Pangolin: $latest_version_pangolin."
     echo "Latest version available of Nextclade: $latest_version_nextclade."
 
-    # Update viralrecon_sars.config file
-    echo "Updating ../DOC/viralrecon_sars.config file..."
-    sed -i \
-        -e "s|pangolin:4.2--pyhdfd78af_1|$latest_version_pangolin|" \
-        -e "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" \
-        "../DOC/viralrecon_sars.config"
-    echo "File ../DOC/viralrecon_sars.config UPDATED."
-
     # Checking if latest_version_pangolin downloaded
     echo "Checking if latest version of Pangolin image is already downloaded..."
     if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_pangolin" ]; then
         echo "File $latest_version_pangolin already downloaded."
+        echo "Pangolin database UP TO DATE."
     else
         echo "Downloading $latest_version_pangolin file..."
         wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
         echo "$latest_version_pangolin file succesfully downloaded."
+        echo "Setting datadir for Pangolin database."
+        cd /data/bi/references/pangolin/
+        mkdir $(date '+%Y%m%d')
+        srun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        echo "Pangolin database UPDATED."
+        cd -
     fi
 
     # Checking if latest_version_nextclade downloaded
@@ -57,15 +56,14 @@ if [ "$test_ref" == "NC_045512.2" ]; then
         echo "$latest_version_nextclade file succesfully downloaded."
     fi
 
-    # Set datadir
-    echo "Updating and setting Pangolin database --datadir..."
-    cd /data/bi/references/pangolin/
-    bash lablog
-    bash _01_update_pangolin_$(date '+%Y%m%d').sh
-    echo "Pangolin database UPDATED."
-    cd -
-    sed -i "s|--datadir XXXX|--datadir /data/bi/references/pangolin/$(date '+%Y%m%d')|" "../DOC/viralrecon_sars.config"
-    echo "DATADIR in file ../DOC/viralrecon_sars.config UPDATED."
+    # Update viralrecon_sars.config file
+    echo "Updating ../DOC/viralrecon_sars.config file..."
+    sed -i \
+        -e "s|pangolin:4.2--pyhdfd78af_1|$latest_version_pangolin|" \
+        -e "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" \
+        -e "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" \
+        "../DOC/viralrecon_sars.config"
+    echo "File ../DOC/viralrecon_sars.config UPDATED."
 
     # Extracting the current SARS tag from nextclade image
     echo "Extracting SARS-CoV-2 TAG..."
