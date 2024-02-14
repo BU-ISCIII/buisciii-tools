@@ -63,7 +63,7 @@ if [ "$test_ref" == "NC_045512.2" ]; then
     bash /data/bi/references/pangolin/_01_update_pangolin_$(date '+%Y%m%d').sh
     echo "Pangolin database UPDATED."
     sed -i "s|--datadir XXXX|--datadir /data/bi/references/pangolin/$(date '+%Y%m%d')|" "../DOC/viralrecon_sars.config"
-    echo "File ../DOC/viralrecon_sars.config UPDATED."
+    echo "DATADIR in file ../DOC/viralrecon_sars.config UPDATED."
 
     # Extracting the current SARS tag from nextclade image
     echo "Extracting SARS-CoV-2 TAG..."
@@ -77,7 +77,7 @@ if [ "$test_ref" == "NC_045512.2" ]; then
 
     # Update viralrecon_sars_params.yml file
     sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "../DOC/viralrecon_sars_params.yml"
-    echo "DATADIR in file ../DOC/viralrecon_sars_params.yml UPDATED."
+    echo "SARS-CoV-2 TAG in file ../DOC/viralrecon_sars_params.yml UPDATED."
 
     # Setting work variables
     ANALYSIS_TYPE=AMPLICONS
