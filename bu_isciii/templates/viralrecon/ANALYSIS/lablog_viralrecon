@@ -49,7 +49,7 @@ if [ "$test_ref" == "NC_045512.2" ]; then
     # Checking if latest_version_nextclade downloaded
     echo "Checking if latest version of Nextclade image is already downloaded..."
     if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
-        echo "File $latest_version_pangolin already downloaded."
+        echo "File $latest_version_nextclade already downloaded."
     else
         echo "Downloading $latest_version_nextclade file..."
         wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
