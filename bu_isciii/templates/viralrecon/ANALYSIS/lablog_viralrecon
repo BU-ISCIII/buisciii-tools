@@ -65,19 +65,13 @@ if [ "$test_ref" == "NC_045512.2" ]; then
         "../DOC/viralrecon_sars.config"
     echo "File ../DOC/viralrecon_sars.config UPDATED."
 
-    # Extracting the current SARS tag from nextclade image
-    echo "Extracting SARS-CoV-2 TAG..."
-    nextclade_tag=$(singularity run /data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade nextclade dataset list --json | \
-    python3 /data/bi/references/nextclade/json_parser.py)
-    if [ "$nextclade_tag" == "None" ]; then
-        echo "WARNING! Error during tag extraction. Please, set the tag manually (https://github.com/nextstrain/nextclade_data/releases) and consider fixing json_parser.py if needed."
-        echo "WARNING! Error during tag extraction. Please, set the tag manually (https://github.com/nextstrain/nextclade_data/releases) and consider fixing json_parser.py if needed." >> warnings.log
-    else
-        echo "Latest SARS-CoV-2 dataset version TAG: $nextclade_tag."
-
-    fi
+    # Extracting the current Nextclade data TAG
+    echo "Extracting Nextclade data TAG..."
+    nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
+    echo "Latest SARS-CoV-2 dataset version TAG: $nextclade_tag."
 
     # Update viralrecon_sars_params.yml file
+    echo "Updating ../DOC/viralrecon_sars_params.yml..."
     sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "../DOC/viralrecon_sars_params.yml"
     echo "SARS-CoV-2 TAG in file ../DOC/viralrecon_sars_params.yml UPDATED."
 
