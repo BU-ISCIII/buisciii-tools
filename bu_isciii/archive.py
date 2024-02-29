@@ -394,12 +394,11 @@ class Archive:
 
         for service in self.services.keys():
             if "Data dir" in self.services[service]["found"]:
-                self.services[service][
-                    "non_archived_size"
-                ] = bu_isciii.utils.get_dir_size(
-                    self.services[service]["non_archived_path"]
-                ) / pow(
-                    1024, 3
+                self.services[service]["non_archived_size"] = (
+                    bu_isciii.utils.get_dir_size(
+                        self.services[service]["non_archived_path"]
+                    )
+                    / pow(1024, 3)
                 )
             if "Archive" in self.services[service]["found"]:
                 self.services[service]["archived_size"] = bu_isciii.utils.get_dir_size(
