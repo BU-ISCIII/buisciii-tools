@@ -71,6 +71,8 @@ Code contributions to the release:
 - Added finish module
 - Added json files: sftp_user.json
 - Added delivery jinja templates
+- Added IRMA template to services.json
+- Scratch module now executes rsync using SLURM's srun 
 
 #### Fixes
 
