@@ -4,9 +4,47 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0dev] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.1.X
 
-## [2.0.0dev] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.0.0
+### Credits
+
+Code contributions to the hotfix:
+
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [2.X.1hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.1
+
+### Credits
+
+Code contributions to the hotfix:
+
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [2.0.0] - 2024-03-01 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.0.0
 
 ### Credits
 
@@ -33,6 +71,8 @@ Code contributions to the release:
 - Added finish module
 - Added json files: sftp_user.json
 - Added delivery jinja templates
+- Added IRMA template to services.json
+- Scratch module now executes rsync using SLURM's srun 
 
 #### Fixes
 
@@ -47,25 +87,6 @@ Code contributions to the release:
 
 - Added PyYAML
 
-## [1.0.2hot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.2
-
-### Credits
-
-Code contributions to the hotfix:
-
-### Template fixes and updates
-
-### Modules
-
-#### Added enhancements
-
-#### Fixes
-
-#### Changed
-
-#### Removed
-
-### Requirements
 
 ## [1.0.1] - 2024-02-01 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/1.0.1
 
