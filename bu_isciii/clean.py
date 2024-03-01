@@ -23,18 +23,15 @@ stderr = Console(
 
 
 class CleanUp:
-    def __init__(self, resolution_id=None, path=None, ask_path=False, option=None):
-        """
-        Description:
-            Class to perform the cleaning.
-
-        Usage:
-
-        Attributes:
-
-        Methods:
-
-        """
+    def __init__(
+        self,
+        resolution_id=None,
+        path=None,
+        ask_path=False,
+        option=None,
+        api_user=None,
+        api_password=None,
+    ):
         # access the api with the resolution name to obtain the data
         # ask away if no input given
         if resolution_id is None:
@@ -42,33 +39,48 @@ class CleanUp:
         else:
             self.resolution_id = resolution_id
 
-        if path is None:
-            if ask_path:
-                stderr.print("Directory where you want to create the service folder.")
-                self.path = bu_isciii.utils.prompt_path(msg="Path")
-            else:
-                self.path = os.getcwd()
-        else:
-            self.path = path
-
         # Obtain info from iskylims api
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
-            "resolutionFullNumber"
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolution_full_number"
         ]
-        self.services_requested = self.resolution_info["Resolutions"][
-            "availableServices"
+        self.services_requested = self.resolution_info["resolutions"][0][
+            "available_services"
         ]
-        if self.service_folder in self.path:
-            self.full_path = self.path
+        self.service_samples = self.resolution_info["samples"]
+
+        if ask_path and path is None:
+            stderr.print(
+                "Absolute path to the directory containing the service to clean."
+            )
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
         else:
-            self.full_path = os.path.join(self.path, self.service_folder)
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
+
+        self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
         self.services_to_clean = bu_isciii.utils.get_service_ids(
@@ -258,36 +270,29 @@ class CleanUp:
         elements = ", ".join(to_find)
         # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?", dflt=True):
             stderr.print("You are the boss here.")
             sys.exit()
 
         path_content = self.scan_dirs(to_find=to_find)
-
+        unfiltered_path_content = [f.path for f in os.scandir(self.full_path)]
         for directory_to_rename in path_content:
-            if add in directory_to_rename:
+            renamed_directory = str(directory_to_rename + add)
+            if renamed_directory in unfiltered_path_content:
                 stderr.print(
-                    "[orange]WARNING: Directory %s already renamed"
-                    % directory_to_rename
+                    "[orange]WARNING: Directory %s already renamed to %s Omitting..."
+                    % (directory_to_rename, renamed_directory)
                 )
                 continue
             else:
                 newpath = directory_to_rename + add
-                os.replace(directory_to_rename, newpath)
-                if verbose:
-                    print(f"Renamed {directory_to_rename} to {newpath}.")
-        return
-
-    def rename_nocopy(self, verbose=True):
-        """
-        Description:
-
-        Usage:
-
-        Params:
-
-        """
-        self.rename(to_find=self.nocopy, add="_NC", verbose=verbose)
+                try:
+                    os.replace(directory_to_rename, newpath)
+                    if verbose:
+                        print(f"Renamed {directory_to_rename} to {newpath}.")
+                except PermissionError as e:
+                    print(f"Error moving {directory_to_rename} to {newpath}: {e}")
+                    sys.exit()
         return
 
     def purge_files(self):
@@ -306,7 +311,7 @@ class CleanUp:
             for sample_info in self.service_samples:
                 for file in self.delete_files:
                     file_to_delete = file.replace(
-                        "sample_name", sample_info["sampleName"]
+                        "sample_name", sample_info["sample_name"]
                     )
                     files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
@@ -378,7 +383,7 @@ class CleanUp:
         self.show_removable()
 
         # Ask for confirmation
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?"):
+        if not bu_isciii.utils.prompt_yn_question("Is it okay?", dflt=True):
             stderr.print("You got it.")
             sys.exit()
 
@@ -426,7 +431,7 @@ class CleanUp:
         """
 
         self.delete_rename()
-        self.rename_nocopy()
+        self.rename(to_find=self.nocopy, add="_NC", verbose=True)
 
     def handle_clean(self):
         """
@@ -439,7 +444,7 @@ class CleanUp:
         if self.option == "full_clean":
             self.full_clean()
         if self.option == "rename_nocopy":
-            self.rename_nocopy()
+            self.rename(to_find=self.nocopy, add="_NC", verbose=True)
         if self.option == "clean":
             self.delete_rename()
         if self.option == "revert_renaming":

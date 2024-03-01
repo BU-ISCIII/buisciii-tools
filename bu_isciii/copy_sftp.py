@@ -1,17 +1,5 @@
 #!/usr/bin/env python
 
-"""
- =============================================================
- HEADER
- =============================================================
- INSTITUTION: BU-ISCIII
- AUTHORS: Erika Kvalem Soto and Sarai Varona Fernandez
- ================================================================
- END_OF_HEADER
- ================================================================
-
- """
-
 # Generic imports
 import os
 import sys
@@ -37,64 +25,74 @@ stderr = Console(
 
 
 class CopySftp:
-    def __init__(self, resolution_id=None, source=None, destination=None):
-        """
-        Description:
-            Class to perform the copy of the service to sftp folfer.
-
-        Usage:
-
-        Attributes:
-
-        Methods:
-
-        """
-
+    def __init__(
+        self,
+        resolution_id=None,
+        path=None,
+        ask_path=False,
+        sftp_folder=None,
+        api_user=None,
+        api_password=None,
+    ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
-        if source is None:
-            self.source = bu_isciii.utils.prompt_source_path()
-        else:
-            self.source = source
-
-        if destination is None:
-            self.destination = bu_isciii.utils.prompt_destination_path()
-        else:
-            self.destination = destination
-
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("sftp_copy")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
 
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
 
         self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
-            "resolutionFullNumber"
+        if sftp_folder is None:
+            self.sftp_folder = bu_isciii.utils.get_sftp_folder(self.resolution_info)[0]
+        else:
+            self.sftp_folder = sftp_folder
+
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolution_full_number"
         ]
-        self.services_requested = self.resolution_info["Resolutions"][
-            "availableServices"
+        self.services_requested = self.resolution_info["resolutions"][0][
+            "available_services"
         ]
         self.sftp_options = bu_isciii.config_json.ConfigJson().get_find(
             "sftp_copy", "options"
-        )
-
-        self.sftp_exclusions = bu_isciii.config_json.ConfigJson().get_find(
-            "sftp_copy", "exclusions"
         )
         self.services_to_copy = bu_isciii.utils.get_service_ids(self.services_requested)
 
         self.last_folders = self.get_last_folders(
             self.services_to_copy, type="last_folder"
         )
+        if ask_path and path is None:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
+
+        self.full_path = os.path.join(self.path, self.service_folder)
 
     def get_last_folders(self, services_ids, type="last_folder"):
         """
@@ -130,24 +128,31 @@ class CopySftp:
                 print(os.path.join(path, name))
 
     def copy_sftp(self):
-        if self.service_folder in self.source:
+        if self.service_folder in self.full_path:
             today_date = datetime.today().strftime("%Y%m%d")
             log_command = (
-                "--log-file=" + self.source + "/DOC/rsync_" + today_date + ".log"
+                "--log-file=" + self.full_path + "/DOC/rsync_" + today_date + ".log"
             )
             self.sftp_options.append(log_command)
             try:
-                sysrsync.run(
-                    source=self.source,
-                    destination=self.destination,
-                    options=self.sftp_options,
-                    exclusions=self.sftp_exclusions,
-                    sync_source_contents=False,
-                )
-                stderr.print(
-                    "[green] Data copied to the sftp folder successfully",
-                    highlight=False,
-                )
+                if self.conf["protocol"] == "rsync":
+                    sysrsync.run(
+                        source=self.full_path,
+                        destination=self.sftp_folder,
+                        options=self.sftp_options,
+                        exclusions=self.conf["exclusions"],
+                        sync_source_contents=False,
+                    )
+                    stderr.print(
+                        "[green] Data copied to the sftp folder successfully",
+                        highlight=False,
+                    )
+                else:
+                    stderr.print(
+                        "[ref] This protocol is not allowed at the moment",
+                        highlight=False,
+                    )
+                    sys.exit()
             except RsyncError as e:
                 stderr.print(e)
                 stderr.print(
@@ -157,7 +162,7 @@ class CopySftp:
             finally:
                 for folders_list in self.last_folders:
                     final_folder = os.path.join(
-                        self.destination, self.service_folder, folders_list
+                        self.sftp_folder, self.service_folder, folders_list
                     )
                     stderr.print(
                         "Listing the content of the final folder %s" % folders_list
@@ -166,7 +171,7 @@ class CopySftp:
         else:
             stderr.print(
                 "[red]ERROR: Service number %s not in the source path %s"
-                % (self.service_folder, self.source)
+                % (self.service_folder, self.full_path)
             )
             sys.exit()
         return True

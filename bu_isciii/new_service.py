@@ -5,7 +5,7 @@ import sys
 import os
 import logging
 import glob
-
+import json
 import shutil
 import rich
 
@@ -27,18 +27,18 @@ stderr = rich.console.Console(
 
 class NewService:
     def __init__(
-        self, resolution_id=None, path=None, no_create_folder=None, ask_path=False
+        self,
+        resolution_id=None,
+        path=None,
+        no_create_folder=None,
+        ask_path=False,
+        api_user=None,
+        api_password=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-
-        if ask_path:
-            stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
-        else:
-            self.path = os.getcwd()
 
         if no_create_folder is None:
             self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
@@ -47,73 +47,44 @@ class NewService:
 
         # Load conf
         self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         # Obtain info from iskylims api
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
-            conf_api["server"], conf_api["api_url"]
+        self.rest_api = bu_isciii.drylab_api.RestServiceApi(
+            conf_api["server"], conf_api["api_url"], api_user, api_password
         )
-        self.resolution_info = rest_api.get_request(
-            "resolutionFullData", "resolution", self.resolution_id
+        self.resolution_info = self.rest_api.get_request(
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
-        self.service_folder = self.resolution_info["Resolutions"][
-            "resolutionFullNumber"
+        self.service_folder = self.resolution_info["resolutions"][0][
+            "resolution_full_number"
         ]
-        self.services_requested = self.resolution_info["Resolutions"][
-            "availableServices"
+        self.services_requested = self.resolution_info["resolutions"][0][
+            "available_services"
         ]
-        self.service_samples = self.resolution_info.get("Samples", None)
+        self.service_samples = self.resolution_info.get("samples", None)
+
+        if ask_path and path is None:
+            stderr.print("Directory where you want to create the service folder.")
+            self.path = bu_isciii.utils.prompt_path(msg="Path")
+        elif path == "-a":
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        elif path is not None and ask_path is False:
+            self.path = path
+        elif path is not None and ask_path is not False:
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            )
+            sys.exit()
+        else:
+            self.path = bu_isciii.utils.get_service_paths(
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
+            )
         self.full_path = os.path.join(self.path, self.service_folder)
-        #
-        # resolutionFullData example
-        #
-        # {
-        #    "Service": {
-        #        "pk": 1551,
-        #        "serviceRequestNumber": "SRVCNM564",
-        #        "serviceStatus": "queued",
-        #        "serviceUserId": {
-        #            "username": "smonzon",
-        #            "first_name": "Sara",
-        #            "last_name": "Monzon",
-        #            "email": "smonzon@isciii.es"
-        #        },
-        #        "serviceCreatedOnDate": "2022-02-24",
-        #        "serviceSeqCenter": "Centro Nacional de Microbiologia",
-        #        "serviceAvailableService": [
-        #            "Genomic Data Analysis",
-        #            "DNAseq: Exome sequencing (WES) / Genome sequencing (WGS) / Target (Amplicon, probes)  / Direct seq",
-        #            "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)"
-        #        ],
-        #        "serviceFileExt": null,
-        #        "serviceNotes": "this is for buisciii tools testing"
-        #    },
-        #    "Resolutions": {
-        #        "pk": 1716,
-        #        "resolutionNumber": "SRVCNM564.1",
-        #        "resolutionFullNumber": "SRVCNM564_20220224_TESTINGBUISCIIITOOLS_smonzon_S",
-        #        "resolutionServiceID": 1551,
-        #        "resolutionDate": "2022-02-24",
-        #        "resolutionEstimatedDate": "2022-02-25",
-        #        "resolutionOnQueuedDate": "2022-02-24",
-        #        "resolutionOnInProgressDate": null,
-        #        "resolutionDeliveryDate": null,
-        #        "resolutionNotes": "",
-        #        "resolutionPipelines": [],
-        #        "availableServices": [
-        #            {
-        #                "availServiceDescription": "Viral: consensus, assembly and minor variants detection - Viralrecon (with reference)",
-        #                "serviceId": "viralrecon"
-        #            }
-        #        ]
-        #    },
-        #    "Samples": [
-        #        {
-        #            "runName": "NovaSeq_GEN_032",
-        #            "projectName": "NovaSeq_GEN_032_20220209_RAbad",
-        #            "sampleName": "9793",
-        #            "samplePath": "220209_A01158_0051_AHWCJJDRXY"
-        #        }
-        #
 
     def create_folder(self):
         if not self.no_create_folder:
@@ -182,9 +153,10 @@ class NewService:
                 sys.exit()
         else:
             stderr.print(
-                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry! Please re-run and select one of the service ids."
+                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry!"
+                "Please re-run and select one of the service ids."
             )
-            sys.exit()
+            sys.exit(1)
             return False
         return True
 
@@ -198,33 +170,63 @@ class NewService:
                 "a",
                 encoding="utf-8",
             ) as f:
-                line = sample["sampleName"] + "\n"
+                line = sample["sample_name"] + "\n"
                 f.write(line)
 
     def create_symbolic_links(self):
+        samples_files = []
         for sample in self.service_samples:
             regex = os.path.join(
-                self.conf["fastq_repo"], sample["projectName"], "{}*"
-            ).format(sample["sampleName"])
-            sample_files = glob.glob(regex)
-            if not sample_files:
-                stderr.print(
-                    "[red] This regex has not output any file: %s. This maybe because the project is not yet in the fastq repo or because some of the samples are not in the project."
-                    % regex
-                )
+                self.conf["fastq_repo"], sample["project_name"], "{}_*"
+            ).format(sample["sample_name"])
+            sample_file = glob.glob(regex)
 
-            try:
-                for file in sample_files:
+            if sample_file:
+                samples_files.append(sample_file)
+            else:
+                stderr.print(
+                    "[red] This regex has not output any file: %s." % regex,
+                    "This maybe because the project is not yet in the fastq repo"
+                    "or because some of the samples are not in the project.",
+                )
+        stderr.print(
+            "[blue] Service has %s number of selected samples in iSkyLIMS"
+            % len(self.service_samples)
+        )
+        stderr.print(
+            "[blue] %s number of samples where found to create symbolic links"
+            % len(samples_files)
+        )
+        if len(self.service_samples) != len(samples_files):
+            if not bu_isciii.utils.prompt_yn_question(
+                "Do you want to continue with the service creation?", dflt=True
+            ):
+                stderr.print("Bye!")
+                sys.exit()
+        for sample in samples_files:
+            for file in sample:
+                try:
                     os.symlink(
                         file,
                         os.path.join(self.full_path, "RAW", os.path.basename(file)),
                     )
-            except OSError as e:
-                stderr.print(
-                    "[red]ERROR: Symbolic links creation failed for sample %s."
-                    % sample["sampleName"]
-                )
-                stderr.print("Traceback: %s" % e)
+                except OSError as e:
+                    stderr.print(
+                        "[red]ERROR: Symbolic links creation failed for sample %s."
+                        % sample["sampleName"]
+                    )
+                    stderr.print("Traceback: %s" % e)
+                    sys.exit()
+
+    def samples_json(self):
+        json_samples = json.dumps(self.service_samples, indent=4)
+        json_file_name = self.resolution_id + ".json"
+        json_samples_file = os.path.join(
+            self.path, self.service_folder, "RAW", json_file_name
+        )
+        f = open(json_samples_file, "w")
+        f.write(json_samples)
+        f.close()
 
     def create_new_service(self):
         if self.service_samples is not None:
@@ -232,13 +234,27 @@ class NewService:
             self.copy_template()
             self.create_samples_id()
             self.create_symbolic_links()
+            self.samples_json()
+            self.rest_api.put_request(
+                "update-state", "resolution", self.resolution_id, "state", "in_progress"
+            )
         else:
             stderr.print(
                 "[yellow]WARN: No samples recorded in service: " + self.resolution_id
             )
-            bu_isciii.utils.prompt_yn_question("Do you want to proceed?: ")
-            self.create_folder()
-            self.copy_template()
+            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
+                self.create_folder()
+                self.copy_template()
+                self.rest_api.put_request(
+                    "update-state",
+                    "resolution",
+                    self.resolution_id,
+                    "state",
+                    "in_progress",
+                )
+            else:
+                stderr.print("Directory not created. Bye!")
+                sys.exit(1)
 
     def get_resolution_id(self):
         return self.resolution_id

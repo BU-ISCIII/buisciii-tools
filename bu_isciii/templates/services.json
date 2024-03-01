@@ -14,7 +14,7 @@
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": "assets/reports/pdf/report_bacterial_assembly.pdf"
+        "results_md": ""
     },
     "mtbseq_assembly": {
         "label": "",
@@ -31,7 +31,7 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "results_md": ""
     },
     "mtbseq": {
         "label": "",
@@ -48,7 +48,7 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "results_md": ""
     },
     "pikavirus": {
       "label": "",
@@ -64,8 +64,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "",
-      "delivery_pdf": ""
+      "delivery_md": "assets/reports/md/pikavirus.md",
+      "results_md": "assets/reports/results/pikavirus.md"
   },
     "plasmidid_assembly": {
       "label": "",
@@ -81,7 +81,7 @@
       },
       "no_copy": ["RAW", "TMP"],
       "delivery_md": "",
-      "delivery_pdf": ""
+      "results_md": ""
   },
     "wgmlst_taranis": {
         "label": "",
@@ -99,7 +99,7 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "results_md": ""
     },
     "wgmlst_chewbbaca": {
         "label": "",
@@ -117,7 +117,7 @@
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "results_md": ""
     },
     "viralrecon": {
         "label": "",
@@ -133,8 +133,8 @@
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
-        "delivery_md": "",
-        "delivery_pdf": "assets/reports/pdf/report_viralrecon.pdf"
+        "delivery_md": "assets/reports/md/viralrecon.md",
+        "results_md": "assets/reports/results/viralrecon.md"
     },
     "rnaseq": {
         "label": "",
@@ -150,8 +150,8 @@
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
-        "delivery_md": "",
-        "delivery_pdf": "assets/reports/pdf/rnaseq.pdf"
+        "delivery_md": "assets/reports/md/rnaseq.md",
+        "results_md": "assets/reports/results/rnaseq.md"
     },
     "lowfreq_panel": {
         "label": "",
@@ -168,7 +168,7 @@
         "no_copy": ["RAW", "TMP", "00-reads"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
-        "delivery_pdf": ""
+        "results_md": ""
     },
     "snippy": {
       "label": "",
@@ -185,7 +185,7 @@
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "results_md": ""
     },
     "seek_and_destroy": {
       "label": "",
@@ -218,7 +218,24 @@
       "no_copy": ["RAW", "TMP", "00-reads"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "results_md": ""
+    },
+    "mag_met": {
+      "label": "",
+      "template": "mag_met",
+      "order": 2,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/nf-core/mag",
+      "description": "Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
+      "clean": {
+        "folders":[""],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"RESULTS",
+      "delivery_md": "assets/reports/md/mag.md",
+      "results_md": "assets/reports/results/mag.md"
     },
     "exometrio": {
       "label": "",
@@ -235,7 +252,7 @@
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "results_md": ""
     },
     "exomeeb": {
       "label": "",
@@ -252,7 +269,7 @@
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
+      "results_md": ""
     },
     "wgstrio": {
       "label": "",
@@ -269,6 +286,40 @@
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
-      "delivery_pdf": ""
-    }
+      "results_md": ""
+    },
+    "freebayes_outbreak": {
+      "label": "",
+      "template": "freebayes_outbreak",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"RESULTS",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "IRMA": {
+      "label": "",
+      "template": "IRMA",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+  }
 }
