@@ -71,9 +71,6 @@ class Scratch:
             "resolution_full_number"
         ]
         self.scratch_tmp_path = os.path.join(self.tmp_dir, self.service_folder)
-        self.out_file = os.path.join(
-            self.tmp_dir, self.scratch_tmp_path, "DOC", "service_info.txt"
-        )
         # params like --chdir, --partition and --time
         srun_params = self.conf["srun_settings"].items()
         self.srun_settings = [arg for param in srun_params for arg in param]
@@ -98,12 +95,15 @@ class Scratch:
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
+        self.out_file = os.path.join(
+            self.full_path, "DOC", "service_info.txt"
+        )
 
     def srun_command(self, srun_settings, command):
         command_list = [["srun"], srun_settings, command]
         srun_command = [arg for command in command_list for arg in command]
-        subprocess.run(srun_command, check=True, shell=True)
-        return
+        exit_code = subprocess.call(srun_command)
+        return exit_code
 
     def copy_scratch(self):
         stderr.print("[blue]I will copy the service from %s" % self.full_path)
@@ -114,31 +114,35 @@ class Scratch:
                 if protocol == "rsync":
                     rsync_command = sysrsync.get_rsync_command(
                         source=self.full_path,
-                        destination=self.conf["scratch_path"],
+                        destination=self.conf["scratch_path"]+"/",
                         options=self.conf["options"],
                         exclusions=self.conf["exclusions"],
                         sync_source_contents=False,
                     )
-                    self.srun_command(self.srun_settings, rsync_command)
-                    stderr.print(
-                        "[green] Data copied to the sftp folder successfully",
-                        highlight=False,
-                    )
+                    exit_code = self.srun_command(self.srun_settings, rsync_command)
+
                 else:
                     stderr.print(
                         "[ref] This protocol is not allowed at the moment",
                         highlight=False,
                     )
                     sys.exit()
-                f = open(self.out_file, "w")
-                f.write("Temporal directory: " + self.scratch_tmp_path + "\n")
-                f.write("Origin service directory: " + self.full_path + "\n")
-                f.close()
-                stderr.print(
-                    "[green]Successfully copied the directory to %s"
-                    % self.scratch_tmp_path,
-                    highlight=False,
-                )
+                if exit_code == 0:
+                    stderr.print(
+                        "[green] Data copied to the sftp folder successfully",
+                        highlight=False,
+                    )
+                    f = open(self.out_file, "w")
+                    f.write("Temporal directory: " + self.scratch_tmp_path + "\n")
+                    f.write("Origin service directory: " + self.full_path + "\n")
+                    f.close()
+                    stderr.print(
+                        "[green]Successfully copied the directory to %s"
+                        % self.scratch_tmp_path,
+                        highlight=False,
+                    )
+                else:
+                    stderr.print(f"[red]Errors while copying {self.full_path}")
             except Exception as e:
                 stderr.print(e)
                 stderr.print(
@@ -173,7 +177,7 @@ class Scratch:
                     if self.conf["protocol"] == "rsync":
                         # scratch_tmp cannot be used due to permission issues
                         scratch_bi_path = "".join(
-                            self.conf["scratch_path"], self.service_folder
+                            [self.conf["scratch_path"], self.service_folder]
                         )
                         rsync_command = sysrsync.get_rsync_command(
                             source=scratch_bi_path,
