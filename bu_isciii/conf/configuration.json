@@ -21,10 +21,10 @@
     },
     "xtutatis_api_settings": {
         "api_url": "/drylab/api/",
-        "server": "http://iskylims.isciiides.es"
+        "server": "https://iskylims.isciii.es"
     },
     "api_settings": {
-        "server": "http://iskylims.isciiides.es",
+        "server": "https://iskylims.isciii.es",
         "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
