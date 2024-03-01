@@ -95,9 +95,7 @@ class Scratch:
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
-        self.out_file = os.path.join(
-            self.full_path, "DOC", "service_info.txt"
-        )
+        self.out_file = os.path.join(self.full_path, "DOC", "service_info.txt")
 
     def srun_command(self, srun_settings, command):
         command_list = [["srun"], srun_settings, command]
@@ -114,7 +112,7 @@ class Scratch:
                 if protocol == "rsync":
                     rsync_command = sysrsync.get_rsync_command(
                         source=self.full_path,
-                        destination=self.conf["scratch_path"]+"/",
+                        destination=self.conf["scratch_path"] + "/",
                         options=self.conf["options"],
                         exclusions=self.conf["exclusions"],
                         sync_source_contents=False,
