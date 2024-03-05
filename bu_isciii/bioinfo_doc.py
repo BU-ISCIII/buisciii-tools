@@ -262,13 +262,34 @@ class BioinfoDoc:
         return
 
     def post_delivery_info(self):
-        delivery_notes = bu_isciii.utils.ask_for_some_text(
-            msg="Write some delivery notes:"
-        )
+        if bu_isciii.utils.prompt_yn_question(
+            msg="Do you wish to provide a text file for delivery notes?", dflt=False
+        ):
+            for i in range(3, -1, -1):
+                self.provided_txt = bu_isciii.utils.prompt_path(
+                    msg="Write the path to the file with RAW text as delivery notes"
+                )
+                if not os.path.isfile(os.path.expanduser(self.provided_txt)):
+                    stderr.print(f"Provided file doesn't exist. Attempts left: {i}")
+                else:
+                    stderr.print(f"File selected: {self.provided_txt}")
+                    break
+            else:
+                stderr.print("No more attempts left. Delivery notes will be given by prompt")
+                self.provided_txt = None
+        else:
+            self.provided_txt = None
 
+        if self.provided_txt:
+            with open(os.path.expanduser(self.provided_txt)) as f:
+                self.delivery_notes = " ".join([x.strip() for x in f.readlines()])
+        else:
+            self.delivery_notes = bu_isciii.utils.ask_for_some_text(
+                msg="Write some delivery notes:"
+            )
         delivery_dict = {
             "resolution_number": self.resolution_id,
-            "delivery_notes": delivery_notes,
+            "delivery_notes": self.delivery_notes,
         }
 
         # How json should be fully formatted:
@@ -568,9 +589,15 @@ class BioinfoDoc:
         if bu_isciii.utils.prompt_yn_question(
             "Do you want to add some delivery notes to the e-mail?", dflt=False
         ):
-            email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
-                msg="Write email notes"
-            )
+            if self.provided_txt:
+                if bu_isciii.utils.prompt_yn_question(
+                    f"Do you want to use notes from {self.provided_txt}?", dflt=False
+                ):
+                    email_data["email_notes"] = self.delivery_notes
+            else:
+                email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
+                    msg="Write email notes"
+                )
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
@@ -617,18 +644,21 @@ class BioinfoDoc:
             + self.service_name.split("_", 5)[2]
         )
         if bu_isciii.utils.prompt_yn_question(
-            "Do you want to add any other sender? appart from "
-            + self.resolution_info["service_user_id"]["email"],
+            "Do you want to add any other sender? apart from %s. Note: %s is the default CC."
+            % (self.resolution_info["service_user_id"]["email"], msg["CC"].rstrip(";")),
             dflt=False,
         ):
             stderr.print(
-                "[red] Write emails to be added in semicolon separated format: bioinformatica@isciii.es;icuesta@isciii.es"
+                "[red] Write emails to be added in semicolon separated format: icuesta@isciii.es;user2@isciii.es"
             )
-            msg["CC"] = bu_isciii.utils.ask_for_some_text(msg="E-mails:")
-            rcpt = msg["CC"].split(";") + [msg["To"]]
+            cc_address = bu_isciii.utils.ask_for_some_text(msg="E-mails:")
         else:
-            rcpt = self.resolution_info["service_user_id"]["email"]
-
+            cc_address = str()
+        if cc_address:
+            msg["CC"] = str("bioinformatica@isciii.es;" + str(cc_address))
+        else:
+            msg["CC"] = "bioinformatica@isciii.es"
+        rcpt = msg["CC"].split(";") + [msg["To"]]
         html = MIMEText(html_text, "html")
         msg.attach(html)
         with open(results_pdf_file, "rb") as f:
@@ -639,7 +669,6 @@ class BioinfoDoc:
             filename=str(os.path.basename(results_pdf_file)),
         )
         msg.attach(attach)
-
         server.sendmail(
             email_host_user,
             rcpt,
