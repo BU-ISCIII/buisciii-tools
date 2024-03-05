@@ -18,6 +18,8 @@ Code contributions to the hotfix:
 
 - [#207](https://github.com/BU-ISCIII/buisciii-tools/pull/207) - Bioinfo-doc updates: email password can be given in buisciii_config.yml and delivery notes in a text file
 
+#### Fixes
+
 #### Changed
 
 #### Removed
