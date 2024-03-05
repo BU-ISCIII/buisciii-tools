@@ -12,6 +12,8 @@ Code contributions to the hotfix:
 
 ### Template fixes and updates
 
+- Added blast_nt template to services.json
+
 ### Modules
 
 #### Added enhancements
