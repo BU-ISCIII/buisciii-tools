@@ -275,7 +275,7 @@ class BioinfoDoc:
                     stderr.print(f"File selected: {self.provided_txt}")
                     break
             else:
-                stderr.print("No more attempts left. Delivery notes will be given by prompt")
+                stderr.print("No more attempts. Delivery notes will be given by prompt")
                 self.provided_txt = None
         else:
             self.provided_txt = None
