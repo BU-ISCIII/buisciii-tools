@@ -321,5 +321,22 @@
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "results_md": ""
+    },
+    "blast_nt": {
+      "label": "",
+      "template": "blast_nt",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
   }
 }
