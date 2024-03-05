@@ -55,7 +55,7 @@ def run_bu_isciii():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "1.0.1"
+    __version__ = "2.0.0"
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
@@ -507,6 +507,7 @@ def bioinfo_doc(
     """
     Create the folder documentation structure in bioinfo_doc server
     """
+    email_pass = email_psswd if email_psswd else ctx.obj.get("email_password")
     new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(
         type,
         resolution,
@@ -517,7 +518,7 @@ def bioinfo_doc(
         results_md,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
-        email_psswd,
+        email_pass,
     )
     new_doc.create_documentation()
 
@@ -564,6 +565,7 @@ def bioinfo_doc(
     default=None,
     help="Tsv output path + filename with archive stats and info",
 )
+@click.pass_context
 def archive(
     ctx,
     service_id,
