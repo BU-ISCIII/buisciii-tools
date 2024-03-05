@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 import calendar
 import datetime
 import hashlib
@@ -28,6 +29,7 @@ def rich_force_colors():
     return None
 
 
+log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True, style="dim", highlight=False, force_terminal=rich_force_colors()
 )
@@ -267,10 +269,13 @@ def get_dir_size(path):
 
     for path, dirs, files in os.walk(path):
         for file in files:
-            if os.path.islink(os.path.join(path, file)):
-                size += os.lstat(os.path.join(path, file)).st_size
-            else:
-                size += os.path.getsize(os.path.join(path, file))
+            try:
+                if os.path.islink(os.path.join(path, file)):
+                    size += os.lstat(os.path.join(path, file)).st_size
+                else:
+                    size += os.path.getsize(os.path.join(path, file))
+            except FileNotFoundError as e:
+                log.warning(f"File not found error while scouting size: {e}")
 
     return size
 
