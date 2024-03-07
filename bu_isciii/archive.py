@@ -1077,12 +1077,12 @@ class Archive:
                     if "Data dir" in self.services[service]["found"]
                     else "Not found in data dir"
                 )
-                csv_dict["Compressed size in data directory"] = (
+                csv_dict["UnCompressed size in data directory"] = (
                     self.services[service]["non_archived_size"]
                     if self.services[service]["non_archived_size"] != 0
                     else "Not calculated"
                 )
-                csv_dict["Uncompressed size in data directory"] = (
+                csv_dict["Compressed size in data directory"] = (
                     self.services[service]["non_archived_compressed_size"]
                     if self.services[service]["non_archived_compressed_size"] != 0
                     else "Not calculated"
