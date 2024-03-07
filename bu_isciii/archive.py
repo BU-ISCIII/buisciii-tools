@@ -1037,7 +1037,7 @@ class Archive:
                     if self.services[service]["found_in_system"]
                     else "NOT found on iSkyLIMS"
                 )
-                csv_dict["Delivery date"] = ""
+                csv_dict["Delivery date"] = self.services[service]["delivery_date"]
 
                 # Fields for archive
                 csv_dict["Path in archive"] = (
@@ -1045,7 +1045,7 @@ class Archive:
                     if self.services[service]["archived_path"] is not None
                     else "Archived path could not be generated"
                 )
-                csv_dict["Found in archive"] = (
+                csv_dict["Found on archive"] = (
                     "Yes"
                     if "Archive" in self.services[service]["found"]
                     else "Not found in archive"
