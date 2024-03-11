@@ -4,7 +4,7 @@ import pandas as pd
 from typing import List, Dict
 
 # conda activate viralrecon_report
-"""Standard usage: python excel_generator.py -r ./reference.tmp"""
+"""Standard usage: python excel_generator.py -r ./reference.tmp --merge_lineage_files"""
 """Single csv to excel usage: python excel_generator.py -s csv_file.csv"""
 parser = argparse.ArgumentParser(
     description="Generate excel files from viralrecon results"
@@ -21,6 +21,12 @@ parser.add_argument(
     type=str,
     default="",
     help="Transform a single csv file to excel format. Omit rest of processes",
+)
+parser.add_argument(
+    "-l",
+    "--merge_lineage_files",
+    action='store_true',
+    help="Merge pangolin and nextclade lineage tables",
 )
 args = parser.parse_args()
 
@@ -135,7 +141,7 @@ def main(args):
         ref: str("ref_samples/samples_" + ref + ".tmp") for ref in references
     }
 
-    if len(references) > 1:
+    if args.merge_lineage_files:
         # Merge pangolin and nextclade csv files separatedly and create excel files for them
         merge_lineage_tables(reference_folders, samples_ref_files)
         for reference, folder in reference_folders.items():
