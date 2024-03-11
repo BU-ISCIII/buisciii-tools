@@ -25,7 +25,7 @@ parser.add_argument(
 parser.add_argument(
     "-l",
     "--merge_lineage_files",
-    action='store_true',
+    action="store_true",
     help="Merge pangolin and nextclade lineage tables",
 )
 args = parser.parse_args()
