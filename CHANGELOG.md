@@ -13,6 +13,7 @@ Code contributions to the hotfix:
 ### Template fixes and updates
 
 - Added blast_nt template to services.json
+- Included new user to sftp_user.json
 
 ### Modules
 
@@ -22,7 +23,13 @@ Code contributions to the hotfix:
 
 #### Fixes
 
+- Autoclean_sftp does not crash anymore. New argument from 'utils.prompt_yn_question()' in v2.0.0 was missing: 'dflt'
+- Bioinfo-doc now sends email correctly to multiple CCs
+
 #### Changed
+
+- excel_generator.py reverted to last state, now lineage tables are merged when argument -l is given
+- Adapted viralrecon_results lablog to new excel_generator.py argument
 
 #### Removed
 
