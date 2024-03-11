@@ -631,7 +631,7 @@ class BioinfoDoc:
             server.login(user=email_host_user, password=email_host_password)
         except Exception as e:
             stderr.print("[red] Unable to send e-mail" + e)
-
+        default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart("alternative")
         msg["To"] = self.resolution_info["service_user_id"]["email"]
         msg["From"] = email_host_user
@@ -645,7 +645,7 @@ class BioinfoDoc:
         )
         if bu_isciii.utils.prompt_yn_question(
             "Do you want to add any other sender? apart from %s. Note: %s is the default CC."
-            % (self.resolution_info["service_user_id"]["email"], msg["CC"].rstrip(";")),
+            % (self.resolution_info["service_user_id"]["email"], default_cc),
             dflt=False,
         ):
             stderr.print(
@@ -655,9 +655,9 @@ class BioinfoDoc:
         else:
             cc_address = str()
         if cc_address:
-            msg["CC"] = str("bioinformatica@isciii.es;" + str(cc_address))
+            msg["CC"] = str(default_cc + ";" + str(cc_address))
         else:
-            msg["CC"] = "bioinformatica@isciii.es"
+            msg["CC"] = default_cc
         rcpt = msg["CC"].split(";") + [msg["To"]]
         html = MIMEText(html_text, "html")
         msg.attach(html)
