@@ -110,7 +110,7 @@ Output:
 ┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃           Service name ┃ Description                               ┃ Github                                     ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    assembly_annotation │ Nextflow assembly pipeline to assemble    │                                            │
+│    assembly_annotation │ Nextflow assembly pipeline to assemble    │ https://github.com/Daniel-VM/bacass/...    │
 │                        │ bacterial genomes                         │                                            │
 │        mtbseq_assembly │ Mycobacterium tuberculosis mapping,       │ https://github.com/ngs-fzb/MTBseq_source   │
 │                        │ variant calling and detection of          │                                            │
