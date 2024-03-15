@@ -23,6 +23,8 @@ Code contributions to the hotfix:
 
 #### Fixes
 
+- Added missing url for service assembly_annotation in module list
+- Autoclean-sftp refined folder name parsing with regex label adjustment 
 - Autoclean_sftp does not crash anymore. New argument from 'utils.prompt_yn_question()' in v2.0.0 was missing: 'dflt'
 - Bioinfo-doc now sends email correctly to multiple CCs
 
