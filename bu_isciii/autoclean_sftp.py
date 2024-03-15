@@ -109,7 +109,7 @@ class AutoremoveSftpService:
     def get_sftp_services(self):
         self.sftp_services = {}  # {sftp-service_path : last_update}
         service_pattern = (
-            r"^[SRV][A-Z]+[0-9]+_\d{8}_[A-Z0-9]+_[a-zA-Z]+(?:\.[a-zA-Z]+)?_[a-zA-Z]$"
+            r"^[SRV][A-Z]+[0-9]+_\d{8}_[A-Z0-9.-]+_[a-zA-Z]+(?:\.[a-zA-Z]+)?_[a-zA-Z]$"
         )
 
         stderr.print("[blue]Scanning " + self.path + "...")
