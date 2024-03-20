@@ -27,13 +27,17 @@ Code contributions to the hotfix:
 - Autoclean-sftp refined folder name parsing with regex label adjustment 
 - Autoclean_sftp does not crash anymore. New argument from 'utils.prompt_yn_question()' in v2.0.0 was missing: 'dflt'
 - Bioinfo-doc now sends email correctly to multiple CCs
+- Included a missing sed inside IRMA's 04-irma/lablog
 
 #### Changed
 
 - excel_generator.py reverted to last state, now lineage tables are merged when argument -l is given
 - Adapted viralrecon_results lablog to new excel_generator.py argument
+- IRMA/RESULTS now creates a summary of the different types of flu found in irma_stats.txt
 
 #### Removed
+
+- Removed empty strings from services.json
 
 ### Requirements
 
