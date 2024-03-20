@@ -29,7 +29,7 @@ echo 'grep -w 'B__' irma_stats.txt | cut -f1 | while read sample; do cat B_fragm
 
 echo 'grep -w 'C__' irma_stats.txt | cut -f1 | while read sample; do cat C_fragment_list.txt | while read fragment; do if test -f ${sample}/${fragment}*.fasta; then cat ${sample}/${fragment}*.fasta | sed "s/^>/\>${sample}_/g" | sed s/_H1//g | sed s/_H3//g | sed s/_N1//g | sed s/_N2//g | sed s@-@/@g | sed s/_C_/_/g ; fi >> C/${fragment}.txt; done; done' >> _03_post_processing.sh
 
-echo 'cat ../samples_id.txt | while read in; do cat ${in}/*.fasta | sed "s/^>/\>${in}_/g" | sed 's/_H1//g' | sed 's/_H3//g' | sed 's/_N1//g' | sed 's/_N2//g' | sed 's@-@/@g' | 's/_A_/_/g' | sed 's/_B_/_/g' | sed 's/_C_/_/g' >> all_samples_completo.txt; done' >> _03_post_processing.sh
+echo 'cat ../samples_id.txt | while read in; do cat ${in}/*.fasta | sed "s/^>/\>${in}_/g" | sed 's/_H1//g' | sed 's/_H3//g' | sed 's/_N1//g' | sed 's/_N2//g' | sed 's@-@/@g' | sed 's/_A_/_/g' | sed 's/_B_/_/g' | sed 's/_C_/_/g' >> all_samples_completo.txt; done' >> _03_post_processing.sh
 
 echo 'sed -i "s/__//g" irma_stats.txt' >> _03_post_processing.sh
 echo 'sed -i "s/_\t/\t/g" irma_stats.txt' >> _03_post_processing.sh
