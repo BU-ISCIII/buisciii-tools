@@ -34,7 +34,7 @@ Code contributions to the hotfix:
 - excel_generator.py reverted to last state, now lineage tables are merged when argument -l is given
 - Adapted viralrecon_results lablog to new excel_generator.py argument
 - IRMA/RESULTS now creates a summary of the different types of flu found in irma_stats.txt
-- Updated IRMA executable to new location and reduced threads to 16
+- Updated IRMA to v1.1.4 date 02-2024 and reduced threads to 16
 
 #### Removed
 
