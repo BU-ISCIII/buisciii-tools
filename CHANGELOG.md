@@ -28,6 +28,8 @@ Code contributions to the hotfix:
 - Autoclean_sftp does not crash anymore. New argument from 'utils.prompt_yn_question()' in v2.0.0 was missing: 'dflt'
 - Bioinfo-doc now sends email correctly to multiple CCs
 - Included a missing sed inside IRMA's 04-irma/lablog
+- Changed singularity mount options in Viralrecon template to fix errors with Nextflow v23.10.0
+
 
 #### Changed
 
@@ -35,6 +37,7 @@ Code contributions to the hotfix:
 - Adapted viralrecon_results lablog to new excel_generator.py argument
 - IRMA/RESULTS now creates a summary of the different types of flu found in irma_stats.txt
 - Updated IRMA to v1.1.4 date 02-2024 and reduced threads to 16
+- IRMA 04-irma/lablog now creates B and C dirs only if those flu-types are present
 
 #### Removed
 
