@@ -47,11 +47,8 @@ cd assembly_spades; rsync -rlv ../../../ANALYSIS/*/*/assembly/spades/rnaviral/*.
 cd abacas_assembly; cat ../../../ANALYSIS/*/samples_ref.txt | while read in; do arr=($in); ln -s ../../../ANALYSIS/*/*${arr[1]}*/assembly/spades/rnaviral/abacas/${arr[0]}.abacas.fasta ./${arr[0]}_${arr[1]}.abacas.fasta; done; cd -
 ln -s ../../ANALYSIS/*/all_samples_filtered_BLAST_results.xlsx .
 
-"""
-Auxiliar script useful for multiple hosts if samples have pattern to distinguish:
-e.g. HOSTPATTERN = 'MONKEY'
+#Auxiliar script useful for multiple hosts if samples have pattern to distinguish: e.g. HOSTPATTERN1 = 'MONKEY'
 
-cat ../viralrecon_results | sed 's@../../@../../../@g' | sed 's/entrega01/$HOSTPATTERN_results/g' > results_wgs
-sed -i 's@ANALYSIS/\*/@ANALYSIS/*HOSTPATTERN*/@g' results_wgs.sh
-sed 's/SAMPLEPATTERN/HOSTPATTERN/g' results_wgs > results_gf.sh
-"""
+#cat ../viralrecon_results | sed 's@../../@../../../@g' | sed 's/entrega01/HOSTPATTERN1_results/g' > results_wgs
+#sed -i 's@ANALYSIS/\*/@ANALYSIS/*HOSTPATTERN1*/@g' results_wgs.sh
+#sed 's/HOSTPATTERN1/HOSTPATTERN2/g' results_wgs > results_gf.sh
