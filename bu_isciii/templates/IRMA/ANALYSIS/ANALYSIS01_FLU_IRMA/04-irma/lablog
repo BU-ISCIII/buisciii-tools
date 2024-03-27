@@ -13,9 +13,9 @@ echo "ls */*HA*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | sort -u | cut -d '_' -
 
 echo "cat HA_types.txt | while read in; do mkdir \${in}; done" >> _03_post_processing.sh
 
-echo "mkdir B" >> _03_post_processing.sh
+echo "if grep -qw 'B__' irma_stats.txt; then mkdir B; fi" >> _03_post_processing.sh
 
-echo "mkdir C" >> _03_post_processing.sh
+echo "if grep -qw 'C__' irma_stats.txt; then mkdir C; fi" >> _03_post_processing.sh
 
 echo "ls */*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | cut -d '_' -f1,2 | sort -u | grep 'A_' > A_fragment_list.txt" >> _03_post_processing.sh
 
@@ -31,5 +31,5 @@ echo 'grep -w 'C__' irma_stats.txt | cut -f1 | while read sample; do cat C_fragm
 
 echo 'cat ../samples_id.txt | while read in; do cat ${in}/*.fasta | sed "s/^>/\>${in}_/g" | sed 's/_H1//g' | sed 's/_H3//g' | sed 's/_N1//g' | sed 's/_N2//g' | sed 's@-@/@g' | sed 's/_A_/_/g' | sed 's/_B_/_/g' | sed 's/_C_/_/g' >> all_samples_completo.txt; done' >> _03_post_processing.sh
 
-echo 'sed -i "s/__//g" irma_stats.txt' >> _03_post_processing.sh
-echo 'sed -i "s/_\t/\t/g" irma_stats.txt' >> _03_post_processing.sh
+echo 'sed "s/__//g" irma_stats.txt > clean_irma_stats.txt' >> _03_post_processing.sh
+echo 'sed "s/_\t/\t/g" irma_stats.txt > clean_irma_stats.txt' >> _03_post_processing.sh
