@@ -196,7 +196,7 @@
       "url": "https://github.com/GuilleGorines/Seek-Destroy",
       "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
       "clean": {
-        "folders":[""],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP", "00-reads"],
@@ -212,7 +212,7 @@
       "end": "",
       "description": "",
       "clean": {
-        "folders":[""],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP", "00-reads"],
@@ -229,7 +229,7 @@
       "url": "https://github.com/nf-core/mag",
       "description": "Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
       "clean": {
-        "folders":[""],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP"],
