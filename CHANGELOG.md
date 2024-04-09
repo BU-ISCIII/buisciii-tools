@@ -14,6 +14,7 @@ Code contributions to the hotfix:
 
 - Added blast_nt template to services.json
 - Included new user to sftp_user.json
+- Fixed characterization template
 
 ### Modules
 
