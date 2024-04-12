@@ -1,0 +1,6 @@
+ln -s ../samples_id.txt .
+ln -s ../00-reads .
+
+mkdir 01-assemblies 03-grapetree
+
+cd 01-assemblies; echo "rsync -rlv ../../*ASSEMBLY*/03-assembly/unicycler/*.fasta.gz ." | bash; gunzip *; cd -
