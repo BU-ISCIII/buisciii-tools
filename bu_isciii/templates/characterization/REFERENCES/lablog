@@ -1,0 +1,44 @@
+# conda activate ariba
+
+mkdir logs
+
+scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+
+# Function to print colored text
+print_color() {
+    case "$2" in
+        "red")
+            echo -e "\e[1;31m$1\e[0m"
+            ;;
+        "green")
+            echo -e "\e[1;32m$1\e[0m"
+            ;;
+        "blue")
+            echo -e "\e[1;34m$1\e[0m"
+            ;;
+        *)
+            echo "$1"
+            ;;
+    esac
+}
+
+# Function to prompt with color
+prompt_with_color() {
+    read -p "$(print_color $1 'blue') $2" response
+}
+
+print_color "This will take some seconds to display, please wait" 'blue'
+
+# Select genome from PMLST
+IFS=$'\n'
+bacterial_options=( $(ariba pubmlstspecies | sed 's/^/"/g' | sed 's/$/"/g') )
+print_color "Indicate the preferred bacterial genome:" 'blue'
+select BACTERIA in "${bacterial_options[@]}"; do
+    if [ -n "$BACTERIA" ]; then
+        print_color "Selected bacteria: $BACTERIA" 'green'
+        echo "srun --chdir ${scratch_dir} --mem 10G --time 1:00:00 --job-name PUBMLSTGET --output logs/PUBMLSTGET.%j.log --partition short_idx --cpus-per-task 5 ariba pubmlstget $BACTERIA $(date '+%Y%m%d') &" > _01_download_pubmlst.sh
+        break
+    else
+        print_color "Invalid input. Please select a valid option." 'red'
+    fi
+done
