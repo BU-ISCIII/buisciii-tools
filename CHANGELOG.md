@@ -12,6 +12,11 @@ Code contributions to the new version:
 
 ### Template fixes and updates
 
+- Added blast_nt template to services.json
+- Included new user to sftp_user.json
+- Fixed characterization template
+- Added chewbbaca template
+
 ### Modules
 
 #### Added enhancements
