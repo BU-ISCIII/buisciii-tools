@@ -1,6 +1,6 @@
 # module load fastp 
 # if assembly pipeline was performed first and the trimmed sequences were saved, this should work:
-# cat ../samples_id | xargs -I mkdir @@; cd $_; ln -s ../../*/01-preprocessing/trimmed_sequences/@@*.gz @@; cd -
+# cat ../samples_id.txt | xargs -I @@ mkdir @@; cd @@; ln -s ../../../*/01-processing/fastp/@@_1.fastp.fastq.gz ./@@_R1_filtered.fastq.gz; ln -s ../../../*/01-processing/fastp/@@_2.fastp.fastq.gz ./@@_R2_filtered.fastq.gz ; cd -
 # else: 
 mkdir logs
 scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')

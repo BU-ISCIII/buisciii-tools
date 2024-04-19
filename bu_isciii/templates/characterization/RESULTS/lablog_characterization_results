@@ -1,11 +1,12 @@
 DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
 
-mkdir $DELIVERY_FOLDER
+mkdir -p $DELIVERY_FOLDER
 mkdir "${DELIVERY_FOLDER}/characterization"
 
 # ARIBA characterization service
 cd $DELIVERY_FOLDER/characterization
-ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/*.csv .
-ln -s ../../../ANALYSIS/*CHARACTERIZATION/02-ariba/summary/*summary*.csv .
-rm *phandango*
+ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/ariba_*.tsv .
+ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/ariba_*.csv .
+find . -xtype l -delete
+
 cd -

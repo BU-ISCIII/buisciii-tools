@@ -2,7 +2,7 @@
     "assembly_annotation": {
         "label": "",
         "template": "assembly",
-        "url": "",
+        "url": "https://github.com/Daniel-VM/bacass/tree/buisciii-develop",
         "order": 1,
         "begin": "",
         "end": "",
@@ -196,7 +196,7 @@
       "url": "https://github.com/GuilleGorines/Seek-Destroy",
       "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
       "clean": {
-        "folders":[""],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP", "00-reads"],
@@ -212,7 +212,7 @@
       "end": "",
       "description": "",
       "clean": {
-        "folders":[""],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP", "00-reads"],
@@ -229,7 +229,7 @@
       "url": "https://github.com/nf-core/mag",
       "description": "Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
       "clean": {
-        "folders":[""],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP"],
@@ -315,6 +315,23 @@
       "description": "",
       "clean": {
         "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "blast_nt": {
+      "label": "",
+      "template": "blast_nt",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP"],
