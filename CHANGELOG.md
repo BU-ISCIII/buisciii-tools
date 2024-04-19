@@ -4,17 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0dev] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.1.X
+## [2.1.0dev] - 2024-04-19 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.1.0
 
 ### Credits
 
-Code contributions to the hotfix:
+Code contributions to the new version:
+- [Sarai Varona](https://github.com/svarona)
+- [Pablo Mata](https://github.com/Shettland)
+- [Daniel Valle](https://github.com/Daniel-VM)
 
 ### Template fixes and updates
 
-- Added blast_nt template to services.json
+- Added blast_nt template to services.json [#208](https://github.com/BU-ISCIII/buisciii-tools/pull/208) 
 - Included new user to sftp_user.json
-- Fixed characterization template
+- Included a missing sed inside IRMA's 04-irma/lablog [#213](https://github.com/BU-ISCIII/buisciii-tools/pull/213) 
+- Changed singularity mount options in Viralrecon template to fix errors with Nextflow v23.10.0
+- excel_generator.py reverted to last state, now lineage tables are merged when argument -l is given
+- Adapted viralrecon_results lablog to new excel_generator.py argument
+- IRMA/RESULTS now creates a summary of the different types of flu found in irma_stats.txt
+- Updated IRMA to v1.1.4 date 02-2024 and reduced threads to 16
+- IRMA 04-irma/lablog now creates B and C dirs only if those flu-types are present
+- Fixed characterization template [#220](https://github.com/BU-ISCIII/buisciii-tools/pull/220)
+- Created Chewbbaca template [#230](https://github.com/BU-ISCIII/buisciii-tools/pull/230)
 
 ### Modules
 
@@ -28,17 +39,8 @@ Code contributions to the hotfix:
 - Autoclean-sftp refined folder name parsing with regex label adjustment 
 - Autoclean_sftp does not crash anymore. New argument from 'utils.prompt_yn_question()' in v2.0.0 was missing: 'dflt'
 - Bioinfo-doc now sends email correctly to multiple CCs
-- Included a missing sed inside IRMA's 04-irma/lablog
-- Changed singularity mount options in Viralrecon template to fix errors with Nextflow v23.10.0
-
 
 #### Changed
-
-- excel_generator.py reverted to last state, now lineage tables are merged when argument -l is given
-- Adapted viralrecon_results lablog to new excel_generator.py argument
-- IRMA/RESULTS now creates a summary of the different types of flu found in irma_stats.txt
-- Updated IRMA to v1.1.4 date 02-2024 and reduced threads to 16
-- IRMA 04-irma/lablog now creates B and C dirs only if those flu-types are present
 
 #### Removed
 
