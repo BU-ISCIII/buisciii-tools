@@ -16,6 +16,8 @@ Code contributions to the new version:
 
 #### Added enhancements
 
+- Added markdown of assembly analysis procedure [#244](https://github.com/BU-ISCIII/buisciii-tools/pull/244)
+
 #### Fixes
 
 #### Changed
