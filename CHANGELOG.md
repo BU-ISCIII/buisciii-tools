@@ -12,7 +12,7 @@ Code contributions to the new version:
 
 ### Template fixes and updates
 
-- Updated documentation and results markdown for viralrecon, pikavirus and MAG
+- Updated documentation and results markdown for viralrecon, pikavirus and MAG [#247](https://github.com/BU-ISCIII/buisciii-tools/pull/247)
 
 ### Modules
 
