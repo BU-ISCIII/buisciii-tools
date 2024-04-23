@@ -1,7 +1,6 @@
 ## mRNAseq
 
-Here we describe the results from the mRNAseq pipeline for transcriptomic analysis.
-
+Here we describe the results from the mRNAseq pipeline for transcriptomic analysis and differential gene expression.
 
 > [!WARNING]
 > Some of the files listed here may not be in your  `RESULTS` folder. It will depend on the analysis you requested.
