@@ -18,6 +18,7 @@ Code contributions to the new version:
 
 #### Added enhancements
 
+- Added documentation and results markdown for RNAseq [#248](https://github.com/BU-ISCIII/buisciii-tools/pull/248)
 - Added markdown of assembly analysis procedure [#244](https://github.com/BU-ISCIII/buisciii-tools/pull/244)
 - Added output and results markdowns for ExomeEB, ExomeTrio and WGStrio [#249](https://github.com/BU-ISCIII/buisciii-tools/pull/249)
 - Added markdown of assembly results folder [#250](https://github.com/BU-ISCIII/buisciii-tools/pull/250)
