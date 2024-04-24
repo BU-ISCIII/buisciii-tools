@@ -50,19 +50,19 @@ Here, we describe the results from the Assembly pipeline for de novo genome asse
 * **summary_assembly_metrics_mqc.csv**: a custom table containing most relevant assembly QC metrics.
   * *Sample*: sample ID.
   * *Input reads*: number of input reads for each sample.
-  * *Trimmed reads (fastp)*:
+  * *Trimmed reads (fastp)*: number of trimmed reads.
   * *Contigs*: number of contigs.
   * *Largest contig*: length of the largest contig.
-  * *N50*:
-  * *% Genome fraction*:
-  * *Best hit (Kmerfinder)*: 
-  * *Best hit assembly ID (Kmerfinder)*:
-  * *Best hit query coverage (Kmerfinder)*:
-  * *Best hit depth (Kmerfinder)*:
-  * *Second hit (Kmerfinder)*:
-  * *Second hit assembly ID (Kmerfinder)*:
-  * *Second hit query coverage (Kmerfinder)*:
-  * *Second hit depth (Kmerfinder)*:
+  * *N50*: is the contig length such that using longer or equal length contigs produces half of the bases of the assembly. Usually there is no value that produces exactly 50%, so the technical definition is the maximum length x such that using contigs of length at least x accounts for at least 50% of the total assembly length.
+  * *% Genome fraction*: the total number of aligned bases in the reference, divided by the genome size. 
+  * *Best hit (Kmerfinder)*: best hit species name.
+  * *Best hit assembly ID (Kmerfinder)*: best hit RefSeq assembly accession ID.
+  * *Best hit query coverage (Kmerfinder)*: best hit query coverage.
+  * *Best hit depth (Kmerfinder)*: best hit depth.
+  * *Second hit (Kmerfinder)*: second hit species name.
+  * *Second hit assembly ID (Kmerfinder)*: second hit RefSeq assembly accession ID.
+  * *Second hit query coverage (Kmerfinder)*: second hit query coverage.
+  * *Second hit depth (Kmerfinder)*: second hit depth.
 
 > [!WARNING]
 > Software's versions used in this analysis can be obtained from the  `MultiQC` report.
