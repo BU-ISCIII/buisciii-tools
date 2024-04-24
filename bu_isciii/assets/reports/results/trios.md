@@ -1,3 +1,7 @@
+# ExomeTrio & WGStrio
+
+These file briefly describes the results from ExomeTrio and WGStrio services.
+
 ## exomiser.html
 
 This file includes information regarding variant annotation, effect prediction and inheritance typing:
