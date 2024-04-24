@@ -1,3 +1,7 @@
+# ExomeEB
+
+This markdown briefly describes the files found in `RESULTS/` folder for ExomeEB service.
+
 ## exomiser.html
 
 This file includes information regarding variant annotation, effect prediction and inheritance typing:
