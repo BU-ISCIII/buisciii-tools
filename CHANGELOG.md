@@ -19,6 +19,7 @@ Code contributions to the new version:
 #### Added enhancements
 
 - Added markdown of assembly analysis procedure [#244](https://github.com/BU-ISCIII/buisciii-tools/pull/244)
+- Added output and results markdowns for ExomeEB, ExomeTrio and WGStrio [#249](https://github.com/BU-ISCIII/buisciii-tools/pull/249)
 
 #### Fixes
 
