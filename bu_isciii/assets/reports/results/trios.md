@@ -1,6 +1,6 @@
 # ExomeTrio & WGStrio
 
-These file briefly describes the results from ExomeTrio and WGStrio services.
+These file briefly describes the files in `RESULTS/` folder from ExomeTrio and WGStrio services.
 
 ## exomiser.html
 
