@@ -251,8 +251,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "",
-      "results_md": ""
+      "delivery_md": "sarek.md",
+      "results_md": "trios.md"
     },
     "exomeeb": {
       "label": "",
@@ -268,8 +268,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "",
-      "results_md": ""
+      "delivery_md": "sarek.md",
+      "results_md": "exomeeb.md"
     },
     "wgstrio": {
       "label": "",
@@ -285,8 +285,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "",
-      "results_md": ""
+      "delivery_md": "sarek.md",
+      "results_md": "trios.md"
     },
     "freebayes_outbreak": {
       "label": "",
