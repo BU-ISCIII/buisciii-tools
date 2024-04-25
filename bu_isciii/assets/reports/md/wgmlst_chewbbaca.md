@@ -61,5 +61,5 @@ MLST service performs Multi-Locus Sequence Typing of the samples with the _de no
 > For more information, see the [ChewBBACA's documentation](https://chewbbaca.readthedocs.io/en/latest/index.html) in the `User Guide` secton
 
 - `03-grapetree`:
-  - `tree.svg`: Minimum Spannig Tree plot. Branches longer than = 700 are shown shortenned
-  - `tree.nwk`: Newick tree from the Minimum Spannig Tree plot.
+  - `tree.svg`: Minimum Spannig Tree plot in SVG (Scalable Vector Graphics) format. Branches longer than = 700 are shown shortenned.
+  - `tree.nwk`: Newick tree from the Minimum Spannig Tree.
