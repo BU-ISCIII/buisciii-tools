@@ -19,6 +19,7 @@ Code contributions to the new version:
 #### Added enhancements
 
 - Added documentation and results markdown for RNAseq [#248](https://github.com/BU-ISCIII/buisciii-tools/pull/248)
+- Added documentation both output and results for plasmidID[#258](https://github.com/BU-ISCIII/buisciii-tools/pull/258)
 - Added markdown of assembly analysis procedure [#244](https://github.com/BU-ISCIII/buisciii-tools/pull/244)
 - Added output and results markdowns for ExomeEB, ExomeTrio and WGStrio [#249](https://github.com/BU-ISCIII/buisciii-tools/pull/249)
 - Added markdown of assembly results folder [#250](https://github.com/BU-ISCIII/buisciii-tools/pull/250)
@@ -26,7 +27,13 @@ Code contributions to the new version:
 - Added output and results markdowns for cgMLST/wgMLST [#255](https://github.com/BU-ISCIII/buisciii-tools/pull/255)
 - Added markdown for IRMA [#256](https://github.com/BU-ISCIII/buisciii-tools/pull/256)
 
+### Modules
+
+#### Added enhancements
+
 #### Fixes
+
+- Fixed archive module. Updated correct header for scout tsv.
 
 #### Changed
 
