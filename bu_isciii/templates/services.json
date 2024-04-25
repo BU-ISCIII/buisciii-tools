@@ -116,8 +116,8 @@
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
-        "delivery_md": "",
-        "results_md": ""
+        "delivery_md": "assets/reports/md/wgmlst_chewbbaca.md",
+        "results_md": "assets/reports/results/wgmlst_chewbbaca.md"
     },
     "viralrecon": {
         "label": "",
