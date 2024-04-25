@@ -14,6 +14,7 @@ The directories listed below will be created in the analysis directory after the
     - [PlasmidID data for circos](#plasmidid-data-for-circos)
     - [Circos images](#circos-images)
   - [Reconstructed plasmid sequences](#reconstructed-plasmid-sequences)
+    - [Summary report](#summary-report)
 
 ## Preprocessing
 
@@ -146,5 +147,18 @@ A multifasta file is created for each plasmid including all the contig sequences
 `NO_GROUP/fasta_files`
 
 - PLASMID_term.fasta: multifasta file for each plasmid identified in the sample.
+
+</details>
+
+### Summary report
+
+A summary report consolidating all samples in the analysis is created.
+
+<details>
+<summary>Output files description</summary>
+
+`NO_GROUP`
+- `NO_GROUP_final_results.html`: report with same info as table below that can be viewed using chrome.
+- `NO_GROUP_final_results.tab`: plasmid info for each sample.
 
 </details>
