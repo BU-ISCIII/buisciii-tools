@@ -319,8 +319,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "IRMA.md",
-      "results_md": "IRMA_output.md"
+      "delivery_md": "irma.md",
+      "results_md": "irma_output.md"
     },
     "blast_nt": {
       "label": "",
