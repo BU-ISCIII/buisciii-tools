@@ -11,7 +11,7 @@ Here, we describe the results from the Assembly pipeline for de novo genome asse
   * *07-kmerfinder_best_hit_Description*: additional descriptions available in fasta file, or in the case of organism databases the identifier lines of fasta files.
   * *07-kmerfinder_best_hit_Expected*: is the expected score, i.e.the expected total number of matching Kmers between query and template (randomly selected).
   * *07-kmerfinder_best_hit_Num*: is the sequence number of accession entry in the KmerFinder database.
-  * *07-kmerfinder_best_hit_Query_Coverage*: is the percentage of input query Kmers that match the template.
+  * *07-kmerfinder_best_hit_Query_Coverage*: is the percentage of input query/reads Kmers that match the template.
   * *07-kmerfinder_best_hit_Score*: is the total number of matching Kmers between the query and the template.
   * *07-kmerfinder_best_hit_Species*: Species name.
   * *07-kmerfinder_best_hit_TAXID*: NCBI's TaxID number of the hit.
