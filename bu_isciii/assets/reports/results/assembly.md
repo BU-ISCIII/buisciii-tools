@@ -17,7 +17,7 @@ Here, we describe the results from the Assembly pipeline for de novo genome asse
   * *07-kmerfinder_best_hit_TAXID*: NCBI's TaxID number of the hit.
   * *07-kmerfinder_best_hit_TAXID Species*: NCBI's species TaxID number of the hit (sometimes bacterial strain or substrain TaxIDs can be given above).
   * *07-kmerfinder_best_hit_Taxonomy*: complete taxonomy of the hit.
-  * *07-kmerfinder_best_hit_Template_Coverage*: is the template coverage.
+  * *07-kmerfinder_best_hit_Template_Coverage*: is the template/genome coverage.
   * *07-kmerfinder_best_hit_Template_length*: is the number of Kmers in the template.
   * *07-kmerfinder_best_hit_p_value*: is the p-value corresponding to the obtained q_value.
   * *07-kmerfinder_best_hit_q_value*: is the quantile in a standard Pearson Chi-square test, to test whether the current template is a significant hit.
