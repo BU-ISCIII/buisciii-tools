@@ -13,8 +13,8 @@
         },
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
-        "delivery_md": "",
-        "results_md": ""
+        "delivery_md": "assets/reports/md/assembly.md",
+        "results_md": "assets/reports/results/assembly.md"
     },
     "mtbseq_assembly": {
         "label": "",
