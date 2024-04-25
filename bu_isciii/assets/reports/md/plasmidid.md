@@ -158,6 +158,7 @@ A summary report consolidating all samples in the analysis is created.
 <summary>Output files description</summary>
 
 `NO_GROUP`
+
 - `NO_GROUP_final_results.html`: report with same info as table below that can be viewed using chrome.
 - `NO_GROUP_final_results.tab`: plasmid info for each sample.
 
