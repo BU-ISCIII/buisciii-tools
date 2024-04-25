@@ -1,25 +1,27 @@
-## mRNAseq
+# mRNAseq (DEG): results
 
 Here we describe the results from the mRNAseq pipeline for transcriptomic analysis and differential gene expression.
 
 > [!WARNING]
 > Some of the files listed here may not be in your  `RESULTS` folder. It will depend on the analysis you requested.
 
-### Alignment and quantification
+## Alignment and quantification
 
 <!--  BU-ISCIII
 TODO: Penging to discuss which generic/common files are going to be reported in `RESULTS`
 -->
-> [!WARNING]: Please note that the files in the RESULTS directory are still pending determination by our administrative team. We are currently discussing which generic/common files will be included in this section to ensure that you receive the most relevant and useful information for your analysis.
+> [!WARNING]
+> Please note that the files in the RESULTS directory are still pending determination by our administrative team. We are currently discussing which generic/common files will be included in this section to ensure that you receive the most relevant and useful information for your analysis.
 
-### Differential expression analysis with DESEQ2
+## Differential expression analysis with DESEQ2
 
 <!--  BU-ISCIII
 TODO: Penging to discuss which generic/common files are going to be reported in `RESULTS`
 -->
-> [!WARNING]: Please note that the files in the RESULTS directory are still pending determination by our administrative team. We are currently discussing which generic/common files will be included in this section to ensure that you receive the most relevant and useful information for your analysis.
+> [!WARNING]
+> Please note that the files in the RESULTS directory are still pending determination by our administrative team. We are currently discussing which generic/common files will be included in this section to ensure that you receive the most relevant and useful information for your analysis.
 
-### Interpretation of Differential Expression Results:
+## Interpretation of Differential Expression Results:
 
 For each comparison conducted, a separate folder has been created, following the naming convention outlined below:
 
@@ -38,7 +40,7 @@ Additionally, the file `normalized_expression.xlsx` contains the normalized expr
 > [!WARNING]
 > Software's versions used in this analysis can be obtained from the  `MultiQC` report.
 
-#### Description of output files
+### Description of output files
 - `<EXPERIMENT>/Differential_expression/DESeq2/Differential_expression.csv`: This file contains the results of the differential expression analysis performed using DESeq2, including information on differentially expressed genes and associated statistical metrics such as fold change, p-values, and adjusted p-values.
 
 - `<EXPERIMENT>/Differential_expression/DESeq2/heatmapCount_top20_differentially_expressed.pdf`: This PDF file presents a heatmap visualization displaying the expression patterns of the top 20 differentially expressed genes, clustered by sample distance, as determined by the DESeq2 analysis.

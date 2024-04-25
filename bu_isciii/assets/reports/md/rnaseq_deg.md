@@ -1,7 +1,7 @@
 <!---
 nf-core/rnaseq tag 3.10.1
 --->
-# mRNAseq: Output
+# mRNAseq (DEG): Output
 
 ## Introduction
 

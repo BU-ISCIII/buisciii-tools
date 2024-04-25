@@ -150,8 +150,8 @@
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
-        "delivery_md": "assets/reports/md/rnaseq.md",
-        "results_md": "assets/reports/results/rnaseq.md"
+        "delivery_md": "assets/reports/md/rnaseq_deg.md",
+        "results_md": "assets/reports/results/rnaseq_deg.md"
     },
     "lowfreq_panel": {
         "label": "",
