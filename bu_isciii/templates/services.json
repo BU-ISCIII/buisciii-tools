@@ -80,8 +80,8 @@
         "files":[]
       },
       "no_copy": ["RAW", "TMP"],
-      "delivery_md": "",
-      "results_md": ""
+      "delivery_md": "assets/reports/md/plasmidid.md",
+      "results_md": "assets/reports/results/plasmidid.md"
   },
     "wgmlst_taranis": {
         "label": "",
