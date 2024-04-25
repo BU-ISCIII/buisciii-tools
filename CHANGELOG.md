@@ -21,7 +21,7 @@ Code contributions to the new version:
 - Added markdown of assembly analysis procedure [#244](https://github.com/BU-ISCIII/buisciii-tools/pull/244)
 - Added output and results markdowns for ExomeEB, ExomeTrio and WGStrio [#249](https://github.com/BU-ISCIII/buisciii-tools/pull/249)
 - Added markdown of assembly results folder [#250](https://github.com/BU-ISCIII/buisciii-tools/pull/250)
-- Updated lablog results filenames where necessary (IRMA, seekndestroy, viralrecon and genomeev) [#252](https://github.com/BU-ISCIII/buisciii-tools/pull/252)
+- Updated lablog results filenames where necessary (IRMA, seekndestroy, viralrecon and genomeev) [#253](https://github.com/BU-ISCIII/buisciii-tools/pull/253)
 
 #### Fixes
 
