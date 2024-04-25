@@ -3,7 +3,7 @@
 Here, we describe the results from the Assembly pipeline for de novo genome assembly and annotation.
 
 * **assemblies**: a symbolic link to the raw reads associated with the resolution.
-* **kmerfinder_summary.csv**: a .csv file containing the main results from kmerfinder.
+* **kmerfinder_summary.csv**: a .csv file containing the main results from kmerfinder. For each sample, you should check that both the best hit and the second hit reported by kmerfinder correspond to the species name indicated by the researcher when requesting the service. If the second hit is associated to a different species, check other metrics like %GC or %genome fraction in the MultiQC report, since this might reveal a contamination in that sample.
   * *sample_name*: sample name.
   * *07-kmerfinder_best_hit_# Assembly*: RefSeq assembly accession ID.
   * *07-kmerfinder_best_hit_Accession Number*: accession number of entry ID in fasta file.
