@@ -13,11 +13,6 @@ Code contributions to the new version:
 ### Template fixes and updates
 
 - Updated documentation and results markdown for viralrecon, pikavirus and MAG [#247](https://github.com/BU-ISCIII/buisciii-tools/pull/247)
-
-### Modules
-
-#### Added enhancements
-
 - Added documentation and results markdown for RNAseq [#248](https://github.com/BU-ISCIII/buisciii-tools/pull/248)
 - Added documentation both output and results for plasmidID[#258](https://github.com/BU-ISCIII/buisciii-tools/pull/258)
 - Added markdown of assembly analysis procedure [#244](https://github.com/BU-ISCIII/buisciii-tools/pull/244)
@@ -31,9 +26,13 @@ Code contributions to the new version:
 
 #### Added enhancements
 
+### Modules
+
+#### Added enhancements
+
 #### Fixes
 
-- Fixed archive module. Updated correct header for scout tsv.
+- Fixed archive module. Updated correct header for scout tsv [#258](https://github.com/BU-ISCIII/buisciii-tools/pull/258).
 
 #### Changed
 
