@@ -1,13 +1,13 @@
-# Viralrecon
+# PlasmidID
 
 This document describes the output produced by the pipeline.
 
 The directories listed below will be created in the analysis directory after the pipeline has finished. All paths are relative to the top-level results directory.
 
-- [Viralrecon](#viralrecon)
+- [PlasmidID](#plasmidid)
   - [Preprocessing](#preprocessing)
   - [Assembly](#assembly)
-  - [PlasmidID](#plasmidid)
+  - [PlasmidID](#plasmidid-1)
     - [Clustering (mash) results](#clustering-mash-results)
     - [Prokka annotation](#prokka-annotation)
     - [Mapping againts found plasmids](#mapping-againts-found-plasmids)
