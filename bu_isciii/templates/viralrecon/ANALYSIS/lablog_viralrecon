@@ -1,6 +1,92 @@
-test_ref=$(cut -f2 samples_ref.txt | head -n1); if [ "$test_ref" == "NC_045512.2" ]; then ANALYSIS_TYPE=AMPLICONS; else ANALYSIS_TYPE=METAGENOMIC; fi
-test_ref=$(cut -f2 samples_ref.txt | head -n1); if [ "$test_ref" == "NC_045512.2" ]; then CONFIG_FILE=../../DOC/viralrecon_sars.config; else CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"; fi
-test_ref=$(cut -f2 samples_ref.txt | head -n1); if [ "$test_ref" == "NC_045512.2" ]; then PARAMS_FILE=../../DOC/viralrecon_sars_params.yml; else PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"; fi
+# module load singularity
+
+# If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
+
+# Setting samples_ref.txt file
+read -p "Is samples_ref.txt file already prepared? [y/n]: " samples_ref_prepared
+if [ "$samples_ref_prepared" == "y" ]; then 
+    echo "File samples_ref.txt READY."
+else
+    echo "File samples_ref NOT prepared."
+    while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" != "y" ]; do
+        read -p "Please specify the host: " host
+        read -p "Please specify the reference: " reference
+        read -p "Are host [$host] and reference [$reference] correct? (y/n): " answer
+    done
+    python3 samples_ref_viralrecon.py $reference $host
+    echo "File samples_ref.txt READY."
+fi
+
+# Preparing the environment for SARS-CoV-2 analysis
+test_ref=$(cut -f2 samples_ref.txt | head -n1)
+if [ "$test_ref" == "NC_045512.2" ]; then
+
+    # Extracting the latest version of Pangolin and Nextclade containers
+    echo "Checking Pangolin and Nextclade container version..."
+    url=$(curl -s "https://depot.galaxyproject.org/singularity/")
+    latest_version_pangolin=$(echo "$url" | grep -oP 'pangolin:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+    latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+    echo "Latest version available of Pangolin: $latest_version_pangolin."
+    echo "Latest version available of Nextclade: $latest_version_nextclade."
+
+    # Checking if latest_version_pangolin downloaded
+    echo "Checking if latest version of Pangolin image is already downloaded..."
+    if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_pangolin" ]; then
+        echo "File $latest_version_pangolin already downloaded."
+        echo "Pangolin database UP TO DATE."
+    else
+        echo "Downloading $latest_version_pangolin file..."
+        wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
+        echo "$latest_version_pangolin file succesfully downloaded."
+        echo "Setting datadir for Pangolin database."
+        cd /data/bi/references/pangolin/
+        mkdir $(date '+%Y%m%d')
+        srun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        echo "Pangolin database UPDATED."
+        cd -
+    fi
+
+    # Checking if latest_version_nextclade downloaded
+    echo "Checking if latest version of Nextclade image is already downloaded..."
+    if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
+        echo "File $latest_version_nextclade already downloaded."
+    else
+        echo "Downloading $latest_version_nextclade file..."
+        wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
+        echo "$latest_version_nextclade file succesfully downloaded."
+    fi
+
+    # Update viralrecon_sars.config file
+    echo "Updating ../DOC/viralrecon_sars.config file..."
+    sed -i \
+        -e "s|pangolin:4.2--pyhdfd78af_1|$latest_version_pangolin|" \
+        -e "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" \
+        -e "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" \
+        "../DOC/viralrecon_sars.config"
+    echo "File ../DOC/viralrecon_sars.config UPDATED."
+
+    # Extracting the current Nextclade data TAG
+    echo "Extracting Nextclade data TAG..."
+    nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
+    echo "Latest SARS-CoV-2 dataset version TAG: $nextclade_tag."
+
+    # Update viralrecon_sars_params.yml file
+    echo "Updating ../DOC/viralrecon_sars_params.yml..."
+    sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "../DOC/viralrecon_sars_params.yml"
+    echo "SARS-CoV-2 TAG in file ../DOC/viralrecon_sars_params.yml UPDATED."
+
+    # Setting work variables
+    ANALYSIS_TYPE=AMPLICONS
+    CONFIG_FILE="../../DOC/viralrecon_sars.config"
+    PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
+
+# Preparing the enviroment for non-SARS-CoV-2 viruses
+else
+    ANALYSIS_TYPE=METAGENOMIC
+    CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
+    PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
+
+fi
 
 mkdir -p 00-reads
 cat samples_ref.txt | cut -f3 | sort -u | while read in; do echo ${in^^}; done > host_list.tmp
