@@ -290,7 +290,7 @@ class BioinfoDoc:
 
         if self.provided_txt:
             with open(os.path.expanduser(self.provided_txt)) as f:
-                self.delivery_notes = " ".join([x.strip() for x in f.readlines()])
+                self.delivery_notes = "\n".join([x.strip() for x in f.readlines()])
         else:
             self.delivery_notes = bu_isciii.utils.ask_for_some_text(
                 msg="Write some delivery notes:"
