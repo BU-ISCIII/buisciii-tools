@@ -21,6 +21,9 @@ Code contributions to the new version:
 - Updated lablog results filenames where necessary (IRMA, seekndestroy, viralrecon and genomeev) [#253](https://github.com/BU-ISCIII/buisciii-tools/pull/253)
 - Added output and results markdowns for cgMLST/wgMLST [#255](https://github.com/BU-ISCIII/buisciii-tools/pull/255)
 - Added markdown for IRMA [#256](https://github.com/BU-ISCIII/buisciii-tools/pull/256)
+- Included RESULTS/lablog for exomeeb, exometrio and wgstrio templates and updated files to clean  [#260](https://github.com/BU-ISCIII/buisciii-tools/pull/260)
+- Changed scratch copy queue to middle_obx
+- Included missing folders in wgstrio template
 
 ### Modules
 

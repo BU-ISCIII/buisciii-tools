@@ -64,4 +64,3 @@ echo "sbatch sarek.sbatch" > _01_run_sarek.sh
 
 echo "srun --partition short_obx --chdir $scratch_dir rm -rf work &" > _02_clean.sh
 echo "srun --partition short_obx --chdir $scratch_dir rm -rf 01-sarek/gatk4/ &" >> _02_clean.sh
-echo "srun --partition short_obx --chdir $scratch_dir rm -rf 01-sarek/preprocessing/markduplicates &" >> _02_clean.sh
