@@ -247,7 +247,7 @@
       "description": "",
       "clean": {
         "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates", "03-annotation/vep", "03-annotation/exomiser"],
-        "files":[]
+        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
@@ -264,7 +264,7 @@
       "description": "",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing"],
-        "files":[]
+        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
@@ -281,7 +281,7 @@
       "description": "",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
-        "files":[]
+        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
