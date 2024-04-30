@@ -95,13 +95,11 @@ if [ "$test_ref" == "NC_045512.2" ]; then
     echo "SARS-CoV-2 TAG in file ../DOC/viralrecon_sars_params.yml UPDATED."
 
     # Setting work variables
-    ANALYSIS_TYPE=AMPLICONS
     CONFIG_FILE="../../DOC/viralrecon_sars.config"
     PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
 
 # Preparing the enviroment for non-SARS-CoV-2 viruses
 else
-    ANALYSIS_TYPE=METAGENOMIC
     CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
     PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
 
