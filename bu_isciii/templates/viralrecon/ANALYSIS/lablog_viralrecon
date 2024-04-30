@@ -3,7 +3,7 @@
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
 # Setting samples_ref.txt file
-read -p "Is samples_ref.txt file already prepared? [y/n]: " samples_ref_prepared
+read -p "Is samples_ref.txt file already prepared? [y/N]: " samples_ref_prepared
 if [ "$samples_ref_prepared" == "y" ]; then 
     echo "File samples_ref.txt READY."
 else
@@ -11,7 +11,7 @@ else
     while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" != "y" ]; do
         read -p "Please specify the host: " host
         read -p "Please specify the reference: " reference
-        read -p "Are host [$host] and reference [$reference] correct? (y/n): " answer
+        read -p "Are host [$host] and reference [$reference] correct? [y/N]: " answer
     done
     python3 samples_ref_viralrecon.py $reference $host
     echo "File samples_ref.txt READY."
