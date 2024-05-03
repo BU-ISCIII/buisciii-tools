@@ -251,8 +251,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "sarek.md",
-      "results_md": "trios.md"
+      "delivery_md": "assets/reports/md/sarek.md",
+      "results_md": "assets/reports/results/trios.md"
     },
     "exomeeb": {
       "label": "",
@@ -268,8 +268,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "sarek.md",
-      "results_md": "exomeeb.md"
+      "delivery_md": "assets/reports/md/sarek.md",
+      "results_md": "assets/reports/results/exomeeb.md"
     },
     "wgstrio": {
       "label": "",
@@ -285,8 +285,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "sarek.md",
-      "results_md": "trios.md"
+      "delivery_md": "assets/reports/md/sarek.md",
+      "results_md": "assets/reports/results/trios.md"
     },
     "freebayes_outbreak": {
       "label": "",
@@ -319,8 +319,8 @@
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
-      "delivery_md": "irma.md",
-      "results_md": "irma_output.md"
+      "delivery_md": "assets/reports/md/irma.md",
+      "results_md": "assets/reports/results/irma_output.md"
     },
     "blast_nt": {
       "label": "",
