@@ -24,6 +24,7 @@ Code contributions to the new version:
 - Included RESULTS/lablog for exomeeb, exometrio and wgstrio templates and updated files to clean  [#260](https://github.com/BU-ISCIII/buisciii-tools/pull/260)
 - Changed scratch copy queue to middle_obx
 - Included missing folders in wgstrio template
+- Changed exomiser-html-description to png format and fixed location of irma-sarek markdowns [#261](https://github.com/BU-ISCIII/buisciii-tools/pull/261)
 
 ### Modules
 
