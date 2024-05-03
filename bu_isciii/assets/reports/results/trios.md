@@ -6,9 +6,9 @@ These file briefly describes the files in `RESULTS/` folder from ExomeTrio and W
 
 This file includes information regarding variant annotation, effect prediction and inheritance typing:
 
-![HTML Description 1](images/exomiser-html-description-1.svg)
+![HTML Description 1](images/exomiser-html-description-1.png)
 
-![HTML Description 2](images/exomiser-html-description-2.svg)
+![HTML Description 2](images/exomiser-html-description-2.png)
 
 ## picard_hsmetrics.csv
 
