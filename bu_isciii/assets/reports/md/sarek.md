@@ -1253,9 +1253,9 @@ These formats are detailed below.
 
 ## HTML
 
-![HTML Description 1](images/exomiser-html-description-1.svg)
+![HTML Description 1](images/exomiser-html-description-1.png)
 
-![HTML Description 2](images/exomiser-html-description-2.svg)
+![HTML Description 2](images/exomiser-html-description-2.png)
 
 ## JSON
 
