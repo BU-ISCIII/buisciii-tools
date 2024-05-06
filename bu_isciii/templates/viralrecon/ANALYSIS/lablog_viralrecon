@@ -65,9 +65,17 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
         sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
         echo "File ../DOC/viralrecon_metagenomic.config UPDATED."
 
+        # Extracting the current Nextclade data TAG
+        echo "Extracting Nextclade data TAG..."
+        nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
+        echo "Latest Nextclade dataset version TAG: $nextclade_tag."
+
         # Updating params file
         echo "Updating ../DOC/viralrecon_metagenomic_params.yml file..."
         sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
+        echo "nextclade_dataset_name: 'mpox'" >> $PARAMS_FILE
+        echo "nextclade_dataset: false" >> $PARAMS_FILE
+        echo "nextclade_dataset_tag: '$nextclade_tag'" >> $PARAMS_FILE
         echo "File ../DOC/viralrecon_metagenomic_params.yml UPDATED."
 
 
