@@ -60,6 +60,16 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
             echo "$latest_version_nextclade file succesfully downloaded."
         fi
 
+        # Updating config file
+        echo "Updating ../DOC/viralrecon_metagenomic.config file..."
+        sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
+        echo "File ../DOC/viralrecon_metagenomic.config UPDATED."
+
+        # Updating params file
+        echo "Updating ../DOC/viralrecon_metagenomic_params.yml file..."
+        sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
+        echo "File ../DOC/viralrecon_metagenomic_params.yml UPDATED."
+
 
 # Preparing the environment for SARS-CoV-2 analysis
 test_ref=$(cut -f2 samples_ref.txt | head -n1)
