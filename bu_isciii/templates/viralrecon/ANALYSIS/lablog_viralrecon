@@ -8,11 +8,11 @@ echo 1. METAGENOMICS
 echo 2. AMPLICONS
 while true; do
     read ANALYSIS_TYPE
-    if [ "$ANALYSIS_TYPE" = "1" ]; then
+    if [ "$ANALYSIS_TYPE" == "1" ]; then
         ANALYSIS_TYPE="METAGENOMIC"
         echo "You selected $ANALYSIS_TYPE analysis."
         break
-    elif [ "$ANALYSIS_TYPE" = "2" ]; then
+    elif [ "$ANALYSIS_TYPE" == "2" ]; then
         ANALYSIS_TYPE="AMPLICONS"
         echo "You selected $ANALYSIS_TYPE analysis."
         break
