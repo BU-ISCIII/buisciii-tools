@@ -3,7 +3,7 @@
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
 # Setting the type of analysis
-echo Please specify the type of analisys.
+echo Please specify the type of analysis.
 echo 1. METAGENOMICS
 echo 2. AMPLICONS
 while true; do
