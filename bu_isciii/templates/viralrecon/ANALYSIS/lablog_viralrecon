@@ -36,6 +36,31 @@ else
     echo "File samples_ref.txt READY."
 fi
 
+
+# Preparing enviroment for METAGENOMIC analysis
+if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
+    CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
+    PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
+    read -p "Do the sequences correspond to monkeypox virus (MPV)? [y/N]: " monkeypox
+    if [ "$monkeypox" == "y" ]; then
+
+        # Extracting the latest version of Nextclade container
+        echo "Checking Nextclade container version..."
+        url=$(curl -s "https://depot.galaxyproject.org/singularity/")
+        latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+        echo "Latest version available of Nextclade: $latest_version_nextclade."
+
+        # Checking if latest_version_nextclade downloaded
+        echo "Checking if latest version of Nextclade image is already downloaded..."
+        if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
+            echo "File $latest_version_nextclade already downloaded."
+        else
+            echo "Downloading $latest_version_nextclade file..."
+            wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
+            echo "$latest_version_nextclade file succesfully downloaded."
+        fi
+
+
 # Preparing the environment for SARS-CoV-2 analysis
 test_ref=$(cut -f2 samples_ref.txt | head -n1)
 if [ "$test_ref" == "NC_045512.2" ]; then
