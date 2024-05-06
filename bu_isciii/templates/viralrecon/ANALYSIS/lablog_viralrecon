@@ -77,6 +77,8 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
         echo "nextclade_dataset: false" >> $PARAMS_FILE
         echo "nextclade_dataset_tag: '$nextclade_tag'" >> $PARAMS_FILE
         echo "File ../DOC/viralrecon_metagenomic_params.yml UPDATED."
+    fi
+fi
 
 
 # Preparing the environment for SARS-CoV-2 analysis
