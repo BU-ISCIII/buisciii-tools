@@ -39,6 +39,8 @@ fi
 
 # Preparing enviroment for METAGENOMIC analysis
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
+
+    # Setting work variables
     CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
     PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
 
@@ -111,6 +113,10 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
     # Preparing the environment for SARS-CoV-2 analysis
     if [ "$virus_ref" == "SARS-CoV-2" ]; then
 
+        # Setting work variables
+        CONFIG_FILE="../../DOC/viralrecon_sars.config"
+        PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
+
         # Extracting the latest version of Pangolin and Nextclade containers
         echo "Checking Pangolin and Nextclade container version..."
         url=$(curl -s "https://depot.galaxyproject.org/singularity/")
@@ -164,10 +170,6 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         echo "Updating ../DOC/viralrecon_sars_params.yml..."
         sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "../DOC/viralrecon_sars_params.yml"
         echo "SARS-CoV-2 TAG in file ../DOC/viralrecon_sars_params.yml UPDATED."
-
-        # Setting work variables
-        CONFIG_FILE="../../DOC/viralrecon_sars.config"
-        PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
 
 fi
 
