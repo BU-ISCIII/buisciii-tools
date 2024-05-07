@@ -109,8 +109,7 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
     done
 
     # Preparing the environment for SARS-CoV-2 analysis
-    test_ref=$(cut -f2 samples_ref.txt | head -n1)
-    if [ "$test_ref" == "NC_045512.2" ]; then
+    if [ "$virus_ref" == "SARS-CoV-2" ]; then
 
         # Extracting the latest version of Pangolin and Nextclade containers
         echo "Checking Pangolin and Nextclade container version..."
