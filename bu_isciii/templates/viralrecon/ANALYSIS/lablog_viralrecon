@@ -171,6 +171,20 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "../DOC/viralrecon_sars_params.yml"
         echo "SARS-CoV-2 TAG in file ../DOC/viralrecon_sars_params.yml UPDATED."
 
+    elif [ "$virus_ref" == "RSV" ]; then
+
+        # Setting work variables
+        CONFIG_FILE="../../DOC/viralrecon_rsv.config"
+        PARAMS_FILE="../../DOC/viralrecon_rsv_params.yml"
+
+    else
+
+        # Setting work variables
+        CONFIG_FILE="../../DOC/viralrecon_amplicons.config"
+        PARAMS_FILE="../../DOC/viralrecon_amplicons_params.yml"
+
+    fi
+
 fi
 
 mkdir -p 00-reads
