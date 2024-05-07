@@ -170,11 +170,6 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         CONFIG_FILE="../../DOC/viralrecon_sars.config"
         PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
 
-# Preparing the enviroment for non-SARS-CoV-2 viruses
-else
-    CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
-    PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
-
 fi
 
 mkdir -p 00-reads
