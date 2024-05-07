@@ -82,6 +82,31 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
     fi
 fi
 
+# Preparing enviroment for AMPLICONS analysis
+if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
+
+    echo Please specify the organism to which the sequences correspond.
+    echo 1. SARS-CoV-2
+    echo 2. RSV
+    echo 3. Other
+    while true; do
+        read virus_ref
+        if [ "$virus_ref" == "1" ]; then
+            virus_ref="SARS-CoV-2"
+            echo "You selected $virus_ref virus."
+            break
+        elif [ "$virus_ref" == "2" ]; then
+            virus_ref="RSV"
+            echo "You selected $virus_ref virus."
+            break
+        elif [ "$virus_ref" == "3" ]; then
+            virus_ref="Other"
+            echo "You selected $virus_ref virus."
+            break
+        else
+            echo "Invalid input. Please select a valid number"
+        fi
+    done
 
 # Preparing the environment for SARS-CoV-2 analysis
 test_ref=$(cut -f2 samples_ref.txt | head -n1)
