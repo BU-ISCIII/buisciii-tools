@@ -2,6 +2,53 @@
 
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
+# Defining functions for updating Pangolin and Nextclade
+
+update_pangolin() {
+    echo "Checking Pangolin container version..."
+    url=$(curl -s "https://depot.galaxyproject.org/singularity/")
+    latest_version_pangolin=$(echo "$url" | grep -oP 'pangolin:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+    echo "Latest version available of Pangolin: $latest_version_pangolin."
+
+    echo "Checking if latest version of Pangolin image is already downloaded..."
+    if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_pangolin" ]; then
+        echo "File $latest_version_pangolin already downloaded."
+        echo "Pangolin database UP TO DATE."
+    else
+        echo "Downloading $latest_version_pangolin file..."
+        wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
+        echo "$latest_version_pangolin file succesfully downloaded."
+        echo "Setting datadir for Pangolin database."
+        cd /data/bi/references/pangolin/
+        mkdir "$(date '+%Y%m%d')"
+        srun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        echo "Pangolin database UPDATED."
+        cd -
+    fi
+}
+
+update_nextclade() {
+    echo "Checking Nextclade container version..."
+    url=$(curl -s "https://depot.galaxyproject.org/singularity/")
+    latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+    echo "Latest version available of Nextclade: $latest_version_nextclade."
+
+    echo "Checking if latest version of Nextclade image is already downloaded..."
+    if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
+        echo "File $latest_version_nextclade already downloaded."
+    else
+        echo "Downloading $latest_version_nextclade file..."
+        wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
+        echo "$latest_version_nextclade file succesfully downloaded."
+    fi
+
+    # Extracting the current Nextclade data TAG
+    echo "Extracting Nextclade data TAG..."
+    nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
+    echo "Latest Nextclade dataset version TAG: $nextclade_tag."
+}
+
+
 # Setting the type of analysis
 echo Please specify the type of analysis.
 echo 1. METAGENOMICS
@@ -48,31 +95,13 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
     read -p "Do the sequences correspond to monkeypox virus (MPV)? [y/N]: " monkeypox
     if [ "$monkeypox" == "y" ]; then
 
-        # Extracting the latest version of Nextclade container
-        echo "Checking Nextclade container version..."
-        url=$(curl -s "https://depot.galaxyproject.org/singularity/")
-        latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-        echo "Latest version available of Nextclade: $latest_version_nextclade."
-
-        # Checking if latest_version_nextclade downloaded
-        echo "Checking if latest version of Nextclade image is already downloaded..."
-        if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
-            echo "File $latest_version_nextclade already downloaded."
-        else
-            echo "Downloading $latest_version_nextclade file..."
-            wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
-            echo "$latest_version_nextclade file succesfully downloaded."
-        fi
+        # Update Nextclade
+        update_nextclade
 
         # Updating config file
         echo "Updating ../DOC/viralrecon_metagenomic.config file..."
         sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
         echo "File ../DOC/viralrecon_metagenomic.config UPDATED."
-
-        # Extracting the current Nextclade data TAG
-        echo "Extracting Nextclade data TAG..."
-        nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
-        echo "Latest Nextclade dataset version TAG: $nextclade_tag."
 
         # Updating params file
         echo "Updating ../DOC/viralrecon_metagenomic_params.yml file..."
@@ -117,40 +146,9 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         CONFIG_FILE="../../DOC/viralrecon_sars.config"
         PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
 
-        # Extracting the latest version of Pangolin and Nextclade containers
-        echo "Checking Pangolin and Nextclade container version..."
-        url=$(curl -s "https://depot.galaxyproject.org/singularity/")
-        latest_version_pangolin=$(echo "$url" | grep -oP 'pangolin:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-        latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-        echo "Latest version available of Pangolin: $latest_version_pangolin."
-        echo "Latest version available of Nextclade: $latest_version_nextclade."
-
-        # Checking if latest_version_pangolin downloaded
-        echo "Checking if latest version of Pangolin image is already downloaded..."
-        if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_pangolin" ]; then
-            echo "File $latest_version_pangolin already downloaded."
-            echo "Pangolin database UP TO DATE."
-        else
-            echo "Downloading $latest_version_pangolin file..."
-            wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
-            echo "$latest_version_pangolin file succesfully downloaded."
-            echo "Setting datadir for Pangolin database."
-            cd /data/bi/references/pangolin/
-            mkdir $(date '+%Y%m%d')
-            srun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
-            echo "Pangolin database UPDATED."
-            cd -
-        fi
-
-        # Checking if latest_version_nextclade downloaded
-        echo "Checking if latest version of Nextclade image is already downloaded..."
-        if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
-            echo "File $latest_version_nextclade already downloaded."
-        else
-            echo "Downloading $latest_version_nextclade file..."
-            wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
-            echo "$latest_version_nextclade file succesfully downloaded."
-        fi
+        # Update Nextclade and Pangolin
+        update_nextclade
+        update_pangolin
 
         # Update viralrecon_sars.config file
         echo "Updating $CONFIG_FILE file..."
@@ -160,11 +158,6 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
             -e "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" \
             "$CONFIG_FILE"
         echo "File $CONFIG_FILE UPDATED."
-
-        # Extracting the current Nextclade data TAG
-        echo "Extracting Nextclade data TAG..."
-        nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
-        echo "Latest SARS-CoV-2 dataset version TAG: $nextclade_tag."
 
         # Update viralrecon_sars_params.yml file
         echo "Updating $PARAMS_FILE file..."
