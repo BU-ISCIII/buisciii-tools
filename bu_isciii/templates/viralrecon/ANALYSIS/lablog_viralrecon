@@ -22,13 +22,19 @@ update_pangolin() {
         echo "Downloading $latest_version_pangolin file..."
         wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
         echo "$latest_version_pangolin file succesfully downloaded."
-        echo "Setting datadir for Pangolin database."
-        cd /data/bi/references/pangolin/
+    fi
+
+    # Updating Pangolin database
+    echo "Setting datadir for Pangolin database."
+    cd /data/bi/references/pangolin/
+    if [ -e "./$(date '+%Y%m%d')" ]; then
+        echo "Pangolin database is UP TO DATE"
+    else
         mkdir "$(date '+%Y%m%d')"
         srun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
         echo "Pangolin database UPDATED."
-        cd -
     fi
+    cd -
 
     # Updating config file
     echo "Updating $CONFIG_FILE file..."
