@@ -99,17 +99,17 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
         update_nextclade
 
         # Updating config file
-        echo "Updating ../DOC/viralrecon_metagenomic.config file..."
+        echo "Updating $CONFIG_FILE file..."
         sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
-        echo "File ../DOC/viralrecon_metagenomic.config UPDATED."
+        echo "File $CONFIG_FILE UPDATED."
 
         # Updating params file
-        echo "Updating ../DOC/viralrecon_metagenomic_params.yml file..."
+        echo "Updating $PARAMS_FILE file..."
         sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
         echo "nextclade_dataset_name: 'mpox'" >> $PARAMS_FILE
         echo "nextclade_dataset: false" >> $PARAMS_FILE
         echo "nextclade_dataset_tag: '$nextclade_tag'" >> $PARAMS_FILE
-        echo "File ../DOC/viralrecon_metagenomic_params.yml UPDATED."
+        echo "File $PARAMS_FILE UPDATED."
     fi
 fi
 
