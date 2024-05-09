@@ -25,6 +25,13 @@ update_pangolin() {
         echo "Pangolin database UPDATED."
         cd -
     fi
+
+    # Updating config file
+    echo "Updating $CONFIG_FILE file..."
+    sed -i "s|pangolin:4.2--pyhdfd78af_1|$latest_version_pangolin|" "$CONFIG_FILE"
+    sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
+    echo "File $CONFIG_FILE UPDATED."
+
 }
 
 update_nextclade() {
@@ -46,6 +53,16 @@ update_nextclade() {
     echo "Extracting Nextclade data TAG..."
     nextclade_tag=$(curl -s "https://github.com/nextstrain/nextclade_data/tags" | grep "chore: release" | head -n 1 | cut -d ' ' -f12)
     echo "Latest Nextclade dataset version TAG: $nextclade_tag."
+
+    # Updating config file
+    echo "Updating $CONFIG_FILE file..."
+    sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
+    echo "File $CONFIG_FILE UPDATED."
+
+    # Updating params file
+    echo "Updating $PARAMS_FILE file..."
+    sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "$PARAMS_FILE"
+    echo "File $PARAMS_FILE UPDATED."
 }
 
 
@@ -98,11 +115,6 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
         # Update Nextclade
         update_nextclade
 
-        # Updating config file
-        echo "Updating $CONFIG_FILE file..."
-        sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
-        echo "File $CONFIG_FILE UPDATED."
-
         # Updating params file
         echo "Updating $PARAMS_FILE file..."
         sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
@@ -150,25 +162,14 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         update_nextclade
         update_pangolin
 
-        # Update viralrecon_sars.config file
-        echo "Updating $CONFIG_FILE file..."
-        sed -i \
-            -e "s|pangolin:4.2--pyhdfd78af_1|$latest_version_pangolin|" \
-            -e "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" \
-            -e "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" \
-            "$CONFIG_FILE"
-        echo "File $CONFIG_FILE UPDATED."
-
-        # Update viralrecon_sars_params.yml file
-        echo "Updating $PARAMS_FILE file..."
-        sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "$PARAMS_FILE"
-        echo "SARS-CoV-2 TAG in file $PARAMS_FILE UPDATED."
-
     elif [ "$virus_ref" == "RSV" ]; then
 
         # Setting work variables
         CONFIG_FILE="../../DOC/viralrecon_rsv.config"
         PARAMS_FILE="../../DOC/viralrecon_rsv_params.yml"
+        
+        # Update Nextclade
+        update_nextclade
 
     else
 
