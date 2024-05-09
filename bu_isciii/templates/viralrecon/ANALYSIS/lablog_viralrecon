@@ -32,6 +32,11 @@ update_pangolin() {
     sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
     echo "File $CONFIG_FILE UPDATED."
 
+    # Updating params file
+    echo "Updating $PARAMS_FILE file..."
+    sed -i "s|skip_pangolin: true|skip_pangolin: false|" "$PARAMS_FILE"
+    echo "File $PARAMS_FILE UPDATED."
+
 }
 
 update_nextclade() {
@@ -61,7 +66,10 @@ update_nextclade() {
 
     # Updating params file
     echo "Updating $PARAMS_FILE file..."
-    sed -i "s|2023-03-16T12:00:00Z|$nextclade_tag|" "$PARAMS_FILE"
+    sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
+    echo "nextclade_dataset_name: '$virus_tag'" >> $PARAMS_FILE
+    echo "nextclade_dataset: false" >> $PARAMS_FILE
+    echo "nextclade_dataset_tag: '$nextclade_tag'" >> $PARAMS_FILE
     echo "File $PARAMS_FILE UPDATED."
 }
 
@@ -112,21 +120,17 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
     read -p "Do the sequences correspond to monkeypox virus (MPV)? [y/N]: " monkeypox
     if [ "$monkeypox" == "y" ]; then
 
+        virus_tag='mpox'
         # Update Nextclade
         update_nextclade
 
-        # Updating params file
-        echo "Updating $PARAMS_FILE file..."
-        sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
-        echo "nextclade_dataset_name: 'mpox'" >> $PARAMS_FILE
-        echo "nextclade_dataset: false" >> $PARAMS_FILE
-        echo "nextclade_dataset_tag: '$nextclade_tag'" >> $PARAMS_FILE
-        echo "File $PARAMS_FILE UPDATED."
     fi
 fi
 
 # Preparing enviroment for AMPLICONS analysis
 if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
+
+    sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
     echo Please specify the organism to which the sequences correspond.
     echo 1. SARS-CoV-2
@@ -158,9 +162,12 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         CONFIG_FILE="../../DOC/viralrecon_sars.config"
         PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
 
+        virus_tag='sars-cov-2'
         # Update Nextclade and Pangolin
         update_nextclade
         update_pangolin
+
+        echo "primer_bed: '/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4.1/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
 
     elif [ "$virus_ref" == "RSV" ]; then
 
@@ -170,6 +177,8 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
         
         # Update Nextclade
         update_nextclade
+        sed -i '/^nextclade_dataset_name/d' $PARAMS_FILE
+        sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
 
     else
 
