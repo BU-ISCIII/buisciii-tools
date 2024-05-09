@@ -2,6 +2,10 @@
 
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
+# Setting work variables
+CONFIG_FILE="../../DOC/viralrecon.config"
+PARAMS_FILE="../../DOC/viralrecon_params.yml"
+
 # Defining functions for updating Pangolin and Nextclade
 
 update_pangolin() {
@@ -112,10 +116,6 @@ fi
 # Preparing enviroment for METAGENOMIC analysis
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
-    # Setting work variables
-    CONFIG_FILE="../../DOC/viralrecon_metagenomic.config"
-    PARAMS_FILE="../../DOC/viralrecon_metagenomic_params.yml"
-
     # Nextclade is able to analyze monkeypox virus
     read -p "Do the sequences correspond to monkeypox virus (MPV)? [y/N]: " monkeypox
     if [ "$monkeypox" == "y" ]; then
@@ -125,10 +125,9 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
         update_nextclade
 
     fi
-fi
 
 # Preparing enviroment for AMPLICONS analysis
-if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
+else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
@@ -157,11 +156,6 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
 
     # Preparing the environment for SARS-CoV-2 analysis
     if [ "$virus_ref" == "SARS-CoV-2" ]; then
-
-        # Setting work variables
-        CONFIG_FILE="../../DOC/viralrecon_sars.config"
-        PARAMS_FILE="../../DOC/viralrecon_sars_params.yml"
-
         virus_tag='sars-cov-2'
         # Update Nextclade and Pangolin
         update_nextclade
@@ -169,23 +163,17 @@ if [ "$ANALYSIS_TYPE" = "AMPLICONS" ]; then
 
         echo "primer_bed: '/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4.1/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
 
-    elif [ "$virus_ref" == "RSV" ]; then
-
-        # Setting work variables
-        CONFIG_FILE="../../DOC/viralrecon_rsv.config"
-        PARAMS_FILE="../../DOC/viralrecon_rsv_params.yml"
-        
+    elif [ "$virus_ref" == "RSV" ]; then       
         # Update Nextclade
         update_nextclade
         sed -i '/^nextclade_dataset_name/d' $PARAMS_FILE
         sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
 
+        echo "Remember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline"
+
     else
-
-        # Setting work variables
-        CONFIG_FILE="../../DOC/viralrecon_amplicons.config"
-        PARAMS_FILE="../../DOC/viralrecon_amplicons_params.yml"
-
+        echo "primer_bed: '../REFERENCES/XXXX'" >> $PARAMS_FILE
+        echo "Remember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline"
     fi
 
 fi
@@ -231,6 +219,10 @@ do
         echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --gff ${REF_GFF} \\\\" >> ${FOLDER_NAME}/lablog
+        if [ $virus_ref == 'RSV' ]; then
+            echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
+            echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
+            echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
         echo "          -resume" >> ${FOLDER_NAME}/lablog
         printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
