@@ -161,13 +161,14 @@ read -p "Is samples_ref.txt file already prepared? [y/N]: " samples_ref_prepared
 if [ "$samples_ref_prepared" == "y" ]; then 
     echo "File samples_ref.txt READY."
 else
+    : > samples_ref.txt
     echo "File samples_ref NOT prepared."
-    while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" != "y" ]; do
+    while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
         read -p "Please specify the host: " host
         read -p "Please specify the reference: " reference
-        read -p "Are host [$host] and reference [$reference] correct? [y/N]: " answer
+        read -p "Are host [${host^^}] and reference [$reference] correct? [Y/n]: " answer
     done
-    python3 samples_ref_viralrecon.py $reference $host
+    while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
     echo "File samples_ref.txt READY."
 fi
 
@@ -238,7 +239,7 @@ else
 fi
 
 mkdir -p 00-reads
-cat samples_ref.txt | cut -f3 | sort -u | while read in; do echo ${in^^}; done > host_list.tmp
+cat samples_ref.txt | cut -f3 | sort -u | while read in; do echo ${in}; done > host_list.tmp
 i=1; cat host_list.tmp | while read in
 do
     FOLDER_NAME=$(echo $(date '+%Y%m%d')_ANALYSIS0${i}_${ANALYSIS_TYPE}_${in})
