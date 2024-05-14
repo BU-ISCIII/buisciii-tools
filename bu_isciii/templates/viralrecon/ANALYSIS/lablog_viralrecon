@@ -86,7 +86,7 @@ update_nextclade() {
     echo "File $PARAMS_FILE UPDATED."
 }
 
-# 
+# Checks if fasta and gff references are downloaded. If not, it downloades them (and create family folder if neccesary)
 check_references() {
     echo "Processing reference: ${ref}."
 
