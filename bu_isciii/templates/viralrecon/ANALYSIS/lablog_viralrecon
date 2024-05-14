@@ -2,12 +2,15 @@
 
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
-# Setting work variables
-CONFIG_FILE="../../DOC/viralrecon.config"
-PARAMS_FILE="../../DOC/viralrecon_params.yml"
-
-
+####################################
 # Defining functions
+
+# Coloring messages
+echo_bold() { echo -e "\e[1;37m$1\e[0m"; }
+echo_red() { echo -e "\e[1;31m$1\e[0m"; }
+echo_green() { echo -e "\e[1;32m$1\e[0m"; }
+echo_blinking_red() { echo -e "\e[1;5;97;5;41m$1\e[0m"; }
+
 
 # Updating pangolin. Checks last image available and if is already downloaded. If not, downloads it. This function also updates pangolin database. Update related config files with pangolin info
 update_pangolin() {
@@ -136,6 +139,11 @@ check_references() {
 
     unset family
 }
+####################################
+
+# Setting work variables
+CONFIG_FILE="../../DOC/viralrecon.config"
+PARAMS_FILE="../../DOC/viralrecon_params.yml"
 
 # Setting the type of analysis
 echo Please specify the type of analysis.
