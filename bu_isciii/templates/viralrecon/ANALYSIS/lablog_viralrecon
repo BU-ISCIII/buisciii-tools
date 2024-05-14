@@ -6,8 +6,10 @@
 CONFIG_FILE="../../DOC/viralrecon.config"
 PARAMS_FILE="../../DOC/viralrecon_params.yml"
 
-# Defining functions for updating Pangolin and Nextclade
 
+# Defining functions
+
+# Updating pangolin. Checks last image available and if is already downloaded. If not, downloads it. This function also updates pangolin database. Update related config files with pangolin info
 update_pangolin() {
     echo "Checking Pangolin container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
@@ -49,6 +51,7 @@ update_pangolin() {
 
 }
 
+# Updating Nextclade. Checks last image available and if is already downloaded. If not, downloads it. Update related config files with nextclade info
 update_nextclade() {
     echo "Checking Nextclade container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
@@ -83,6 +86,56 @@ update_nextclade() {
     echo "File $PARAMS_FILE UPDATED."
 }
 
+# 
+check_references() {
+    echo "Processing reference: ${ref}."
+
+    # Obtaining family information
+    obtain_family() {
+        organism_id=$(curl -s "https://www.ncbi.nlm.nih.gov/nuccore/${ref}" | grep -o 'ORGANISM=[0-9]\+' | head -n 1 | awk -F '=' '{print $2}')
+        family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'TITLE="family">.*<' | awk -F 'TITLE="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
+        if [ -z $family ]; then
+            family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
+        fi
+        echo "Reference $ref organism belongs to $family family."
+    }
+
+    # Check if FASTA sequence is already downloaded
+    REF_FASTA=$(find . -maxdepth 2 -type f -name "${ref}.fa*")
+    if [ -z $REF_FASTA ]; then
+        obtain_family
+        if [ ! -e "./$family" ]; then
+            echo Creating new directory: /data/bi/references/virus/${family}/
+            mkdir ./${family}/
+        else
+            echo "Directory /data/bi/references/virus/${family}/ ALREADY EXISTS."
+        fi
+        echo "Downloading ${ref}.fasta file..."
+        wget -q -O "./${family}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+        REF_FASTA="/data/bi/references/virus/${family}/${ref}.fasta"
+        echo "File ${ref}.fasta downloaded in $REF_FASTA."
+    else
+        echo "File ${ref}.fasta is ALREADY available in $REF_FASTA."
+    fi
+
+    # Check if GFF file is already downloaded
+    REF_GFF=$(find . -maxdepth 2 -type f -name "${ref}.gff*")
+    if [ -z $REF_GFF ]; then
+        if [ ! -v family ]; then obtain_family; fi
+        if [ ! -e "./$family" ]; then
+            echo Creating new directory: /data/bi/references/virus/${family}/
+            mkdir ./${family}/
+        fi
+        echo "Downloading ${ref}.gff file..."
+        wget -q -O "./${family}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+        REF_GFF="/data/bi/references/virus/${family}/${ref}.gff"
+        echo "File ${ref}.gff downloaded in $REF_GFF."
+    else
+        echo "File ${ref}.gff is ALREADY available in $REF_GFF."
+    fi
+
+    unset family
+}
 
 # Setting the type of analysis
 echo Please specify the type of analysis.
@@ -206,8 +259,7 @@ do
         do
             arr=($samples); echo "${arr[0]},00-reads/${arr[0]}_R1.fastq.gz,00-reads/${arr[0]}_R2.fastq.gz" >> ${FOLDER_NAME}/samplesheet_${ref}.csv
         done
-        REF_FASTA=$(find /data/bi/references/virus/ -name ${ref}.fasta)
-        REF_GFF=$(find /data/bi/references/virus/ -name ${ref}.gff)
+        check_references
         echo "cat <<EOF > ${ref}_viralrecon.sbatch" >> ${FOLDER_NAME}/lablog
         echo "#!/bin/sh" >> ${FOLDER_NAME}/lablog
         echo "#SBATCH --ntasks 1" >> ${FOLDER_NAME}/lablog
