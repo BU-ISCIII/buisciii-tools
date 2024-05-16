@@ -25,7 +25,6 @@ Code contributions to the new version:
 - Changed scratch copy queue to middle_obx
 - Included missing folders in wgstrio template
 - Changed exomiser-html-description to png format and fixed location of irma-sarek markdowns [#261](https://github.com/BU-ISCIII/buisciii-tools/pull/261)
-- Updated configuration.json so that either idx or obx is used in case one of these queues is full [#262](https://github.com/BU-ISCIII/buisciii-tools/pull/262)
 
 ### Modules
 
