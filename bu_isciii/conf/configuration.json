@@ -54,7 +54,7 @@
         ],
         "scratch_path": "/scratch/bi/",
         "srun_settings": {
-            "--partition": "middle_obx",
+            "--partition": "middle_idx,middle_obx",
             "--time": "24:00:00",
             "--chdir": "/scratch/bi/"
         }
