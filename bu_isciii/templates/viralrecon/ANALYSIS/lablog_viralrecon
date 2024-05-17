@@ -107,7 +107,7 @@ check_references() {
     REF_FASTA=$(find . -maxdepth 2 -type f -name "${ref}.fa*")
     if [ -z $REF_FASTA ]; then
         obtain_family
-        if [ ! -e "./$family" ]; then
+        if [ ! -e "./$family" ]; then # Check if directory doesn't exists
             echo Creating new directory: /data/bi/references/virus/${family}/
             mkdir ./${family}/
         else
@@ -115,8 +115,12 @@ check_references() {
         fi
         echo "Downloading ${ref}.fasta file..."
         wget -q -O "./${family}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
-        REF_FASTA="/data/bi/references/virus/${family}/${ref}.fasta"
-        echo "File ${ref}.fasta downloaded in $REF_FASTA."
+        if [ $? -eq 0 ]; then
+            REF_FASTA="/data/bi/references/virus/${family}/${ref}.fasta"
+            echo "File ${ref}.fasta downloaded in $REF_FASTA."
+        else
+            echo "An error occurred during file downloading."
+        fi
     else
         echo "File ${ref}.fasta is ALREADY available in $REF_FASTA."
     fi
@@ -131,8 +135,12 @@ check_references() {
         fi
         echo "Downloading ${ref}.gff file..."
         wget -q -O "./${family}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
-        REF_GFF="/data/bi/references/virus/${family}/${ref}.gff"
-        echo "File ${ref}.gff downloaded in $REF_GFF."
+        if [ $? -eq 0 ]; then
+            REF_GFF="/data/bi/references/virus/${family}/${ref}.gff"
+            echo "File ${ref}.gff downloaded in $REF_GFF."
+        else
+            echo "An error occurred during file downloading."
+        fi
     else
         echo "File ${ref}.gff is ALREADY available in $REF_GFF."
     fi
