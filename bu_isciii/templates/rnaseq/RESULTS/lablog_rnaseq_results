@@ -2,7 +2,7 @@ DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
 
 mkdir $DELIVERY_FOLDER
 
-# Assembly service
+# RNASEQ service
 cd $DELIVERY_FOLDER
 
 # Links to reports
