@@ -172,9 +172,9 @@ else
     : > samples_ref.txt
     echo "File samples_ref NOT prepared."
     while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
-        read -p "Please specify the host: " host
-        read -p "Please specify the reference: " reference
-        read -p "Are host [${host^^}] and reference [$reference] correct? [Y/n]: " answer
+        read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
+        read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
+        read -p $'\e[1;37mAre host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] and reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] correct? [Y/n]: ' answer
     done
     while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
     echo "File samples_ref.txt READY."
