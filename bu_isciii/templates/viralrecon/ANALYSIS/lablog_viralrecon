@@ -27,7 +27,7 @@ update_pangolin() {
         echo -e "Pangolin container is UP TO DATE. \xE2\x9C\x85"
     else
         echo "Downloading $latest_version_pangolin file..."
-        wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
+        wget -P "/data/bi/pipelines/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
         if [ $? -eq 0 ]; then
             echo_green "$latest_version_pangolin file succesfully downloaded."
         else
@@ -77,7 +77,7 @@ update_nextclade() {
         echo -e "Nexctlade container is UP TO DATE. \xE2\x9C\x85"
     else
         echo "Downloading $latest_version_nextclade file..."
-        wget -P "/data/bi/scratch_tmp/bi/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
+        wget -P "/data/bi/pipelines/singularity-images" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
         if [ $? -eq 0 ]; then
             echo_green "$latest_version_nextclade file succesfully downloaded."
         else
