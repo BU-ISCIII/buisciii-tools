@@ -1,0 +1,9 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+
+mkdir $DELIVERY_FOLDER
+
+# Assembly service
+cd $DELIVERY_FOLDER
+
+# Links to reports
+ln -s ../../../ANALYSIS/*RNASEQ/*rnaseq/multiqc/star_salmon/multiqc_report.html .
