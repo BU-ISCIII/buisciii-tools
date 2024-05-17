@@ -161,11 +161,11 @@ while true; do
     read ANALYSIS_TYPE
     if [ "$ANALYSIS_TYPE" == "1" ]; then
         ANALYSIS_TYPE="METAGENOMIC"
-        echo "You selected $ANALYSIS_TYPE analysis."
+        echo "$ANALYSIS_TYPE analysis selected."
         break
     elif [ "$ANALYSIS_TYPE" == "2" ]; then
         ANALYSIS_TYPE="AMPLICONS"
-        echo "You selected $ANALYSIS_TYPE analysis."
+        echo "$ANALYSIS_TYPE analysis selected."
         break
     else
         echo "Invalid input. Please enter 1 or 2."
@@ -223,7 +223,7 @@ else
             break
         elif [ "$virus_ref" == "3" ]; then
             virus_ref="Other"
-            echo "You selected $virus_ref virus."
+            echo "$virus_ref virus selected."
             break
         else
             echo "Invalid input. Please select a valid number"
