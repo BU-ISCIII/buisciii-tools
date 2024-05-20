@@ -123,17 +123,17 @@ check_references() {
     }
 
     # Check if FASTA sequence is already downloaded
-    REF_FASTA=$(find . -maxdepth 2 -type f -name "${ref}.fa*")
+    REF_FASTA=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.fa*")
     if [ -z $REF_FASTA ]; then
         obtain_family
-        if [ ! -e "./$family" ]; then # Check if directory doesn't exists
+        if [ ! -e "/data/bi/references/virus/$family" ]; then # Check if directory doesn't exists
             echo "Creating new directory: /data/bi/references/virus/${family}/"
-            mkdir ./${family}/
+            mkdir /data/bi/references/virus/${family}/
         else
             echo "Directory /data/bi/references/virus/${family}/ ALREADY EXISTS."
         fi
         echo "Downloading ${ref}.fasta file..."
-        wget -q -O "./${family}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+        wget -q -O "/data/bi/references/virus/${family}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
         if [ $? -eq 0 ]; then
             REF_FASTA="/data/bi/references/virus/${family}/${ref}.fasta"
             echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
@@ -145,15 +145,15 @@ check_references() {
     fi
 
     # Check if GFF file is already downloaded
-    REF_GFF=$(find . -maxdepth 2 -type f -name "${ref}.gff*")
+    REF_GFF=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.gff*")
     if [ -z $REF_GFF ]; then
         if [ ! -v family ]; then obtain_family; fi
-        if [ ! -e "./$family" ]; then
+        if [ ! -e "/data/bi/references/virus/$family" ]; then
             echo "Creating new directory: /data/bi/references/virus/${family}/"
-            mkdir ./${family}/
+            mkdir /data/bi/references/virus/${family}/
         fi
         echo "Downloading ${ref}.gff file..."
-        wget -q -O "./${family}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+        wget -q -O "/data/bi/references/virus/${family}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
         if [ $? -eq 0 ]; then
             REF_GFF="/data/bi/references/virus/${family}/${ref}.gff"
             echo_green "File ${ref}.gff downloaded in $REF_GFF."
