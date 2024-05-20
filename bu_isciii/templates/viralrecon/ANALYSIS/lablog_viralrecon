@@ -178,7 +178,7 @@ echo_bold "Please specify the type of analysis."
 echo_bold "1. METAGENOMICS"
 echo_bold "2. AMPLICONS"
 while true; do
-    echo -ne "\e[1;38;5;220m"; read ANALYSIS_TYPE
+    echo -ne "\e[1;38;5;220m"; read ANALYSIS_TYPE; tput sgr0
     if [ "$ANALYSIS_TYPE" == "1" ]; then
         ANALYSIS_TYPE="METAGENOMIC"
         echo_green "$ANALYSIS_TYPE analysis selected."
@@ -233,7 +233,7 @@ else
     echo_bold "2. RSV"
     echo_bold "3. Other"
     while true; do
-        echo -ne "\e[1;38;5;220m"; read virus_ref
+        echo -ne "\e[1;38;5;220m"; read virus_ref; tput sgr0
         if [ "$virus_ref" == "1" ]; then
             virus_ref="SARS-CoV-2"
             echo_green "$virus_ref virus selected."
