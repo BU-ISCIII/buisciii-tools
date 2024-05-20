@@ -128,7 +128,7 @@ check_references() {
         obtain_family
         if [ ! -e "/data/bi/references/virus/$family" ]; then # Check if directory doesn't exists
             echo "Creating new directory: /data/bi/references/virus/${family}/"
-            mkdir /data/bi/references/virus/${family}/
+            mkdir /data/bi/references/virus/${family}/; chgrp bi /data/bi/references/virus/${family}/
         else
             echo "Directory /data/bi/references/virus/${family}/ ALREADY EXISTS."
         fi
@@ -136,6 +136,7 @@ check_references() {
         wget -q -O "/data/bi/references/virus/${family}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
         if [ $? -eq 0 ]; then
             REF_FASTA="/data/bi/references/virus/${family}/${ref}.fasta"
+            chgrp bi $REF_FASTA
             echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
         else
             echo_blinking_red "An error occurred during file downloading."
@@ -150,12 +151,13 @@ check_references() {
         if [ ! -v family ]; then obtain_family; fi
         if [ ! -e "/data/bi/references/virus/$family" ]; then
             echo "Creating new directory: /data/bi/references/virus/${family}/"
-            mkdir /data/bi/references/virus/${family}/
+            mkdir /data/bi/references/virus/${family}/; chgrp bi /data/bi/references/virus/${family}/
         fi
         echo "Downloading ${ref}.gff file..."
         wget -q -O "/data/bi/references/virus/${family}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
         if [ $? -eq 0 ]; then
             REF_GFF="/data/bi/references/virus/${family}/${ref}.gff"
+            chgrp bi $REF_GFF
             echo_green "File ${ref}.gff downloaded in $REF_GFF."
         else
             echo_blinking_red "An error occurred during file downloading."
