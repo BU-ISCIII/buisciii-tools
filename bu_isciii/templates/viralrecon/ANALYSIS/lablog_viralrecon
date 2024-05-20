@@ -169,8 +169,8 @@ check_references() {
 ####################################
 
 # Setting work variables
-CONFIG_FILE="../../DOC/viralrecon.config"
-PARAMS_FILE="../../DOC/viralrecon_params.yml"
+CONFIG_FILE="../DOC/viralrecon.config"
+PARAMS_FILE="../DOC/viralrecon_params.yml"
 
 # Setting the type of analysis
 echo
@@ -309,8 +309,8 @@ do
         printf "#SBATCH --chdir \$scratch_dir\n\n" >> ${FOLDER_NAME}/lablog
         printf 'export NXF_OPTS="-Xms500M -Xmx4G"\n\n' >> ${FOLDER_NAME}/lablog
         echo "nextflow run /data/bi/pipelines/nf-core-viralrecon-2.6.0/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
-        echo "          -c ${CONFIG_FILE} \\\\" >> ${FOLDER_NAME}/lablog
-        echo "          -params-file ${PARAMS_FILE} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -c ../${CONFIG_FILE} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -params-file ../${PARAMS_FILE} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --input samplesheet_${ref}.csv \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
