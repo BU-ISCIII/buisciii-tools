@@ -127,7 +127,7 @@ check_references() {
     if [ -z $REF_FASTA ]; then
         obtain_family
         if [ ! -e "./$family" ]; then # Check if directory doesn't exists
-            echo Creating new directory: /data/bi/references/virus/${family}/
+            echo "Creating new directory: /data/bi/references/virus/${family}/"
             mkdir ./${family}/
         else
             echo "Directory /data/bi/references/virus/${family}/ ALREADY EXISTS."
@@ -149,7 +149,7 @@ check_references() {
     if [ -z $REF_GFF ]; then
         if [ ! -v family ]; then obtain_family; fi
         if [ ! -e "./$family" ]; then
-            echo Creating new directory: /data/bi/references/virus/${family}/
+            echo "Creating new directory: /data/bi/references/virus/${family}/"
             mkdir ./${family}/
         fi
         echo "Downloading ${ref}.gff file..."
@@ -174,9 +174,9 @@ PARAMS_FILE="../../DOC/viralrecon_params.yml"
 
 # Setting the type of analysis
 echo
-echo_bold Please specify the type of analysis.
-echo_bold 1. METAGENOMICS
-echo_bold 2. AMPLICONS
+echo_bold "Please specify the type of analysis."
+echo_bold "1. METAGENOMICS"
+echo_bold "2. AMPLICONS"
 while true; do
     read ANALYSIS_TYPE
     if [ "$ANALYSIS_TYPE" == "1" ]; then
@@ -228,10 +228,10 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    echo_bold Please specify the organism to which the sequences correspond.
-    echo_bold 1. SARS-CoV-2
-    echo_bold 2. RSV
-    echo_bold 3. Other
+    echo_bold "Please specify the organism to which the sequences correspond."
+    echo_bold "1. SARS-CoV-2"
+    echo_bold "2. RSV"
+    echo_bold "3. Other"
     while true; do
         read virus_ref
         if [ "$virus_ref" == "1" ]; then
