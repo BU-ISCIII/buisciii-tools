@@ -203,7 +203,7 @@ else
     while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
         read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
         read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
-        read -p $'\e[1;37mAre host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] and reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] correct? [Y/n]: ' answer
+        read -p $'\e[1;37mAre host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] and reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' answer; tput sgr0
     done
     while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
     echo -e "File samples_ref.txt READY. \xE2\x9C\x85"
@@ -319,6 +319,7 @@ do
             echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
             echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
             echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
+        fi
         echo "          -resume" >> ${FOLDER_NAME}/lablog
         printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
         printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
