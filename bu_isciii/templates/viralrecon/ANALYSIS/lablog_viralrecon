@@ -19,7 +19,7 @@ update_pangolin() {
     echo "Checking Pangolin container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
     latest_version_pangolin=$(echo "$url" | grep -oP 'pangolin:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-    echo_bold "Latest version available of Pangolin:\e[1;38;5;220m $latest_version_pangolin."; tput sgr0
+    echo_bold "Latest version available of Pangolin:\e[1;38;5;220m $latest_version_pangolin"; tput sgr0
 
     echo "Checking if latest version of Pangolin image is already downloaded..."
     if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_pangolin" ]; then
@@ -69,7 +69,7 @@ update_nextclade() {
     echo "Checking Nextclade container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
     latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-    echo_bold "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade."; tput sgr0
+    echo_bold "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade"; tput sgr0
 
     echo "Checking if latest version of Nextclade image is already downloaded..."
     if [ -e "/data/bi/scratch_tmp/bi/singularity-images/$latest_version_nextclade" ]; then
