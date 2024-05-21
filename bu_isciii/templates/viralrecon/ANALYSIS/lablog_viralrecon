@@ -321,7 +321,13 @@ do
         if [ $virus_ref == 'RSV' ]; then
             echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
             echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
-            echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
+            if [ $ref == "EPI_ISL_18668201" ]; then
+                echo "          --nextclade_dataset_name 'rsv_a' \\\\" >> ${FOLDER_NAME}/lablog
+            elif [ $ref == "EPI_ISL_1653999" ]; then
+                echo "          --nextclade_dataset_name 'rsv_b' \\\\" >> ${FOLDER_NAME}/lablog
+            else
+                echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
+            fi
         fi
         echo "          -resume" >> ${FOLDER_NAME}/lablog
         printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
