@@ -123,7 +123,7 @@ check_references() {
     }
 
     # Check if FASTA sequence is already downloaded
-    REF_FASTA=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.fa*")
+    REF_FASTA=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.fa*" | head -n1)
     if [ -z $REF_FASTA ]; then
         obtain_family
         if [ ! -e "/data/bi/references/virus/$family" ]; then # Check if directory doesn't exists
