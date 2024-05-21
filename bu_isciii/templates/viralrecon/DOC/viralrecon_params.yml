@@ -6,3 +6,4 @@ consensus_caller: 'bcftools'
 skip_pangolin: true
 skip_nextclade: true
 skip_assembly: true
+skip_variants: false
