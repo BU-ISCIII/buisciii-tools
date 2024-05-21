@@ -194,6 +194,30 @@ while true; do
     fi
 done
 
+echo_bold "Please specify the method to be performed."
+    echo_bold "1. Mapping"
+    echo_bold "2. De novo assemby"
+    echo_bold "3. Both"
+    while true; do
+        echo -ne "\e[1;38;5;220m"; read method; tput sgr0
+        if [ "$method" == "1" ]; then
+            echo_green "Mapping method selected."
+            break
+        elif [ "$method" == "2" ]; then
+            echo_green "De novo assembly method selected."
+            sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
+            sed -i "s|skip_variants: false|skip_variants: true|" "$PARAMS_FILE"
+            break
+        elif [ "$method" == "3" ]; then
+            echo_green "Mapping + de novo assembly methods selected."
+            sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
+            break
+        else
+            echo_red "Invalid input. Please select a valid number."
+        fi
+    done
+
+
 # Setting samples_ref.txt file
 echo
 read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' samples_ref_prepared; tput sgr0
@@ -267,7 +291,6 @@ else
         update_nextclade
         sed -i '/^nextclade_dataset_name/d' $PARAMS_FILE
         sed -i '/^nextclade_dataset_tag/d' $PARAMS_FILE
-        sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
 
         echo_bold "Remember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline"
 
