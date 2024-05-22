@@ -298,11 +298,11 @@ else
         sed -i '/^nextclade_dataset_name/d' $PARAMS_FILE
         sed -i '/^nextclade_dataset_tag/d' $PARAMS_FILE
 
-        echo_bold "Remember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline"
+        echo_bold "\nRemember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline."
 
     else
         echo "primer_bed: '../REFERENCES/XXXX'" >> $PARAMS_FILE
-        echo_bold "Remember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline"
+        echo_bold "\nRemember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline."
     fi
 
 fi
