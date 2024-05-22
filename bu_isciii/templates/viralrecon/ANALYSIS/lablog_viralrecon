@@ -175,8 +175,7 @@ CONFIG_FILE="../DOC/viralrecon.config"
 PARAMS_FILE="../DOC/viralrecon_params.yml"
 
 # Setting the type of analysis
-echo
-echo_bold "Please specify the type of analysis."
+echo_bold "\nPlease specify the type of analysis."
 echo_bold "1. METAGENOMICS"
 echo_bold "2. AMPLICONS"
 while true; do
@@ -194,7 +193,7 @@ while true; do
     fi
 done
 
-echo_bold "Please specify the method to be performed."
+echo_bold "\nPlease specify the method to be performed."
     echo_bold "1. Mapping"
     echo_bold "2. De novo assemby"
     echo_bold "3. Both"
@@ -240,6 +239,7 @@ fi
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
     # Nextclade is able to analyze monkeypox virus
+    echo
     read -p "Do the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m" monkeypox; tput sgr0
     if [ "$monkeypox" == "y" ]; then
 
@@ -254,7 +254,7 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    echo_bold "Please specify the organism to which the sequences correspond."
+    echo_bold "\nPlease specify the organism to which the sequences correspond."
     echo_bold "1. SARS-CoV-2"
     echo_bold "2. RSV"
     echo_bold "3. Other"
