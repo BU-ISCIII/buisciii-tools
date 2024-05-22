@@ -74,7 +74,7 @@ update_nextclade() {
     echo "Checking if latest version of Nextclade image is already downloaded..."
     if [ -e "/data/bi/pipelines/singularity-images/$latest_version_nextclade" ]; then
         echo "File $latest_version_nextclade already downloaded."
-        echo -e "Nexctlade container is UP TO DATE. \xE2\x9C\x85"
+        echo -e "Nextclade container is UP TO DATE. \xE2\x9C\x85"
     else
         echo "Downloading $latest_version_nextclade file..."
         wget -P "/data/bi/pipelines/singularity-images" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
