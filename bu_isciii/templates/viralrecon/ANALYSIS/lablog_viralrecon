@@ -240,7 +240,7 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
     # Nextclade is able to analyze monkeypox virus
     echo
-    read -p "Do the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m" monkeypox; tput sgr0
+    read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' monkeypox; tput sgr0
     if [ "$monkeypox" == "y" ]; then
 
         virus_tag='mpox'
