@@ -115,6 +115,10 @@ check_references() {
     # Obtaining family information
     obtain_family() {
         organism_id=$(curl -s "https://www.ncbi.nlm.nih.gov/nuccore/${ref}" | grep -o 'ORGANISM=[0-9]\+' | head -n 1 | awk -F '=' '{print $2}')
+        if [ -z $organism_id ]; then
+            echo_blinking_red "$ref not found in NCBI. Please download it manually."
+            return
+        fi
         family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'TITLE="family">.*<' | awk -F 'TITLE="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
         if [ -z $family ]; then
             family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
@@ -125,7 +129,8 @@ check_references() {
     # Check if FASTA sequence is already downloaded
     REF_FASTA=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.fa*" ! -name "*.fai")
     if [ -z $REF_FASTA ]; then
-        obtain_family
+        echo "File ${ref}.fasta is not yet downloaded."
+        obtain_family; if [ -z $family ]; then return; fi
         if [ ! -e "/data/bi/references/virus/$family" ]; then # Check if directory doesn't exists
             echo "Creating new directory: /data/bi/references/virus/${family}/"
             mkdir /data/bi/references/virus/${family}/; chgrp bi /data/bi/references/virus/${family}/
@@ -148,7 +153,8 @@ check_references() {
     # Check if GFF file is already downloaded
     REF_GFF=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.gff*")
     if [ -z $REF_GFF ]; then
-        if [ ! -v family ]; then obtain_family; fi
+        echo "File ${ref}.gff is not yet downloaded."
+        if [ ! -v family ]; then obtain_family; if [ -z $family ]; then return; fi; fi
         if [ ! -e "/data/bi/references/virus/$family" ]; then
             echo "Creating new directory: /data/bi/references/virus/${family}/"
             mkdir /data/bi/references/virus/${family}/; chgrp bi /data/bi/references/virus/${family}/
@@ -341,7 +347,7 @@ do
         echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --gff ${REF_GFF} \\\\" >> ${FOLDER_NAME}/lablog
-        if [ $virus_ref == 'RSV' ]; then
+        if [ "$virus_ref" == 'RSV' ]; then
             echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
             echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
             if [ $ref == "EPI_ISL_18668201" ]; then
