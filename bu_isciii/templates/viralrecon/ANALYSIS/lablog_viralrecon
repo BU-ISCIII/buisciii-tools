@@ -319,8 +319,6 @@ do
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
-    echo "#module load Nextflow singularity" >> ${FOLDER_NAME}/lablog
-    echo "" >> ${FOLDER_NAME}/lablog
     printf 'scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")\n\n' >> ${FOLDER_NAME}/lablog
     cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | while read ref
     do
@@ -340,6 +338,7 @@ do
         echo "#SBATCH --output ${ref}_$(date '+%Y%m%d')_viralrecon.log" >> ${FOLDER_NAME}/lablog
         printf "#SBATCH --chdir \$scratch_dir\n\n" >> ${FOLDER_NAME}/lablog
         printf 'export NXF_OPTS="-Xms500M -Xmx4G"\n\n' >> ${FOLDER_NAME}/lablog
+        printf "module load Nextflow singularity\n\n" >> ${FOLDER_NAME}/lablog
         echo "nextflow run /data/bi/pipelines/nf-core-viralrecon-2.6.0/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
         echo "          -c ../${CONFIG_FILE} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          -params-file ../${PARAMS_FILE} \\\\" >> ${FOLDER_NAME}/lablog
