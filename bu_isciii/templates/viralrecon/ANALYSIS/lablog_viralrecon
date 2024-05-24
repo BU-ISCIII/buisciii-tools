@@ -43,6 +43,9 @@ update_pangolin() {
     else
         mkdir "$(date '+%Y%m%d')"
         srun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        # log file creation
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tmkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/log
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tsrun --partition short_idx singularity run -B ${PWD} /scratch/bi/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/log
         echo_green "Pangolin database UPDATED."
     fi
     cd -
