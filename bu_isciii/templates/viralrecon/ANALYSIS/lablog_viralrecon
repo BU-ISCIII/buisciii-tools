@@ -1,3 +1,15 @@
+# LABLOG_VIRALRECON
+
+: '
+The function of this script is to setup the initial configuration for the services that
+will be running the viralrecon pipeline. To do so, it sets up the required configuration
+files, as well as the necessary parameters depending on the type of analysis to be carried
+out (type of sequencing, processing method, etc.). It is in charge of creating a proper
+working environment, by preparing and updating the software to be used in the analysis,
+as well as preparing and downloading the reference sequences required for the correct
+execution of the analysis.
+'
+
 # module load singularity
 
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
