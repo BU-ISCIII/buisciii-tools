@@ -7,18 +7,33 @@ scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 mkdir -p logs
 
+<<<<<<< HEAD
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTSNPS.log --job-name SELECTSNPS singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
      -V ${scratch_dir}/../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \
+=======
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTSNPS.log --job-name SELECTSNPS singularity exec /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
+     -V ../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \
+>>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
      -select-type SNP \
      -O ${scratch_dir}/snps.vcf.gz &" > _01_separate_snps_indels.sh
 
+<<<<<<< HEAD
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTINDELS.log --job-name SELECTINDELS singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
     -V ${scratch_dir}/../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \
+=======
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTINDELS.log --job-name SELECTINDELS singularity exec /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
+    -V ../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \
+>>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
     -select-type INDEL \
     -O ${scratch_dir}/indels.vcf.gz &" >> _01_separate_snps_indels.sh
 
+<<<<<<< HEAD
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILSNP.log --job-name FILSNP singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
 	-V ${scratch_dir}/snps.vcf.gz \
+=======
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILSNP.log --job-name FILSNP singularity exec /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
+	-V snps.vcf.gz \
+>>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
 	-filter 'QD < 2.0' --filter-name 'QD2' \
 	-filter 'QUAL < 30.0' --filter-name 'QUAL30' \
 	-filter 'SOR > 3.0' --filter-name 'SOR3' \
@@ -28,17 +43,29 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 	-filter 'ReadPosRankSum < -8.0' --filter-name 'ReadPosRankSum-8' \
 	-O ${scratch_dir}/snps_filtered.vcf.gz &" > _02_filter.sh
 
+<<<<<<< HEAD
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILINDEL.log --job-name FILINDEL singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
 	-V ${scratch_dir}/indels.vcf.gz \
+=======
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILINDEL.log --job-name FILINDEL singularity exec /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
+	-V indels.vcf.gz \
+>>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
 	-filter 'QD < 2.0' --filter-name 'QD2' \
 	-filter 'QUAL < 30.0' --filter-name 'QUAL30' \
 	-filter 'FS > 200.0' --filter-name 'FS200' \
 	-filter 'ReadPosRankSum < -20.0' --filter-name 'ReadPosRankSum-20' \
 	-O ${scratch_dir}/indels_filtered.vcf.gz &" >> _02_filter.sh
 
+<<<<<<< HEAD
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEVCF.log --job-name MERGEVCF singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk MergeVcfs \
 	-I ${scratch_dir}/snps_filtered.vcf.gz \
 	-I ${scratch_dir}/indels_filtered.vcf.gz \
 	-O ${scratch_dir}/variants_fil.vcf.gz &" > _03_merge_vcfs.sh
+=======
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEVCF.log --job-name MERGEVCF singularity exec /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk MergeVcfs \
+	-I ./snps_filtered.vcf.gz \
+	-I ./indels_filtered.vcf.gz \
+	-O variants_fil.vcf.gz &" > _03_merge_vcfs.sh
+>>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
 
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/GZIP.log --job-name GZIP gzip -d variants_fil.vcf.gz &" > _04_gzip.sh

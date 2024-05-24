@@ -20,7 +20,11 @@ SAMPLE_LIST=(\$(<$samples_file))
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 
 mkdir \$SAMPLE
+<<<<<<< HEAD
 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H ${scratch_dir}/../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
+=======
+singularity exec /data/bi/tmp/pipelines_new/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H ../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
+>>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
 EOF
 
 echo "sbatch bcftools_query.sbatch" > _01_bcftools_query.sh
