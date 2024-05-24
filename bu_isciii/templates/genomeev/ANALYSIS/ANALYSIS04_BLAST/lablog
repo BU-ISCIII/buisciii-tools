@@ -1,4 +1,4 @@
-# module load BLAST+/2.11.0-gompi-2020b
+# module load singularity
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 mkdir logs
@@ -27,7 +27,7 @@ cat ../samples_id.txt | while read in; do
 done 
 
 # NOTE3: change the -query flag to meet your requirements
-cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 200G --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_%%_%j.log --job-name BLASTN_%% blastn -num_threads 10 -db ${BLAST_DATABASE} -query %%/%%.scaffolds.fa -out %%/%%_blast.tsv -outfmt '6 qseqid stitle qaccver saccver pident length mismatch gaps qstart qend sstart send evalue bitscore slen qlen qcovs' &" > _01_blast.sh
+cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 200G --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_%%_%j.log --job-name BLASTN_%% singularity exec /data/bi/pipelines/singularity-images/blast:2.11.0--pl5262h3289130_1 blastn -num_threads 10 -db ${BLAST_DATABASE} -query %%/%%.scaffolds.fa -out %%/%%_blast.tsv -outfmt '6 qseqid stitle qaccver saccver pident length mismatch gaps qstart qend sstart send evalue bitscore slen qlen qcovs' &" > _01_blast.sh
 
 # Filtering criteria:
     # %refCovered > 0.7

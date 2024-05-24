@@ -1,3 +1,5 @@
+# module load singularity
+
 scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
 mkdir logs
 
@@ -14,13 +16,11 @@ cat <<EOF > bcftools_query.sbatch
 #SBATCH --output logs/bcftools_query_%A_%a.log
 #SBATCH --chdir $scratch_dir
 
-module load BCFtools/1.12-GCC-10.2.0
-
 SAMPLE_LIST=(\$(<$samples_file))
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 
 mkdir \$SAMPLE
-bcftools query -H ../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
+singularity exec /data/bi/tmp/pipelines_new/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H ../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
 EOF
 
 echo "sbatch bcftools_query.sbatch" > _01_bcftools_query.sh

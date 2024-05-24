@@ -1,4 +1,4 @@
-# conda activate mtbseq
+# module load singularity
 # NOTE: error Java version is fixed by using module purge
 mkdir logs
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
@@ -7,7 +7,7 @@ cat ../samples_id.txt | xargs -I % echo "mkdir %; cd %; ln -s ../../*ANALYSIS01*
 cat ../samples_id.txt | xargs -I % echo "cd %; ln -s ../../*ANALYSIS01*/01-preprocessing/trimmed_sequences/%_2.trim.fastq.gz %_lib1_R2.fastq.gz; cd -" | bash
 cat ../samples_id.txt | xargs -I % echo "cd %; ls *.fastq.gz | tr '_' '\t' | cut -f 1,2 | sort -u > samples.txt; cd -" | bash
 
-cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 100G --chdir ${scratch_dir}/@@ --cpus-per-task 10 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _01_mtbseq.sh
+cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 100G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec /data/bi/pipelines/singularity-images/mtbseq:1.0.4--hdfd78af_2 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _01_mtbseq.sh
 
 # classification
 YEAR=$(date +%Y)
