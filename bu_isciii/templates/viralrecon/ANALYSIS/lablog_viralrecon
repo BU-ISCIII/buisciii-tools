@@ -102,9 +102,16 @@ update_nextclade() {
 
     # Extracting the current Nextclade data TAG
     echo "Extracting Nextclade data TAG..."
-    nextclade_tag=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
-    echo_bold "Latest \e[1;38;5;220m${virus_tag} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag"; tput sgr0
-
+    if [ "$virus_tag" == "RSV" ]; then
+        nextclade_tag_A=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
+        nextclade_tag_B=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
+        echo_bold "Latest \e[1;38;5;220mRSV-A \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag_A"; tput sgr0
+        echo_bold "Latest \e[1;38;5;220mRSV-B \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag_B"; tput sgr0
+    else
+        nextclade_tag=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
+        echo_bold "Latest \e[1;38;5;220m${virus_tag} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag"; tput sgr0
+    fi
+    
     # Updating config file
     echo "Updating $CONFIG_FILE file..."
     sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
