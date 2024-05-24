@@ -1,5 +1,5 @@
 # module load singularity
-# module load Java/17.0.2.lua
+# module load Java/17.0.2.lua R/4.2.1
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
@@ -43,7 +43,7 @@ echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_Vep_pl
 # Merge vep_plugin.txt with dbNSFP_ENSG_gene_GRCh37.txt by "Gene" column, save as vep_dbNSFP.txt. 
 # Merge vep_dbNSFP.txt with variants.table by "ID" column, save as variants_annot_all.tab
 
-echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir ${scratch_dir} --output logs/MERGE_ALL.log --job-name MERGE_ALL singularity exec /data/bi/pipelines/singularity-images/r-base:4.2.1 Rscript Merge_All.R" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "srun --partition short_idx --nodelist ideafix04 --mem 200G --time 12:00:00 --chdir ${scratch_dir} --output logs/MERGE_ALL.log --job-name MERGE_ALL Rscript Merge_All.R" >> _03_Vep_plugin_dbNSFP_parse.sh
 
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./aux_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
 
