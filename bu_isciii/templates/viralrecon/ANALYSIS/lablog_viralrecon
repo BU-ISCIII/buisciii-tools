@@ -113,15 +113,8 @@ update_nextclade() {
 
     # Extracting the current Nextclade data TAG
     echo "Extracting Nextclade data TAG..."
-    if [ "$virus_tag" == "RSV" ]; then
-        nextclade_tag_A=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
-        nextclade_tag_B=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
-        echo_bold "Latest \e[1;38;5;220mRSV-A \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag_A"; tput sgr0
-        echo_bold "Latest \e[1;38;5;220mRSV-B \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag_B"; tput sgr0
-    else
-        nextclade_tag=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
-        echo_bold "Latest \e[1;38;5;220m${virus_tag} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag"; tput sgr0
-    fi
+    nextclade_tag=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
+    echo_bold "Latest \e[1;38;5;220m${virus_tag} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag"; tput sgr0
     
     # Updating config file
     echo "Updating $CONFIG_FILE file..."
@@ -304,7 +297,7 @@ else
             echo_green "$virus_ref virus selected."
             break
         elif [ "$virus_ref" == "2" ]; then
-            virus_ref="RSV"
+            virus_ref="rsv"
             echo_green "$virus_ref virus selected."
             break
         elif [ "$virus_ref" == "3" ]; then
@@ -325,11 +318,10 @@ else
 
         echo "primer_bed: '/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4.1/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
 
-    elif [ "$virus_ref" == "RSV" ]; then       
+    elif [ "$virus_ref" == "rsv" ]; then       
         # Update Nextclade
         update_nextclade
         sed -i '/^nextclade_dataset_name/d' $PARAMS_FILE
-        sed -i '/^nextclade_dataset_tag/d' $PARAMS_FILE
 
         echo_bold "\nRemember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline."
 
