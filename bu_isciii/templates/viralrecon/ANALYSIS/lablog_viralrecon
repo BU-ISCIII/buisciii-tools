@@ -8,6 +8,17 @@ out (type of sequencing, processing method, etc.). It is in charge of creating a
 working environment, by preparing and updating the software to be used in the analysis,
 as well as preparing and downloading the reference sequences required for the correct
 execution of the analysis.
+
+The functions performed by the script can be listed as follows:
+- Preparation of the environment depending on the type of sequencing (metagenomics/amplicons),
+  the method of analysis (mapping/assembly) as well as some presets depending on the microorganism (SARS, RSV or MPV).
+- Creation of the samples_ref.txt file.
+- Checking of the last available version of the Pangolin container. Download if necessary. Database update. File configuration.
+- Checking the last available version of the Nextclade container. Download if necessary. Extraction of the tag for the
+  analysis dataset. File configuration.
+- Checking of required references (fasta and gff) and downloading of from NCBI if necessary.
+- Creation of the necessary directories for the analysis hosts, and subdirectories for each of the references.
+
 '
 
 # module load singularity
