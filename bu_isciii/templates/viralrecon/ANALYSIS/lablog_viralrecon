@@ -75,7 +75,7 @@ update_pangolin() {
 
     # Updating config file
     echo "Updating $CONFIG_FILE file..."
-    sed -i "s|pangolin:4.2--pyhdfd78af_1|$latest_version_pangolin|" "$CONFIG_FILE"
+    sed -i "s|pangolin:4.3--pyhdfd78af_2|$latest_version_pangolin|" "$CONFIG_FILE"
     sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
     echo_bold "File $CONFIG_FILE UPDATED."
 
@@ -118,7 +118,7 @@ update_nextclade() {
     
     # Updating config file
     echo "Updating $CONFIG_FILE file..."
-    sed -i "s|nextclade:2.13.1--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
+    sed -i "s|nextclade:3.5.0--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
     echo_bold "File $CONFIG_FILE UPDATED."
 
     # Updating params file
