@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 Code contributions to the new version:
+- [Pablo Mata](https://github.com/Shettland)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
+- [Sara Monzón](https://github.com/saramonzon)
+- [Sarai Varona](https://github.com/svarona)
+- [Daniel Valle](https://github.com/Daniel-VM)
+- [Víctor López](https://github.com/victor5lm)
 
 ### Template fixes and updates
 
@@ -26,7 +32,9 @@ Code contributions to the new version:
 - Included missing folders in wgstrio template
 - Changed exomiser-html-description to png format and fixed location of irma-sarek markdowns [#261](https://github.com/BU-ISCIII/buisciii-tools/pull/261)
 - Updated configuration.json so that either idx or obx is used in case one of these queues is full [#263](https://github.com/BU-ISCIII/buisciii-tools/pull/263)
+- Updated lablog_viralrecon script for the automation of the setup of viralrecon services. [#264](https://github.com/BU-ISCIII/buisciii-tools/pull/264)
 - Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#266](https://github.com/BU-ISCIII/buisciii-tools/pull/266).
+=======
 
 ### Modules
 
