@@ -34,7 +34,6 @@ Code contributions to the new version:
 - Updated configuration.json so that either idx or obx is used in case one of these queues is full [#263](https://github.com/BU-ISCIII/buisciii-tools/pull/263)
 - Updated lablog_viralrecon script for the automation of the setup of viralrecon services. [#264](https://github.com/BU-ISCIII/buisciii-tools/pull/264)
 - Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#266](https://github.com/BU-ISCIII/buisciii-tools/pull/266).
-=======
 
 ### Modules
 
