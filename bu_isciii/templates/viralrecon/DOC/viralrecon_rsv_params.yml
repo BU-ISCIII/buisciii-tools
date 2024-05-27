@@ -1,8 +1,0 @@
-platform: 'illumina'
-protocol: 'amplicon'
-kraken2_db: '/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz'
-variant_caller: 'ivar' 
-consensus_caller: 'bcftools'
-skip_pangolin: true
-skip_nextclade: false
-skip_assembly: false
