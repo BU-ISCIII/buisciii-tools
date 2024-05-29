@@ -9,8 +9,8 @@ read -p $'\e[1;37mDid you save the trimmed reads from previous assembly pipeline
         while read in; do
         mkdir ${in}
         cd ${in}
-        ln -s ../../../*/01-processing/fastp/${in}_1.fastp.fastq.gz ${in}/${in}_R1_filtered.fastq.gz
-        ln -s ../../../*/01-processing/fastp/${in}_2.fastp.fastq.gz ${in}/${in}_R2_filtered.fastq.gz
+        ln -s ../../../*/01-processing/fastp/${in}_1.fastp.fastq.gz ${in}_R1_filtered.fastq.gz
+        ln -s ../../../*/01-processing/fastp/${in}_2.fastp.fastq.gz ${in}_R2_filtered.fastq.gz
         cd -
         done < ../samples_id.txt
 
