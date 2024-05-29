@@ -33,6 +33,7 @@ Code contributions to the new version:
 - Changed exomiser-html-description to png format and fixed location of irma-sarek markdowns [#261](https://github.com/BU-ISCIII/buisciii-tools/pull/261)
 - Updated configuration.json so that either idx or obx is used in case one of these queues is full [#263](https://github.com/BU-ISCIII/buisciii-tools/pull/263)
 - Updated lablog_viralrecon script for the automation of the setup of viralrecon services. [#264](https://github.com/BU-ISCIII/buisciii-tools/pull/264)
+- Included MULTIQC v.1.19 in viralrecon.config to fix error with string and numeric samples [#267](https://github.com/BU-ISCIII/buisciii-tools/pull/267)
 
 ### Modules
 
