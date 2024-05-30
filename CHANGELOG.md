@@ -34,6 +34,10 @@ Code contributions to the new version:
 - Updated configuration.json so that either idx or obx is used in case one of these queues is full [#263](https://github.com/BU-ISCIII/buisciii-tools/pull/263)
 - Updated lablog_viralrecon script for the automation of the setup of viralrecon services. [#264](https://github.com/BU-ISCIII/buisciii-tools/pull/264)
 - Included MULTIQC v.1.19 in viralrecon.config to fix error with string and numeric samples [#267](https://github.com/BU-ISCIII/buisciii-tools/pull/267)
+- Updated MTBSeq template to fit bacass pipeline. [#268](https://github.com/BU-ISCIII/buisciii-tools/pull/268)
+- IRMA template modified in order to avoid average overload.
+- Added "01" to results folder creation in assembly template.
+- Some prompt answers limited to 1 character in lablog_viralrecon.
 
 ### Modules
 
