@@ -39,6 +39,7 @@ Code contributions to the new version:
 - Added "01" to results folder creation in assembly template.
 - Some prompt answers limited to 1 character in lablog_viralrecon.
 - Created lablog_mtbseq_results. [#270](https://github.com/BU-ISCIII/buisciii-tools/pull/270)
+- PR #271. Closes [#235](https://github.com/BU-ISCIII/buisciii-tools/issues/235), [#228](https://github.com/BU-ISCIII/buisciii-tools/issues/228) and [#196](https://github.com/BU-ISCIII/buisciii-tools/issues/196)
 
 ### Modules
 
