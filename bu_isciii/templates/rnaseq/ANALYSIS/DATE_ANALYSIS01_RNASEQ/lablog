@@ -24,7 +24,6 @@ export NXF_OPTS="-Xms500M -Xmx4G"
           -params-file ../../DOC/hg38_ensmbl_rnaseq.yml \\
           --input samplesheet.csv \\
           --outdir 01-$(date '+%Y%m%d')_rnaseq \\
-          --save_align_intermeds \\
           --skip_markduplicates \\
           --pseudo_aligner salmon \\
           -resume
