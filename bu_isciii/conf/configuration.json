@@ -16,7 +16,8 @@
             "'.nextflow*'",
             "'*_DEL'",
             "'*.R'",
-            "'*.py'"
+            "'*.py'",
+            "'*.sbatch"
         ]
     },
     "xtutatis_api_settings": {
