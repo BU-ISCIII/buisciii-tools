@@ -1,7 +1,6 @@
 DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
 
-mkdir $DELIVERY_FOLDER
-mkdir $DELIVERY_FOLDER/assembly
+mkdir -p $DELIVERY_FOLDER/assembly
 
 # Assembly service
 cd $DELIVERY_FOLDER/assembly
