@@ -10,4 +10,4 @@ ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/resistances_all/ .
 ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/stats_all/statistics_all.tab .
 ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/classification_all/strain_classification_all.tab .
 
-find -type l | while read in; do unlink ${in}; done
+find . -xtype l -delete
