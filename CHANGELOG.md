@@ -38,6 +38,7 @@ Code contributions to the new version:
 - IRMA template modified in order to avoid average overload.
 - Added "01" to results folder creation in assembly template.
 - Some prompt answers limited to 1 character in lablog_viralrecon.
+- Created lablog_mtbseq_results. [#269](https://github.com/BU-ISCIII/buisciii-tools/pull/269)
 
 ### Modules
 
