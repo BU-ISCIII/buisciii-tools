@@ -3,10 +3,10 @@ name: python_lint
 on:
   push:
     paths:
-      - '**.py'
+      - '**/*.py'
   pull_request:
     paths:
-      - '**.py'
+      - '**/*.py'
 
 jobs:
   flake8_py3:
