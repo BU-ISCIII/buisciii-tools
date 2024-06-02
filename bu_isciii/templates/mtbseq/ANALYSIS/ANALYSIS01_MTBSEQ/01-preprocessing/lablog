@@ -1,3 +1,4 @@
+
 # module load singularity
 
 # if assembly pipeline was performed first and the trimmed sequences were saved, this should work:
