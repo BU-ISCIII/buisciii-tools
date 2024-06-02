@@ -1,4 +1,5 @@
-# module load singularity
+
+# module load fastp
 
 # if assembly pipeline was performed first and the trimmed sequences were saved, this should work:
 read -p $'\e[1;37mDid you save the trimmed reads from previous assembly pipeline? [y/N]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
