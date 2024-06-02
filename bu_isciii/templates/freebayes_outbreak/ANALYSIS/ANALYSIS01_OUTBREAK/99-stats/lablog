@@ -26,10 +26,14 @@ SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 echo \$SAMPLE
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ${scratch_dir}/../04-Alignment/\${SAMPLE}/\${SAMPLE}_sorted_rg.bam > samtools_flagstats/\${SAMPLE}_flagstats.txt
 =======
 singularity exec /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ../04-Alignment/\${SAMPLE}/\${SAMPLE}_sorted_rg.bam > samtools_flagstats/\${SAMPLE}_flagstats.txt
 >>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
+=======
+singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ${scratch_dir}/../04-Alignment/\${SAMPLE}/\${SAMPLE}_sorted_rg.bam > samtools_flagstats/\${SAMPLE}_flagstats.txt
+>>>>>>> b871678 (Updated templates)
 
 EOF
 
@@ -37,10 +41,14 @@ echo "sbatch samtools_flagstats.sbatch" > _01_samtools_flagstats.sh
 echo "Done"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ${scratch_dir}/../04-Alignment/@@/@@_sorted_rg.bam -O ${scratch_dir}/picard/@@_collect_wgs_metrics.txt -R ${scratch_dir}/REFERENCE_GENOME &" > _02_wgsmetrics.sh
 =======
 cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 singularity exec /data/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ../04-Alignment/@@/@@_sorted_rg.bam -O picard/@@_collect_wgs_metrics.txt -R REFERENCE_GENOME &" > _02_wgsmetrics.sh
 >>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
+=======
+cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ${scratch_dir}/../04-Alignment/@@/@@_sorted_rg.bam -O ${scratch_dir}/picard/@@_collect_wgs_metrics.txt -R ${scratch_dir}/REFERENCE_GENOME &" > _02_wgsmetrics.sh
+>>>>>>> b871678 (Updated templates)
 
 echo "printf \"SAMPLENAME\t\$(grep \"GENOME_TERRITORY\" */*collect_wgs_metrics.txt | cut -d\":\" -f2 | sed 's/ /_/g'| sort -u)\n\" > wgs_metrics_all.txt" > _03_gather_wgs_metrics.sh
 

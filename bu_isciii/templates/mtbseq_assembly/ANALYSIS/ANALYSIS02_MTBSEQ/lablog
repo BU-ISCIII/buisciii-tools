@@ -8,10 +8,14 @@ cat ../samples_id.txt | xargs -I % echo "cd %; ln -s ../../*ANALYSIS01*/01-prepr
 cat ../samples_id.txt | xargs -I % echo "cd %; ls *.fastq.gz | tr '_' '\t' | cut -f 1,2 | sort -u > samples.txt; cd -" | bash
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 100G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/mtbseq:1.0.4--hdfd78af_2 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _01_mtbseq.sh
 =======
 cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 100G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec /data/bi/pipelines/singularity-images/mtbseq:1.0.4--hdfd78af_2 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _01_mtbseq.sh
 >>>>>>> f5bbd37 (Modified all templates so that singularity images are used instead of conda envs or loaded modules)
+=======
+cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 100G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/mtbseq:1.0.4--hdfd78af_2 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _01_mtbseq.sh
+>>>>>>> b871678 (Updated templates)
 
 # classification
 YEAR=$(date +%Y)
