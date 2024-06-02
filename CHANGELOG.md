@@ -40,7 +40,7 @@ Code contributions to the new version:
 - Some prompt answers limited to 1 character in lablog_viralrecon.
 - Created lablog_mtbseq_results. [#270](https://github.com/BU-ISCIII/buisciii-tools/pull/270)
 - PR #271. Closes [#235](https://github.com/BU-ISCIII/buisciii-tools/issues/235), [#228](https://github.com/BU-ISCIII/buisciii-tools/issues/228) and [#196](https://github.com/BU-ISCIII/buisciii-tools/issues/196)
-- Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#266](https://github.com/BU-ISCIII/buisciii-tools/pull/266)
+- Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#266](https://github.com/BU-ISCIII/buisciii-tools/pull/266).
 
 ### Modules
 
