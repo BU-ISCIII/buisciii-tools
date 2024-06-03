@@ -1,3 +1,5 @@
+# module load singularity
+
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 mkdir -p logs
@@ -18,23 +20,19 @@ cat <<EOF > samtools_flagstats.sbatch
 #SBATCH --output logs/samtools_flagstats_%A_%a.log
 #SBATCH --chdir $scratch_dir
 
-module load SAMtools
-
 SAMPLE_LIST=(\$(<$samples_file))
 echo \$SAMPLE_LIST
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 echo \$SAMPLE
 
-samtools flagstat ../04-Alignment/\${SAMPLE}/\${SAMPLE}_sorted_rg.bam > samtools_flagstats/\${SAMPLE}_flagstats.txt
+singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ${scratch_dir}/../04-Alignment/\${SAMPLE}/\${SAMPLE}_sorted_rg.bam > samtools_flagstats/\${SAMPLE}_flagstats.txt
 
 EOF
 
 echo "sbatch samtools_flagstats.sbatch" > _01_samtools_flagstats.sh
 echo "Done"
 
-# module load picard
-
-cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 java -jar \$EBROOTPICARD/picard.jar CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ../04-Alignment/@@/@@_sorted_rg.bam -O picard/@@_collect_wgs_metrics.txt -R REFERENCE_GENOME &" > _02_wgsmetrics.sh
+cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ${scratch_dir}/../04-Alignment/@@/@@_sorted_rg.bam -O ${scratch_dir}/picard/@@_collect_wgs_metrics.txt -R ${scratch_dir}/REFERENCE_GENOME &" > _02_wgsmetrics.sh
 
 echo "printf \"SAMPLENAME\t\$(grep \"GENOME_TERRITORY\" */*collect_wgs_metrics.txt | cut -d\":\" -f2 | sed 's/ /_/g'| sort -u)\n\" > wgs_metrics_all.txt" > _03_gather_wgs_metrics.sh
 
