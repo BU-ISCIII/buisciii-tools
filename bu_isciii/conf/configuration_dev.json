@@ -1,7 +1,7 @@
 {
     "global": {
-        "data_path": "/data/bi",
-        "archived_path": "/archived/bi",
+        "data_path": "/home/smonzon/tests_buisciii/data/bi",
+        "archived_path": "/home/smonzon/tests_buisciii/archived/bi",
         "yaml_conf_path": "~/buisciii_config.yml"
     },
     "sftp_copy": {
@@ -22,28 +22,28 @@
     },
     "xtutatis_api_settings": {
         "api_url": "/drylab/api/",
-        "server": "https://iskylims.isciii.es"
+        "server": "http://iskylims.isciiides.es"
     },
     "api_settings": {
-        "server": "https://iskylims.isciii.es",
+        "server": "http://iskylims.isciiides.es",
         "api_url": "/drylab/api/"
     },
     "bioinfo_doc": {
-        "bioinfodoc_path": "/data/bioinfo_doc/",
+        "bioinfodoc_path": "/home/smonzon/tests_buisciii/bioinfo_doc/",
         "services_path": "services",
         "service_folder": ["service_info", "result"],
         "service_info_template_path_file": "templates/jinja_template_service_info.j2",
         "delivery_template_path_file": "templates/jinja_template_delivery.j2",
         "html_template_path_file": "templates/html_service_template.html",
         "path_to_css": "assets/css",
-        "wkhtmltopdf_path": "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf",
+        "wkhtmltopdf_path": "/home/smonzon/micromamba/envs/buisciii/bin/wkhtmltopdf",
         "email_host": "mx2.isciii.es",
         "email_port": "587",
         "email_host_user": "bioinformatica@isciii.es",
         "email_use_tls": "True"
     },
     "new_service": {
-        "fastq_repo": "/srv/fastq_repo"
+        "fastq_repo": "/home/smonzon/tests_buisciii/fastq_repo"
     },
     "scratch_copy": {
         "protocol": "rsync",
@@ -53,11 +53,11 @@
             "'service_info.txt'",
             "'work'"
         ],
-        "scratch_path": "/scratch/bi/",
+        "scratch_path": "/home/smonzon/tests_buisciii/scratch/bi/",
         "srun_settings": {
             "--partition": "middle_obx,middle_idx",
             "--time": "24:00:00",
-            "--chdir": "/scratch/bi/"
+            "--chdir": "/home/smonzon/tests_buisciii/scratch/bi/"
         }
     },
     "archive": {

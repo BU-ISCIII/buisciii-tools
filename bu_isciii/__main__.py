@@ -2,6 +2,7 @@
 
 # import sys
 import logging
+import os
 
 import click
 import rich.console
@@ -9,6 +10,7 @@ import rich.logging
 import rich.traceback
 
 import bu_isciii
+import bu_isciii.config_json
 import bu_isciii.utils
 import bu_isciii.new_service
 import bu_isciii.scratch
@@ -133,8 +135,9 @@ class CustomHelpOrder(click.Group):
     required=False,
     default=None,
 )
+@click.option("-d", "--dev", help="Develop settings", is_flag=True, default=False)
 @click.pass_context
-def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file):
+def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev):
     # Set the base logger to output DEBUG
     log.setLevel(logging.INFO)
     # Initialize context
@@ -150,7 +153,18 @@ def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file):
         )
         log.addHandler(log_fh)
 
-    ctx.obj = bu_isciii.utils.get_yaml_config()
+    if dev:
+        conf = bu_isciii.config_json.ConfigJson(
+            json_file=os.path.join(
+                os.path.dirname(__file__), "conf", "configuration_dev.json"
+            )
+        )
+    else:
+        conf = bu_isciii.config_json.ConfigJson()
+
+    ctx.obj = bu_isciii.utils.get_yaml_config(conf, cred_file)
+    ctx.obj["conf"] = conf
+
     if bu_isciii.utils.validate_api_credentials(ctx.obj):
         print("API credentials successfully extracted from yaml config file")
     else:
@@ -212,6 +226,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     new_ser.create_new_service()
 
@@ -264,6 +279,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     scratch_copy.handle_scratch()
 
@@ -315,7 +331,13 @@ def clean(ctx, resolution, path, ask_path, option):
     show removable files or show folders for no copy.
     """
     clean = bu_isciii.clean.CleanUp(
-        resolution, path, ask_path, option, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        ask_path,
+        option,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     clean.handle_clean()
 
@@ -356,6 +378,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
         sftp_folder,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     new_del.copy_sftp()
 
@@ -404,6 +427,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         "clean",
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
@@ -415,6 +439,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
@@ -425,6 +450,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         "rename_nocopy",
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
@@ -435,6 +461,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         sftp_folder,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
@@ -518,6 +545,7 @@ def bioinfo_doc(
         results_md,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
         email_pass,
     )
     new_doc.create_documentation()
@@ -587,6 +615,7 @@ def archive(
         option,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
         skip_prompts,
         date_from,
         date_until,
@@ -611,9 +640,11 @@ def archive(
     default=14,
     help="Integer, remove files older than a window of `-d [int]` days. Default 14 days.",
 )
-def autoclean_sftp(sftp_folder, days):
+def autoclean_sftp(ctx, sftp_folder, days):
     """Clean old sftp services"""
-    sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(sftp_folder, days)
+    sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(
+        sftp_folder, days, ctx.obj["conf"]
+    )
     sftp_clean.handle_autoclean_sftp()
 
 

@@ -33,6 +33,7 @@ class CopySftp:
         sftp_folder=None,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -40,10 +41,8 @@ class CopySftp:
             self.resolution_id = resolution_id
 
         # Load conf
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("sftp_copy")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        self.conf = conf.get_configuration("sftp_copy")
+        conf_api = conf.get_configuration("xtutatis_api_settings")
 
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
@@ -54,7 +53,9 @@ class CopySftp:
             request_info="service-data", safe=False, resolution=self.resolution_id
         )
         if sftp_folder is None:
-            self.sftp_folder = bu_isciii.utils.get_sftp_folder(self.resolution_info)[0]
+            self.sftp_folder = bu_isciii.utils.get_sftp_folder(
+                conf, self.resolution_info
+            )[0]
         else:
             self.sftp_folder = sftp_folder
 
@@ -64,9 +65,7 @@ class CopySftp:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.sftp_options = bu_isciii.config_json.ConfigJson().get_find(
-            "sftp_copy", "options"
-        )
+        self.sftp_options = conf.get_find("sftp_copy", "options")
         self.services_to_copy = bu_isciii.utils.get_service_ids(self.services_requested)
 
         self.last_folders = self.get_last_folders(
@@ -89,7 +88,10 @@ class CopySftp:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)

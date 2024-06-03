@@ -34,6 +34,7 @@ class NewService:
         ask_path=False,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -46,10 +47,8 @@ class NewService:
             self.no_create_folder = no_create_folder
 
         # Load conf
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        self.conf = conf.get_configuration("new_service")
+        conf_api = conf.get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
@@ -82,7 +81,10 @@ class NewService:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
         self.full_path = os.path.join(self.path, self.service_folder)
 
