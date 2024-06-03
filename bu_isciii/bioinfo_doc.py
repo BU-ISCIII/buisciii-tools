@@ -47,6 +47,7 @@ class BioinfoDoc:
         results_md=False,
         api_user=None,
         api_password=None,
+        conf=None,
         email_psswd=None,
     ):
         if type is None:
@@ -54,7 +55,7 @@ class BioinfoDoc:
                 msg="Select the documentation type you want to create",
                 choices=["service_info", "delivery"],
             )
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("bioinfo_doc")
+        self.conf = conf.get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
                 self.path = bu_isciii.utils.prompt_path(
@@ -71,7 +72,7 @@ class BioinfoDoc:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = conf.get_configuration("api_settings")
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
@@ -157,7 +158,7 @@ class BioinfoDoc:
                         )
 
         if self.type == "delivery":
-            self.sftp_data = bu_isciii.utils.get_sftp_folder(self.resolution_info)
+            self.sftp_data = bu_isciii.utils.get_sftp_folder(conf, self.resolution_info)
         if self.type == "delivery" and sftp_folder is None:
             self.sftp_folder = self.sftp_data[0]
         else:

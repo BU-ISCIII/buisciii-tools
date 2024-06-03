@@ -37,6 +37,7 @@ class Archive:
         option=None,
         api_user=None,
         api_password=None,
+        conf=None,
         skip_prompts=False,
         date_from=None,
         date_until=None,
@@ -74,8 +75,8 @@ class Archive:
 
         # Get configuration params from configuration.json
         # Get data to connect to the API
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        self.conf = conf.get_configuration("archive")
+        conf_api = conf.get_configuration("api_settings")
 
         # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
@@ -273,30 +274,26 @@ class Archive:
                     self.services[service]["found_in_system"] = True
                     self.services[service]["archived_path"] = os.path.join(
                         bu_isciii.utils.get_service_paths(
-                            self.ser_type, service_data, "archived_path"
+                            conf, self.ser_type, service_data, "archived_path"
                         ),
                         service_data["resolutions"][0]["resolution_full_number"],
                     )
 
                     self.services[service]["non_archived_path"] = os.path.join(
                         bu_isciii.utils.get_service_paths(
-                            self.ser_type, service_data, "non_archived_path"
+                            conf, self.ser_type, service_data, "non_archived_path"
                         ),
                         service_data["resolutions"][0]["resolution_full_number"],
                     )
             else:
                 self.services[service]["found_in_system"] = True
                 self.services[service]["archived_path"] = os.path.join(
-                    bu_isciii.config_json.ConfigJson().get_configuration("global")[
-                        "archived_path"
-                    ],
+                    conf.get_configuration("global")["archived_path"],
                     self.ser_type,
                     service_id,
                 )
                 self.services[service]["non_archived_path"] = os.path.join(
-                    bu_isciii.config_json.ConfigJson().get_configuration("global")[
-                        "data_path"
-                    ],
+                    conf.get_configuration("global")["data_path"],
                     self.ser_type,
                     service_id,
                 )

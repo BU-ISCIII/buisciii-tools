@@ -65,16 +65,14 @@ class AutoremoveSftpService:
     within 14 days
     """
 
-    def __init__(self, path=None, days=14):
+    def __init__(self, path=None, days=14, conf=None):
         # Parse input path
         if path is None:
             use_default = bu_isciii.utils.prompt_yn_question(
                 "Use default path?: ", dflt=False
             )
             if use_default:
-                data_path = bu_isciii.config_json.ConfigJson().get_configuration(
-                    "global"
-                )["data_path"]
+                data_path = conf.get_configuration("global")["data_path"]
                 self.path = os.path.join(data_path, "sftp")
             else:
                 self.path = bu_isciii.utils.prompt_path(

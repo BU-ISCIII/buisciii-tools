@@ -36,6 +36,7 @@ class Scratch:
         ask_path=False,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -55,14 +56,12 @@ class Scratch:
         else:
             self.direction = direction
         # Load conf
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        conf_api = conf.get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
+        self.conf = conf.get_configuration("scratch_copy")
 
         self.resolution_info = rest_api.get_request(
             request_info="service-data", safe=False, resolution=self.resolution_id
@@ -91,7 +90,10 @@ class Scratch:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)

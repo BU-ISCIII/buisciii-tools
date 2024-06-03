@@ -49,5 +49,6 @@
     "svaldezate": ["Labtaxonomia"],
     "svazquez": ["Labvirusres"],
     "ycampos": ["LabUfiecMithocondrial"],
-    "anadonoso": ["Labenterovirus"]
+    "anadonoso": ["Labenterovirus"],
+    "bioinfoadm": ["test"]
 }

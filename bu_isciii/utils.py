@@ -185,12 +185,12 @@ def ask_password(msg):
     return password
 
 
-def get_service_paths(type, info, archived_status):
+def get_service_paths(conf, type, info, archived_status):
     """
     Given a service, a conf and a type,
     get the path it would have service
     """
-    global_conf = bu_isciii.config_json.ConfigJson().get_configuration("global")
+    global_conf = conf.get_configuration("global")
     service_path = None
     if type == "services_and_colaborations":
         if archived_status == "archived_path":
@@ -214,7 +214,7 @@ def get_service_paths(type, info, archived_status):
     return service_path
 
 
-def get_sftp_folder(resolution_info):
+def get_sftp_folder(conf, resolution_info):
     service_user = resolution_info["service_user_id"]["username"]
     json_file = os.path.join(os.path.dirname(__file__), "templates", "sftp_user.json")
     user_sftp_file = open(json_file)
@@ -224,9 +224,7 @@ def get_sftp_folder(resolution_info):
     for user_sftp in json_data:
         if user_sftp == service_user:
             sftp_folders_list = json_data[user_sftp]
-    data_path = bu_isciii.config_json.ConfigJson().get_configuration("global")[
-        "data_path"
-    ]
+    data_path = conf.get_configuration("global")["data_path"]
     if not sftp_folders_list:
         print(f"User {service_user} does not have an assigned sftp folder. Aborting...")
         exit()
@@ -396,7 +394,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     return datetime.date(int(year), int(chosen_month_number), int(day))
 
 
-def get_yaml_config():
+def get_yaml_config(conf, path):
     """Search the config yaml file described in configuration.json and extract fields
 
     Returns:
@@ -407,7 +405,11 @@ def get_yaml_config():
             "Other keys": "values"
         }
     """
-    yaml_path = bu_isciii.config_json.ConfigJson().get_find("global", "yaml_conf_path")
+    if path:
+        yaml_path = path
+    else:
+        yaml_path = conf.get_find("global", "yaml_conf_path")
+
     try:
         yaml_file = os.path.expanduser(yaml_path)
     except Exception:
