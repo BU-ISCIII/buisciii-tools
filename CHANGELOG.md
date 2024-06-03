@@ -41,7 +41,7 @@ Code contributions to the new version:
 - Created lablog_mtbseq_results. [#270](https://github.com/BU-ISCIII/buisciii-tools/pull/270)
 - PR #271. Closes [#235](https://github.com/BU-ISCIII/buisciii-tools/issues/235), [#228](https://github.com/BU-ISCIII/buisciii-tools/issues/228) and [#196](https://github.com/BU-ISCIII/buisciii-tools/issues/196)
 - Included annotated tab description in exome-trios markdowns [#273](https://github.com/BU-ISCIII/buisciii-tools/pull/273)
-- Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#266](https://github.com/BU-ISCIII/buisciii-tools/pull/266)
+- Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#272](https://github.com/BU-ISCIII/buisciii-tools/pull/272)
 
 ### Modules
 
