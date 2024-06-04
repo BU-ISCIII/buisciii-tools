@@ -47,9 +47,7 @@ Code contributions to the new version:
 
 #### Added enhancements
 
-### Modules
-
-#### Added enhancements
+- PR [#274](https://github.com/BU-ISCIII/buisciii-tools/pull/274): added `--dev` option, configuration dev and test folder structure.
 
 #### Fixes
 
