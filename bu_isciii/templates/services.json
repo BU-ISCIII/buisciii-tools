@@ -8,8 +8,8 @@
         "end": "",
         "description": "nf-core/bacass:  Simple bacterial assembly and annotation pipeline",
         "clean": {
-          "folders":["01-preprocessing/trimmed_sequences"],
-          "files":[]
+          "folders":[],
+          "files":["01-processing/fastp/*.fastp.fastq.gz"]
         },
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
