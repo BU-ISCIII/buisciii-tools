@@ -1,8 +1,0 @@
-stitle	qaccver	saccver	pident	length	mismatch	gapopen	qstart	qend	sstart	send	evalue	bitscore	slen	qlen	qcovs	%cgAligned	%refCovered
-Rotavirus A segment 1, complete genome	NODE_1_length_3421_cov_1627.113038	NC_011507.2	79.439	3317	652	27	78	3379	3302	1	0.0	2320	3302	3421	97	0.9696	1.00454
-Bat rotavirus isolate BatRVA/KEN/BATp39/Rousettus aegyptiacus/2015 VP2 protein (VP2) gene, complete cds	NODE_2_length_2879_cov_1635.574946	NC_040413.1	79.026	2546	520	9	108	2649	2643	108	0.0	1731	2649	2879	88	0.884335	0.961117
-Rotavirus A segment 8, complete genome	NODE_8_length_1144_cov_1443.509841	NC_011502.2	82.846	1061	178	4	69	1127	1059	1	0.0	948	1059	1144	93	0.927448	1.00189
-Rotavirus A segment 9, complete genome	NODE_9_length_1137_cov_2446.663208	NC_011503.2	80.056	1063	207	5	78	1137	1	1061	0.0	784	1062	1137	93	0.934916	1.00094
-Rotavirus A segment 10, complete genome	NODE_10_length_819_cov_3584.164420	NC_011504.2	82.527	744	127	3	77	818	1	743	0.0	651	751	819	91	0.908425	0.990679
-Rotavirus A segment 11, complete genome	NODE_11_length_809_cov_1708.538251	NC_011505.2	89.222	668	67	4	78	741	667	1	0.0	830	667	809	90	0.825711	1.0015
-Bat rotavirus isolate BatRVA/KEN/BATp39/Rousettus aegyptiacus/2015 NSP5 (NSP5) gene, complete cds	NODE_11_length_809_cov_1708.538251	NC_040407.1	80.134	599	108	9	129	720	595	1	1.05e-120	436	597	809	73	0.74042	1.00335
