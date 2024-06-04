@@ -188,7 +188,9 @@ class BioinfoDoc:
         try:
             self.config_pdfkit = pdfkit.configuration()
         except OSError as e:
-            stderr.print("[red] wkhtmlpdf executable was not found. Install it using conda environment.")
+            stderr.print(
+                "[red] wkhtmlpdf executable was not found. Install it using conda environment."
+            )
             stderr.print(f"[red] Error: {e}")
             sys.exit()
 
