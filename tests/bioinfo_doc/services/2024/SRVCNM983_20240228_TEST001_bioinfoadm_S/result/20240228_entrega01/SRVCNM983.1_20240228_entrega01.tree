@@ -1,0 +1,11 @@
+/home/smonzon/tests_buisciii/data/bi/sftp/test/SRVCNM983_20240228_TEST001_bioinfoadm_S
+├── ANALYSIS
+│   ├── ANALYSIS01_ASSEMBLY
+│   └── samples_id.txt
+├── DOC
+│   ├── hpc_slurm_assembly.config
+│   └── rsync_20240603.log
+├── REFERENCES
+└── RESULTS
+
+5 directories, 3 files

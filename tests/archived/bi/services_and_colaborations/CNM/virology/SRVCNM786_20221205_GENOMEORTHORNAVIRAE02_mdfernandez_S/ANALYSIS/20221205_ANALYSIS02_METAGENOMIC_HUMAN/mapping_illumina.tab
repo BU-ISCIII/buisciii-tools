@@ -1,0 +1,8 @@
+run	user	host	Virussequence	sample	totalreads	readshostR1	readshost	%readshost	readsvirus	%readsvirus	unmappedreads	%unmapedreads	medianDPcoveragevirus	Coverage>10x(%)	Variantsinconsensusx10	MissenseVariants	%Ns10x
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA201	271460	3	6	0.00221027	8941	3.29	262513	96.7041	NA	20.0	258	59	
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA203	129406	2	4	0.00309105	5244	4.05	124158	95.9445	NA	28.000000000000004	362	58	
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA205	301120	3	6	0.00199256	25510	8.47	275604	91.5263	NA	28.999999999999996	444	79	
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA200	572950	12	24	0.00418885	10365	1.81	562561	98.1868	NA	13.0	145	51	
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA202	287454	1514	3028	1.05339	1451	0.5	282975	98.4418	NA	11.0	119	35	
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA204	249886	1	2	0.000800365	16446	6.58	233438	93.4178	NA	28.999999999999996	431	78	
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	Human	RotavirusA_11segments	PTA206	294260	2	4	0.00135934	17587	5.98	276669	94.022	NA	27.0	416	71	

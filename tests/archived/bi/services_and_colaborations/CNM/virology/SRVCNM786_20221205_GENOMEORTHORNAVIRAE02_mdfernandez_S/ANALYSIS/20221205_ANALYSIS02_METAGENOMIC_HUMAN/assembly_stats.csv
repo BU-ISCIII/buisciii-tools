@@ -1,0 +1,8 @@
+run	user	host	Virussequence	sample	totalreads	readshostR1	readshost	%readshost	Non-host-reads	%Non-host-reads	Contigs	Largest_contig	%Genome_fraction
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA201	271460	3	6	0	271454	100	12	3790	1.514
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA203	129406	2	4	0	129402	100	11	3338	1.422
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA205	301120	3	6	0	301114	100	11	3367	1.174
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA200	572950	12	24	0	572926	100	11	3421	1.535
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA202	287454	1514	3028	1.05	284426	98.95	11	3427	1.53
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA204	249886	1	2	0	249884	100	11	3352	1.126
+MiSeq_GEN_341_20221129_MDFernanadez	mdfernandez	human	RotavirusA_11segments	PTA206	294260	2	4	0	294256	100	11	3367	1.121

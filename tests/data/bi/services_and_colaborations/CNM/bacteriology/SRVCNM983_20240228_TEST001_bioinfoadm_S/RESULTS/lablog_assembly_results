@@ -1,0 +1,31 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+
+mkdir -p $DELIVERY_FOLDER/assembly
+
+# Assembly service
+cd $DELIVERY_FOLDER/assembly
+
+# Links to reports
+ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/multiqc/multiqc_report.html .
+ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/summary_assembly_metrics_mqc.csv .
+ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/kmerfinder_summary.csv .
+ln -s ../../../ANALYSIS/*ASSEMBLY/03-assembly/quast/global_report/report.html quast_global_report.html
+
+# Links to per reference reports
+for dir in ../../../ANALYSIS/*ASSEMBLY/03-assembly/quast/per_reference_reports/*; do
+    base=$(basename "$dir")
+    if compgen -G "$dir" > /dev/null; then
+        ln -s "$dir/report.html" "quast_${base}_report.html"
+    fi
+done
+
+# Links to assemblies
+assembly_dirs=(unicycler dragonflye canu miniasm)
+for tool in "${assembly_dirs[@]}"; do
+    path="../../../ANALYSIS/*ASSEMBLY/03-assembly/${tool}"
+    if compgen -G "$path" > /dev/null; then
+        find $path -type d -exec ln -nsf {} assemblies \;
+        break
+    fi
+done
+cd -
