@@ -1,0 +1,1 @@
+sbatch assembly.sbatch

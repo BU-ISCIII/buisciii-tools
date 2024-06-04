@@ -1,0 +1,131 @@
+# Function to print colored text
+print_color() {
+    case "$2" in
+        "red")
+            echo -e "\e[1;31m$1\e[0m"
+            ;;
+        "green")
+            echo -e "\e[1;32m$1\e[0m"
+            ;;
+        "blue")
+            echo -e "\e[1;34m$1\e[0m"
+            ;;
+        *)
+            echo "$1"
+            ;;
+    esac
+}
+
+# Function to prompt with color
+prompt_with_color() {
+    read -p "$(print_color $1 'blue') $2" response
+}
+
+# Select assembly mode
+assembly_options=("short" "long" "hybrid")
+print_color "Indicate the preferred assembly mode:" 'blue'
+select ASSEMBLY_MODE in "${assembly_options[@]}"; do
+    if [ -n "$ASSEMBLY_MODE" ]; then
+        if [ $ASSEMBLY_MODE == "short" ]; then 
+            ASSEMBLER="unicycler"
+        elif [ "$ASSEMBLY_MODE" == "long" ] || [ "$ASSEMBLY_MODE" == "hybrid" ]; then
+            ASSEMBLER="dragonflye"
+        fi
+        break
+    else
+        print_color "Invalid input. Please select a valid option." 'red'
+    fi
+done
+print_color "Selected assembly mode: $ASSEMBLY_MODE" 'green'
+
+# Select whether to save trimmed reads
+trim_options=("Yes" "No")
+print_color "Do you want to save trimmed reads in outdir?" 'blue'
+select TRIMMED in "${trim_options[@]}"; do
+    if [ -n "$TRIMMED" ]; then
+        # rename trimmed
+        if [ "$TRIMMED" == "Yes" ] || [ "$TRIMMED" == "y" ]; then
+            SAVETRIMMED="true"
+        else 
+            SAVETRIMMED="false"
+        fi
+
+        break
+    else
+        print_color "Invalid input. Please select a valid option." 'red'
+    fi
+done
+print_color "Selected trimmed file option: $TRIMMED save trimmed" 'green'
+
+# Select Prokka gram type
+gram_options=("+" "-" "skip")
+
+print_color "Is gram positive or negative?" 'blue'
+select GRAMTYPE in "${gram_options[@]}"; do
+    if [ -n "$GRAMTYPE" ]; then
+        if [ "$GRAMTYPE" != "skip" ]; then
+            PROKKA_ARGS="--prokka_args '--gram ${GRAMTYPE}'"
+        fi
+        break
+    else
+        print_color "Invalid input. Please select a valid option." 'red'
+    fi
+done
+
+print_color "Selected Prokka gram type: $GRAMTYPE" 'green'
+
+
+# SETUP INTPUT SAMPLE SHEET
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+
+echo "ID,R1,R2,LongFastQ,Fast5,GenomeSize" > samplesheet.csv
+cat samples_id.txt | while read in; do
+    if [ "$ASSEMBLY_MODE" == "short" ]; then
+        echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,NA,NA,NA";
+    elif [ "$ASSEMBLY_MODE" == "long" ]; then
+        echo "${in},NA,NA,00-reads/${in}.fastq.gz,NA,NA";
+    elif [ "$ASSEMBLY_MODE" == "hybrid" ]; then
+        echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,00-reads/${in}.fastq.gz,NA,NA";
+    else
+        echo "Format not recognized for the sample : ${in}.";
+    fi
+done >> samplesheet.csv
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+cat <<EOF > assembly.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 8G
+#SBATCH --time 8:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_assembly01.log
+#SBATCH --chdir $scratch_dir
+
+# module load Nextflow/23.10.0 singularity
+export NXF_OPTS="-Xms500M -Xmx8G"
+
+nextflow run /data/bi/pipelines/nf-core-bacass/main.nf \\
+        -c ../../DOC/hpc_slurm_assembly.config \\
+        -profile singularity \\
+        --input samplesheet.csv \\
+        --outdir ./ \\
+        --assembly_type ${ASSEMBLY_MODE} \\
+        --assembler ${ASSEMBLER} \\
+        --skip_polish true \\
+        --save_trimmed ${SAVETRIMMED} \\
+        --fastp_args '--qualified_quality_phred 20 --cut_mean_quality 20' \\
+        --skip_kraken2 true \\
+        --skip_kmerfinder false \\
+        --kmerfinderdb /data/bi/references/kmerfinder/20190108_stable_dirs/bacteria \\
+        --ncbi_assembly_metadata /data/bi/references/bacteria/20191212/assembly_summary_bacteria.txt \\
+        ${PROKKA_ARGS} \\
+        -resume
+
+EOF
+
+echo "sbatch assembly.sbatch" > _01_nf_assembly.sh
+
+

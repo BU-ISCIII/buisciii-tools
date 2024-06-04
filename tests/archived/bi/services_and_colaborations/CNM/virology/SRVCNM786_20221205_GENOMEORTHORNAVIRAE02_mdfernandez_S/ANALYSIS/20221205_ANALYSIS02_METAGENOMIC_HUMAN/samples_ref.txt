@@ -1,0 +1,7 @@
+PTA201	RotavirusA_11segments
+PTA203	RotavirusA_11segments
+PTA205	RotavirusA_11segments
+PTA200	RotavirusA_11segments
+PTA202	RotavirusA_11segments
+PTA204	RotavirusA_11segments
+PTA206	RotavirusA_11segments
