@@ -51,6 +51,7 @@ Code contributions to the new version:
 #### Added enhancements
 
 - PR [#274](https://github.com/BU-ISCIII/buisciii-tools/pull/274): added `--dev` option, configuration dev and test folder structure.
+- PR [#276](https://github.com/BU-ISCIII/buisciii-tools/pull/276): wkhtmlpdf does not need absolute path to executable. Added better error handling when executable does not exists.
 
 #### Fixes
 
