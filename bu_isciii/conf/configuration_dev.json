@@ -36,7 +36,7 @@
         "delivery_template_path_file": "templates/jinja_template_delivery.j2",
         "html_template_path_file": "templates/html_service_template.html",
         "path_to_css": "assets/css",
-        "wkhtmltopdf_path": "/home/smonzon/micromamba/envs/buisciii/bin/wkhtmltopdf",
+        "wkhtmltopdf_path": "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf",
         "email_host": "mx2.isciii.es",
         "email_port": "587",
         "email_host_user": "bioinformatica@isciii.es",
