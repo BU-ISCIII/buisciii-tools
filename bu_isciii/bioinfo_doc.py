@@ -185,8 +185,13 @@ class BioinfoDoc:
         )
         self.samples = self.resolution_info.get("samples", None)
         self.handled_services = None
-        path_to_wkhtmltopdf = os.path.normpath(self.conf["wkhtmltopdf_path"])
-        self.config_pdfkit = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+        try:
+            self.config_pdfkit = pdfkit.configuration()
+        except OSError as e:
+            stderr.print("[red] wkhtmlpdf executable was not found. Install it using conda environment.")
+            stderr.print(f"[red] Error: {e}")
+            sys.exit()
+
         if self.type == "service_info":
             self.template_file = self.conf["service_info_template_path_file"]
         else:
@@ -416,6 +421,7 @@ class BioinfoDoc:
             )
         except OSError as e:
             stderr.print("[red] Unable to convert to PDF")
+            stderr.print(f"[red] Error: {e}")
             log.exception("Unable to create pdf.", exc_info=e)
         return
 
