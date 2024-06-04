@@ -7,9 +7,8 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
 
 - [buisciii-tools](#buisciii-tools)
   - [Installation](#installation)
-    - [Bioconda](#bioconda)
-    - [Pip](#pip)
-    - [Development version](#development-version)
+    - [Micromamba and pip](#micromamba-and-pip)
+    - [Dev version](#dev-version)
   - [Usage](#usage)
     - [Command-line](#command-line)
       - [list](#list)
@@ -26,28 +25,40 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
 
 ## Installation
 
-### Bioconda
+### Micromamba and pip
 
 ```bash
-conda create -n buisciii-tools pip
-conda activate 
-conda env update --file environment.yml
+micromamba create -n buisciii -f environment.yml
+micromamba activate buisciii
+pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/buisciii-tools.git@main
 ```
 
-### Pip
+or
 
 ```bash
+git checkout main
+conda create -n buisciii -f environment.yml
 conda activate 
 pip install .
 ```
 
-### Development version
+### Dev version
 
 If you want to install the latest code in the repository:
 
 ```bash
-conda create -n buisciii_dev pip
+micromamba create -n buisciii_dev -f environment.yml
+micromamba activate buisciii_dev
 pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/buisciii-tools.git@develop
+```
+
+or locally:
+
+```bash
+git checkout develop
+micromamba create -n buisciii_dev -f environment.yml
+micromamba activate buisciii_dev
+pip install .
 ```
 
 ## Usage
