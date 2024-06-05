@@ -55,7 +55,7 @@ class CleanUp:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.service_samples = self.resolution_info["samples"]
+        self.service_samples = [sample_id["sample_name"] for sample_id in self.resolution_info["samples"]]
 
         if ask_path and path is None:
             stderr.print(
@@ -94,7 +94,6 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
-        self.service_samples = self.resolution_info.get("Samples", None)
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
@@ -313,7 +312,7 @@ class CleanUp:
             for sample_info in self.service_samples:
                 for file in self.delete_files:
                     file_to_delete = file.replace(
-                        "sample_name", sample_info["sample_name"]
+                        "sample_name", sample_info
                     )
                     files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
