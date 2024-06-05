@@ -4,7 +4,7 @@ ln -s ../00-reads/ .
 ln -s ../samples_id.txt .
 
 echo -e "patient,sex,status,sample,lane,fastq_1,fastq_2" > samplesheet.csv
-cat samples_id.txt | xargs -I % echo -e "%,XY,0,%,1,00-re ads/%_R1.fastq.gz,00-reads/%_R2.fastq.gz" >> samplesheet.csv
+cat samples_id.txt | xargs -I % echo -e "%,XY,0,%,1,00-reads/%_R1.fastq.gz,00-reads/%_R2.fastq.gz" >> samplesheet.csv
 
 while read -r sample;
 do
