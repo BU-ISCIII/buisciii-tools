@@ -24,7 +24,7 @@ jobs:
         run: pip install flake8
       - name: Check for Python file changes
         id: file_check
-        uses: tj-actions/changed-files@v33
+        uses: tj-actions/changed-files@v44
         with:
           sha: ${{ github.event.pull_request.head.sha }}
           files: |
@@ -47,11 +47,10 @@ jobs:
           run: pip install black[jupyter]
         - name: Check for Python file changes
           id: file_check
-          uses: tj-actions/changed-files@v34
+          uses: tj-actions/changed-files@v44
           with:
             sha: ${{ github.event.pull_request.head.sha }}
-            files: |
-              **.py
+            files: '**.py'
         - name: Check code lints with Black
           if: steps.file_check.outputs.any_changed == 'true'
           uses: psf/black@stable
