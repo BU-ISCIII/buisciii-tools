@@ -246,7 +246,7 @@ class Scratch:
             )
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{scratch_folder}'"
+                f"Directory path is not the same as service resolution. Skip folder copy '{scratch_folder}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
