@@ -17,38 +17,34 @@ jobs:
           python-version: 3.9.x
           architecture: x64
       - name: Checkout PyTorch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+          fetch-depth: 0
       - name: Install flake8
         run: pip install flake8
       - name: Check for Python file changes
         id: file_check
-        run: |
-          git fetch origin ${{ github.base_ref }}
-          diff_pyfiles=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.head_ref }} -- '*.py')
-          echo "::set-output name=diff_pyfiles::$diff_pyfiles"
+        uses: tj-actions/changed-files@v33
       - name: Run flake8
-        if: steps.file_check.outputs.diff_pyfiles != ''
+        if: steps.file_check.outputs.any_changed == 'true'
         run: flake8 --ignore E501,W503,E203,W605
       - name: No Python files changed
-        if: steps.file_check.outputs.diff_pyfiles == ''
+        if: steps.file_check.outputs.any_changed != 'true'
         run: echo "No Python files have been changed."
 
   black_lint:
     runs-on: ubuntu-latest
     steps:
         - name: Setup
-          uses: actions/checkout@v2
+          uses: actions/checkout@v3
+            fetch-depth: 0
         - name: Install black in jupyter
           run: pip install black[jupyter]
         - name: Check for Python file changes
           id: file_check
-          run: |
-            git fetch origin ${{ github.base_ref }}
-            diff_pyfiles=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.head_ref }} -- '*.py')
-            echo "::set-output name=diff_pyfiles::$diff_pyfiles"
+          uses: tj-actions/changed-files@v34
         - name: Check code lints with Black
-          if: steps.file_check.outputs.diff_pyfiles != ''
+          if: steps.file_check.outputs.any_changed == 'true'
           uses: psf/black@stable
         - name: No Python files changed
-          if: steps.file_check.outputs.diff_pyfiles == ''
+          if: steps.file_check.outputs.any_changed != 'true'
           run: echo "No Python files have been changed."
