@@ -44,7 +44,7 @@ Code contributions to the new version:
 - Included annotated tab description in exome-trios markdowns [#273](https://github.com/BU-ISCIII/buisciii-tools/pull/273)
 - Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#272](https://github.com/BU-ISCIII/buisciii-tools/pull/272)
 - Updated sarek version in exomeeb, exometrio and wgstrio templates [#277](https://github.com/BU-ISCIII/buisciii-tools/pull/277)
-- Change of extension file of all_samples_virus_table_filtered (from csv to tsv) in lablog_viralrecon_results [#278](https://github.com/BU-ISCIII/buisciii-tools/pull/278) 
+- Extension file of all_samples_virus_table_filtered (from csv to tsv) in lablog_viralrecon_results changed [#278](https://github.com/BU-ISCIII/buisciii-tools/pull/278) 
 
 ### Modules
 
