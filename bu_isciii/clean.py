@@ -100,7 +100,7 @@ class CleanUp:
                 "Options",
                 [
                     "full_clean",
-                    "rename_nocopy",
+                    "rename",
                     "clean",
                     "revert_renaming",
                     "show_removable",
@@ -445,7 +445,7 @@ class CleanUp:
             self.show_nocopy()
         if self.option == "full_clean":
             self.full_clean()
-        if self.option == "rename_nocopy":
+        if self.option == "rename":
             self.rename(to_find=self.nocopy, add="_NC", verbose=True)
             if self.delete_folders != "":
                 self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
