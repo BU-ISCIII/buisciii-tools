@@ -98,7 +98,7 @@ class CleanUp:
                 "Options",
                 [
                     "full_clean",
-                    "rename",
+                    "rename_nocopy",
                     "clean",
                     "revert_renaming",
                     "show_removable",
@@ -369,7 +369,7 @@ class CleanUp:
         else:
             stderr.print("There is no work folder here")
 
-    def delete(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
+    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
             Remove both files and purge folders defined for the service, and rename to tag.
@@ -390,8 +390,10 @@ class CleanUp:
         # Purge folders
         if self.delete_folders != "":
             self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
+            # Rename to tag.
+            self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
         else:
-            stderr.print("No folders to remove")
+            stderr.print("No folders to remove or rename")
         # Purge work
         self.delete_work()
         # Delete files
@@ -428,10 +430,8 @@ class CleanUp:
         Perform and handle the whole cleaning of the service
         """
 
-        self.delete()
+        self.delete_rename()
         self.rename(to_find=self.nocopy, add="_NC", verbose=True)
-        if self.delete_folders != "":
-            self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
 
     def handle_clean(self):
         """
@@ -443,10 +443,8 @@ class CleanUp:
             self.show_nocopy()
         if self.option == "full_clean":
             self.full_clean()
-        if self.option == "rename":
+        if self.option == "rename_nocopy":
             self.rename(to_find=self.nocopy, add="_NC", verbose=True)
-            if self.delete_folders != "":
-                self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
         if self.option == "clean":
             self.delete_rename()
         if self.option == "revert_renaming":
