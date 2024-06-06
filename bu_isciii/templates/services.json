@@ -25,7 +25,7 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["GATK_Bam", "Bam", "Mpileup"],
+          "folders":["Bam", "Mpileup"],
           "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
         },
         "no_copy": ["RAW", "TMP"],
@@ -42,7 +42,7 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["GATK_Bam", "Bam", "Mpileup"],
+          "folders":["Bam", "Mpileup"],
           "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
         },
         "no_copy": ["RAW", "TMP"],
