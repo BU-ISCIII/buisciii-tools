@@ -25,6 +25,10 @@ jobs:
       - name: Check for Python file changes
         id: file_check
         uses: tj-actions/changed-files@v33
+        with:
+          since_last_remote_commit: true
+          files: |
+             **.py
       - name: Run flake8
         if: steps.file_check.outputs.any_changed == 'true'
         run: flake8 --ignore E501,W503,E203,W605
@@ -44,6 +48,10 @@ jobs:
         - name: Check for Python file changes
           id: file_check
           uses: tj-actions/changed-files@v34
+          with:
+            since_last_remote_commit: true
+            files: |
+              **.py
         - name: Check code lints with Black
           if: steps.file_check.outputs.any_changed == 'true'
           uses: psf/black@stable
