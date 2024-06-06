@@ -18,6 +18,7 @@ jobs:
           architecture: x64
       - name: Checkout PyTorch
         uses: actions/checkout@v2
+        with:
           fetch-depth: 0
       - name: Install flake8
         run: pip install flake8
@@ -36,6 +37,7 @@ jobs:
     steps:
         - name: Setup
           uses: actions/checkout@v2
+          with:
             fetch-depth: 0
         - name: Install black in jupyter
           run: pip install black[jupyter]
