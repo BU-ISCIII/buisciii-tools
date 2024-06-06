@@ -241,7 +241,7 @@ class Scratch:
         if self.service_folder in scratch_folder:
             shutil.rmtree(scratch_folder)
             stderr.print(
-                "[green]Successfully removed the directory %s" % scratch_folder,
+                "[green]Successfully removed directory %s" % scratch_folder,
                 highlight=False,
             )
         else:
