@@ -2,11 +2,10 @@ name: python_lint
 
 on:
   push:
-    paths:
-      - '**.py'
+    branches: "**"
   pull_request:
-    paths:
-      - '**.py'
+    types: [opened, reopened, synchronize, closed]
+    branches: "**"
 
 jobs:
   flake8_py3:
