@@ -31,6 +31,7 @@ class CleanUp:
         option=None,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         # access the api with the resolution name to obtain the data
         # ask away if no input given
@@ -40,10 +41,8 @@ class CleanUp:
             self.resolution_id = resolution_id
 
         # Obtain info from iskylims api
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        self.conf = conf.get_configuration("cleanning")
+        conf_api = conf.get_configuration("xtutatis_api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
@@ -77,7 +76,10 @@ class CleanUp:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
