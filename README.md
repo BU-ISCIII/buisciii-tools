@@ -72,7 +72,7 @@ Options:
   -u, --api_user TEXT        User for the API logging
   -p, --api_password TEXT    Password for the API logging
   -c, --cred_file TEXT       Config file with API logging credentials
-  --help                     Show this message and exit.
+  --help                     Show this message and exit
 
 Commands:
   list         List available bu-isciii services.
