@@ -201,7 +201,7 @@ class Scratch:
                 except Exception as e:
                     stderr.print(e)
                     stderr.print(
-                        "[red]ERROR: Copy of the directory %s failed"
+                        "[red]ERROR: Copy of directory %s failed"
                         % self.scratch_tmp_path,
                         highlight=False,
                     )
