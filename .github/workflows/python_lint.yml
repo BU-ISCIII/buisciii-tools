@@ -3,10 +3,10 @@ name: python_lint
 on:
   push:
     paths:
-      - '**/*.py'
+      - '**.py'
   pull_request:
     paths:
-      - '**/*.py'
+      - '**.py'
 
 jobs:
   flake8_py3:
@@ -21,8 +21,18 @@ jobs:
         uses: actions/checkout@v2
       - name: Install flake8
         run: pip install flake8
+      - name: Check for Python file changes
+        id: file_check
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          diff_pyfiles=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.head_ref }} -- '*.py')
+          echo "::set-output name=diff_pyfiles::$diff_pyfiles"
       - name: Run flake8
+        if: steps.file_check.outputs.diff_pyfiles != ''
         run: flake8 --ignore E501,W503,E203,W605
+      - name: No Python files changed
+        if: steps.file_check.outputs.diff_pyfiles == ''
+        run: echo "No Python files have been changed."
 
   black_lint:
     runs-on: ubuntu-latest
@@ -31,5 +41,15 @@ jobs:
           uses: actions/checkout@v2
         - name: Install black in jupyter
           run: pip install black[jupyter]
+        - name: Check for Python file changes
+          id: file_check
+          run: |
+            git fetch origin ${{ github.base_ref }}
+            diff_pyfiles=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.head_ref }} -- '*.py')
+            echo "::set-output name=diff_pyfiles::$diff_pyfiles"
         - name: Check code lints with Black
+          if: steps.file_check.outputs.diff_pyfiles != ''
           uses: psf/black@stable
+        - name: No Python files changed
+          if: steps.file_check.outputs.diff_pyfiles == ''
+          run: echo "No Python files have been changed."
