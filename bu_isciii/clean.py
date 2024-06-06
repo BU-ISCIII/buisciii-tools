@@ -31,7 +31,6 @@ class CleanUp:
         option=None,
         api_user=None,
         api_password=None,
-        conf=None,
     ):
         # access the api with the resolution name to obtain the data
         # ask away if no input given
@@ -41,8 +40,10 @@ class CleanUp:
             self.resolution_id = resolution_id
 
         # Obtain info from iskylims api
-        self.conf = conf.get_configuration("cleanning")
-        conf_api = conf.get_configuration("xtutatis_api_settings")
+        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
+        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+            "xtutatis_api_settings"
+        )
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
@@ -76,10 +77,7 @@ class CleanUp:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                conf,
-                "services_and_colaborations",
-                self.resolution_info,
-                "non_archived_path",
+                "services_and_colaborations", self.resolution_info, "non_archived_path"
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
@@ -314,7 +312,8 @@ class CleanUp:
                     file_to_delete = file.replace(
                         "sample_name", sample_info
                     )
-                    files_to_delete.append(file_to_delete)
+                    if file_to_delete not in files_to_delete:
+                        files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
             for file in path_content:
                 os.remove(file)
