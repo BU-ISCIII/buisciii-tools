@@ -58,6 +58,8 @@ Code contributions to the new version:
 
 #### Changed
 
+- Forcing python lint to success if no .py files are in PR [#279](https://github.com/BU-ISCIII/buisciii-tools/pull/279)
+
 #### Removed
 
 ### Requirements
