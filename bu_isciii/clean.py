@@ -390,10 +390,8 @@ class CleanUp:
         # Purge folders
         if self.delete_folders != "":
             self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
-            # Rename to tag.
-            self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
         else:
-            stderr.print("No folders to remove or rename")
+            stderr.print("No folders to remove")
         # Purge work
         self.delete_work()
         # Delete files
@@ -432,6 +430,8 @@ class CleanUp:
 
         self.delete_rename()
         self.rename(to_find=self.nocopy, add="_NC", verbose=True)
+        if self.delete_folders != "":
+            self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
 
     def handle_clean(self):
         """
@@ -445,6 +445,8 @@ class CleanUp:
             self.full_clean()
         if self.option == "rename_nocopy":
             self.rename(to_find=self.nocopy, add="_NC", verbose=True)
+            if self.delete_folders != "":
+                self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
         if self.option == "clean":
             self.delete_rename()
         if self.option == "revert_renaming":
