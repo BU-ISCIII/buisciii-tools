@@ -369,7 +369,7 @@ class CleanUp:
         else:
             stderr.print("There is no work folder here")
 
-    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
+    def delete(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
             Remove both files and purge folders defined for the service, and rename to tag.
@@ -428,7 +428,7 @@ class CleanUp:
         Perform and handle the whole cleaning of the service
         """
 
-        self.delete_rename()
+        self.delete()
         self.rename(to_find=self.nocopy, add="_NC", verbose=True)
         if self.delete_folders != "":
             self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
