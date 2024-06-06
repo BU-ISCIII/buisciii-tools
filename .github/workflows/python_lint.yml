@@ -26,7 +26,7 @@ jobs:
         id: file_check
         uses: tj-actions/changed-files@v33
         with:
-          since_last_remote_commit: true
+          sha: ${{ github.event.pull_request.head.sha }}
           files: |
              **.py
       - name: Run flake8
@@ -49,7 +49,7 @@ jobs:
           id: file_check
           uses: tj-actions/changed-files@v34
           with:
-            since_last_remote_commit: true
+            sha: ${{ github.event.pull_request.head.sha }}
             files: |
               **.py
         - name: Check code lints with Black
