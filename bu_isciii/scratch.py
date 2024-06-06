@@ -251,7 +251,7 @@ class Scratch:
             stderr.print(
                 "[red]ERROR: Directory "
                 + scratch_folder
-                + " not the same as "
+                + " is not the same as "
                 + self.scratch_tmp_path,
                 highlight=False,
             )
