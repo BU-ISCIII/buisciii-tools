@@ -23,7 +23,7 @@ cat references.tmp | while read in; do ln -s ../../ANALYSIS/*/*${in}*/variants/i
 ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
 ln -s ../../ANALYSIS/*/mapping_illumina*.tab ./mapping_illumina.csv
 ln -s ../../ANALYSIS/*/assembly_stats.csv ./assembly_stats.csv
-ln -s ../../ANALYSIS/*/01-PikaVirus-results/all_samples_virus_table_filtered.csv ./pikavirus_table.csv
+ln -s ../../ANALYSIS/*/01-PikaVirus-results/all_samples_virus_table_filtered.tsv ./pikavirus_table.tsv
 
 #conda activate viralrecon_report
 echo "python ./excel_generator.py -r ./references.tmp --merge_lineage_files" > _01_generate_excel_files.sh
