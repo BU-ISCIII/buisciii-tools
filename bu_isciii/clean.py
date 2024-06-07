@@ -55,7 +55,9 @@ class CleanUp:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.service_samples = [sample_id["sample_name"] for sample_id in self.resolution_info["samples"]]
+        self.service_samples = [
+            sample_id["sample_name"] for sample_id in self.resolution_info["samples"]
+            ]
 
         if ask_path and path is None:
             stderr.print(
@@ -311,9 +313,7 @@ class CleanUp:
             files_to_delete = []
             for sample_info in self.service_samples:
                 for file in self.delete_files:
-                    file_to_delete = file.replace(
-                        "sample_name", sample_info
-                    )
+                    file_to_delete = file.replace("sample_name", sample_info)
                     if file_to_delete not in files_to_delete:
                         files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
@@ -433,7 +433,7 @@ class CleanUp:
         self.delete()
         self.rename(to_find=self.nocopy, add="_NC", verbose=True)
         if self.delete_folders != "":
-                self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
+            self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
 
     def handle_clean(self):
         """
