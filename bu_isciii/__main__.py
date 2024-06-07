@@ -307,7 +307,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     type=click.Choice(
         [
             "full_clean",
-            "rename_nocopy",
+            "rename",
             "clean",
             "revert_renaming",
             "show_removable",
@@ -317,7 +317,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     multiple=False,
     help=(
         "Select what to do inside the cleanning step: full_clean: delete files and folders to clean,"
-        " rename no copy and deleted folders, rename_nocopy: just rename no copy folders, clean: "
+        " rename no copy and deleted folders, rename: just rename folders, clean: "
         "delete files and folders to clean,"
         "revert_renaming: remove no_copy and delete tags,"
         "show_removable: list folders and files to remove "
@@ -447,7 +447,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         resolution,
         path,
         ask_path,
-        "rename_nocopy",
+        "rename",
         ctx.obj["api_user"],
         ctx.obj["api_password"],
         ctx.obj["conf"],
