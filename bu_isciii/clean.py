@@ -57,7 +57,7 @@ class CleanUp:
         ]
         self.service_samples = [
             sample_id["sample_name"] for sample_id in self.resolution_info["samples"]
-            ]
+        ]
 
         if ask_path and path is None:
             stderr.print(
