@@ -640,6 +640,7 @@ def archive(
     default=14,
     help="Integer, remove files older than a window of `-d [int]` days. Default 14 days.",
 )
+@click.pass_context
 def autoclean_sftp(ctx, sftp_folder, days):
     """Clean old sftp services"""
     sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(
