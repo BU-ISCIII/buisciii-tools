@@ -57,6 +57,7 @@ Code contributions to the new version:
 
 - Fixed archive module. Updated correct header for scout tsv [#258](https://github.com/BU-ISCIII/buisciii-tools/pull/258).
 - Fixed clean module. Corrected purge_files function. Renaming stage moved from clean to rename_nocopy option. Updated services.json file with correct paths for some services. [#280](https://github.com/BU-ISCIII/buisciii-tools/pull/280)
+- Fixed autoclean-sftp function. [#281](https://github.com/BU-ISCIII/buisciii-tools/pull/281)
 
 #### Changed
 
