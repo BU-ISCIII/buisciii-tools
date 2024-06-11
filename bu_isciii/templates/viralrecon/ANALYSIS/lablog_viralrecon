@@ -211,7 +211,7 @@ echo_bold "\nPlease specify the type of analysis."
 echo_bold "1. METAGENOMICS"
 echo_bold "2. AMPLICONS"
 while true; do
-    echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0
+    echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0; echo
     if [ "$ANALYSIS_TYPE" == "1" ]; then
         ANALYSIS_TYPE="METAGENOMIC"
         echo_green "$ANALYSIS_TYPE analysis selected."
@@ -230,7 +230,7 @@ echo_bold "\nPlease specify the method to be performed."
     echo_bold "2. De novo assemby"
     echo_bold "3. Both"
     while true; do
-        echo -ne "\e[1;38;5;220m"; read -n 1 method; tput sgr0
+        echo -ne "\e[1;38;5;220m"; read -n 1 method; tput sgr0; echo
         if [ "$method" == "1" ]; then
             echo_green "Mapping method selected."
             break
@@ -251,7 +251,7 @@ echo_bold "\nPlease specify the method to be performed."
 
 # Setting samples_ref.txt file
 echo
-read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0
+read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0; echo
 if [ "$samples_ref_prepared" == "y" ]; then 
     echo -e "File samples_ref.txt READY. \xE2\x9C\x85"
 else
@@ -260,7 +260,7 @@ else
     while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
         read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
         read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
-        read -p $'\e[1;37mAre host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] and reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0
+        read -p $'\e[1;37mAre host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] and reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
     done
     while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
     echo -e "File samples_ref.txt READY. \xE2\x9C\x85"
@@ -272,7 +272,7 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
     # Nextclade is able to analyze monkeypox virus
     echo
-    read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0
+    read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
     if [ "$monkeypox" == "y" ]; then
 
         virus_tag='mpox'
@@ -291,7 +291,7 @@ else
     echo_bold "2. RSV"
     echo_bold "3. Other"
     while true; do
-        echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0
+        echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
         if [ "$virus_tag" == "1" ]; then
             virus_tag="sars-cov-2"
             echo_green "${virus_tag^^} virus selected."
