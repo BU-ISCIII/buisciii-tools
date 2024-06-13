@@ -45,7 +45,11 @@ Code contributions to the new version:
 - Installed all necessary singularity images and modified all templates so that, instead of using conda environments or loaded modules, the corresponding singularity images are used [#272](https://github.com/BU-ISCIII/buisciii-tools/pull/272)
 - Updated sarek version in exomeeb, exometrio and wgstrio templates [#277](https://github.com/BU-ISCIII/buisciii-tools/pull/277)
 - Extension file of all_samples_virus_table_filtered (from csv to tsv) in lablog_viralrecon_results changed [#278](https://github.com/BU-ISCIII/buisciii-tools/pull/278)
+<<<<<<< HEAD
 - Fixed singularity-images path when updating pangolin database in lablog_viralrecon. Added line break after prompted input. [#282](https://github.com/BU-ISCIII/buisciii-tools/pull/282)
+=======
+- Fixed singularity-images path when updating pangolin database in lablog_viralrecon. [#282](https://github.com/BU-ISCIII/buisciii-tools/pull/282)
+>>>>>>> c4bd14e (Updated Changelog)
 
 ### Modules
 
