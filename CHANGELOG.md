@@ -47,7 +47,7 @@ Code contributions to the new version:
 - Extension file of all_samples_virus_table_filtered (from csv to tsv) in lablog_viralrecon_results changed [#278](https://github.com/BU-ISCIII/buisciii-tools/pull/278)
 - Fixed singularity-images path when updating pangolin database in lablog_viralrecon. Added line break after prompted input. [#282](https://github.com/BU-ISCIII/buisciii-tools/pull/282)
 - Updated characterization and snippy templates to fit bacass pipeline. Corrected path in 05-iqtree in snippy template. [#283](https://github.com/BU-ISCIII/buisciii-tools/pull/283)
-
+- Included multiqc_report.html in RESULTS folder in every service, where necessary [#265] (https://github.com/BU-ISCIII/buisciii-tools/pull/265)
 
 ### Modules
 
