@@ -6,4 +6,4 @@ mkdir $DELIVERY_FOLDER
 cd $DELIVERY_FOLDER
 
 # Links to reports
-ln -s ../../../ANALYSIS/*RNASEQ/*rnaseq/multiqc/star_salmon/multiqc_report.html .
+ln -s ../../ANALYSIS/*RNASEQ/*rnaseq/multiqc/star_salmon/multiqc_report.html .

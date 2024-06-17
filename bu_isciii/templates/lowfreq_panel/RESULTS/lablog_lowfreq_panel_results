@@ -6,4 +6,4 @@ mkdir $DELIVERY_FOLDER
 cd $DELIVERY_FOLDER
 
 # Links to reports
-ln -s ../../../ANALYSIS/*RBPANEL/99-stats/multiqc_report.html .
+ln -s ../../ANALYSIS/*RBPANEL/99-stats/multiqc_report.html .
