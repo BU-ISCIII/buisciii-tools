@@ -20,7 +20,7 @@ cat references.tmp | while read in; do cd excel_files_${in}; ln -s ../../../ANAL
 #Create symbolic links to files that are going to be converted to excel
 cat references.tmp | while read in; do ln -s ../../ANALYSIS/*/*${in}*/variants/ivar/variants_long_table.csv ${in}_variants_long_table.csv; done
 
-for ref in $(cut -f2 ../../ANALYSIS/samples_ref.txt | sort | uniq); do for organism in $(cut -f3 ../../ANALYSIS/samples_ref.txt | tr '[:lower:]' '[:upper:]' | sort | uniq); do report="../../ANALYSIS/*_${organism}/${ref}_*_viralrecon_mapping/multiqc/multiqc_report.html"; if [ -e $report ]; then ln -s ${report} ./multiqc_report_${ref}_${organism}.html; else echo "Multiqc report not found for reference $reference and organism $organism"; fi; done; done
+for ref in $(cut -f2 ../../ANALYSIS/samples_ref.txt | sort | uniq); do for organism in $(cut -f3 ../../ANALYSIS/samples_ref.txt | tr '[:lower:]' '[:upper:]' | sort | uniq); do report="../../ANALYSIS/*_${organism}/${ref}_*_viralrecon_mapping/multiqc/multiqc_report.html"; if [ -e $report ]; then ln -s ${report} ./multiqc_report_${ref}_${organism}.html; else echo "Multiqc report not found for reference $ref and organism $organism"; fi; done; done
 ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
 ln -s ../../ANALYSIS/*/mapping_illumina*.tab ./mapping_illumina.csv
 ln -s ../../ANALYSIS/*/assembly_stats.csv ./assembly_stats.csv
