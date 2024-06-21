@@ -125,16 +125,19 @@ class NewService:
         )
         services_ids = bu_isciii.utils.get_service_ids(self.services_requested)
         services_json = bu_isciii.service_json.ServiceJson()
-        if len(services_ids) == 1:
+        for service_id in services_ids:
             try:
-                service_template = services_json.get_find(services_ids[0], "template")
+                service_template = services_json.get_find(service_id, "template")
+                service_end = services_json.get_find(service_id, "end")
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
+                    % service_id
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
+            if service_end not in services_ids and service_end != '':
+                services_ids.append(service_end)
             try:
                 shutil.copytree(
                     os.path.join(
@@ -153,13 +156,6 @@ class NewService:
                 stderr.print("[red]ERROR: Copying template failed.")
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-        else:
-            stderr.print(
-                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry!"
-                "Please re-run and select one of the service ids."
-            )
-            sys.exit(1)
-            return False
         return True
 
     def create_samples_id(self):
