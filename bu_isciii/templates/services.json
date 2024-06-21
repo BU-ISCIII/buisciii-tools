@@ -222,7 +222,7 @@
     },
     "mag_met": {
       "label": "",
-      "template": "mag_met",
+      "template": "mag",
       "order": 2,
       "begin": "base",
       "end": "",
