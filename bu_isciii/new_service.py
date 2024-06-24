@@ -128,7 +128,6 @@ class NewService:
         for service_id in services_ids:
             try:
                 service_template = services_json.get_find(service_id, "template")
-                service_end = services_json.get_find(service_id, "end")
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
@@ -136,8 +135,6 @@ class NewService:
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-            if service_end not in services_ids and service_end != '':
-                services_ids.append(service_end)
             try:
                 shutil.copytree(
                     os.path.join(

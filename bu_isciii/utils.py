@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import tarfile
+import sys
 
 import questionary
 import rich
@@ -167,6 +168,19 @@ def get_service_ids(services_requested):
         if services["service_id"] is not None:
             service_id_list.append(services["service_id"])
             service_id_list_all.append(services["service_id"])
+            services_json = bu_isciii.service_json.ServiceJson()
+            try:
+                service_end = services_json.get_find(services["service_id"], "end")
+            except KeyError as e:
+                stderr.print(
+                    "[red]ERROR: Service id %s not found in services json file."
+                    % services["service_id"]
+                )
+                stderr.print("traceback error %s" % e)
+                sys.exit()
+            if service_end not in service_id_list and service_end != '':
+                service_id_list.append(service_end)
+                service_id_list_all.append(service_end)
     service_id_list_all.append("all")
     stderr.print("Which selected service do you want to manage?")
     services_sel = [prompt_selection("Service label:", service_id_list_all)]
