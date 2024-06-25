@@ -207,8 +207,7 @@ class NewService:
                     )
                 except OSError as e:
                     stderr.print(
-                        "[red]ERROR: Symbolic links creation failed for file %s."
-                        % file
+                        "[red]ERROR: Symbolic links creation failed for file %s." % file
                     )
                     stderr.print("Traceback: %s" % e)
                     continue
@@ -232,7 +231,11 @@ class NewService:
             self.samples_json()
             if self.resolution_info["service_state"] != "in_progress":
                 self.rest_api.put_request(
-                    "update-state", "resolution", self.resolution_id, "state", "in_progress"
+                    "update-state",
+                    "resolution",
+                    self.resolution_id,
+                    "state",
+                    "in_progress",
                 )
 
         else:
