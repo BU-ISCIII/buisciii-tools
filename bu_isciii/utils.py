@@ -178,7 +178,7 @@ def get_service_ids(services_requested):
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-            if service_end not in service_id_list and service_end != '':
+            if service_end not in service_id_list and service_end != "":
                 service_id_list.append(service_end)
                 service_id_list_all.append(service_end)
     service_id_list_all.append("all")
