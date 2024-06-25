@@ -388,7 +388,7 @@ class BioinfoDoc:
                 "pymdownx.highlight",
                 "pymdownx.emoji",
                 "pymdownx.tilde",
-		"nl2br",
+                "nl2br",
             ],
             extension_configs={
                 "pymdownx.b64": {
