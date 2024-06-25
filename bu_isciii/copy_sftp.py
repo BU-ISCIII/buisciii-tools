@@ -112,8 +112,9 @@ class CopySftp:
         last_folders_list = []
         for service in services_ids:
             try:
-                items = service_conf.get_find_deep(service, type)
-                last_folders_list.append(items)
+                item = service_conf.get_find_deep(service, type)
+                if item not in last_folders_list:
+                    last_folders_list.append(item)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
