@@ -211,7 +211,7 @@ class NewService:
                         % file
                     )
                     stderr.print("Traceback: %s" % e)
-                    sys.exit()
+                    continue
 
     def samples_json(self):
         json_samples = json.dumps(self.service_samples, indent=4)
