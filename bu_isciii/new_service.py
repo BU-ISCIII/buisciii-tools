@@ -230,9 +230,11 @@ class NewService:
             self.create_samples_id()
             self.create_symbolic_links()
             self.samples_json()
-            self.rest_api.put_request(
-                "update-state", "resolution", self.resolution_id, "state", "in_progress"
-            )
+            if self.resolution_info["service_state"] != "in_progress":
+                self.rest_api.put_request(
+                    "update-state", "resolution", self.resolution_id, "state", "in_progress"
+                )
+
         else:
             stderr.print(
                 "[yellow]WARN: No samples recorded in service: " + self.resolution_id
@@ -240,13 +242,14 @@ class NewService:
             if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
                 self.create_folder()
                 self.copy_template()
-                self.rest_api.put_request(
-                    "update-state",
-                    "resolution",
-                    self.resolution_id,
-                    "state",
-                    "in_progress",
-                )
+                if self.resolution_info["service_state"] != "in_progress":
+                    self.rest_api.put_request(
+                        "update-state",
+                        "resolution",
+                        self.resolution_id,
+                        "state",
+                        "in_progress",
+                    )
             else:
                 stderr.print("Directory not created. Bye!")
                 sys.exit(1)
