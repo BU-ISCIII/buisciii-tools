@@ -207,8 +207,8 @@ class NewService:
                     )
                 except OSError as e:
                     stderr.print(
-                        "[red]ERROR: Symbolic links creation failed for sample %s."
-                        % sample["sampleName"]
+                        "[red]ERROR: Symbolic links creation failed for file %s."
+                        % file
                     )
                     stderr.print("Traceback: %s" % e)
                     sys.exit()
