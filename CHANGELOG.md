@@ -48,6 +48,7 @@ Code contributions to the new version:
 - Fixed singularity-images path when updating pangolin database in lablog_viralrecon. Added line break after prompted input. [#282](https://github.com/BU-ISCIII/buisciii-tools/pull/282)
 - Updated characterization and snippy templates to fit bacass pipeline. Corrected path in 05-iqtree in snippy template. [#283](https://github.com/BU-ISCIII/buisciii-tools/pull/283)
 - Included multiqc_report.html in RESULTS folder in every service, where necessary [#265] (https://github.com/BU-ISCIII/buisciii-tools/pull/265)
+- Added MAG tempalte and removed MAG from other templates [#288](https://github.com/BU-ISCIII/buisciii-tools/pull/288)
 
 ### Modules
 
@@ -55,6 +56,7 @@ Code contributions to the new version:
 
 - PR [#274](https://github.com/BU-ISCIII/buisciii-tools/pull/274): added `--dev` option, configuration dev and test folder structure.
 - PR [#276](https://github.com/BU-ISCIII/buisciii-tools/pull/276): wkhtmlpdf does not need absolute path to executable. Added better error handling when executable does not exists.
+- PR [#288](https://github.com/BU-ISCIII/buisciii-tools/pull/288) Allowed to handle more than one service at a time, related to issue [#217](https://github.com/BU-ISCIII/buisciii-tools/issues/217)
 
 #### Fixes
 
@@ -62,6 +64,7 @@ Code contributions to the new version:
 - Fixed clean module. Corrected purge_files function. Renaming stage moved from clean to rename_nocopy option. Updated services.json file with correct paths for some services. [#280](https://github.com/BU-ISCIII/buisciii-tools/pull/280)
 - Fixed autoclean-sftp function. [#281](https://github.com/BU-ISCIII/buisciii-tools/pull/281)
 - Fixed bioinfo_doc.py. Modified it so that this module creates a .pdf file including new-line characters, without merging lines into one single line [#259](https://github.com/BU-ISCIII/buisciii-tools/pull/259).
+- PR [#288](https://github.com/BU-ISCIII/buisciii-tools/pull/288) Fixed updating service's state to in_progress multiple times, related with issue [#285](https://github.com/BU-ISCIII/buisciii-tools/issues/285)
 
 #### Changed
 
