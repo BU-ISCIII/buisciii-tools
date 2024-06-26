@@ -1,0 +1,7 @@
+# conda activate amrfinder
+
+# Only works with assemblies, prior to this you must have executed assembly pipeline
+
+scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+
+cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --organism Clostridioides_difficile --name ${in} --plus -o ${in}_out &" >> _01_run_amrfinder.sh; done
