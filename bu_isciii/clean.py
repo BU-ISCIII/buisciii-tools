@@ -136,7 +136,7 @@ class CleanUp:
                 else:
                     stderr.print(
                         "[red]ERROR: Service type %s not found in services json file for service %s."
-                        % (type,service)
+                        % (type, service)
                     )
                     sys.exit()
             except KeyError as e:
