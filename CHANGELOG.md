@@ -49,6 +49,7 @@ Code contributions to the new version:
 - Updated characterization and snippy templates to fit bacass pipeline. Corrected path in 05-iqtree in snippy template. [#283](https://github.com/BU-ISCIII/buisciii-tools/pull/283)
 - Included multiqc_report.html in RESULTS folder in every service, where necessary [#265] (https://github.com/BU-ISCIII/buisciii-tools/pull/265)
 - Added MAG tempalte and removed MAG from other templates [#288](https://github.com/BU-ISCIII/buisciii-tools/pull/288)
+- Added amrfinderplus to characterization template. [#289] (https://github.com/BU-ISCIII/buisciii-tools/pull/289)
 
 ### Modules
 
