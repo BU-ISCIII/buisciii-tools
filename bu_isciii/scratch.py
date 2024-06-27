@@ -64,7 +64,7 @@ class Scratch:
         self.conf = conf.get_configuration("scratch_copy")
 
         self.resolution_info = rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
