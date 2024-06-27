@@ -12,9 +12,9 @@ select bacteria in "${possible_organisms[@]}"; do
     if [[ -n "$bacteria" ]]; then
         echo -e "\033[0;32mOrganism selected: ${bacteria}\033[0m"
         if [ $bacteria = "OTHER" ]; then
-            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --name ${in} --plus -o ${in}_out &" >> _01_run_amrfinder.sh; done
+            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh; done
         else
-            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --organism ${bacteria} --name ${in} --plus -o ${in}_out &" >> _01_run_amrfinder.sh; done
+            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --organism ${bacteria} --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh; done
         fi
         break
     else
