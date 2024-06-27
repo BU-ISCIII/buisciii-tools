@@ -8,7 +8,7 @@ ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/ariba_*.tsv .
 ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/ariba_*.csv .
 
 cd amrfinderplus
-find ../../../../ANALYSIS/*CHARACTERIZATION/*amrfinderplus -name '*_out' -exec bash -c 'ln -s "$1" "$(basename "${1%_out}.tsv")"' _ {} \;
+ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*amrfinderplus/*tsv .
 find .. -xtype l -delete
 
 cd ../..
