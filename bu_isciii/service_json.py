@@ -38,7 +38,6 @@ class ServiceJson:
 
     def get_find(self, service, found):
         """
-        Owner: Pablo
         Description:
             Obtain from service any forward items from json data
         """
