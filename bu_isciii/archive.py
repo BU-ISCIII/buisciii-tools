@@ -224,7 +224,7 @@ class Archive:
             try:
                 for service in rest_api.get_request(
                     request_info="services",
-                    safe=False,
+                    safe=True,
                     state="delivered",
                     date_from=str(self.date_from),
                     date_until=str(self.date_until),
@@ -259,7 +259,7 @@ class Archive:
                 if isinstance(
                     (
                         service_data := rest_api.get_request(
-                            request_info="service-data", safe=False, service=service
+                            request_info="service-data", safe=True, service=service
                         )
                     ),
                     int,

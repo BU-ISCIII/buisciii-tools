@@ -54,7 +54,7 @@ class NewService:
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
@@ -210,7 +210,6 @@ class NewService:
                         "[red]ERROR: Symbolic links creation failed for file %s." % file
                     )
                     stderr.print("Traceback: %s" % e)
-                    continue
 
     def samples_json(self):
         json_samples = json.dumps(self.service_samples, indent=4)

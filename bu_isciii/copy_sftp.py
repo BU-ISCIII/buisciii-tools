@@ -50,7 +50,7 @@ class CopySftp:
         )
 
         self.resolution_info = rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         if sftp_folder is None:
             self.sftp_folder = bu_isciii.utils.get_sftp_folder(
