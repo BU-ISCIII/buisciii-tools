@@ -129,16 +129,16 @@ class CleanUp:
         for service in services_ids:
             try:
                 items = service_conf.get_find_deep(service, type)
-                if items:
-                    for item in items:
-                        if item not in clean_items_list:
-                            clean_items_list.append(item)
-                else:
+                if items is None:
                     stderr.print(
                         "[red]ERROR: Service type %s not found in services json file for service %s."
                         % (type, service)
                     )
                     sys.exit()
+                else:
+                    for item in items:
+                        if item not in clean_items_list:
+                            clean_items_list.append(item)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
