@@ -129,7 +129,7 @@
         "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
         "clean": {
           "folders":[],
-          "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
+          "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai", "variants/bowtie2/sample_name.ivar_trim.sorted.bam","variants/bowtie2/sample_name.ivar_trim.sorted.bam.bai"]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
