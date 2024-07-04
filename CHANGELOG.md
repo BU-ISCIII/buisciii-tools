@@ -51,6 +51,7 @@ Code contributions to the new version:
 - Added MAG tempalte and removed MAG from other templates [#288](https://github.com/BU-ISCIII/buisciii-tools/pull/288)
 - Added amrfinderplus to characterization template. [#289] (https://github.com/BU-ISCIII/buisciii-tools/pull/289)
 - Updated all files so that paths referring to /pipelines/ are updated according to the new structure [#287](https://github.com/BU-ISCIII/buisciii-tools/pull/287)
+- Updated assembly's template (lablog and config files) [#295](https://github.com/BU-ISCIII/buisciii-tools/pull/295)
 
 ### Modules
 
