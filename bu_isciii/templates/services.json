@@ -16,23 +16,6 @@
         "delivery_md": "assets/reports/md/assembly.md",
         "results_md": "assets/reports/results/assembly.md"
     },
-    "mtbseq_assembly": {
-        "label": "",
-        "template": "mtbseq",
-        "order": 1,
-        "begin": "base",
-        "end": "mag_met",
-        "url": "https://github.com/ngs-fzb/MTBseq_source",
-        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
-        "clean": {
-          "folders":["Bam", "Mpileup"],
-          "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
-        },
-        "no_copy": ["RAW", "TMP"],
-        "last_folder":"REFERENCES",
-        "delivery_md": "",
-        "results_md": ""
-    },
     "mtbseq": {
         "label": "",
         "template": "mtbseq",
