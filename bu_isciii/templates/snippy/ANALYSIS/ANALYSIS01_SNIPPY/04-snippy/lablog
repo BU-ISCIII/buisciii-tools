@@ -23,9 +23,12 @@ echo "srun --chdir ${scratch_dir} --output logs/SNIP-SITES.%j.log --job-name SNI
 
 # awk 'BEGIN{FS="[> ]"} /^>/{val=$2;next}  {print val,length($0)}' phylo.aln
 
+#code to compare samples inpairs
+# awk '$4 != $5 || $4 != $6 || $5 != $6' core.tab > differences.txt
+
 ## GUBBINS commands
-echo "snippy-clean_full_aln core.full.aln > clean.full.aln" > _03_gubbins.sh
-echo "run_gubbins.py --threads 20 -p gubbins clean.full.aln" >> _03_gubbins.sh
-echo "snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln" >> _03_gubbins.sh
+echo "env - PATH="$PATH" singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_4 snippy-clean_full_aln core.full.aln > clean.full.aln" > _03_gubbins.sh
+echo "singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gubbins:3.3.5--py39pl5321he4a0461_0 run_gubbins.py --threads 20 -p gubbins clean.full.aln" >> _03_gubbins.sh
+echo "env - PATH="$PATH" singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_4 snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln" >> _03_gubbins.sh
 # Run gubbins
 echo "srun --chdir ${scratch_dir} --output logs/GUBBINS.%j.log --job-name GUBBINS --cpus-per-task 20 --mem 49152 --partition short_idx --time 02:00:00 bash _03_gubbins.sh &" > _03_run_gubbins.sh
