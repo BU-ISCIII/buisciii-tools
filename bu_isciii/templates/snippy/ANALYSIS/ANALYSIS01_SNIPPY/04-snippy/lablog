@@ -1,4 +1,4 @@
-rm # module load singularity
+# conda activate snippy
 
 scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
 
@@ -6,10 +6,10 @@ mkdir logs
 
 cat ../samples_id.txt | while read in; do echo -e "${in}\t${scratch_dir}/../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz\t${scratch_dir}/../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz"; done >> input.tab
 
-ls ${scratch_dir}/../../../REFERENCES | xargs -I %% singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_2 snippy-multi ${scratch_dir}/input.tab --mincov 9 --mapqual 10 --basequal 5 --minqual 30 --ref ${scratch_dir}/../../../REFERENCES/%% --cpus 5 > commands.out
+singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_4 snippy-multi ${scratch_dir}/input.tab --mincov 9 --mapqual 10 --basequal 5 --minqual 30 --ref ${scratch_dir}/../../../REFERENCES/GCF_015326295.1/GCF_015326295.1_ASM1532629v1_genomic.fna --cpus 5 > commands.out
 
-head -n -1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" | awk '{print $0" &"}' > _00_snippy.sh
-tail -n 1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY_CORE.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" | awk '{print $0" &"}' > _01_snippy_core.sh
+head -n -1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 env - PATH="$PATH" singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_4 @" | awk '{print $0" &"}' > _00_snippy.sh
+tail -n 1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY_CORE.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 env - PATH="$PATH" singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_4 @" | awk '{print $0" &"}' > _01_snippy_core.sh
 
 
 
@@ -19,7 +19,7 @@ tail -n 1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/S
 # echo "grep \"complex\" ./*/snps.vcf | cut -f 1,2,4,5 | cut -d \":\" -f 2 | sort -u | awk '{pos1=\$2; len_ref=length(\$3); printf \"%s\t%s\t%s\n\", \$1, pos1-1, pos1+len_ref+1}' | grep -v \"^#\" > mask_complex_variants.bed" > _01_snippy_core.sh
 # ls ${scratch_dir}/../../../REFERENCES | xargs -I %% echo "snippy-core --debug --mask ./mask_complex_variants.bed --mask-char 'N' --ref '../../../REFERENCES/%%' $(cat ../samples_id.txt | xargs)" >> _01_snippy_core.sh
 
-echo "snp-sites -b -c -o phylo.aln core.full.aln" > _02_phylo_aln.sh
+echo "srun --chdir ${scratch_dir} --output logs/SNIP-SITES.%j.log --job-name SNIP-SITES --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 env - PATH="$PATH" singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/snippy:4.6.0--hdfd78af_4 snp-sites -b -c -o phylo.aln core.full.aln &" > _02_phylo_aln.sh
 
 # awk 'BEGIN{FS="[> ]"} /^>/{val=$2;next}  {print val,length($0)}' phylo.aln
 
