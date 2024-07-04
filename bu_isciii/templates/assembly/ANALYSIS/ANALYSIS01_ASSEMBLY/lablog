@@ -119,7 +119,7 @@ nextflow run /data/bi/pipelines/nf-core-bacass/nf-core-bacass-2.3.1/main.nf \\
         --fastp_args '--qualified_quality_phred 20 --cut_mean_quality 20' \\
         --skip_kraken2 true \\
         --skip_kmerfinder false \\
-        --kmerfinderdb /data/bi/references/kmerfinder/20241004/bacteria \\
+        --kmerfinderdb /data/bi/references/kmerfinder/latest/bacteria \\
         --ncbi_assembly_metadata /data/bi/references/bacteria/20240626/assembly_summary_refseq.txt \\
         ${PROKKA_ARGS} \\
         -resume
