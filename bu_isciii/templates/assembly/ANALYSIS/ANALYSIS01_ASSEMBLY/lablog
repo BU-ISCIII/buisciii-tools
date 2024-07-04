@@ -107,25 +107,23 @@ cat <<EOF > assembly.sbatch
 # module load Nextflow/23.10.0 singularity
 export NXF_OPTS="-Xms500M -Xmx8G"
 
-nextflow run /data/bi/pipelines/nf-core-bacass/nf-core-bacass-2.2.0dev/main.nf \\
+nextflow run /data/bi/pipelines/nf-core-bacass/nf-core-bacass-2.3.1/main.nf \\
         -c ../../DOC/hpc_slurm_assembly.config \\
         -profile singularity \\
         --input samplesheet.csv \\
         --outdir ./ \\
-        --assembly_type ${ASSEMBLY_MODE} \\
-        --assembler ${ASSEMBLER} \\
+        --assembly_type short \\
+        --assembler unicycler \\
         --skip_polish true \\
-        --save_trimmed ${SAVETRIMMED} \\
+        --save_trimmed false \\
         --fastp_args '--qualified_quality_phred 20 --cut_mean_quality 20' \\
         --skip_kraken2 true \\
         --skip_kmerfinder false \\
-        --kmerfinderdb /data/bi/references/kmerfinder/20190108_stable_dirs/bacteria \\
-        --ncbi_assembly_metadata /data/bi/references/bacteria/20191212/assembly_summary_bacteria.txt \\
-        ${PROKKA_ARGS} \\
+        --kmerfinderdb /data/bi/references/kmerfinder/20241004/bacteria \\
+        --ncbi_assembly_metadata /data/bi/references/bacteria/20240626/assembly_summary_refseq.txt \\
+        --prokka_args '--gram +' \\
         -resume
 
 EOF
 
 echo "sbatch assembly.sbatch" > _01_nf_assembly.sh
-
-
