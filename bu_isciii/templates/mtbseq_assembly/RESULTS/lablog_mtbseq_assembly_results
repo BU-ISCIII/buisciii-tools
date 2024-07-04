@@ -1,9 +1,0 @@
-DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
-
-mkdir $DELIVERY_FOLDER
-
-# MTBSEQ-ASSEMBLY service
-cd $DELIVERY_FOLDER
-
-# Links to reports
-ln -s ../../ANALYSIS/*ASSEMBLY/99-stats/MultiQC/multiqc_report.html .
