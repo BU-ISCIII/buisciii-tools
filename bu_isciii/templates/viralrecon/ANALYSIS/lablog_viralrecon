@@ -133,7 +133,7 @@ update_nextclade() {
     echo
 }
 
-# Checks if fasta and gff references are downloaded. If not, it downloades them (and create family folder if neccesary)
+# Checks if fasta and gff references are downloaded. If not, it downloads them (and creates family folder if neccesary)
 check_references() {
     echo
     echo_bold "Processing reference: ${ref}."
@@ -149,53 +149,74 @@ check_references() {
         if [ -z $family ]; then
             family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
         fi
-        echo "Reference $ref organism belongs to $family family."
+        echo "Reference $ref belongs to $family family."
     }
 
     # Check if FASTA sequence is already downloaded
-    REF_FASTA=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.fa*" ! -name "*.fai")
-    if [ -z $REF_FASTA ]; then
+    obtain_family;
+    REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
+    if echo "$REF_FASTA" | grep -q "Traceback"; then 
         echo "File ${ref}.fasta is not yet downloaded."
-        obtain_family; if [ -z $family ]; then return; fi
-        if [ ! -e "/data/bi/references/virus/$family" ]; then # Check if directory doesn't exists
-            echo "Creating new directory: /data/bi/references/virus/${family}/"
-            mkdir /data/bi/references/virus/${family}/; chgrp bi /data/bi/references/virus/${family}/
+        if [ -z ${family} ]; then return; fi
+        if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
+            echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
+            digest=$(openssl rand -hex 24)
+            refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/bi/references/refgenie/genome_config.yaml
+            mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
+            wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+            if [ $? -eq 0 ]; then
+                echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
+                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+            else
+                echo_blinking_red "An error occurred during file downloading."
+            fi
         else
-            echo "Directory /data/bi/references/virus/${family}/ ALREADY EXISTS."
-        fi
-        echo "Downloading ${ref}.fasta file..."
-        wget -q -O "/data/bi/references/virus/${family}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
-        if [ $? -eq 0 ]; then
-            REF_FASTA="/data/bi/references/virus/${family}/${ref}.fasta"
-            chgrp bi $REF_FASTA
-            echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
-        else
-            echo_blinking_red "An error occurred during file downloading."
+            echo "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.fasta."
+            digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
+            mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
+            wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+            if [ $? -eq 0 ]; then 
+                echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
+                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+            else
+                echo_blinking_red "An error occurred during file downloading."
+            fi
         fi
     else
-        echo -e "File ${ref}.fasta is ALREADY available in $REF_FASTA. \xE2\x9C\x85"
+        echo -e "File ${ref}.fasta is ALREADY available in $(dirname $REF_FASTA). \xE2\x9C\x85"
     fi
 
     # Check if GFF file is already downloaded
-    REF_GFF=$(find /data/bi/references/virus/ -maxdepth 2 -type f -name "${ref}.gff*")
-    if [ -z $REF_GFF ]; then
+    REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
+    if echo "$REF_GFF" | grep -q "Traceback"; then 
         echo "File ${ref}.gff is not yet downloaded."
-        if [ ! -v family ]; then obtain_family; if [ -z $family ]; then return; fi; fi
-        if [ ! -e "/data/bi/references/virus/$family" ]; then
-            echo "Creating new directory: /data/bi/references/virus/${family}/"
-            mkdir /data/bi/references/virus/${family}/; chgrp bi /data/bi/references/virus/${family}/
-        fi
-        echo "Downloading ${ref}.gff file..."
-        wget -q -O "/data/bi/references/virus/${family}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
-        if [ $? -eq 0 ]; then
-            REF_GFF="/data/bi/references/virus/${family}/${ref}.gff"
-            chgrp bi $REF_GFF
-            echo_green "File ${ref}.gff downloaded in $REF_GFF."
-        else
-            echo_blinking_red "An error occurred during file downloading."
-        fi
+        if [ ! -v ${family} ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
+        if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
+            echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/bi/references/refgenie/alias/${family}/gff/${ref}."
+            digest=$(openssl rand -hex 24)
+            refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/bi/references/refgenie/genome_config.yaml
+            mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
+            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            if [ $? -eq 0 ]; then
+                echo_green "File ${ref}.gff downloaded in $REF_GFF."
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+            else
+                echo_blinking_red "An error occurred during file downloading."
+            fi
+         else
+            echo "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
+            digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
+            mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
+            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            if [ $? -eq 0 ]; then 
+                echo_green "File ${ref}.gff downloaded in $REF_GFF."
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+            else
+                echo_blinking_red "An error occurred during file downloading."
+            fi
+         fi
     else
-        echo -e "File ${ref}.gff is ALREADY available in $REF_GFF. \xE2\x9C\x85"
+        echo -e "File ${ref}.gff is ALREADY available in $(dirname $REF_GFF). \xE2\x9C\x85"
     fi
 
     unset family
