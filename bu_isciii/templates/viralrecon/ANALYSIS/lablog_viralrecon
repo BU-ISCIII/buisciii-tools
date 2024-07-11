@@ -153,10 +153,10 @@ check_references() {
     }
 
     # Check if FASTA sequence is already downloaded
+    obtain_family; if [ -z $family ]; then return; fi
     REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
     if echo "$REF_FASTA" | grep -q "Traceback"; then
         echo "File ${ref}.fasta is not yet downloaded."
-        obtain_family; if [ -z $family ]; then return; fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
             echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
             digest=$(openssl rand -hex 24)
@@ -164,7 +164,7 @@ check_references() {
             mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then
-                echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
+                echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
                 refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
             else
                 echo_blinking_red "An error occurred during file downloading."
@@ -175,7 +175,7 @@ check_references() {
             mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then 
-                echo_green "File ${ref}.fasta downloaded in $REF_FASTA."
+                echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
                 refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
             else
                 echo_blinking_red "An error occurred during file downloading."
@@ -186,10 +186,10 @@ check_references() {
     fi
 
     # Check if GFF file is already downloaded
+    if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
     REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
     if echo "$REF_GFF" | grep -q "Traceback"; then 
-        echo "File ${ref}.gff is not yet downloaded."
-        if [ ! -v ${family} ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
+        echo "File ${ref}.gff is not yet downloaded."        
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
             echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/bi/references/refgenie/alias/${family}/gff/${ref}."
             digest=$(openssl rand -hex 24)
@@ -197,7 +197,7 @@ check_references() {
             mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then
-                echo_green "File ${ref}.gff downloaded in $REF_GFF."
+                echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
             else
                 echo_blinking_red "An error occurred during file downloading."
@@ -208,7 +208,7 @@ check_references() {
             mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then 
-                echo_green "File ${ref}.gff downloaded in $REF_GFF."
+                echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
             else
                 echo_blinking_red "An error occurred during file downloading."
