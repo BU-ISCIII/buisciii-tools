@@ -12,10 +12,10 @@ cat ../samples_id.txt | xargs -I % echo "cd %;ls *.fastq.gz | tr '_' '\t' | cut 
 cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 48G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/mtbseq:1.0.4--hdfd78af_2 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _02_mtbseq.sh
 
 # classification
-echo "mkdir classification_all" > _03_gather_results.sh
-echo "FIRST_SAMPLE=$(head -n1 ../samples_id.txt); head -n1 ${FIRST_SAMPLE}/Classification/Strain_Classification.tab > classification_all/strain_classification_all.tab; grep \"^'$analysis_year\" */Classification/Strain_Classification.tab | cut -d ":" -f 2 >> classification_all/strain_classification_all.tab" >> _03_gather_results.sh
+echo "mkdir classification_all" > _03_gather_results.sh 
+echo "FIRST_SAMPLE=$(head -n1 ../samples_id.txt); head -n 1 ${FIRST_SAMPLE}/Classification/Strain_Classification.tab > classification_all/strain_classification_all.tab; grep \"^'$analysis_year\" */Classification/Strain_Classification.tab | cut -d ":" -f 2 >> classification_all/strain_classification_all.tab" >> _03_gather_results.sh
 # resistances
 echo "mkdir resistances_all" >> _03_gather_results.sh
 cat ../samples_id.txt | xargs -I % echo "cp %/Amend/NONE_joint_cf4_cr4_fr75_ph4_samples1_amended.tab resistances_all/%_var_res.tab" >> _03_gather_results.sh
 # stats
-echo "mkdir stats_all; FIRST_SAMPLE=$(head -n1 ../samples_id.txt); head -n 1 "$FIRST_SAMPLE/Statistics/Mapping_and_Variant_Statistics.tab" > stats_all/statistics_all.tab; grep \"^'$analysis_year\" */Statistics/Mapping_and_Variant_Statistics.tab | cut -d ":" -f 2 >> stats_all/statistics_all.tab" >> _03_gather_results.sh
+echo "mkdir stats_all; FIRST_SAMPLE=$(head -n1 ../samples_id.txt); head -n 1 ${FIRST_SAMPLE}/Statistics/Mapping_and_Variant_Statistics.tab > stats_all/statistics_all.tab; grep \"^'$analysis_year\" */Statistics/Mapping_and_Variant_Statistics.tab | cut -d ":" -f 2 >> stats_all/statistics_all.tab" >> _03_gather_results.sh
