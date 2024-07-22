@@ -2,7 +2,7 @@
     "assembly_annotation": {
         "label": "",
         "template": "assembly",
-        "url": "https://github.com/Daniel-VM/bacass/tree/buisciii-develop",
+        "url": "https://github.com/nf-core/bacass/tree/2.3.1",
         "order": 1,
         "begin": "",
         "end": "",
