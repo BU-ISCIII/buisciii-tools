@@ -53,6 +53,7 @@ Code contributions to the new version:
 - Updated all files so that paths referring to /pipelines/ are updated according to the new structure [#287](https://github.com/BU-ISCIII/buisciii-tools/pull/287)
 - Updated assembly, ariba, snippy, amrfinderplus and iqtree templates, removed genomeev and mtbseq_assembly templates and updated services.json [#295](https://github.com/BU-ISCIII/buisciii-tools/pull/295)
 - Changed viralrecon's lablog so that references are available within refgenie [#296](https://github.com/BU-ISCIII/buisciii-tools/pull/296)
+- Updated services.json, mtbseq's lablog, viralrecon's lablog and assembly's config file [#299](https://github.com/BU-ISCIII/buisciii-tools/pull/299)
 
 ### Modules
 
