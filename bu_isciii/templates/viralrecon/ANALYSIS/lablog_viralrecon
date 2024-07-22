@@ -166,6 +166,7 @@ check_references() {
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
                 refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
@@ -177,6 +178,7 @@ check_references() {
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
                 refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
@@ -199,6 +201,7 @@ check_references() {
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
@@ -210,6 +213,7 @@ check_references() {
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
