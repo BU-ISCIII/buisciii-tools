@@ -198,7 +198,7 @@
         "folders":[],
         "files":[]
       },
-      "no_copy": ["RAW", "TMP", "00-reads"],
+      "no_copy": ["RAW", "TMP", "00-reads", "fasta_inputs"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "results_md": ""
