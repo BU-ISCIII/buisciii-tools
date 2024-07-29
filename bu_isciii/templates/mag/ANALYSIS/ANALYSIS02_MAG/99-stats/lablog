@@ -1,6 +1,6 @@
 #module load singularity
 
-cat ../../samples_id.txt | while read in; do ln -s ../*_mag/Taxonomy/kraken2/${in}/${in}kraken2_report.txt .; done
+cat ../../samples_id.txt | while read in; do ln -s ../*_mag/Taxonomy/kraken2/${in}/${in}.kraken2_report.txt .; done
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
