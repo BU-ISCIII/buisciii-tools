@@ -12,7 +12,8 @@ cd amrfinderplus
 ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*amrfinderplus/*tsv .
 find .. -xtype l -delete
 
-cd ../emmtyper
+cd ..
+cd emmtyper
 ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*emmtyper/01-typing/results_emmtyper.out .
 
 cd ../../
