@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Create folders
-mkdir -p data_NC
-mkdir -p .slurm_logs_NC
+mkdir -p fasta_inputs
+mkdir -p slurm_logs
 
 # Find all .gz files and write them to a file list
 # TODO: add if to check >1 fasta files are available in assembly results
-find ../../*ANALYSIS*ASSEMBLY/*-assembly/unicycler/*.fasta.gz > data_NC/assembly_file_list.txt
-ASSEMBLY_LIST=data_NC/assembly_file_list.txt
+find ../../*ANALYSIS*ASSEMBLY/*-assembly/unicycler/*.fasta.gz > fasta_inputs/assembly_file_list.txt
+ASSEMBLY_LIST=fasta_inputs/assembly_file_list.txt
 
 # Get the number of files
 num_files=$(wc -l < $ASSEMBLY_LIST)
@@ -25,14 +25,14 @@ cat <<EOF > _00_unzip_jobarray.sbatch
 #SBATCH --partition short_idx
 #SBATCH --array=1-$num_files
 #SBATCH --chdir $scratch_dir
-#SBATCH --output .slurm_logs_NC/slurm-%A_%a.out
-#SBATCH --error .slurm_logs_NC/slurm-%A_%a.err
+#SBATCH --output slurm_logs/slurm-%A_%a.out
+#SBATCH --error slurm_logs/slurm-%A_%a.err
 
 # Get the file to process
 file=\$(sed -n "\${SLURM_ARRAY_TASK_ID}p" $ASSEMBLY_LIST)
 
 # Unzip the file to the destination directory
-gzip -dkc \$file > data_NC/\$(basename "\$file" .gz)
+gzip -dkc \$file > fasta_inputs/\$(basename "\$file" .gz)
 
 EOF
 
@@ -68,7 +68,7 @@ singularity exec \\
     --culling-limit 5 \\
     --output 01-typing/results_emmtyper.out \\
     --output-format verbose \\
-    ./data_NC/*.fasta
+    ./fasta_inputs/*.fasta
 
 mv *.tmp 01-typing/tmps
 
