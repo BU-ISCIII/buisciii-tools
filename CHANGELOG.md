@@ -54,6 +54,7 @@ Code contributions to the new version:
 - Updated assembly, ariba, snippy, amrfinderplus and iqtree templates, removed genomeev and mtbseq_assembly templates and updated services.json [#295](https://github.com/BU-ISCIII/buisciii-tools/pull/295)
 - Changed viralrecon's lablog so that references are available within refgenie [#296](https://github.com/BU-ISCIII/buisciii-tools/pull/296)
 - Updated services.json, mtbseq's lablog, viralrecon's lablog and assembly's config file [#299](https://github.com/BU-ISCIII/buisciii-tools/pull/299)
+- Fixed 99-stats (MAG) template. [#301](https://github.com/BU-ISCIII/buisciii-tools/pull/301)
 
 ### Modules
 
