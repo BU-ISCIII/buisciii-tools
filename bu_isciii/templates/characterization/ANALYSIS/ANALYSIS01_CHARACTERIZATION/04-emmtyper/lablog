@@ -63,7 +63,7 @@ singularity exec \\
     /data/bi/pipelines/singularity-images/singularity-emmtyper.0.2.0--py_0 emmtyper \\
     -w blast \\
     --keep \\
-    --blast_db "${blastdb_path}/cdc_emm_database29042024" \\
+    --blast_db "\${blastdb_path}/cdc_emm_database29042024" \\
     --percent-identity 95 \\
     --culling-limit 5 \\
     --output 01-typing/results_emmtyper.out \\
