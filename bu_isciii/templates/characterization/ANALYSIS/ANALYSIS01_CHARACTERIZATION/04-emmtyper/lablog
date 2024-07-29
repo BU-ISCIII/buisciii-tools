@@ -6,7 +6,7 @@ mkdir -p .slurm_logs_NC
 
 # Find all .gz files and write them to a file list
 # TODO: add if to check >1 fasta files are available in assembly results
-find ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/*.fasta.gz > data_NC/assembly_file_list.txt
+find ../../*ANALYSIS*ASSEMBLY/*-assembly/unicycler/*.fasta.gz > data_NC/assembly_file_list.txt
 ASSEMBLY_LIST=data_NC/assembly_file_list.txt
 
 # Get the number of files
