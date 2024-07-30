@@ -2,7 +2,7 @@
 
 # Create folders
 mkdir -p fasta_inputs
-mkdir -p slurm_logs
+mkdir -p logs
 
 # Find all .gz files and write them to a file list
 # TODO: add if to check >1 fasta files are available in assembly results
@@ -25,8 +25,8 @@ cat <<EOF > _00_unzip_jobarray.sbatch
 #SBATCH --partition short_idx
 #SBATCH --array=1-$num_files
 #SBATCH --chdir $scratch_dir
-#SBATCH --output slurm_logs/slurm-%A_%a.out
-#SBATCH --error slurm_logs/slurm-%A_%a.err
+#SBATCH --output logs/slurm-%A_%a.out
+#SBATCH --error logs/slurm-%A_%a.err
 
 # Get the file to process
 file=\$(sed -n "\${SLURM_ARRAY_TASK_ID}p" $ASSEMBLY_LIST)
