@@ -500,6 +500,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                         content_dict.update({"ALT": ALT})
                         content_dict.update({"TYPE": "DEL"})
                     DP.append(value["Count"])
+                    TOTAL_DP.append(value["Total"])
                     AF.append(value["Frequency"])
                     QUAL.append(value["Average_Quality"])
                 else:
