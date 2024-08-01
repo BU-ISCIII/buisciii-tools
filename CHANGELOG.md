@@ -56,6 +56,7 @@ Code contributions to the new version:
 - Updated services.json, mtbseq's lablog, viralrecon's lablog and assembly's config file [#299](https://github.com/BU-ISCIII/buisciii-tools/pull/299)
 - Added lablog to automate gene characterization with emmtyper, including unzipping assemblies. [#300](https://github.com/BU-ISCIII/buisciii-tools/pull/300)
 - Fixed 99-stats (MAG) template. [#301](https://github.com/BU-ISCIII/buisciii-tools/pull/301)
+- Created a python script to process IRMA's results and create a standard vcf file against reference. [#304](https://github.com/BU-ISCIII/buisciii-tools/pull/304)
 - Fixed IRMA's lablog so that the sequences of the samples are not displayed several times neither in the .txt files of each influenza type nor in all_samples_completo.txt [#305](https://github.com/BU-ISCIII/buisciii-tools/pull/305)
 - Modified bioinfo_doc.py so that new lines in the delivery message are applied in the email [#307](https://github.com/BU-ISCIII/buisciii-tools/pull/307)
 - Added several improvements in lablog_viralrecon (created log files, modified check_references function behaviour, enabled config files regeneration) [#306](https://github.com/BU-ISCIII/buisciii-tools/pull/306)
