@@ -489,6 +489,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "TYPE": subdict["TYPE"]
                 }
                 if value["Allele"] == content_dict["ALT"] or value["Allele_Type"] == "Minority" or content_dict["TYPE"] in ["INS", "DEL", "REF"]:
+                    if value["Allele_Type"] == "Minority":
+                        content_dict.update({"ALT": value["Allele"]})
+                        content_dict.update({"TYPE": "SNP"})
                     DP.append(value["Count"])
                     AF.append(value["Frequency"])
                     QUAL.append(value["Average_Quality"])
