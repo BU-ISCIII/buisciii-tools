@@ -468,11 +468,12 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
             }
         }
     """
+
     af_vcf_dict = {}
     for _, value in alleles_dictionary.items():
         pos = value["Position"]
-        for _, subdict in vcf_dictionary.items():
-            if value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF":
+        for align_pos, subdict in vcf_dictionary.items():
+            if (value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF") or (value["Allele"] == subdict['REF'] and subdict['TYPE'] not in ["DEL", "INS"]):
                 continue
             if 'SAMPLE_POS' in subdict and int(pos) in subdict['SAMPLE_POS']:
                 DP = []
