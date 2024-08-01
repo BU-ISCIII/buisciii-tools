@@ -516,7 +516,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     af_vcf_dict[variant]["QUAL"] += QUAL
                 else:
                     af_vcf_dict[variant] = content_dict
-                break
+                pass
 
     return af_vcf_dict
 
