@@ -5,11 +5,13 @@ mkdir logs
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 32 --mem 35000M --chdir $scratch_dir --time 01:00:00 --output logs/IRMA.${in}.%j.log /data/bi/pipelines/flu-amd/flu-amd-1.1.4/IRMA FLU_AD ../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz ${in} --external-config ../../../DOC/irma_config.sh &"; done > _01_irma.sh
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 32 --mem 35000M --chdir $scratch_dir --time 01:00:00 --output logs/IRMA.${in}.%j.log /data/bi/tmp/pipelines_new/flu-amd/flu-amd-1.1.4/IRMA FLU_AD ../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz ${in} --external-config ../../../DOC/irma_config.sh &"; done > _01_irma.sh
 
 echo 'bash create_irma_stats.sh' > _02_create_stats.sh
 
 echo "ls */*HA*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | sort -u | cut -d '_' -f3  | sed '/^\$/d' | sed 's/^/A_/g' > HA_types.txt" > _03_post_processing.sh
+
+echo 'cat HA_types.txt | while read type; do if test -d ${type}; then rm -rf ${type}; fi; done; if test -d B ; then rm -rf B; fi; if test -d C; then rm -rf C; fi' >> _03_post_processing.sh
 
 echo "cat HA_types.txt | while read in; do mkdir \${in}; done" >> _03_post_processing.sh
 
