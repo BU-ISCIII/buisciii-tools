@@ -324,6 +324,10 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "9",
                     "10"
                 ],
+                "TOTAL_DP": [
+                    "9",
+                    "10"
+                ],
                 "AF": [
                     "1",
                     "1"
@@ -333,7 +337,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "34"
                 ]
             },
-            "19": {
+            "EPI_ISL_18668201_10_A": {
                 "CHROM": "EPI_ISL_18668201",
                 "REF_POS": 10,
                 "SAMPLE_POS": [
@@ -345,6 +349,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "DP": [
                     "60"
                 ],
+                "TOTAL_DP": [
+                    "72"
+                ],
                 "AF": [
                     "0.833333333333333"
                 ],
@@ -352,7 +359,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "34.0166666666667"
                 ]
             },
-            "7542": {
+            "EPI_ISL_18668201_7531_TT": {
                 "CHROM": "EPI_ISL_18668201",
                 "REF_POS": 7531,
                 "SAMPLE_POS": [
@@ -364,6 +371,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "DP": [
                     "74"
                 ],
+                "TOTAL_DP": [
+                    "75"
+                ],
                 "AF": [
                     "0.986666666666667"
                 ],
@@ -371,7 +381,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "34.8648648648649"
                 ]
             },
-            "7543": {
+            "EPI_ISL_18668201_7531_TC": {
                 "CHROM": "EPI_ISL_18668201",
                 "REF_POS": 7531,
                 "SAMPLE_POS": [
@@ -383,6 +393,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "DP": [
                     "75"
                 ],
+                "TOTAL_DP": [
+                    "75"
+                ],
                 "AF": [
                     "1"
                 ],
@@ -390,7 +403,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "35.04"
                 ]
             },
-            "7544": {
+            "EPI_ISL_18668201_7531_CA": {
                 "CHROM": "EPI_ISL_18668201",
                 "REF_POS": 7531,
                 "SAMPLE_POS": [
@@ -402,6 +415,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "DP": [
                     "75"
                 ],
+                "TOTAL_DP": [
+                    "75"
+                ],
                 "AF": [
                     "1"
                 ],
@@ -409,9 +425,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "33.8533333333333"
                 ]
             },
-            "10081": {
+            "EPI_ISL_18668201_10067_A": {
                 "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10068,
+                "REF_POS": 10067,
                 "SAMPLE_POS": [
                     10079
                 ],
@@ -421,23 +437,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "DP": [
                     "10"
                 ],
-                "AF": [
-                    "1"
-                ],
-                "QUAL": [
-                    "34.3"
-                ]
-            },
-            "10082": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10069,
-                "SAMPLE_POS": [
-                    10079
-                ],
-                "REF": "-C",
-                "ALT": "-",
-                "TYPE": "DEL",
-                "DP": [
+                "TOTAL_DP": [
                     "10"
                 ],
                 "AF": [
@@ -447,9 +447,31 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "34.3"
                 ]
             },
-            "10083": {
+            "EPI_ISL_18668201_10068_-": {
                 "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10070,
+                "REF_POS": 10068,
+                "SAMPLE_POS": [
+                    10079
+                ],
+                "REF": "-C",
+                "ALT": "-",
+                "TYPE": "DEL",
+                "DP": [
+                    "10"
+                ],
+                "TOTAL_DP": [
+                    "10"
+                ],
+                "AF": [
+                    "1"
+                ],
+                "QUAL": [
+                    "34.3"
+                ]
+            },
+            "EPI_ISL_18668201_10069_-": {
+                "CHROM": "EPI_ISL_18668201",
+                "REF_POS": 10069,
                 "SAMPLE_POS": [
                     10079
                 ],
@@ -457,6 +479,9 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "ALT": "-",
                 "TYPE": "DEL",
                 "DP": [
+                    "10"
+                ],
+                "TOTAL_DP": [
                     "10"
                 ],
                 "AF": [
@@ -547,6 +572,10 @@ def combine_indels(vcf_dictionary):
                 "DP": [
                     "9"
                 ],
+                "TOTAL_DP": [
+                    "9",
+                    "10"
+                ],
                 "AF": [
                     "1"
                 ],
@@ -564,7 +593,10 @@ def combine_indels(vcf_dictionary):
                 "REF": "T",
                 "ALT": "A",
                 "DP": [
-                    "60"
+                    "72"
+                ],
+                "TOTAL_DP": [
+                    "10"
                 ],
                 "AF": [
                     "0.833333333333333"
@@ -589,6 +621,11 @@ def combine_indels(vcf_dictionary):
                     "75",
                     "75"
                 ],
+                "TOTAL_DP": [
+                    "75",
+                    "75",
+                    "75"
+                ],
                 "AF": [
                     "0.986666666666667",
                     "1",
@@ -601,9 +638,9 @@ def combine_indels(vcf_dictionary):
                 ],
                 "TYPE": "INS"
             },
-            "10068": {
+            "10067": {
                 "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10068,
+                "REF_POS": 10067,
                 "SAMPLE_POS": [
                     10079
                 ],
@@ -611,6 +648,9 @@ def combine_indels(vcf_dictionary):
                 "ALT": "A",
                 "DP": [
                     "10"
+                ],
+                "TOTAL_DP": [
+                    "10",
                 ],
                 "AF": [
                     "1"
