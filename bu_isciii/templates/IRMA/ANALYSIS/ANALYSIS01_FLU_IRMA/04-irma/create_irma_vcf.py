@@ -31,10 +31,26 @@ def parse_args(args=None):
         required=True,
         help="Output vcf file",
     )
+    parser.add_argument(
+        "-f",
+        "--frequency",
+        type=float,
+        default=0.25,
+        required=True,
+        help="Minimum Allele Frequency for a variant to be included in the .vcf file. Default 0.25.",
+    )
+    parser.add_argument(
+        "-d",
+        "--depth",
+        type=int,
+        default=10,
+        required=True,
+        help="Minimum depth for a variant to be included in the .vcf file. Default 10X.",
+    )
     return parser.parse_args(args)
 
 
-def alleles_to_dict(alleles_file):
+def alleles_to_dict(alleles_file, frequency, depth):
     """Convert IRMA's allAlleles file to dictionary.
 
     Parameters
@@ -98,7 +114,8 @@ def alleles_to_dict(alleles_file):
             line_data = line.strip().split('\t')
             position = int(line_data[1])
             variant_af = float(line_data[5])
-            if variant_af > 0.25:
+            position_dp = float(line_data[4])
+            if variant_af >= frequency and position_dp >= depth:
                 entry_dict = {header[i]: line_data[i] for i in range(len(header))}
                 variant = str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
                 alleles_dict[variant] = entry_dict
@@ -744,9 +761,11 @@ def main(args=None):
     alignment = args.alignment
     all_alleles = args.irma_alleles
     output_vcf = args.out_vcf
+    freq = args.frequency
+    dp = args.depth
 
     # Start analysis
-    alleles_dict = alleles_to_dict(all_alleles)
+    alleles_dict = alleles_to_dict(all_alleles, freq, dp)
     alignment_dict = align2dict(alignment)
     af_vcf_dict = stats_vcf(alignment_dict, alleles_dict)
     combined_vcf_dict = combine_indels(af_vcf_dict)
