@@ -625,7 +625,7 @@ def combine_indels(vcf_dictionary):
     """
 
     combined_vcf_dict = {}
-    for key, value in vcf_dictionary.items():
+    for _, value in vcf_dictionary.items():
         content_dict = {
             "CHROM": value["CHROM"],
             "REF_POS": value["REF_POS"],
@@ -658,11 +658,10 @@ def combine_indels(vcf_dictionary):
                 combined_vcf_dict[value["REF_POS"]] = content_dict
         elif value["TYPE"] == "DEL":
             sample_found = False
-            for pos, data in combined_vcf_dict.items():
-                var_type = data["TYPE"]
-                if var_type == "DEL":
+            for _, data in combined_vcf_dict.items():
+                if data["TYPE"] == "DEL":
                     if value["SAMPLE_POS"] == data["SAMPLE_POS"]:
-                        if value["TYPE"] == var_type:
+                        if value["TYPE"] == data["TYPE"]:
                             sample_found = data["REF_POS"]
                             break
                         else:
