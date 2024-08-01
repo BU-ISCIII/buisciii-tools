@@ -55,6 +55,7 @@ Code contributions to the new version:
 - Changed viralrecon's lablog so that references are available within refgenie [#296](https://github.com/BU-ISCIII/buisciii-tools/pull/296)
 - Updated services.json, mtbseq's lablog, viralrecon's lablog and assembly's config file [#299](https://github.com/BU-ISCIII/buisciii-tools/pull/299)
 - Fixed 99-stats (MAG) template. [#301](https://github.com/BU-ISCIII/buisciii-tools/pull/301)
+- Fixed IRMA's lablog so that the sequences of the samples are not displayed several times neither in the .txt files of each influenza type nor in all_samples_completo.txt [#305](https://github.com/BU-ISCIII/buisciii-tools/pull/305)
 
 ### Modules
 
