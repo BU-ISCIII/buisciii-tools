@@ -107,17 +107,19 @@ def alleles_to_dict(alleles_file, frequency, depth):
 
     alleles_dict = {}
     with open(alleles_file, "r") as file:
-        header = file.readline().strip().split('\t')
+        header = file.readline().strip().split("\t")
         for line in file:
-            while line.count('\t') < len(header) - 1:
+            while line.count("\t") < len(header) - 1:
                 line += file.readline()
-            line_data = line.strip().split('\t')
+            line_data = line.strip().split("\t")
             position = int(line_data[1])
             variant_af = float(line_data[5])
             position_dp = float(line_data[4])
             if variant_af >= frequency and position_dp >= depth:
                 entry_dict = {header[i]: line_data[i] for i in range(len(header))}
-                variant = str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
+                variant = (
+                    str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
+                )
                 alleles_dict[variant] = entry_dict
     return alleles_dict
 
@@ -246,9 +248,9 @@ def align2dict(alignment_file):
                     "CHROM": CHROM,
                     "REF_POS": ref_position,
                     "SAMPLE_POS": [sample_position],
-                    "REF": sample_seq[i-1],
-                    "ALT": sample_seq[i-1] + sample_base,
-                    "TYPE": "INS"
+                    "REF": sample_seq[i - 1],
+                    "ALT": sample_seq[i - 1] + sample_base,
+                    "TYPE": "INS",
                 }
                 vcf_dict[align_position] = content_dict
         elif ref_position == 1 and len(SAMPLE_POS) > 1:
@@ -258,37 +260,48 @@ def align2dict(alignment_file):
                 "SAMPLE_POS": SAMPLE_POS,
                 "REF": ref_base,
                 "ALT": ALT + sample_base,
-                "TYPE": "INS"
+                "TYPE": "INS",
             }
             vcf_dict[align_position] = content_dict
         elif sample_base == "-" and ref_base != "N":
             content_dict = {
                 "CHROM": CHROM,
-                "REF_POS": ref_position-1,
+                "REF_POS": ref_position - 1,
                 "SAMPLE_POS": [sample_position],
-                "REF": sample_seq[i-1] + ref_base,
-                "ALT": sample_seq[i-1],
-                "TYPE": "DEL"
+                "REF": sample_seq[i - 1] + ref_base,
+                "ALT": sample_seq[i - 1],
+                "TYPE": "DEL",
             }
             vcf_dict[align_position] = content_dict
-        elif ref_base != sample_base and ref_base != "N" and ref_base != "-" and sample_base != "N" and sample_base != "-":
+        elif (
+            ref_base != sample_base
+            and ref_base != "N"
+            and ref_base != "-"
+            and sample_base != "N"
+            and sample_base != "-"
+        ):
             content_dict = {
                 "CHROM": CHROM,
                 "REF_POS": ref_position,
                 "SAMPLE_POS": [sample_position],
                 "REF": ref_base,
                 "ALT": sample_base,
-                "TYPE": "SNP"
+                "TYPE": "SNP",
             }
             vcf_dict[align_position] = content_dict
-        elif ref_base != "N" and ref_base != "-" and sample_base != "N" and sample_base != "-":
+        elif (
+            ref_base != "N"
+            and ref_base != "-"
+            and sample_base != "N"
+            and sample_base != "-"
+        ):
             content_dict = {
                 "CHROM": CHROM,
                 "REF_POS": ref_position,
                 "SAMPLE_POS": [sample_position],
                 "REF": ref_base,
                 "ALT": sample_base,
-                "TYPE": "REF"
+                "TYPE": "REF",
             }
             vcf_dict[align_position] = content_dict
     return vcf_dict
@@ -498,9 +511,12 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
     for _, value in alleles_dictionary.items():
         pos = value["Position"]
         for align_pos, subdict in vcf_dictionary.items():
-            if (value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF") or (value["Allele"] == subdict['REF'] and subdict['TYPE'] not in ["DEL", "INS"]):
+            if (value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF") or (
+                value["Allele"] == subdict["REF"]
+                and subdict["TYPE"] not in ["DEL", "INS"]
+            ):
                 continue
-            if 'SAMPLE_POS' in subdict and int(pos) in subdict['SAMPLE_POS']:
+            if "SAMPLE_POS" in subdict and int(pos) in subdict["SAMPLE_POS"]:
                 DP = []
                 TOTAL_DP = []
                 AF = []
@@ -511,16 +527,22 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     "SAMPLE_POS": subdict["SAMPLE_POS"],
                     "REF": subdict["REF"],
                     "ALT": subdict["ALT"],
-                    "TYPE": subdict["TYPE"]
+                    "TYPE": subdict["TYPE"],
                 }
-                if value["Allele"] == content_dict["ALT"] or value["Allele_Type"] == "Minority" or content_dict["TYPE"] in ["INS", "DEL", "REF"]:
+                if (
+                    value["Allele"] == content_dict["ALT"]
+                    or value["Allele_Type"] == "Minority"
+                    or content_dict["TYPE"] in ["INS", "DEL", "REF"]
+                ):
                     if value["Allele_Type"] == "Minority":
                         content_dict.update({"ALT": value["Allele"]})
                         content_dict.update({"TYPE": "SNP"})
                     if value["Allele"] == "-" and value["Allele_Type"] == "Minority":
-                        REF = vcf_dictionary[align_pos-1]["REF"]+subdict["REF"]
-                        ALT = vcf_dictionary[align_pos-1]["REF"]
-                        content_dict.update({"REF_POS": vcf_dictionary[align_pos-1]["REF_POS"]})
+                        REF = vcf_dictionary[align_pos - 1]["REF"] + subdict["REF"]
+                        ALT = vcf_dictionary[align_pos - 1]["REF"]
+                        content_dict.update(
+                            {"REF_POS": vcf_dictionary[align_pos - 1]["REF_POS"]}
+                        )
                         content_dict.update({"REF": REF})
                         content_dict.update({"ALT": ALT})
                         content_dict.update({"TYPE": "DEL"})
@@ -532,8 +554,16 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     print("SNP not the same in .fasta file and alleles file")
                     print(value)
                     print(content_dict)
-                content_dict.update({"DP": DP, "TOTAL_DP": TOTAL_DP, "AF": AF, "QUAL": QUAL})
-                variant = content_dict["CHROM"] + "_" + str(content_dict["REF_POS"]) + "_" + content_dict["ALT"]
+                content_dict.update(
+                    {"DP": DP, "TOTAL_DP": TOTAL_DP, "AF": AF, "QUAL": QUAL}
+                )
+                variant = (
+                    content_dict["CHROM"]
+                    + "_"
+                    + str(content_dict["REF_POS"])
+                    + "_"
+                    + content_dict["ALT"]
+                )
 
                 if variant in af_vcf_dict:
                     af_vcf_dict[variant]["DP"] += DP
@@ -676,16 +706,20 @@ def combine_indels(vcf_dictionary):
             "TOTAL_DP": value["TOTAL_DP"],
             "AF": value["AF"],
             "QUAL": value["QUAL"],
-            "TYPE": value["TYPE"]
+            "TYPE": value["TYPE"],
         }
         if value["TYPE"] == "INS":
             if value["REF_POS"] in combined_vcf_dict:
                 if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
                     NEW_ALT = value["ALT"].replace(value["REF"], "")
                     combined_vcf_dict[value["REF_POS"]]["ALT"] += NEW_ALT
-                    combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(value["SAMPLE_POS"][0])
+                    combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(
+                        value["SAMPLE_POS"][0]
+                    )
                     combined_vcf_dict[value["REF_POS"]]["DP"].append(value["DP"][0])
-                    combined_vcf_dict[value["REF_POS"]]["TOTAL_DP"].append(value["TOTAL_DP"][0])
+                    combined_vcf_dict[value["REF_POS"]]["TOTAL_DP"].append(
+                        value["TOTAL_DP"][0]
+                    )
                     combined_vcf_dict[value["REF_POS"]]["AF"].append(value["AF"][0])
                     combined_vcf_dict[value["REF_POS"]]["QUAL"].append(value["QUAL"][0])
                 else:
@@ -751,14 +785,12 @@ def get_vcf_header(chromosome, sample_name):
     header_source = ["##fileformat=VCFv4.2", "##source=custom"]
     header_contig = []
     if chromosome:
-        header_contig += [
-            "##contig=<ID=" + chromosome + ">"
-        ]
+        header_contig += ["##contig=<ID=" + chromosome + ">"]
         header_source += header_contig
 
     header_info = [
         '##INFO=<ID=TYPE,Number=1,Type=String,Description="Either SNP (Single Nucleotide Polymorphism), DEL (deletion) or INS (Insertion)">',
-        '##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">'
+        '##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">',
     ]
     header_filter = [
         '##FILTER=<ID=PASS,Description="All filters passed">',
@@ -769,9 +801,7 @@ def get_vcf_header(chromosome, sample_name):
         '##FORMAT=<ID=ALT_QUAL,Number=1,Type=Integer,Description="Mean quality of alternate base">',
         '##FORMAT=<ID=ALT_FREQ,Number=1,Type=Float,Description="Frequency of alternate base">',
     ]
-    columns = [
-        '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + sample_name
-    ]
+    columns = ["#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sample_name]
     header = header_source + header_info + header_filter + header_format + columns
     return header
 
@@ -809,7 +839,13 @@ def create_vcf(variants_dict, out_vcf, alignment):
             REF = value["REF"]
             ALT = value["ALT"]
             TOTAL_DP_list = [int(number) for number in value["TOTAL_DP"]]
-            INFO = "TYPE=" + value["TYPE"] + ';' + "DP=" + str(round(statistics.mean(TOTAL_DP_list)))
+            INFO = (
+                "TYPE="
+                + value["TYPE"]
+                + ";"
+                + "DP="
+                + str(round(statistics.mean(TOTAL_DP_list)))
+            )
             ALT_QUAL_list = []
             for number in value["QUAL"]:
                 if number != "NA":
@@ -819,8 +855,36 @@ def create_vcf(variants_dict, out_vcf, alignment):
                     ALT_QUAL = "NA"
             ALT_DP_list = [int(number) for number in value["DP"]]
             AF_list = [float(number) for number in value["AF"]]
-            SAMPLE = GT + ':' + str(round(statistics.mean(ALT_DP_list))) + ':' + ALT_QUAL + ':' + str(round(statistics.mean(AF_list), 4))
-            oline = CHROM + '\t' + str(POS) + '\t' + ID + '\t' + REF + '\t' + ALT + '\t' + QUAL + '\t' + FILTER + '\t' + INFO + '\t' + FORMAT + '\t' + SAMPLE
+            SAMPLE = (
+                GT
+                + ":"
+                + str(round(statistics.mean(ALT_DP_list)))
+                + ":"
+                + ALT_QUAL
+                + ":"
+                + str(round(statistics.mean(AF_list), 4))
+            )
+            oline = (
+                CHROM
+                + "\t"
+                + str(POS)
+                + "\t"
+                + ID
+                + "\t"
+                + REF
+                + "\t"
+                + ALT
+                + "\t"
+                + QUAL
+                + "\t"
+                + FILTER
+                + "\t"
+                + INFO
+                + "\t"
+                + FORMAT
+                + "\t"
+                + SAMPLE
+            )
             file_out.write(oline + "\n")
 
 
