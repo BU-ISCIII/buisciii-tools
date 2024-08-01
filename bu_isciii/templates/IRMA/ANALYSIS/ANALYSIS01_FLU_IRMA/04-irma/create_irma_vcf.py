@@ -45,23 +45,48 @@ def alleles_to_dict(alleles_file):
     Returns
     -------
     alleles_dict
-        Dictionary containing alleles information with positions as keys.
-	E.g:
-	{
-	  1: {
-            'Reference_Name': 'rsv_a2',
-            'Position': '1',
-            'Allele': 'A',
-            'Count': '2',
-            'Total': '2',
-            'Frequency': '1',
-            'Average_Quality': '29.5',
-            'ConfidenceNotMacErr': '0.998877981545698',
-            'PairedUB': '1',
-            'QualityUB': '1',
-            'Allele_Type': 'Consensus'
-           }
-	}
+        Dictionary containing alleles information with chrom+positions+allele as key. e.g.
+        {
+            "rsv_a2_1_A": {
+                "Reference_Name": "rsv_a2",
+                "Position": "1",
+                "Allele": "A",
+                "Count": "2",
+                "Total": "2",
+                "Frequency": "1",
+                "Average_Quality": "29.5",
+                "ConfidenceNotMacErr": "0.998877981545698",
+                "PairedUB": "1",
+                "QualityUB": "1",
+                "Allele_Type": "Consensus"
+            },
+            "rsv_a2_2204_A": {
+                "Reference_Name": "rsv_a2",
+                "Position": "2204",
+                "Allele": "A",
+                "Count": "6532",
+                "Total": "15323",
+                "Frequency": "0.426287280558637",
+                "Average_Quality": "34.5708818126148",
+                "ConfidenceNotMacErr": "0.999181140401206",
+                "PairedUB": "0.00396999257813604",
+                "QualityUB": "0.0010642711614851",
+                "Allele_Type": "Minority"
+            },
+            "rsv_a2_2204_G": {
+                "Reference_Name": "rsv_a2",
+                "Position": "2204",
+                "Allele": "G",
+                "Count": "8768",
+                "Total": "15323",
+                "Frequency": "0.5722117078901",
+                "Average_Quality": "35.0286268248175",
+                "ConfidenceNotMacErr": "0.999450989591763",
+                "PairedUB": "0.00396999257813604",
+                "QualityUB": "0.00100698799816366",
+                "Allele_Type": "Consensus"
+            },
+        }
     """
 
     alleles_dict = {}
@@ -72,10 +97,11 @@ def alleles_to_dict(alleles_file):
                 line += file.readline()
             line_data = line.strip().split('\t')
             position = int(line_data[1])
-            allele_type = line_data[10]
-            if allele_type == "Consensus":
+            variant_af = float(line_data[5])
+            if variant_af > 0.25:
                 entry_dict = {header[i]: line_data[i] for i in range(len(header))}
-                alleles_dict[position] = entry_dict
+                variant = str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
+                alleles_dict[variant] = entry_dict
     return alleles_dict
 
 
@@ -104,15 +130,15 @@ def align2dict(alignment_file):
                 "ALT": "AAA",
                 "TYPE": "INS"
             },
-            "19": {
+            "11": {
                 "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10,
+                "REF_POS": 2,
                 "SAMPLE_POS": [
-                    19
+                    11
                 ],
-                "REF": "T",
+                "REF": "A",
                 "ALT": "A",
-                "TYPE": "SNP"
+                "TYPE": "REF"
             },
             "7542": {
                 "CHROM": "EPI_ISL_18668201",
@@ -238,6 +264,16 @@ def align2dict(alignment_file):
                 "TYPE": "SNP"
             }
             vcf_dict[align_position] = content_dict
+        elif ref_base != "N" and ref_base != "-" and sample_base != "N" and sample_base != "-":
+            content_dict = {
+                "CHROM": CHROM,
+                "REF_POS": ref_position,
+                "SAMPLE_POS": [sample_position],
+                "REF": ref_base,
+                "ALT": sample_base,
+                "TYPE": "REF"
+            }
+            vcf_dict[align_position] = content_dict
     return vcf_dict
 
 
@@ -257,7 +293,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
         Updated dictionary with allele frequencies and other metrics.
         E.g:
         {
-            "10": {
+            "EPI_ISL_18668201_1_AAA": {
                 "CHROM": "EPI_ISL_18668201",
                 "REF_POS": 1,
                 "SAMPLE_POS": [
@@ -268,13 +304,16 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 "ALT": "AAA",
                 "TYPE": "INS",
                 "DP": [
-                    "9"
+                    "9",
+                    "10"
                 ],
                 "AF": [
+                    "1",
                     "1"
                 ],
                 "QUAL": [
-                    "33.7777777777778"
+                    "33.7777777777778",
+                    "34"
                 ]
             },
             "19": {
@@ -413,37 +452,43 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
         }
     """
     af_vcf_dict = {}
-    for key, value in vcf_dictionary.items():
-        DP = []
-        AF = []
-        QUAL = []
-        content_dict = {
-            "CHROM": value["CHROM"],
-            "REF_POS": value["REF_POS"],
-            "SAMPLE_POS": value["SAMPLE_POS"],
-            "REF": value["REF"],
-            "ALT": value["ALT"],
-            "TYPE": value["TYPE"]
-        }
-        for position in value["SAMPLE_POS"]:
-            if position in alleles_dictionary:
-                alleles_info = alleles_dictionary[position]
-                if alleles_info["Allele"] == value["ALT"] or value["TYPE"] in ["INS", "DEL"]:
-                    DP.append(alleles_info["Count"])
-                    AF.append(alleles_info["Frequency"])
-                    QUAL.append(alleles_info["Average_Quality"])
-                    break
+    for _, value in alleles_dictionary.items():
+        pos = value["Position"]
+        for _, subdict in vcf_dictionary.items():
+            if value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF":
+                continue
+            if 'SAMPLE_POS' in subdict and int(pos) in subdict['SAMPLE_POS']:
+                DP = []
+                AF = []
+                QUAL = []
+                content_dict = {
+                    "CHROM": subdict["CHROM"],
+                    "REF_POS": subdict["REF_POS"],
+                    "SAMPLE_POS": subdict["SAMPLE_POS"],
+                    "REF": subdict["REF"],
+                    "ALT": subdict["ALT"],
+                    "TYPE": subdict["TYPE"]
+                }
+                if value["Allele"] == content_dict["ALT"] or value["Allele_Type"] == "Minority" or content_dict["TYPE"] in ["INS", "DEL", "REF"]:
+                    DP.append(value["Count"])
+                    AF.append(value["Frequency"])
+                    QUAL.append(value["Average_Quality"])
                 else:
                     print("SNP not the same in .fasta file and alleles file")
                     print(value)
-                    print(alleles_info)
-            else:
-                print("Position not detected in allele file!")
-                print("Position")
-                print(value["SAMPLE_POS"])
-                print(value)
-        content_dict.update({"DP": DP, "AF": AF, "QUAL": QUAL})
-        af_vcf_dict[key] = content_dict
+                    print(content_dict)
+
+                content_dict.update({"DP": DP, "AF": AF, "QUAL": QUAL})
+                variant = content_dict["CHROM"] + "_" + str(content_dict["REF_POS"]) + "_" + content_dict["ALT"]
+
+                if variant in af_vcf_dict:
+                    af_vcf_dict[variant]["DP"] += DP
+                    af_vcf_dict[variant]["AF"] += AF
+                    af_vcf_dict[variant]["QUAL"] += QUAL
+                else:
+                    af_vcf_dict[variant] = content_dict
+                break
+
     return af_vcf_dict
 
 
