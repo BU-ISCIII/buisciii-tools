@@ -707,15 +707,21 @@ def get_vcf_header(chromosome, sample_name):
 
     header_info = [
         '##INFO=<ID=TYPE,Number=1,Type=String,Description="Either SNP (Single Nucleotide Polymorphism), DEL (deletion) or INS (Insertion)">',
+        '##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">'
+    ]
+    header_filter = [
+        '##FILTER=<ID=PASS,Description="All filters passed">',
     ]
     header_format = [
-        '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth of alternate base">',
-        '##FORMAT=<ID=AF,Number=1,Type=Float,Description="Frequency of alternate base">',
+        '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
+        '##FORMAT=<ID=ALT_DP,Number=1,Type=Integer,Description="Depth of alternate base">',
+        '##FORMAT=<ID=ALT_QUAL,Number=1,Type=Integer,Description="Mean quality of alternate base">',
+        '##FORMAT=<ID=ALT_FREQ,Number=1,Type=Float,Description="Frequency of alternate base">',
     ]
     columns = [
-        '#CHROM\tPOS\tREF\tALT\tQUAL\tINFO\tFORMAT\t' + sample_name
+        '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t' + sample_name
     ]
-    header = header_source + header_info + header_format + columns
+    header = header_source + header_info + header_filter + header_format + columns
     return header
 
 
@@ -739,7 +745,11 @@ def create_vcf(variants_dict, out_vcf, alignment):
     chrom = next(iter(variants_dict.values()))["CHROM"]
     sample = alignment.replace(".align.fasta", "")
     vcf_header = "\n".join(get_vcf_header(chrom, sample))
-    FORMAT = "DP:AF"
+    FORMAT = "GT:ALT_DP:ALT_QUAL:ALT_FREQ"
+    ID = "."
+    QUAL = "."
+    FILTER = "PASS"
+    GT = "1"
     with open(out_vcf, "w") as file_out:
         file_out.write(vcf_header + "\n")
         for key, value in variants_dict.items():
@@ -749,9 +759,17 @@ def create_vcf(variants_dict, out_vcf, alignment):
             ALT = value["ALT"]
             TOTAL_DP_list = [int(number) for number in value["TOTAL_DP"]]
             INFO = "TYPE=" + value["TYPE"] + ';' + "DP=" + str(round(statistics.mean(TOTAL_DP_list)))
+            ALT_QUAL_list = []
+            for number in value["QUAL"]:
+                if number != "NA":
+                    ALT_QUAL_list.append(float(number))
+                    ALT_QUAL = str(round(statistics.mean(ALT_QUAL_list), 2))
+                else:
+                    ALT_QUAL = "NA"
+            ALT_DP_list = [int(number) for number in value["DP"]]
             AF_list = [float(number) for number in value["AF"]]
-            SAMPLE = str(round(statistics.mean(DP_list))) + ':' + str(round(statistics.mean(AF_list), 4))
-            oline = CHROM + '\t' + str(POS) + '\t' + REF + '\t' + ALT + '\t' + str("".join(QUAL)) + '\t' + INFO + '\t' + FORMAT + '\t' + SAMPLE
+            SAMPLE = GT + ':' + str(round(statistics.mean(ALT_DP_list))) + ':' + ALT_QUAL + ':' + str(round(statistics.mean(AF_list), 4))
+            oline = CHROM + '\t' + str(POS) + '\t' + ID + '\t' + REF + '\t' + ALT + '\t' + QUAL + '\t' + FILTER + '\t' + INFO + '\t' + FORMAT + '\t' + SAMPLE
             file_out.write(oline + "\n")
 
 
