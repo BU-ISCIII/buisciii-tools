@@ -476,6 +476,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 continue
             if 'SAMPLE_POS' in subdict and int(pos) in subdict['SAMPLE_POS']:
                 DP = []
+                TOTAL_DP = []
                 AF = []
                 QUAL = []
                 content_dict = {
@@ -494,12 +495,12 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                     print("SNP not the same in .fasta file and alleles file")
                     print(value)
                     print(content_dict)
-
-                content_dict.update({"DP": DP, "AF": AF, "QUAL": QUAL})
+                content_dict.update({"DP": DP, "TOTAL_DP": TOTAL_DP, "AF": AF, "QUAL": QUAL})
                 variant = content_dict["CHROM"] + "_" + str(content_dict["REF_POS"]) + "_" + content_dict["ALT"]
 
                 if variant in af_vcf_dict:
                     af_vcf_dict[variant]["DP"] += DP
+                    af_vcf_dict[variant]["TOTAL_DP"] += TOTAL_DP
                     af_vcf_dict[variant]["AF"] += AF
                     af_vcf_dict[variant]["QUAL"] += QUAL
                 else:
@@ -610,6 +611,7 @@ def combine_indels(vcf_dictionary):
         }
 
     """
+
     combined_vcf_dict = {}
     for key, value in vcf_dictionary.items():
         content_dict = {
@@ -619,6 +621,7 @@ def combine_indels(vcf_dictionary):
             "REF": value["REF"],
             "ALT": value["ALT"],
             "DP": value["DP"],
+            "TOTAL_DP": value["TOTAL_DP"],
             "AF": value["AF"],
             "QUAL": value["QUAL"],
             "TYPE": value["TYPE"]
@@ -630,6 +633,7 @@ def combine_indels(vcf_dictionary):
                     combined_vcf_dict[value["REF_POS"]]["ALT"] += NEW_ALT
                     combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(value["SAMPLE_POS"][0])
                     combined_vcf_dict[value["REF_POS"]]["DP"].append(value["DP"][0])
+                    combined_vcf_dict[value["REF_POS"]]["TOTAL_DP"].append(value["TOTAL_DP"][0])
                     combined_vcf_dict[value["REF_POS"]]["AF"].append(value["AF"][0])
                     combined_vcf_dict[value["REF_POS"]]["QUAL"].append(value["QUAL"][0])
                 else:
@@ -692,7 +696,7 @@ def get_vcf_header(chromosome, sample_name):
     header
         String containing all the VCF header lines separated by newline.
     """
-    # Define VCF header
+
     header_source = ["##fileformat=VCFv4.2", "##source=custom"]
     header_contig = []
     if chromosome:
@@ -743,10 +747,8 @@ def create_vcf(variants_dict, out_vcf, alignment):
             POS = value["REF_POS"]
             REF = value["REF"]
             ALT = value["ALT"]
-            QUAL_list = [float(number) for number in value["QUAL"]]
-            QUAL = str(round(statistics.mean(QUAL_list), 2))
-            INFO = "TYPE=" + value["TYPE"]
-            DP_list = [int(number) for number in value["DP"]]
+            TOTAL_DP_list = [int(number) for number in value["TOTAL_DP"]]
+            INFO = "TYPE=" + value["TYPE"] + ';' + "DP=" + str(round(statistics.mean(TOTAL_DP_list)))
             AF_list = [float(number) for number in value["AF"]]
             SAMPLE = str(round(statistics.mean(DP_list))) + ':' + str(round(statistics.mean(AF_list), 4))
             oline = CHROM + '\t' + str(POS) + '\t' + REF + '\t' + ALT + '\t' + str("".join(QUAL)) + '\t' + INFO + '\t' + FORMAT + '\t' + SAMPLE
