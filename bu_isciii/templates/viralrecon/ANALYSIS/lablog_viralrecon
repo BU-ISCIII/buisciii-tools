@@ -16,7 +16,7 @@ The functions performed by the script can be listed as follows:
 - Checking of the last available version of the Pangolin container. Download if necessary. Database update. File configuration.
 - Checking the last available version of the Nextclade container. Download if necessary. Extraction of the tag for the
   analysis dataset. File configuration.
-- Checking of required references (fasta and gff) and downloading of from NCBI if necessary.
+- Checking if required references (fasta and gff) are locally available and downloading them from NCBI if necessary.
 - Creation of the necessary directories for the analysis hosts, and subdirectories for each of the references.
 
 '
@@ -65,11 +65,15 @@ update_pangolin() {
         echo -e "Pangolin database is UP TO DATE. \xE2\x9C\x85"
     else
         mkdir "$(date '+%Y%m%d')"
-        srun --partition short_idx singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
-        # log file creation
-        echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tmkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/log
-        echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tsrun --partition short_idx singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/log
-        echo_green "Pangolin database UPDATED."
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tmkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/command.log
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tsrun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/command.log
+        srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        if [ $? -eq 0 ]; then
+            echo_green "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
+            echo_green "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
+        else
+            echo_blinking_red "Error during pangolin database update."
+        fi
     fi
     cd -
 
