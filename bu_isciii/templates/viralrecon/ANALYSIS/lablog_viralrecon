@@ -21,7 +21,7 @@ The functions performed by the script can be listed as follows:
 
 '
 
-# module load singularity
+module load singularity
 
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
