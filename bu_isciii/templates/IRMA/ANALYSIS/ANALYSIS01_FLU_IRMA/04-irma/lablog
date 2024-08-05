@@ -13,6 +13,8 @@ echo "ls */*HA*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | sort -u | cut -d '_' -
 
 echo 'cat HA_types.txt | while read type; do if test -d ${type}; then rm -rf ${type}; fi; done; if test -d B ; then rm -rf B; fi; if test -d C; then rm -rf C; fi' >> _03_post_processing.sh
 
+echo 'if test -f all_samples_completo.txt; then rm all_samples_completo.txt; fi' >> _03_post_processing.sh
+
 echo "cat HA_types.txt | while read in; do mkdir \${in}; done" >> _03_post_processing.sh
 
 echo "if grep -qw 'B__' irma_stats.txt; then mkdir B; fi" >> _03_post_processing.sh
