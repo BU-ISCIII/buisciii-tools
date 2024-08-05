@@ -128,9 +128,7 @@ update_nextclade() {
     # Updating params file
     echo "Updating $PARAMS_FILE file..."
     sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
-    echo "nextclade_dataset_name: '$virus_tag'" >> $PARAMS_FILE
     echo "nextclade_dataset: false" >> $PARAMS_FILE
-    echo "nextclade_dataset_tag: '$nextclade_tag'" >> $PARAMS_FILE
     echo_bold "File $PARAMS_FILE UPDATED."
 
     echo_bold "Finished NEXTCLADE check/update"
@@ -348,7 +346,6 @@ else
     elif [ "$virus_tag" == "rsv" ]; then       
         # Update Nextclade
         update_nextclade
-        sed -i '/^nextclade_dataset_name/d' $PARAMS_FILE
 
         echo_bold "\nRemember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline."
 
@@ -398,15 +395,20 @@ do
         echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --gff ${REF_GFF} \\\\" >> ${FOLDER_NAME}/lablog
-        if [ "$virus_tag" == 'rsv' ]; then
-            echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
-            echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
-            if [ $ref == "EPI_ISL_18668201" ]; then
-                echo "          --nextclade_dataset_name 'rsv_a' \\\\" >> ${FOLDER_NAME}/lablog
-            elif [ $ref == "EPI_ISL_1653999" ]; then
-                echo "          --nextclade_dataset_name 'rsv_b' \\\\" >> ${FOLDER_NAME}/lablog
-            else
-                echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
+        if [ -n "$virus_tag" ]; then
+            echo "          --nextclade_dataset_tag '$nextclade_tag' \\\\" >> ${FOLDER_NAME}/lablog
+            if [ "$virus_tag" == 'rsv' ]; then
+                echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
+                echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
+                if [ $ref == "EPI_ISL_18668201" ]; then
+                    echo "          --nextclade_dataset_name 'rsv_a' \\\\" >> ${FOLDER_NAME}/lablog
+                elif [ $ref == "EPI_ISL_1653999" ]; then
+                    echo "          --nextclade_dataset_name 'rsv_b' \\\\" >> ${FOLDER_NAME}/lablog
+                else
+                    echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
+                fi
+            else 
+                echo "          --nextclade_dataset_name '$virus_tag' \\\\" >> ${FOLDER_NAME}/lablog
             fi
         fi
         echo "          -resume" >> ${FOLDER_NAME}/lablog
