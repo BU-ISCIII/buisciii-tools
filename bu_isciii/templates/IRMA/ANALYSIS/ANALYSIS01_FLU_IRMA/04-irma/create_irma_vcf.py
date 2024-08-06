@@ -766,6 +766,14 @@ def combine_indels(vcf_dictionary):
                 combined_vcf_dict[value["REF_POS"]] = content_dict
         elif value["TYPE"] == "DEL":
             sample_found = False
+            minority = False
+            for af in value["AF"]:
+                if float(af) < 0.5:
+                    minority = True
+            prev_sample_pos = ""
+            if minority and len(value["SAMPLE_POS"]) == 1:
+                sample_pos = value["SAMPLE_POS"][0]
+                prev_sample_pos = sample_pos - 1
             for _, data in combined_vcf_dict.items():
                 if data["TYPE"] == "DEL":
                     if value["SAMPLE_POS"] == data["SAMPLE_POS"]:
