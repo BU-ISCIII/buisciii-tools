@@ -242,8 +242,11 @@ check_references() {
 ####################################
 
 # Setting work variables
-CONFIG_FILE="../DOC/viralrecon.config"
-PARAMS_FILE="../DOC/viralrecon_params.yml"
+timeset=$(date +"%Y-%m-%d_%H-%M-%S")_
+cp ../DOC/viralrecon.config ../DOC/${timeset}_viralrecon.config
+cp ../DOC/viralrecon_params.yml ../DOC/${timeset}_viralrecon_params.yml
+CONFIG_FILE="../DOC/${timeset}_viralrecon.config"
+PARAMS_FILE="../DOC/${timeset}_viralrecon_params.yml"
 
 # Setting the type of analysis
 echo_bold "\nPlease specify the type of analysis."
