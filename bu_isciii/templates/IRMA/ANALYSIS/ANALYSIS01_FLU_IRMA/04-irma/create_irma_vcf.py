@@ -264,15 +264,26 @@ def align2dict(alignment_file):
             }
             vcf_dict[align_position] = content_dict
         elif sample_base == "-" and ref_base != "N":
-            content_dict = {
-                "CHROM": CHROM,
-                "REF_POS": ref_position - 1,
-                "SAMPLE_POS": [sample_position],
-                "REF": sample_seq[i - 1] + ref_base,
-                "ALT": sample_seq[i - 1],
-                "TYPE": "DEL",
-            }
-            vcf_dict[align_position] = content_dict
+            if sample_position == 0:
+                content_dict = {
+                    "CHROM": CHROM,
+                    "REF_POS": ref_position,
+                    "SAMPLE_POS": [sample_position],
+                    "REF": ref_base + ref_seq[i + 1],
+                    "ALT": ref_seq[i + 1],
+                    "TYPE": "DEL",
+                }
+                vcf_dict[align_position] = content_dict
+            else:
+                content_dict = {
+                    "CHROM": CHROM,
+                    "REF_POS": ref_position - 1,
+                    "SAMPLE_POS": [sample_position],
+                    "REF": sample_seq[i - 1] + ref_base,
+                    "ALT": sample_seq[i - 1],
+                    "TYPE": "DEL",
+                }
+                vcf_dict[align_position] = content_dict
         elif (
             ref_base != sample_base
             and ref_base != "N"
@@ -516,6 +527,29 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
                 and subdict["TYPE"] not in ["DEL", "INS"]
             ):
                 continue
+            if 0 in subdict["SAMPLE_POS"] and len(subdict["SAMPLE_POS"]) == 1:
+                content_dict = {
+                    "CHROM": subdict["CHROM"],
+                    "REF_POS": subdict["REF_POS"],
+                    "SAMPLE_POS": subdict["SAMPLE_POS"],
+                    "REF": subdict["REF"],
+                    "ALT": subdict["ALT"],
+                    "TYPE": subdict["TYPE"],
+                    "DP": ["NA"],
+                    "TOTAL_DP": ["NA"],
+                    "AF": ["NA"],
+                    "QUAL": ["NA"],
+                }
+                variant = (
+                    content_dict["CHROM"]
+                    + "_"
+                    + str(content_dict["REF_POS"])
+                    + "_"
+                    + content_dict["ALT"]
+                )
+                af_vcf_dict[variant] = content_dict
+                pass
+
             if "SAMPLE_POS" in subdict and int(pos) in subdict["SAMPLE_POS"]:
                 DP = []
                 TOTAL_DP = []
@@ -745,8 +779,12 @@ def combine_indels(vcf_dictionary):
                             print("combined_vcf_dict")
                             print(combined_vcf_dict[value["REF_POS"]])
             if sample_found:
-                NEW_REF = value["REF"].replace(value["ALT"], "")
-                combined_vcf_dict[sample_found]["REF"] += NEW_REF
+                if 0 in value["SAMPLE_POS"] and len(value["SAMPLE_POS"]) == 1:
+                    combined_vcf_dict[sample_found]["REF"] += value["ALT"]
+                    combined_vcf_dict[sample_found]["ALT"] = value["ALT"]
+                else:
+                    NEW_REF = value["REF"][len(value["ALT"]):]
+                    combined_vcf_dict[sample_found]["REF"] += NEW_REF
             else:
                 combined_vcf_dict[value["REF_POS"]] = content_dict
         elif value["TYPE"] == "SNP":
@@ -909,3 +947,4 @@ def main(args=None):
 
 if __name__ == "__main__":
     sys.exit(main())
+
