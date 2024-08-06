@@ -164,8 +164,8 @@ check_references() {
     }
 
     # Check if FASTA sequence is already downloaded
-    REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
-    if echo "$REF_FASTA" | grep -q "Traceback"; then
+    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+    if [ -z "$REF_FASTA" ]; then
         echo "File ${ref}.fasta is not yet downloaded."
         obtain_family; if [ -z $family ]; then return; fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
@@ -177,7 +177,8 @@ check_references() {
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
                 refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${family}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
+                bash /data/bi/references/refgenie/alias/ref.sh
+                REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
@@ -189,7 +190,8 @@ check_references() {
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
                 refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${family}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
+                bash /data/bi/references/refgenie/alias/ref.sh
+                REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
@@ -199,8 +201,8 @@ check_references() {
     fi
 
     # Check if GFF file is already downloaded
-    REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
-    if echo "$REF_GFF" | grep -q "Traceback"; then
+    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+    if [ -z "$REF_GFF" ]; then
         echo "File ${ref}.gff is not yet downloaded."
         if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
@@ -212,7 +214,8 @@ check_references() {
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
+                bash /data/bi/references/refgenie/alias/ref.sh
+                REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
@@ -224,7 +227,8 @@ check_references() {
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
+                bash /data/bi/references/refgenie/alias/ref.sh
+                REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
                 echo_blinking_red "An error occurred during file downloading."
             fi
