@@ -34,6 +34,7 @@ echo_green() { echo -e "\e[32m$1\e[0m"; }
 echo_blinking_red() { echo -e "\e[1;5;97;5;41m$1\e[0m"; }
 
 # Loading singularity module
+module purge
 module load singularity
 singularity_loaded=$(module list | grep singularity | awk '{print $2}')
 if [ -n "$singularity_loaded" ]; then
@@ -168,15 +169,24 @@ check_references() {
     if [ -z "$REF_FASTA" ]; then
         echo "File ${ref}.fasta is not yet downloaded."
         obtain_family; if [ -z $family ]; then return; fi
+        # Loading SAMtools module
+        module load SAMtools
+        SAMtools_loaded=$(module list | grep -o 'SAMtools/[0-9.]\+-GCC-[0-9.]\+')
+        if [ -n "$SAMtools_loaded" ]; then
+            echo_green "$SAMtools_loaded module succesfully loaded."
+        else
+            echo_blinking_red "SAMtools module not loaded. Exiting..."
+            exit 1
+        fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
             echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
             digest=$(openssl rand -hex 24)
-            refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/bi/references/refgenie/genome_config.yaml
             mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
-                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${family}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
                 bash /data/bi/references/refgenie/alias/ref.sh
                 REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
@@ -189,8 +199,8 @@ check_references() {
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
-                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${family}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                bash /data/bi/references/refgenie/alias/ref.sh
+                gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R                bash /data/bi/references/refgenie/alias/ref.sh
                 REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
                 echo_blinking_red "An error occurred during file downloading."
