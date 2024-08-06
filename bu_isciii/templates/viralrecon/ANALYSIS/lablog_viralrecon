@@ -21,7 +21,6 @@ The functions performed by the script can be listed as follows:
 
 '
 
-module load singularity
 
 # If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
 
@@ -33,6 +32,16 @@ echo_bold() { echo -e "\e[1;37m$1\e[0m"; }
 echo_red() { echo -e "\e[31m$1\e[0m"; }
 echo_green() { echo -e "\e[32m$1\e[0m"; }
 echo_blinking_red() { echo -e "\e[1;5;97;5;41m$1\e[0m"; }
+
+# Loading singularity module
+module load singularity
+singularity_loaded=$(module list | grep singularity | awk '{print $2}')
+if [ -n "$singularity_loaded" ]; then
+    echo_green "$singularity_loaded module succesfully loaded."
+else
+    echo_blinking_red "Singularity module not loaded. Exiting..."
+    exit 1
+fi
 
 
 # Updating pangolin. Checks last image available and if is already downloaded. If not, downloads it. This function also updates pangolin database. Update related config files with pangolin info
