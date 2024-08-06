@@ -778,6 +778,9 @@ def combine_indels(vcf_dictionary):
                             print(value)
                             print("combined_vcf_dict")
                             print(combined_vcf_dict[value["REF_POS"]])
+                    elif minority and prev_sample_pos in data["SAMPLE_POS"]:
+                        sample_found = data["REF_POS"]
+                        break
             if sample_found:
                 if 0 in value["SAMPLE_POS"] and len(value["SAMPLE_POS"]) == 1:
                     combined_vcf_dict[sample_found]["REF"] += value["ALT"]
@@ -785,6 +788,11 @@ def combine_indels(vcf_dictionary):
                 else:
                     NEW_REF = value["REF"][len(value["ALT"]):]
                     combined_vcf_dict[sample_found]["REF"] += NEW_REF
+                    if minority:
+                        combined_vcf_dict[sample_found]["SAMPLE_POS"] += value["SAMPLE_POS"]
+                        combined_vcf_dict[sample_found]["DP"] += value["DP"]
+                        combined_vcf_dict[sample_found]["TOTAL_DP"] += value["TOTAL_DP"]
+                        combined_vcf_dict[sample_found]["AF"] += value["AF"]
             else:
                 combined_vcf_dict[value["REF_POS"]] = content_dict
         elif value["TYPE"] == "SNP":
