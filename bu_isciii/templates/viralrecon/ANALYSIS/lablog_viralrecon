@@ -350,7 +350,7 @@ else
         update_nextclade
         update_pangolin
 
-        echo "primer_bed: '/data/bi/references/virus/2019-nCoV/amplicons/NC_045512.2/V4.1/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
+        echo "primer_bed: '/data/bi/references/refgenie/alias/coronaviridae/primer_schemes/NC_045512.2/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
 
     elif [ "$virus_tag" == "rsv" ]; then       
         # Update Nextclade
