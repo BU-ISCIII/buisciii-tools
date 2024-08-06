@@ -33,17 +33,6 @@ echo_red() { echo -e "\e[31m$1\e[0m"; }
 echo_green() { echo -e "\e[32m$1\e[0m"; }
 echo_blinking_red() { echo -e "\e[1;5;97;5;41m$1\e[0m"; }
 
-# Loading singularity module
-module purge
-module load singularity
-singularity_loaded=$(module list | grep singularity | awk '{print $2}')
-if [ -n "$singularity_loaded" ]; then
-    echo_green "$singularity_loaded module succesfully loaded."
-else
-    echo_blinking_red "Singularity module not loaded. Exiting..."
-    exit 1
-fi
-
 
 # Updating pangolin. Checks last image available and if is already downloaded. If not, downloads it. This function also updates pangolin database. Update related config files with pangolin info
 update_pangolin() {
@@ -251,12 +240,27 @@ check_references() {
 }
 ####################################
 
+# Loading singularity module
+module purge
+module load singularity
+singularity_loaded=$(module list | grep singularity | awk '{print $2}')
+if [ -n "$singularity_loaded" ]; then
+    echo_green "$singularity_loaded module succesfully loaded."
+    echo -e "$(date +'%Y-%m-%d %H:%M:%S')\t${singularity_loaded} module succesfully loaded." >> $(date '+%Y%m%d')/command.log
+else
+    echo_blinking_red "Singularity module not loaded. Exiting..."
+    exit 1
+fi
+
 # Setting work variables
 timeset=$(date +"%Y-%m-%d_%H-%M-%S")_
 cp ../DOC/viralrecon.config ../DOC/${timeset}_viralrecon.config
 cp ../DOC/viralrecon_params.yml ../DOC/${timeset}_viralrecon_params.yml
 CONFIG_FILE="../DOC/${timeset}_viralrecon.config"
 PARAMS_FILE="../DOC/${timeset}_viralrecon_params.yml"
+echo "Created $CONFIG_FILE file."
+echo "Created $PARAMS_FILE file."
+echo
 
 # Setting the type of analysis
 echo_bold "\nPlease specify the type of analysis."
@@ -459,4 +463,4 @@ rm percentajeNs.py
 rm _02_create_run_percentage_Ns.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
 
-echo_green "\nLablog_viralrecon execution has been completed successfully!"
+echo_green "\nLablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly."
