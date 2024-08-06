@@ -176,7 +176,7 @@ check_references() {
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
-                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${family}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
@@ -188,7 +188,7 @@ check_references() {
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}"
-                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${ref}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                refgenie add ${family}/fasta:${ref} --path data/${digest}/fasta/${ref}/ --seek-keys '{"fasta" : "'"${family}.fasta"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
@@ -211,7 +211,7 @@ check_references() {
             wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
-                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
@@ -223,7 +223,7 @@ check_references() {
             wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}"
-                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${ref}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml)
             else
                 echo_blinking_red "An error occurred during file downloading."
