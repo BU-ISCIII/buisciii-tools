@@ -876,31 +876,57 @@ def create_vcf(variants_dict, out_vcf, alignment):
             POS = value["REF_POS"]
             REF = value["REF"]
             ALT = value["ALT"]
-            TOTAL_DP_list = [int(number) for number in value["TOTAL_DP"]]
+            TOTAL_DP_list = []
+            for number in value["TOTAL_DP"]:
+                if number != "NA":
+                    TOTAL_DP_list.append(int(number))
+            if TOTAL_DP_list:
+                TOTAL_DP = str(round(statistics.mean(TOTAL_DP_list)))
+            else:
+                TOTAL_DP = "NA"
+
             INFO = (
                 "TYPE="
                 + value["TYPE"]
                 + ";"
                 + "DP="
-                + str(round(statistics.mean(TOTAL_DP_list)))
+                + TOTAL_DP
             )
             ALT_QUAL_list = []
             for number in value["QUAL"]:
                 if number != "NA":
                     ALT_QUAL_list.append(float(number))
-                    ALT_QUAL = str(round(statistics.mean(ALT_QUAL_list), 2))
-                else:
-                    ALT_QUAL = "NA"
-            ALT_DP_list = [int(number) for number in value["DP"]]
-            AF_list = [float(number) for number in value["AF"]]
+            if ALT_QUAL_list:
+                ALT_QUAL = str(round(statistics.mean(ALT_QUAL_list), 2))
+            else:
+                ALT_QUAL = "NA"
+
+            ALT_DP_list = []
+            for number in value["DP"]:
+                if number != "NA":
+                    ALT_DP_list.append(int(number))
+            if ALT_DP_list:
+                ALT_DP = str(round(statistics.mean(ALT_DP_list), 0))
+            else:
+                ALT_DP = "NA"
+
+            AF_list = []
+            for number in value["AF"]:
+                if number != "NA":
+                    AF_list.append(float(number))
+            if AF_list:
+                AF = str(round(statistics.mean(AF_list), 4))
+            else:
+                AF = "NA"
+
             SAMPLE = (
                 GT
                 + ":"
-                + str(round(statistics.mean(ALT_DP_list)))
+                + ALT_DP
                 + ":"
                 + ALT_QUAL
                 + ":"
-                + str(round(statistics.mean(AF_list), 4))
+                + AF
             )
             oline = (
                 CHROM
