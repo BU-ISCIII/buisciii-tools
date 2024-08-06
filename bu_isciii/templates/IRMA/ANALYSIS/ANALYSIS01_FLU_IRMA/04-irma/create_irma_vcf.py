@@ -794,10 +794,12 @@ def combine_indels(vcf_dictionary):
                     combined_vcf_dict[sample_found]["REF"] += value["ALT"]
                     combined_vcf_dict[sample_found]["ALT"] = value["ALT"]
                 else:
-                    NEW_REF = value["REF"][len(value["ALT"]):]
+                    NEW_REF = value["REF"][len(value["ALT"]) :]
                     combined_vcf_dict[sample_found]["REF"] += NEW_REF
                     if minority:
-                        combined_vcf_dict[sample_found]["SAMPLE_POS"] += value["SAMPLE_POS"]
+                        combined_vcf_dict[sample_found]["SAMPLE_POS"] += value[
+                            "SAMPLE_POS"
+                        ]
                         combined_vcf_dict[sample_found]["DP"] += value["DP"]
                         combined_vcf_dict[sample_found]["TOTAL_DP"] += value["TOTAL_DP"]
                         combined_vcf_dict[sample_found]["AF"] += value["AF"]
@@ -901,13 +903,7 @@ def create_vcf(variants_dict, out_vcf, alignment):
             else:
                 TOTAL_DP = "NA"
 
-            INFO = (
-                "TYPE="
-                + value["TYPE"]
-                + ";"
-                + "DP="
-                + TOTAL_DP
-            )
+            INFO = "TYPE=" + value["TYPE"] + ";" + "DP=" + TOTAL_DP
             ALT_QUAL_list = []
             for number in value["QUAL"]:
                 if number != "NA":
@@ -935,15 +931,7 @@ def create_vcf(variants_dict, out_vcf, alignment):
             else:
                 AF = "NA"
 
-            SAMPLE = (
-                GT
-                + ":"
-                + ALT_DP
-                + ":"
-                + ALT_QUAL
-                + ":"
-                + AF
-            )
+            SAMPLE = GT + ":" + ALT_DP + ":" + ALT_QUAL + ":" + AF
             oline = (
                 CHROM
                 + "\t"
@@ -989,4 +977,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     sys.exit(main())
-
