@@ -164,10 +164,10 @@ check_references() {
     }
 
     # Check if FASTA sequence is already downloaded
-    obtain_family; if [ -z $family ]; then return; fi
     REF_FASTA=$(refgenie seek ${family}/fasta.fasta:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
     if echo "$REF_FASTA" | grep -q "Traceback"; then
         echo "File ${ref}.fasta is not yet downloaded."
+        obtain_family; if [ -z $family ]; then return; fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
             echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
             digest=$(openssl rand -hex 24)
@@ -199,10 +199,10 @@ check_references() {
     fi
 
     # Check if GFF file is already downloaded
-    if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
     REF_GFF=$(refgenie seek ${family}/gff.gff:${ref} -c /data/bi/references/refgenie/genome_config.yaml 2>&1)
-    if echo "$REF_GFF" | grep -q "Traceback"; then 
-        echo "File ${ref}.gff is not yet downloaded."        
+    if echo "$REF_GFF" | grep -q "Traceback"; then
+        echo "File ${ref}.gff is not yet downloaded."
+        if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
             echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/bi/references/refgenie/alias/${family}/gff/${ref}."
             digest=$(openssl rand -hex 24)
