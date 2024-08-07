@@ -30,6 +30,13 @@ echo -e "$(date +'%Y-%m-%d %H:%M:%S')\tStarting lablog_viralrecon execution." > 
 ####################################
 # Defining functions
 
+# Log message saving
+log_message() {
+    local message="$1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> ./lablog_viralrecon.log
+}
+
+
 # Coloring messages
 echo_bold() { echo -e "\e[1;37m$1\e[0m"; }
 echo_red() { echo -e "\e[31m$1\e[0m"; }
