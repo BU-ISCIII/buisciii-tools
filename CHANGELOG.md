@@ -57,6 +57,7 @@ Code contributions to the new version:
 - Added lablog to automate gene characterization with emmtyper, including unzipping assemblies. [#300](https://github.com/BU-ISCIII/buisciii-tools/pull/300)
 - Fixed 99-stats (MAG) template. [#301](https://github.com/BU-ISCIII/buisciii-tools/pull/301)
 - Fixed IRMA's lablog so that the sequences of the samples are not displayed several times neither in the .txt files of each influenza type nor in all_samples_completo.txt [#305](https://github.com/BU-ISCIII/buisciii-tools/pull/305)
+- Modified bioinfo_doc.py so that new lines in the delivery message are applied in the email [#307](https://github.com/BU-ISCIII/buisciii-tools/pull/307)
 
 ### Modules
 
