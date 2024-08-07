@@ -318,7 +318,7 @@ def align2dict(alignment_file):
     return vcf_dict
 
 
-def stats_vcf(vcf_dictionary, alleles_dictionary):
+def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
     """Add stats to VCF dictionary.
 
     Parameters
@@ -521,6 +521,41 @@ def stats_vcf(vcf_dictionary, alleles_dictionary):
     af_vcf_dict = {}
     for _, value in alleles_dictionary.items():
         pos = value["Position"]
+        chrom = next(iter(vcf_dictionary.values()))["CHROM"]
+
+        if int(pos) > last_pos and value["Allele_Type"] == "Minority":
+            content_dict = {
+                "CHROM": chrom,
+                "REF_POS": last_pos,
+                "SAMPLE_POS": [pos],
+                "REF": last_allele,
+                "ALT": last_allele + value["Allele"],
+                "TYPE": "INS",
+                "DP": [value["Count"]],
+                "TOTAL_DP": [value["Total"]],
+                "AF": [value["Frequency"]],
+                "QUAL": [value["Frequency"]],
+            }
+
+            variant = (
+                content_dict["CHROM"]
+                + "_"
+                + str(content_dict["REF_POS"])
+                + "_"
+                + "final_ins"
+            )
+
+            if variant in af_vcf_dict:
+                af_vcf_dict[variant]["DP"] += content_dict["DP"]
+                af_vcf_dict[variant]["TOTAL_DP"] += content_dict["TOTAL_DP"]
+                af_vcf_dict[variant]["AF"] += content_dict["AF"]
+                af_vcf_dict[variant]["QUAL"] += content_dict["QUAL"]
+                af_vcf_dict[variant]["SAMPLE_POS"] += content_dict["SAMPLE_POS"]
+                af_vcf_dict[variant]["ALT"] += value["Allele"]
+            else:
+                af_vcf_dict[variant] = content_dict
+            pass
+
         for align_pos, subdict in vcf_dictionary.items():
             if (value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF") or (
                 value["Allele"] == subdict["REF"]
@@ -970,7 +1005,13 @@ def main(args=None):
     # Start analysis
     alleles_dict = alleles_to_dict(all_alleles, freq, dp)
     alignment_dict = align2dict(alignment)
-    af_vcf_dict = stats_vcf(alignment_dict, alleles_dict)
+    last_ref_pos = max(position["REF_POS"] for position in alignment_dict.values())
+    last_ref_allele = None
+    for _, value in alignment_dict.items():
+        if value["REF_POS"] == last_ref_pos:
+            last_ref_allele = value["REF"]
+            break
+    af_vcf_dict = stats_vcf(alignment_dict, alleles_dict, last_ref_pos, last_ref_allele)
     combined_vcf_dict = combine_indels(af_vcf_dict)
     create_vcf(combined_vcf_dict, output_vcf, alignment)
 
