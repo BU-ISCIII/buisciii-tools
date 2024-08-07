@@ -29,9 +29,10 @@ The functions performed by the script can be listed as follows:
 # Defining functions
 
 # Log message saving
+current_dir=$PWD
 log_message() {
     local message="$1"
-    echo -e "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> lablog_viralrecon.log
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> $current_dir/lablog_viralrecon.log
 }
 
 
