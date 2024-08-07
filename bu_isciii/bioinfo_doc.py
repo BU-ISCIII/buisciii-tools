@@ -603,11 +603,11 @@ class BioinfoDoc:
                 if bu_isciii.utils.prompt_yn_question(
                     f"Do you want to use notes from {self.provided_txt}?", dflt=False
                 ):
-                    email_data["email_notes"] = self.delivery_notes
+                    email_data["email_notes"] = self.delivery_notes.replace("\n", "<br />")
             else:
                 email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
                     msg="Write email notes"
-                )
+                ).replace("\n", "<br />")
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
