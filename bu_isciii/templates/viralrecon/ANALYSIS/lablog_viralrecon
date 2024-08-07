@@ -206,6 +206,7 @@ check_references() {
                 log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R                bash /data/bi/references/refgenie/alias/ref.sh
+                bash /data/bi/references/refgenie/alias/ref.sh
                 REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
             else
                 echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
