@@ -189,6 +189,7 @@ check_references() {
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
                 log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                echo "Building asset for ${ref}.fasta file..."; log_message "Building asset for ${ref}.fasta file..."
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
                 bash /data/bi/references/refgenie/alias/ref.sh
                 REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
@@ -205,6 +206,7 @@ check_references() {
                 echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
                 log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                echo "Building asset for ${ref}.fasta file..."; log_message "Building asset for ${ref}.fasta file..."
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R                bash /data/bi/references/refgenie/alias/ref.sh
                 bash /data/bi/references/refgenie/alias/ref.sh
                 REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
@@ -231,6 +233,7 @@ check_references() {
             if [ $? -eq 0 ]; then
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
+                echo "Adding asset for ${ref}.gff file..."; log_message "Building asset for ${ref}.gff file..."
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 bash /data/bi/references/refgenie/alias/ref.sh
                 REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
@@ -246,6 +249,7 @@ check_references() {
             if [ $? -eq 0 ]; then 
                 echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
+                echo "Adding asset for ${ref}.gff file..."; log_message "Building asset for ${ref}.gff file..."
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 bash /data/bi/references/refgenie/alias/ref.sh
                 REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
