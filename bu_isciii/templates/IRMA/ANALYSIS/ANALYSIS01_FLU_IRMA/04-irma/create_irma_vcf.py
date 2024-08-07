@@ -745,7 +745,7 @@ def combine_indels(vcf_dictionary):
         if value["TYPE"] == "INS":
             if value["REF_POS"] in combined_vcf_dict:
                 if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
-                    NEW_ALT = value["ALT"].replace(value["REF"], "")
+                    NEW_ALT = value["ALT"][len(value["REF"]) :]
                     combined_vcf_dict[value["REF_POS"]]["ALT"] += NEW_ALT
                     combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(
                         value["SAMPLE_POS"][0]
