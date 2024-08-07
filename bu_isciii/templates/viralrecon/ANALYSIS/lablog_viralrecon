@@ -276,7 +276,7 @@ else
 fi
 
 # Setting work variables
-timeset=$(date +"%Y-%m-%d_%H-%M-%S")_
+timeset=$(date +"%Y-%m-%d_%H-%M-%S")
 cp ../DOC/viralrecon.config ../DOC/${timeset}_viralrecon.config
 cp ../DOC/viralrecon_params.yml ../DOC/${timeset}_viralrecon_params.yml
 CONFIG_FILE="../DOC/${timeset}_viralrecon.config"
