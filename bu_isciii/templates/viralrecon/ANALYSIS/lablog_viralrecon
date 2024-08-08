@@ -130,7 +130,7 @@ update_nextclade() {
     log_message "Checking Nextclade container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
     latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-    log_message "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade"
+    log_message "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade" bold
 
     log_message "Checking if latest version of Nextclade image is already downloaded..."
     if [ -e "/data/bi/pipelines/singularity-images/$latest_version_nextclade" ]; then
