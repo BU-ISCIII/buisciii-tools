@@ -194,10 +194,15 @@ check_references() {
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 echo "Building asset for ${ref}.fasta file..."; log_message "Building asset for ${ref}.fasta file..."
                 srun --partition short_idx --output ${ref}.fasta_build.log refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
-                echo_bold "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
-                log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
-                bash /data/bi/references/refgenie/alias/ref.sh
-                REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                if [ $? -eq 0 ]; then
+                    echo_bold "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
+                    bash /data/bi/references/refgenie/alias/ref.sh
+                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                else
+                    echo_blinking_red "An error ocurred during building asset for ${ref}.fasta file."
+                    log_message "An error ocurred during building asset for ${ref}.fasta file."
+                fi
             else
                 echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
             fi
@@ -213,10 +218,15 @@ check_references() {
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 echo "Building asset for ${ref}.fasta file..."; log_message "Building asset for ${ref}.fasta file..."
                 srun --partition short_idx --output ${ref}.fasta_build.log refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
-                echo_bold "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
-                log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
-                bash /data/bi/references/refgenie/alias/ref.sh
-                REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                if [ $? -eq 0 ]; then
+                    echo_bold "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
+                    bash /data/bi/references/refgenie/alias/ref.sh
+                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                else
+                    echo_blinking_red "An error ocurred during building asset for ${ref}.fasta file."
+                    log_message "An error ocurred during building asset for ${ref}.fasta file."
+                fi
             else
                 echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
             fi
@@ -242,10 +252,15 @@ check_references() {
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
                 echo "Adding asset for ${ref}.gff file..."; log_message "Adding asset for ${ref}.gff file..."
                 srun --partition short_idx --output ${ref}.gff_add.log refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                echo_bold "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
-                log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
-                bash /data/bi/references/refgenie/alias/ref.sh
-                REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                if [ $? -eq 0 ]; then
+                    echo_bold "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
+                    bash /data/bi/references/refgenie/alias/ref.sh
+                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                else
+                    echo_blinking_red "An error ocurred during adding asset for ${ref}.gff file."
+                    log_message "An error ocurred during adding asset for ${ref}.gff file."
+                fi
             else
                 echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
             fi
@@ -260,10 +275,15 @@ check_references() {
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
                 echo "Adding asset for ${ref}.gff file..."; log_message "Adding asset for ${ref}.gff file..."
                 srun --partition short_idx --output ${ref}.gff_add.log refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                echo_bold "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
-                log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
-                bash /data/bi/references/refgenie/alias/ref.sh
-                REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                if [ $? -eq 0 ]; then
+                    echo_bold "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
+                    bash /data/bi/references/refgenie/alias/ref.sh
+                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                else
+                    echo_blinking_red "An error ocurred during adding asset for ${ref}.gff file."
+                    log_message "An error ocurred during adding asset for ${ref}.gff file."
+                fi
             else
                 echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
             fi
