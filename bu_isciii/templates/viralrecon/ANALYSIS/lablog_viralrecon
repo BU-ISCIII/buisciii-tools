@@ -28,11 +28,32 @@ The functions performed by the script can be listed as follows:
 ####################################
 # Defining functions
 
-# Log message saving
-current_dir=$PWD
+# Coloring messages and log saving
+logfile=$(echo "$PWD/lablog_viralrecon.log")
 log_message() {
     local message="$1"
-    echo -e "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> $current_dir/lablog_viralrecon.log
+    case "$2" in
+        "bold")
+            echo -e "\e[1;37m$message\e[0m"
+            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[1;37m$message\e[0m" >> $logfile
+            ;;
+        "red")
+            echo -e "\e[31m$message\e[0m"
+            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[31m$message\e[0m" >> $logfile
+            ;;
+        "green")
+            echo -e "\e[32m$message\e[0m"
+            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[32m$message\e[0m" >> $logfile
+            ;;
+        "blk_red")
+            echo -e "\e[1;5;97;5;41m$message\e[0m"
+            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[1;5;97;5;41m$message\e[0m" >> $logfile
+            ;;
+        *)
+            echo -e "$message"
+            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> $logfile
+            ;;
+    esac
 }
 
 
@@ -46,250 +67,230 @@ echo_blinking_red() { echo -e "\e[1;5;97;5;41m$1\e[0m"; }
 # Updating pangolin. Checks last image available and if is already downloaded. If not, downloads it. This function also updates pangolin database. Update related config files with pangolin info
 update_pangolin() {
     echo
-    echo_bold "Starting PANGOLIN check/update."; log_message "Starting PANGOLIN check/update."
-    echo "Checking Pangolin container version..."; log_message "Checking Pangolin container version..."
+    log_message "Starting PANGOLIN check/update." bold
+    log_message "Checking Pangolin container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
     latest_version_pangolin=$(echo "$url" | grep -oP 'pangolin:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-    echo_bold "Latest version available of Pangolin:\e[1;38;5;220m $latest_version_pangolin"; tput sgr0
-    log_message "Latest version available of Pangolin: $latest_version_pangolin"
+    log_message "Latest version available of Pangolin:\e[1;38;5;220m $latest_version_pangolin" bold
 
-    echo "Checking if latest version of Pangolin image is already downloaded..."; log_message "Checking if latest version of Pangolin image is already downloaded..."
+    log_message "Checking if latest version of Pangolin image is already downloaded..."
     if [ -e "/data/bi/pipelines/singularity-images/$latest_version_pangolin" ]; then
-        echo "File $latest_version_pangolin already downloaded."; log_message "File $latest_version_pangolin already downloaded."
-        echo -e "Pangolin container is UP TO DATE. \xE2\x9C\x85"; log_message "Pangolin container is UP TO DATE. \xE2\x9C\x85"
+        log_message "File $latest_version_pangolin already downloaded."
+        log_message "Pangolin container is UP TO DATE. \xE2\x9C\x85"
     else
-        echo "Downloading $latest_version_pangolin file..."; log_message "Downloading $latest_version_pangolin file..."
+        log_message "Downloading $latest_version_pangolin file..."
         wget -P "/data/bi/pipelines/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
         if [ $? -eq 0 ]; then
-            echo_green "$latest_version_pangolin file succesfully downloaded."; log_message "$latest_version_pangolin file succesfully downloaded."
+            log_message "$latest_version_pangolin file succesfully downloaded." green
         else
-            echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
+            log_message "An error occurred during file downloading." blk_red
         fi
     fi
 
     # Updating Pangolin database
-    echo "Setting datadir for Pangolin database."; log_message "Setting datadir for Pangolin database."
+    log_message "Setting datadir for Pangolin database."
     cd /data/bi/references/pangolin/
     if [ -e "./$(date '+%Y%m%d')" ]; then
-        echo -e "Directory /data/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
         log_message "Directory /data/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
-        echo_green "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"; log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
-        echo_green "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"; log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
+        log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
+        log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
     else
         mkdir "$(date '+%Y%m%d')"
         echo -e "$(date +'%Y-%m-%d %H:%M:%S') - mkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/command.log
         echo -e "$(date +'%Y-%m-%d %H:%M:%S') - srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/command.log
         srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
         if [ $? -eq 0 ]; then
-            echo_green "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"; log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
-            echo_green "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"; log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
+            log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
+            log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
         else
-            echo_blinking_red "Error during pangolin database update."; log_message "Error during pangolin database update."
+            log_message "Error during pangolin database update." blk_red
         fi
     fi
     cd -
 
     # Updating config file
-    echo "Updating $CONFIG_FILE file..."; log_message "Updating $CONFIG_FILE file..."
+    log_message "Updating $CONFIG_FILE file..."
     sed -i "s|pangolin:4.3--pyhdfd78af_2|$latest_version_pangolin|" "$CONFIG_FILE"
     sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
-    echo_bold "File $CONFIG_FILE UPDATED."; log_message "File $CONFIG_FILE UPDATED."
+    log_message "File $CONFIG_FILE UPDATED."
 
     # Updating params file
-    echo "Updating $PARAMS_FILE file..."; log_message "Updating $PARAMS_FILE file..."
+    log_message "Updating $PARAMS_FILE file..."
     sed -i "s|skip_pangolin: true|skip_pangolin: false|" "$PARAMS_FILE"
-    echo_bold "File $PARAMS_FILE UPDATED."; log_message "File $PARAMS_FILE UPDATED."
+    log_message "File $PARAMS_FILE UPDATED."
 
-    echo_bold "Finished PANGOLIN check/update"; log_message "Finished PANGOLIN check/update"
+    log_message "Finished PANGOLIN check/update" bold
     echo
 }
 
 # Updating Nextclade. Checks last image available and if is already downloaded. If not, downloads it. Update related config files with nextclade info
 update_nextclade() {
     echo
-    echo_bold "Starting NEXTCLADE check/update."; log_message "Starting NEXTCLADE check/update."
-    echo "Checking Nextclade container version..."; log_message "Checking Nextclade container version..."
+    log_message "Starting NEXTCLADE check/update." bold
+    log_message "Checking Nextclade container version..."
     url=$(curl -s "https://depot.galaxyproject.org/singularity/")
     latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
-    echo_bold "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade"; tput sgr0
-    log_message "Latest version available of Nextclade: $latest_version_nextclade"
+    log_message "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade"
 
-    echo "Checking if latest version of Nextclade image is already downloaded..."; log_message "Checking if latest version of Nextclade image is already downloaded..."
+    log_message "Checking if latest version of Nextclade image is already downloaded..."
     if [ -e "/data/bi/pipelines/singularity-images/$latest_version_nextclade" ]; then
-        echo "File $latest_version_nextclade already downloaded."; log_message "File $latest_version_nextclade already downloaded."
-        echo -e "Nextclade container is UP TO DATE. \xE2\x9C\x85"; log_message "Nextclade container is UP TO DATE. \xE2\x9C\x85"
+        log_message "File $latest_version_nextclade already downloaded."
+        log_message "Nextclade container is UP TO DATE. \xE2\x9C\x85"
     else
-        echo "Downloading $latest_version_nextclade file..."; log_message "Downloading $latest_version_nextclade file..."
+        log_message "Downloading $latest_version_nextclade file..."
         wget -P "/data/bi/pipelines/singularity-images" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
         if [ $? -eq 0 ]; then
-            echo_green "$latest_version_nextclade file succesfully downloaded."; log_message "$latest_version_nextclade file succesfully downloaded."
+            log_message "$latest_version_nextclade file succesfully downloaded." green
         else
-            echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
+            log_message "An error occurred during file downloading." blk_red
         fi
     fi
 
     # Extracting the current Nextclade data TAG
-    echo "Extracting Nextclade data TAG..."; log_message "Extracting Nextclade data TAG..."
+    log_message "Extracting Nextclade data TAG..."
     nextclade_tag=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
-    echo_bold "Latest \e[1;38;5;220m${virus_tag^^} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag"; tput sgr0
-    log_message "Latest ${virus_tag^^} Nextclade dataset version TAG: $nextclade_tag"
+    log_message "Latest \e[1;38;5;220m${virus_tag^^} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag" bold
     
     # Updating config file
-    echo "Updating $CONFIG_FILE file..."; log_message "Updating $CONFIG_FILE file..."
+    log_message "Updating $CONFIG_FILE file..."
     sed -i "s|nextclade:3.5.0--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
-    echo_bold "File $CONFIG_FILE UPDATED."; log_message "File $CONFIG_FILE UPDATED."
+    log_message "File $CONFIG_FILE UPDATED."
 
     # Updating params file
-    echo "Updating $PARAMS_FILE file..."; log_message "Updating $PARAMS_FILE file..."
+    log_message "Updating $PARAMS_FILE file..."
     sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
     echo "nextclade_dataset: false" >> $PARAMS_FILE
-    echo_bold "File $PARAMS_FILE UPDATED."; log_message "File $PARAMS_FILE UPDATED."
+    log_message "File $PARAMS_FILE UPDATED."
 
-    echo_bold "Finished NEXTCLADE check/update"; log_message "Finished NEXTCLADE check/update"
+    log_message "Finished NEXTCLADE check/update" bold
     echo
 }
 
 # Checks if fasta and gff references are downloaded. If not, it downloads them (and creates family folder if neccesary)
 check_references() {
     echo
-    echo_bold "Processing reference: ${ref}."; log_message "Processing reference: ${ref}."
+    log_message "Processing reference: ${ref}." bold
 
     # Obtaining family information
     obtain_family() {
         organism_id=$(curl -s "https://www.ncbi.nlm.nih.gov/nuccore/${ref}" | grep -o 'ORGANISM=[0-9]\+' | head -n 1 | awk -F '=' '{print $2}')
         if [ -z $organism_id ]; then
-            echo_blinking_red "$ref not found in NCBI. Please download it manually."; log_message "$ref not found in NCBI. Please download it manually."
+            log_message "$ref not found in NCBI. Please download it manually." blk_red
             return
         fi
         family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'TITLE="family">.*<' | awk -F 'TITLE="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
         if [ -z $family ]; then
             family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
         fi
-        echo "Reference $ref belongs to $family family."; log_message "Reference $ref belongs to $family family."
+        log_message "Reference $ref belongs to $family family."
     }
 
     # Check if FASTA sequence is already downloaded
     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
     if [ -z "$REF_FASTA" ]; then
-        echo "File ${ref}.fasta is not yet downloaded."; log_message "File ${ref}.fasta is not yet downloaded."
+        log_message "File ${ref}.fasta is not yet downloaded."
         obtain_family; if [ -z $family ]; then return; fi
         # Loading SAMtools module
         module load SAMtools
         SAMtools_loaded=$(module list | grep -o 'SAMtools/[0-9.]\+-GCC-[0-9.]\+')
         if [ -n "$SAMtools_loaded" ]; then
-            echo_green "$SAMtools_loaded module succesfully loaded."; log_message "$SAMtools_loaded module succesfully loaded."
+            log_message "$SAMtools_loaded module succesfully loaded." green
         else
-            echo_blinking_red "SAMtools module not loaded. Exiting..."; log_message "SAMtools module not loaded. Exiting..."
+            log_message "SAMtools module not loaded. Exiting..." blk_red
             exit 1
         fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
-            echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
             log_message "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
             digest=$(openssl rand -hex 24)
             mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then
-                echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
-                log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
+                log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}." green
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
-                echo "Building asset for ${ref}.fasta file..."; log_message "Building asset for ${ref}.fasta file..."
+                log_message "Building asset for ${ref}.fasta file..."
                 srun --partition short_idx --output ${ref}.fasta_build.log refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
                 if [ $? -eq 0 ]; then
-                    echo_bold "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
-                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
                 else
-                    echo_blinking_red "An error ocurred during building asset for ${ref}.fasta file."
-                    log_message "An error ocurred during building asset for ${ref}.fasta file."
+                    log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
                 fi
             else
-                echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
+                log_message "An error occurred during file downloading." blk_red
             fi
         else
-            echo "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.fasta."
             log_message "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.fasta."
             digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
             mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then 
-                echo_green "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
-                log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}."
+                log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}." green
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
-                echo "Building asset for ${ref}.fasta file..."; log_message "Building asset for ${ref}.fasta file..."
+                log_message "Building asset for ${ref}.fasta file..."
                 srun --partition short_idx --output ${ref}.fasta_build.log refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
                 if [ $? -eq 0 ]; then
-                    echo_bold "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
-                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)"
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
                 else
-                    echo_blinking_red "An error ocurred during building asset for ${ref}.fasta file."
-                    log_message "An error ocurred during building asset for ${ref}.fasta file."
+                    log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
                 fi
             else
-                echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
+                log_message "An error occurred during file downloading." blk_red
             fi
         fi
     else
-        echo -e "File ${ref}.fasta is ALREADY available in $(dirname $REF_FASTA). \xE2\x9C\x85"; log_message "File ${ref}.fasta is ALREADY available in $(dirname $REF_FASTA). \xE2\x9C\x85"
+        log_message "File ${ref}.fasta is ALREADY available in $(dirname $REF_FASTA). \xE2\x9C\x85"
     fi
 
     # Check if GFF file is already downloaded
     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
     if [ -z "$REF_GFF" ]; then
-        echo "File ${ref}.gff is not yet downloaded."; log_message "File ${ref}.gff is not yet downloaded."
+        log_message "File ${ref}.gff is not yet downloaded."
         if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
         if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
-            echo "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/bi/references/refgenie/alias/${family}/gff/${ref}."
             log_message "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/bi/references/refgenie/alias/${family}/gff/${ref}."
             digest=$(openssl rand -hex 24)
             refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/bi/references/refgenie/genome_config.yaml
             mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then
-                echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
-                log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
-                echo "Adding asset for ${ref}.gff file..."; log_message "Adding asset for ${ref}.gff file..."
+                log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
+                log_message "Adding asset for ${ref}.gff file..."
                 srun --partition short_idx --output ${ref}.gff_add.log refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 if [ $? -eq 0 ]; then
-                    echo_bold "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
-                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
                 else
-                    echo_blinking_red "An error ocurred during adding asset for ${ref}.gff file."
-                    log_message "An error ocurred during adding asset for ${ref}.gff file."
+                    log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
                 fi
             else
-                echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
+                log_message "An error occurred during file downloading." blk_red
             fi
          else
-            echo "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
             log_message "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
             digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
             mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
             wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then 
-                echo_green "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
-                log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}."
-                echo "Adding asset for ${ref}.gff file..."; log_message "Adding asset for ${ref}.gff file..."
+                log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
+                log_message "Adding asset for ${ref}.gff file..."
                 srun --partition short_idx --output ${ref}.gff_add.log refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
                 if [ $? -eq 0 ]; then
-                    echo_bold "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
-                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)"
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
                 else
-                    echo_blinking_red "An error ocurred during adding asset for ${ref}.gff file."
-                    log_message "An error ocurred during adding asset for ${ref}.gff file."
+                    log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
                 fi
             else
-                echo_blinking_red "An error occurred during file downloading."; log_message "An error occurred during file downloading."
+                log_message "An error occurred during file downloading." blk_red
             fi
          fi
     else
-        echo -e "File ${ref}.gff is ALREADY available in $(dirname $REF_GFF). \xE2\x9C\x85"; log_message "File ${ref}.gff is ALREADY available in $(dirname $REF_GFF). \xE2\x9C\x85"
+        log_message "File ${ref}.gff is ALREADY available in $(dirname $REF_GFF). \xE2\x9C\x85"
     fi
 
     unset family
@@ -297,18 +298,16 @@ check_references() {
 ####################################
 
 
-echo_bold "Starting lablog_viralrecon execution."
-echo -e "$(date +'%Y-%m-%d %H:%M:%S') - Starting lablog_viralrecon execution." > lablog_viralrecon.log
+echo -e "\e[1;37mStarting lablog_viralrecon execution.\e[0m"
+echo -e "$(date +'%Y-%m-%d %H:%M:%S') - \e[1;37mStarting lablog_viralrecon execution.\e[0m" > $logfile
 
 # Loading singularity module
 module load singularity
 singularity_loaded=$(module list | grep singularity | awk '{print $2}')
 if [ -n "$singularity_loaded" ]; then
-    echo_green "$singularity_loaded module succesfully loaded."
-    log_message "${singularity_loaded} module succesfully loaded."
+    log_message "${singularity_loaded} module succesfully loaded." green
 else
-    echo_blinking_red "Singularity module not loaded. Exiting..."
-    log_message "Singularity module not loaded. Exiting..."
+    log_message "Singularity module not loaded. Exiting..." blk_red
     exit 1
 fi
 
@@ -318,8 +317,8 @@ cp ../DOC/viralrecon.config ../DOC/${timeset}_viralrecon.config
 cp ../DOC/viralrecon_params.yml ../DOC/${timeset}_viralrecon_params.yml
 CONFIG_FILE="../DOC/${timeset}_viralrecon.config"
 PARAMS_FILE="../DOC/${timeset}_viralrecon_params.yml"
-echo "Created $CONFIG_FILE file."; log_message "Created $CONFIG_FILE file."
-echo "Created $PARAMS_FILE file."; log_message "Created $PARAMS_FILE file."
+log_message "Created $CONFIG_FILE file."
+log_message "Created $PARAMS_FILE file."
 echo
 
 # Setting the type of analysis
@@ -330,11 +329,11 @@ while true; do
     echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0; echo
     if [ "$ANALYSIS_TYPE" == "1" ]; then
         ANALYSIS_TYPE="METAGENOMIC"
-        echo_green "$ANALYSIS_TYPE analysis selected."; log_message "$ANALYSIS_TYPE analysis selected."
+        log_message "$ANALYSIS_TYPE analysis selected." green
         break
     elif [ "$ANALYSIS_TYPE" == "2" ]; then
         ANALYSIS_TYPE="AMPLICONS"
-        echo_green "$ANALYSIS_TYPE analysis selected."; log_message "$ANALYSIS_TYPE analysis selected."
+        log_message "$ANALYSIS_TYPE analysis selected." green
         break
     else
         echo_red "Invalid input. Please enter 1 or 2."
@@ -348,15 +347,15 @@ echo_bold "\nPlease specify the method to be performed."
     while true; do
         echo -ne "\e[1;38;5;220m"; read -n 1 method; tput sgr0; echo
         if [ "$method" == "1" ]; then
-            echo_green "Mapping method selected."; log_message "Mapping method selected."
+            log_message "Mapping method selected." green
             break
         elif [ "$method" == "2" ]; then
-            echo_green "De novo assembly method selected."; log_message "De novo assembly method selected."
+            log_message "De novo assembly method selected." green
             sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
             sed -i "s|skip_variants: false|skip_variants: true|" "$PARAMS_FILE"
             break
         elif [ "$method" == "3" ]; then
-            echo_green "Mapping + de novo assembly methods selected."; log_message "Mapping + de novo assembly methods selected."
+            log_message "Mapping + de novo assembly methods selected." green
             sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
             break
         else
@@ -369,17 +368,17 @@ echo_bold "\nPlease specify the method to be performed."
 echo
 read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0; echo
 if [ "$samples_ref_prepared" == "y" ]; then 
-    echo -e "File samples_ref.txt READY. \xE2\x9C\x85"; log_message "File samples_ref.txt READY. \xE2\x9C\x85"
+    log_message "File samples_ref.txt READY. \xE2\x9C\x85"
 else
     : > samples_ref.txt
-    echo "File samples_ref NOT prepared."; log_message "File samples_ref NOT prepared."
+    log_message "File samples_ref NOT prepared."
     while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
         read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
         read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
         read -p $'\e[1;37mAre host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] and reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
     done
     while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
-    echo -e "File samples_ref.txt READY. \xE2\x9C\x85"; log_message "File samples_ref.txt READY. \xE2\x9C\x85. Host: ${host^^}. Reference: ${reference}."
+    log_message "File samples_ref.txt READY. \xE2\x9C\x85. Host: ${host^^}. Reference: ${reference}."
 fi
 
 
@@ -391,6 +390,7 @@ if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
     read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
     if [ "$monkeypox" == "y" ]; then
 
+        log_message "Monkeypox virus (MPV) analisys selected"
         virus_tag='mpox'
         # Update Nextclade
         update_nextclade
@@ -410,15 +410,15 @@ else
         echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
         if [ "$virus_tag" == "1" ]; then
             virus_tag="sars-cov-2"
-            echo_green "${virus_tag^^} virus selected."; log_message "${virus_tag^^} virus selected."
+            log_message "${virus_tag^^} virus selected." green
             break
         elif [ "$virus_tag" == "2" ]; then
             virus_tag="rsv"
-            echo_green "${virus_tag^^} virus selected."; log_message "${virus_tag^^} virus selected."
+            log_message "${virus_tag^^} virus selected." green
             break
         elif [ "$virus_tag" == "3" ]; then
             virus_tag="Other"
-            echo_green "$virus_tag virus selected."; log_message "$virus_tag virus selected."
+            log_message "$virus_tag virus selected." green
             break
         else
             echo_red "Invalid input. Please select a valid number."
@@ -437,13 +437,11 @@ else
         # Update Nextclade
         update_nextclade
 
-        echo_bold "\nRemember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline."
-        log_message "Remember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline."
+        log_message "Remember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline." bold
 
     else
         echo "primer_bed: '../REFERENCES/XXXX'" >> $PARAMS_FILE
-        echo_bold "\nRemember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline."
-        log_message "Remember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline."
+        log_message "Remember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline." bold
     fi
 
 fi
@@ -525,5 +523,4 @@ rm percentajeNs.py
 rm _02_create_run_percentage_Ns.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
 
-echo_green "\nLablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly."
-log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly."
+log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly." green
