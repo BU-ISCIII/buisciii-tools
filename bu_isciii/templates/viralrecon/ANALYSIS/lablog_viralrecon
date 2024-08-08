@@ -71,7 +71,10 @@ update_pangolin() {
     echo "Setting datadir for Pangolin database."; log_message "Setting datadir for Pangolin database."
     cd /data/bi/references/pangolin/
     if [ -e "./$(date '+%Y%m%d')" ]; then
-        echo -e "Pangolin database is UP TO DATE. \xE2\x9C\x85"; log_message "Pangolin database is UP TO DATE. \xE2\x9C\x85"
+        echo -e "Directory /data/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
+        log_message "Directory /data/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
+        echo_green "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"; log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
+        echo_green "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"; log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")"
     else
         mkdir "$(date '+%Y%m%d')"
         echo -e "$(date +'%Y-%m-%d %H:%M:%S') - mkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/command.log
