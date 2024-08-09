@@ -30,28 +30,29 @@ The functions performed by the script can be listed as follows:
 
 # Coloring messages and log saving
 logfile=$(echo "$PWD/lablog_viralrecon.log")
+timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
 log_message() {
     local message="$1"
     case "$2" in
         "bold")
             echo -e "\e[1;37m$message\e[0m"
-            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[1;37m$message\e[0m" >> $logfile
+            echo -e "$timestamp - \e[1;37m$message\e[0m" >> $logfile
             ;;
         "red")
             echo -e "\e[31m$message\e[0m"
-            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[31m$message\e[0m" >> $logfile
+            echo -e "$timestamp - \e[31m$message\e[0m" >> $logfile
             ;;
         "green")
             echo -e "\e[32m$message\e[0m"
-            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[32m$message\e[0m" >> $logfile
+            echo -e "$timestamp - \e[32m$message\e[0m" >> $logfile
             ;;
         "blk_red")
             echo -e "\e[1;5;97;5;41m$message\e[0m"
-            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - \e[1;5;97;5;41m$message\e[0m" >> $logfile
+            echo -e "$timestamp - \e[1;5;97;5;41m$message\e[0m" >> $logfile
             ;;
         *)
             echo -e "$message"
-            echo -e "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> $logfile
+            echo -e "$timestamp - $message" >> $logfile
             ;;
     esac
 }
@@ -312,11 +313,10 @@ else
 fi
 
 # Setting work variables
-timeset=$(date +"%Y-%m-%d_%H-%M-%S")
-cp ../DOC/viralrecon.config ../DOC/${timeset}_viralrecon.config
-cp ../DOC/viralrecon_params.yml ../DOC/${timeset}_viralrecon_params.yml
-CONFIG_FILE="../DOC/${timeset}_viralrecon.config"
-PARAMS_FILE="../DOC/${timeset}_viralrecon_params.yml"
+cp ../DOC/viralrecon.config ../DOC/${timestamp}_viralrecon.config
+cp ../DOC/viralrecon_params.yml ../DOC/${timestamp}_viralrecon_params.yml
+CONFIG_FILE="../DOC/${timestamp}_viralrecon.config"
+PARAMS_FILE="../DOC/${timestamp}_viralrecon_params.yml"
 log_message "Created $CONFIG_FILE file."
 log_message "Created $PARAMS_FILE file."
 echo
