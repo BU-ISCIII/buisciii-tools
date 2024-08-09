@@ -185,7 +185,7 @@ check_references() {
             if [ -z $family ]; then
                 family="miscellanous"
                 log_message "Reference $ref does not currently belong to any family. Assigned to $family."
-                break
+                return
             fi
         fi
         log_message "Reference $ref belongs to $family family."
