@@ -182,6 +182,11 @@ check_references() {
         family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'TITLE="family">.*<' | awk -F 'TITLE="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
         if [ -z $family ]; then
             family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
+            if [ -z $family ]; then
+                family="miscellanous"
+                log_message "Reference $ref does not currently belong to any family. Assigned to $family."
+                break
+            fi
         fi
         log_message "Reference $ref belongs to $family family."
     }
