@@ -528,4 +528,4 @@ rm percentajeNs.py
 rm _02_create_run_percentage_Ns.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
 
-log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly." green
+log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly." bold
