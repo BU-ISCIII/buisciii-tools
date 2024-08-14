@@ -263,7 +263,7 @@ cat(blue("########################\nStarting with loading data\n################
 
 ####LOAD TRANSCRIPT RELATION DATA FILE #########################
 
-tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "salmon_tx2gene.tsv"), header = F)
+tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "tx2gene.tsv"), header = F)
 colnames(tx2gene) <- c("TXNAME", "GENEID", "gene_name")
 gene_genename <- tx2gene[,c(2:3)]
 gene_genename <- gene_genename %>% distinct()
