@@ -214,8 +214,8 @@ check_references() {
                 log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}." green
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 log_message "Building asset for ${ref}.fasta file..."
-                srun --partition short_idx --output ${ref}.fasta_build.log refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
-                if [ $? -eq 0 ]; then
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
+                if grep -q "Created" "${ref}.fasta_build.log"; then
                     log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
@@ -234,8 +234,8 @@ check_references() {
                 log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}." green
                 gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 log_message "Building asset for ${ref}.fasta file..."
-                srun --partition short_idx --output ${ref}.fasta_build.log refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R
-                if [ $? -eq 0 ]; then
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
+                if grep -q "Created" "${ref}.fasta_build.log"; then
                     log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
@@ -264,8 +264,8 @@ check_references() {
             if [ $? -eq 0 ]; then
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
                 log_message "Adding asset for ${ref}.gff file..."
-                srun --partition short_idx --output ${ref}.gff_add.log refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                if [ $? -eq 0 ]; then
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
+                if grep -q "Created" "${ref}.gff_add.log"; then
                     log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
@@ -283,8 +283,8 @@ check_references() {
             if [ $? -eq 0 ]; then 
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
                 log_message "Adding asset for ${ref}.gff file..."
-                srun --partition short_idx --output ${ref}.gff_add.log refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml
-                if [ $? -eq 0 ]; then
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
+                if grep -q "Created" "${ref}.gff_add.log"; then
                     log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
                     bash /data/bi/references/refgenie/alias/ref.sh
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
