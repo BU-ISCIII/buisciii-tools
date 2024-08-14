@@ -232,6 +232,49 @@ quality_plots <- function(norm_data){
   dev.off()
 }
 
+####TIME SERIES PLOTS#########################
+time_series_plots <- function(gene, res, dds) {
+  plot_name <- paste(gene, "expression.pdf", sep = "_")
+  file_path <- paste("Time_series_plots", plot_name, sep = "/")
+  index = which(rownames(res) == gene, arr.ind = TRUE)
+  gene_name <- DE_results_merged[index,2]
+  fiss <- plotCounts(dds, index, 
+                    intgroup = c("time","condition"), returnData = TRUE)
+  fiss$time <- factor(fiss$time, levels = time_order)
+  p <- ggplot(fiss, aes(x = time, y = count, color = condition, group = condition)) + 
+    geom_point() + 
+    stat_summary(fun = mean, geom = "line") +
+    scale_y_log10() +
+    labs(title = paste("Expression evolution of gene: ", gene_name, sep = ""))
+  pdf(file=file_path)
+  print(p)
+  dev.off()
+}
+
+####WALD TEST FOR TIME SERIES#########################
+
+wald_test <- function(dds, condition){
+  condition_test <- results(dds, name=condition, test="Wald")
+  print(condition_test[which.min(condition_test$padj),])
+}
+
+####BETAS PLOT FOR TIME SERIES#########################
+
+betas_plot <- function(res, dds) {
+  betas <- coef(dds)
+  colnames(betas)
+
+  topGenes <- head(order(res$padj),20)
+  mat <- betas[topGenes, -c(1,2)]
+  thr <- 3
+  mat[mat < -thr] <- -thr
+  mat[mat > thr] <- thr
+  pdf(file="Time_series_plots/betas_pheatmap.pdf")
+  pheatmap(mat, breaks=seq(from=-thr, to=thr, length=101),
+          cluster_col=TRUE, main = "log2FC of top20 significant genes")
+  dev.off()
+}
+
 ################################################
 ## WARNINGS                                   ##
 ################################################
@@ -334,6 +377,23 @@ if (opt$quality_plots) {
   dir.create("Quality_plots/DESeq2",showWarnings = FALSE)
   quality_plots(norm_data = norm_count)
 }
+
+cat(blue("########################\nStarting with time series plots\n###############################\n"))
+
+top4 <- rownames(head(deseq2_results$dds_matrix[order(deseq2_results$results$padj),], 4))
+
+dir.create("Time_series_plots",showWarnings = FALSE)
+
+for (gene in top4) {
+  time_series_plots(gene, res = deseq2_results$results, dds = deseq2_results$dds_matrix)
+}
+
+all_conditions <- resultsNames(deseq2_results$dds_matrix)
+for (condition in all_conditions) {
+  wald_test(dds = deseq2_results$dds_matrix, condition)
+}
+
+betas_plot(res = deseq2_results$results, dds = deseq2_results$dds_matrix)
 
 save.image()
 cat(blue("########################\nNumber of genes with padj < 0.05 and log2FC >= |2|:\n"))
