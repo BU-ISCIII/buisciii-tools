@@ -90,7 +90,7 @@ load_sample_data <- function(clinical_data, group) {
 
 ####DIFFERENTIAL EXPRESSION#########################
 
-deseq2_analysis <- function(txi_data, samples, compare_char1, compare_char2){
+deseq2_analysis <- function(txi_data, samples){
   ddsTxi <- DESeqDataSetFromTximport(txi_data,
                                      colData = samples,
                                      design = ~ condition + time + condition:time)
@@ -298,7 +298,7 @@ txi <- tximport(files, type="salmon", tx2gene=tx2gene)
 test_data(samples_data = samples_clin_data, txi_data = txi)
 
 cat(blue("########################\nStarting with differential expression\n###############################\n"))
-deseq2_results <- deseq2_analysis(txi_data = txi, samples = samples_clin_data, compare_char1 = opt$treatment, opt$control)
+deseq2_results <- deseq2_analysis(txi_data = txi, samples = samples_clin_data)
 mcols(deseq2_results$results, use.names = T)
 DE_results <- as.data.frame(deseq2_results$results)
 
