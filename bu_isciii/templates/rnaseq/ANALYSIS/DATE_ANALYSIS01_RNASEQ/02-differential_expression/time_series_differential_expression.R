@@ -37,11 +37,11 @@ library(data.table)
 cat(cyan$bgRed$bold("########################\nStarting diferential expression pipeline\n###############################\n"))
 
 option_list <- list(
-  make_option(c("-r", "--rnaseq_dir"              ), type="character" , default='../../01-rnaseq'      , metavar="path"   , help="Path to rna-seq results"                                                                                                                                                 ),
-  make_option(c("-c", "--clinical_data"           ), type="character" , default='./clinical_data.txt' , metavar="path"   , help="Path to clinical data file"                                                                                                                                              ),
-  make_option(c("-g", "--group_col"               ), type="character" , default='Group'                , metavar="string" , help="Colname with the sample classes in sample_data of the experiment for the DE."                                                                                            ),
-  make_option(c("-n", "--norm_counts"             ), type="logical"   , default=FALSE                  , metavar="boolean", help="Create table with normalized counts"                                                                                                                                     ),
-  make_option(c("-q", "--quality_plots"           ), type="logical"   , default=TRUE                   , metavar="boolean", help="Create quality plots or not."                                                                                                                                            )
+  make_option(c("-r", "--rnaseq_dir"    ), type="character" , default='../../01-rnaseq'      , metavar="path"   , help="Path to rna-seq results"                                                      ),
+  make_option(c("-c", "--clinical_data" ), type="character" , default='../clinical_data.txt' , metavar="path"   , help="Path to clinical data file"                                                   ),
+  make_option(c("-g", "--group_col"     ), type="character" , default='Group'                , metavar="string" , help="Colname with the sample classes in sample_data of the experiment for the DE." ),
+  make_option(c("-n", "--norm_counts"   ), type="logical"   , default=FALSE                  , metavar="boolean", help="Create table with normalized counts"                                          ),
+  make_option(c("-q", "--quality_plots" ), type="logical"   , default=TRUE                   , metavar="boolean", help="Create quality plots or not."                                                 )
 )
 
 opt_parser <- OptionParser(option_list=option_list)
