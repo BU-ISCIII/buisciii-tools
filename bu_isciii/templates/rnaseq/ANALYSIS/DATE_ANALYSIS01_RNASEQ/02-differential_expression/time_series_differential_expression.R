@@ -41,7 +41,8 @@ option_list <- list(
   make_option(c("-c", "--clinical_data" ), type="character" , default='../clinical_data.txt' , metavar="path"   , help="Path to clinical data file"                                                   ),
   make_option(c("-g", "--group_col"     ), type="character" , default='Group'                , metavar="string" , help="Colname with the sample classes in sample_data of the experiment for the DE." ),
   make_option(c("-n", "--norm_counts"   ), type="logical"   , default=FALSE                  , metavar="boolean", help="Create table with normalized counts"                                          ),
-  make_option(c("-q", "--quality_plots" ), type="logical"   , default=TRUE                   , metavar="boolean", help="Create quality plots or not."                                                 )
+  make_option(c("-q", "--quality_plots" ), type="logical"   , default=TRUE                   , metavar="boolean", help="Create quality plots or not."                                                 ),
+  make_option(c("-t", "--time_order"    ), type="character" , default=NULL                   , metavar="string" , help="Order to plot the dates as list, eg: 15D,45D,3M."                                                     )
 )
 
 opt_parser <- OptionParser(option_list=option_list)
@@ -51,6 +52,14 @@ cat(blue$bold("########################\nRunning analysis with the following par
 cat(blue("-Path to RNAseq input folder: ")) + cat(blue(opt$rnaseq_dir))+cat(blue("\n"))
 cat(blue("-Path to samples clinical data: ")) + cat(blue(opt$clinical_data))+cat(blue("\n"))
 cat(blue("-Column with the group info: ")) + cat(blue(opt$group_col))+cat(blue("\n"))
+
+if (is.null(opt$time_order)) {
+    print_help(opt_parser)
+    stop("You need to specify the order for the dates.", call.=FALSE)
+} else {
+  time_order <- unlist(strsplit(opt$time_order, ","))
+}
+
 if (opt$norm_counts) {
   cat(blue("-Saving normalized counts to file\n"))
 } else{
@@ -62,6 +71,7 @@ if (opt$quality_plots) {
   cat(blue("-Skipping quality plots\n"))
 }
 
+cat(blue("Time order: ")) + cat(blue(time_order)) +cat(blue("\n"))
 
 ################################################
 ################################################
