@@ -260,7 +260,7 @@ check_references() {
             digest=$(openssl rand -hex 24)
             refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/bi/references/refgenie/genome_config.yaml
             mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
-            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
                 log_message "Adding asset for ${ref}.gff file..."
@@ -279,7 +279,7 @@ check_references() {
             log_message "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
             digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
             mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
-            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${ref}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then 
                 log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
                 log_message "Adding asset for ${ref}.gff file..."
