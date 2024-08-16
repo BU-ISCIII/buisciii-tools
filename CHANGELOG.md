@@ -62,7 +62,8 @@ Code contributions to the new version:
 - Added several improvements in lablog_viralrecon (created log files, modified check_references function behaviour, enabled config files regeneration) [#306](https://github.com/BU-ISCIII/buisciii-tools/pull/306)
 - Fixed bug when lablog_viralrecon tries to download references that don't belong to any family. [#310](https://github.com/BU-ISCIII/buisciii-tools/pull/310)
 - Added mvmoneo to SFTP users. [#317](https://github.com/BU-ISCIII/buisciii-tools/pull/317)
-- Added scripts for time series RNAseq and updated differential expression code for differentially expressed transcripts [#316](https://github.com/BU-ISCIII/buisciii-tools/pull/316)
+- Added scripts for time series RNAseq and updated differential expression code for differentially expressed transcripts [#316](https://github.com/BU-ISCIII/buisciii-tools/pull/316).
+- Added bbaladron to SFTP users [#316](https://github.com/BU-ISCIII/buisciii-tools/pull/316).
 
 ### Modules
 
