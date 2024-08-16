@@ -61,7 +61,7 @@ Code contributions to the new version:
 - Modified bioinfo_doc.py so that new lines in the delivery message are applied in the email [#307](https://github.com/BU-ISCIII/buisciii-tools/pull/307)
 - Added several improvements in lablog_viralrecon (created log files, modified check_references function behaviour, enabled config files regeneration) [#306](https://github.com/BU-ISCIII/buisciii-tools/pull/306)
 - Fixed bug when lablog_viralrecon tries to download references that don't belong to any family. [#310](https://github.com/BU-ISCIII/buisciii-tools/pull/310)
--Added mvmoneo to SFTP users. [#317](https://github.com/BU-ISCIII/buisciii-tools/pull/317)
+- Added mvmoneo to SFTP users. [#317](https://github.com/BU-ISCIII/buisciii-tools/pull/317)
 
 ### Modules
 
