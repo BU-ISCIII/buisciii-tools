@@ -80,6 +80,7 @@ Code contributions to the new version:
 - Fixed autoclean-sftp function. [#281](https://github.com/BU-ISCIII/buisciii-tools/pull/281)
 - Fixed bioinfo_doc.py. Modified it so that this module creates a .pdf file including new-line characters, without merging lines into one single line [#259](https://github.com/BU-ISCIII/buisciii-tools/pull/259).
 - PR [#288](https://github.com/BU-ISCIII/buisciii-tools/pull/288) Fixed updating service's state to in_progress multiple times, related with issue [#285](https://github.com/BU-ISCIII/buisciii-tools/issues/285)
+- Review and update of services.json for files and folders cleaning [#318](https://github.com/BU-ISCIII/buisciii-tools/pull/318).
 
 #### Changed
 
