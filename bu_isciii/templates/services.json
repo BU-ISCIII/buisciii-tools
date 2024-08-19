@@ -60,7 +60,7 @@
       "description": "Plasmid identification tool based on mapping and assisted by assembly",
       "clean": {
         "folders":["01-preprocessing/trimmed_sequences"],
-        "files":[]
+        "files":["mapping/sample_name.sorted.bam", "kmer/database.msh"]
       },
       "no_copy": ["RAW", "TMP"],
       "delivery_md": "assets/reports/md/plasmidid.md",
