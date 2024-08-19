@@ -42,10 +42,10 @@
       "url": "https://github.com/BU-ISCIII/PikaVirus",
       "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus.",
       "clean": {
-        "folders":[],
+        "folders":["virus_coverage/plots"],
         "files":[]
       },
-      "no_copy": ["RAW", "TMP"],
+      "no_copy": ["RAW", "TMP", "01-PikaVirus-results"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/pikavirus.md",
       "results_md": "assets/reports/results/pikavirus.md"
