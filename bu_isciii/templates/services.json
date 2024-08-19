@@ -195,7 +195,7 @@
       "end": "",
       "description": "",
       "clean": {
-        "folders":[],
+        "folders":["01-preprocessing"],
         "files":[]
       },
       "no_copy": ["RAW", "TMP", "00-reads", "fasta_inputs"],
