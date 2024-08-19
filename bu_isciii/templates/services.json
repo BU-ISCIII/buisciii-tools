@@ -94,7 +94,7 @@
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation",
         "clean": {
-          "folders":["03-assembly/trimming/trimmed", "01-preprocessing/{sample_name}"],
+          "folders":[],
           "files":[]
         },
         "no_copy": ["RAW", "TMP"],
