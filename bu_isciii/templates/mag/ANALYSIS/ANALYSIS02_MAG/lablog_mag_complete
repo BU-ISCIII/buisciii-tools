@@ -1,0 +1,37 @@
+# SETUP INTPUT SAMPLE SHEET
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+
+# Setup samplesheet
+echo "sample,group,short_reads_1,short_reads_2,long_reads" > samplesheet.csv
+cat samples_id.txt | while read in; do
+	echo "${in},,00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,"
+done >> samplesheet.csv
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+
+
+cat <<EOF > complete_mag.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 8G
+#SBATCH --time 120:00:00
+#SBATCH --partition long_idx
+#SBATCH --output $(date '+%Y%m%d')_metagenomics01.log
+#SBATCH --chdir $scratch_dir
+
+# module load Nextflow/23.10.0 singularity
+export NXF_OPTS="-Xms500M -Xmx8G"
+
+nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-2.5.3/workflow/main.nf \\
+    -c ../../DOC/hpc_slurm_mag.config \\
+    -profile singularity \\
+    --input samplesheet.csv \\
+    --kraken2_db '/data/bi/references/kraken/minikraken_8GB_20200312.tgz' \\
+    --skip_spadeshybrid true \\
+    --outdir $(date '+%Y%m%d')_mag_complete \\
+    -resume
+EOF
+
+echo "sbatch complete_mag.sbatch" > _01_run_complete_mag.sh
