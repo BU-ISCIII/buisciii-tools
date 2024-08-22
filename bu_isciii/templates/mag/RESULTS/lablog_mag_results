@@ -3,4 +3,4 @@ cd $(date '+%Y%m%d')_entrega01
 
 #Create symbolic links depending on the analysis
 #Individual files
-ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
+ln -s ../../ANALYSIS/*_ANALYSIS02_MAG_TAXONOMICS/99-stats/multiqc_report.html ./krona_results.html
