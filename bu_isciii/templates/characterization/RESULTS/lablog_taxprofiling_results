@@ -1,0 +1,8 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+mkdir -p $DELIVERY_FOLDER/taxprofiling
+
+# Taxprofiling service
+cd $DELIVERY_FOLDER/taxprofiling
+
+# Links to reports
+ln -s ../../../ANALYSIS/*ANALYSIS02_TAXPROFILING/results/multiqc/multiqc_report.html .
