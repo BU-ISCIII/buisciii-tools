@@ -148,9 +148,10 @@ Output:
 │                        │ control, host removal and exploratory     │                                            │
 │                        │ analysis of samples.                      │                                            │
 │ ariba_characterization │                                           │                                            │
-│                mag_met │ Bioinformatics best-practise analysis     │ https://github.com/nf-core/mag             │
-│                        │ pipeline for assembly, binning and        │                                            │
-│                        │ annotation of metagenomes.                │                                            │
+│                mag_met │ 1- Bioinformatics best-practise analysis  │ https://github.com/nf-core/mag or          │
+│                        │ for taxonomic classification and          │ https://github.com/nf-core/taxprofiler     │
+│                        │ profiling; 2- Bioinformatics best-practise│                                            │
+│                        │ analysis pipeline for assembly, binning   │                                            │
 └────────────────────────┴───────────────────────────────────────────┴────────────────────────────────────────────┘
 ```
 
