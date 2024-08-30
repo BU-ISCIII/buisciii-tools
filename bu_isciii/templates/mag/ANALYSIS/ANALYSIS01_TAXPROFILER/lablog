@@ -65,11 +65,11 @@ cat <<EOF > taxprofiler.sbatch
 #SBATCH --chdir $scratch_dir
 
 # module load Nextflow/23.10.0 singularity
-export NXF_OPTS="-Xms500M -Xmx10G"
+export NXF_OPTS="-Xms500M -Xmx6G"
 
 nextflow run /data/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.1.8 \\
     -profile singularity \\
-    -c ../../DOC/hpc_slurm_taxprofiler.config \\
+    -c ../../DOC/taxprofiler.config \\
     --input samplesheet.csv \\
     --outdir ./ \\
     --databases ../../DOC/databasesheet.csv \\
