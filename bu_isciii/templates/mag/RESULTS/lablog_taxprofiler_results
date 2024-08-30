@@ -5,4 +5,4 @@ mkdir -p $DELIVERY_FOLDER/taxprofiler
 cd $DELIVERY_FOLDER/taxprofiler
 
 # Links to reports
-ln -s ../../../ANALYSIS/*ANALYSIS01_TAXPROFILER/results/multiqc/multiqc_report.html .
+ln -s ../../../ANALYSIS/*ANALYSIS01_TAXPROFILER/multiqc/multiqc_report.html .
