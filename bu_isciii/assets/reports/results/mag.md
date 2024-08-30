@@ -6,3 +6,12 @@ Here we describe the results from the MAG pipeline for multispecies metagenomic 
 
 > [!WARNING]
 > Software's versions used in this analysis can be obtained from the  `MultiQC` report.
+
+## Taxprofiler
+
+Here we describe the results from the (nf-core/taxprofiler)[https://nf-co.re/taxprofiler/1.1.8] pipeline for multispecies taxonomic classification and profiling of shorgun short- and long-read.
+
+* multiqc_report.html​ : Final HTML report collecting numerical stats from each module executed in this pipeline.
+
+> [!WARNING]
+> Software's versions used in this analysis can be obtained from the  `MultiQC` report.
