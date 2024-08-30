@@ -1,6 +1,6 @@
 tool,db_name,db_params,db_path
-kraken2,db1,,/data/bi/references/kraken/minikraken_8GB_20200312.tgz
-bracken,db2,,/data/bi/references/bracken/bracken_minikraken_8GB_20200312.tgz
+kraken2,db1,,/data/bi/references/kraken/k2_standard_16gb_20240605.tar.gz
+bracken,db2,,/data/bi/references/kraken/k2_standard_16gb_20240605.tar.gz
 centrifuge,db3,,/data/bi/references/centrifuge/201612_centrifuge_index_p+h+v.tar.gz
 metaphlan,db4,,/data/bi/references/metaphlan/mpa_vJun23_CHOCOPhlAnSGB_20240/
 kaiju,db5,,/data/bi/references/kaiju/nr_euk_2023-05-10/
