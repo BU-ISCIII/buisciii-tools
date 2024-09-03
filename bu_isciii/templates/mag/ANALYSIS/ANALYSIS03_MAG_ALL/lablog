@@ -11,14 +11,14 @@ done >> samplesheet.csv
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 
-cat <<EOF > mag_complete.sbatch
+cat <<EOF > mag_all.sbatch
 #!/bin/sh
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 2
 #SBATCH --mem 8G
-#SBATCH --time 120:00:00
+#SBATCH --time 72:00:00
 #SBATCH --partition long_idx
-#SBATCH --output $(date '+%Y%m%d')_mag_complete.log
+#SBATCH --output $(date '+%Y%m%d')_mag_all.log
 #SBATCH --chdir $scratch_dir
 
 # module load Nextflow/23.10.0 singularity
@@ -30,8 +30,8 @@ nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-2.5.3/workflow/main.nf \
     --input samplesheet.csv \\
     --kraken2_db '/data/bi/references/kraken/minikraken_8GB_20200312.tgz' \\
     --skip_spadeshybrid true \\
-    --outdir $(date '+%Y%m%d')_mag_complete \\
+    --outdir $(date '+%Y%m%d')_mag_all \\
     -resume
 EOF
 
-echo "sbatch mag_complete.sbatch" > _01_run_mag_complete.sh
+echo "sbatch mag_all.sbatch" > _01_run_mag_all.sh
