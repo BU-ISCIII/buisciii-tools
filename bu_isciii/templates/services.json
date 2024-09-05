@@ -210,7 +210,7 @@
       "begin": "base",
       "end": "",
       "url": "https://github.com/nf-core/mag or https://github.com/nf-core/taxprofiler",
-      "description": "1- Bioinformatics best-practise analysis for taxonomic classification and profiling; 2- Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
+      "description": "1- Bioinformatics best-practise analysis for taxonomic classification and/or genome binning; 2- Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
       "clean": {
         "folders":[],
         "files":[]
