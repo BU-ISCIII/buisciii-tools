@@ -1,6 +1,25 @@
-mkdir $(date '+%Y%m%d')_entrega01
-cd $(date '+%Y%m%d')_entrega01
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+mkdir -p $DELIVERY_FOLDER/mag_all
 
-#Create symbolic links depending on the analysis
-#Individual files
-ln -s ../../ANALYSIS/*_ANALYSIS03_MAG_ALL/99-stats/multiqc_report.html ./krona_results.html
+# Taxprofiling service
+cd $DELIVERY_FOLDER/mag_all
+ANALYSIS_FOLDER=../../../ANALYSIS/*_ANALYSIS03_MAG_ALL/*_mag_all
+
+# multiqc report
+ln -s ${ANALYSIS_FOLDER}/99-stats/multiqc_report.html .
+
+# quast reports
+mkdir -p quast
+for quast_report in ${ANALYSIS_FOLDER}/Assembly/*/QC/*/QUAST/report.html; do
+    assembly_tool=$(echo "$quast_report" | awk -F'/' '{print $8}')
+    sample_name=$(echo "$quast_report" | awk -F'/' '{print $10}')
+    ln -s "../$quast_report" "quast/${sample_name}.${assembly_tool}.report.html"
+done
+
+# krona reports
+mkdir -p krona
+for krona_report in ${ANALYSIS_FOLDER}/Taxonomy/*/*/taxonomy.krona.html; do
+    taxonomy_tool=$(echo "$krona_report" | awk -F'/' '{print $8}')
+    sample_name=$(echo "$krona_report" | awk -F'/' '{print $9}')
+    ln -s "../$krona_report" "krona/${sample_name}.${taxonomy_tool}.report.html"
+done
