@@ -30,6 +30,7 @@ nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-2.5.3/workflow/main.nf \
     --input samplesheet.csv \\
     --kraken2_db '/data/bi/references/kraken/minikraken_8GB_20200312.tgz' \\
     --skip_spadeshybrid true \\
+    --skip_concoct true \\
     --refine_bins_dastool true \\
     --outdir $(date '+%Y%m%d')_mag_all \\
     -resume
