@@ -211,21 +211,32 @@ class BioinfoDoc:
         if self.type == "delivery":
             service_list = {}
             for service_id_requested in self.service_ids_requested_list:
-                service_list[service_id_requested] = bu_isciii.service_json.ServiceJson().get_find(service_id_requested, "label")
+                service_list[
+                    service_id_requested
+                ] = bu_isciii.service_json.ServiceJson().get_find(
+                    service_id_requested, "label"
+                )
             self.all_services = service_list
 
     def load_versions(self):
         """Load and parse the versions.yml file."""
-        result = subprocess.run(f"find /data/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'", stdout=subprocess.PIPE, text=True, shell=True)
+        result = subprocess.run(
+            f"find /data/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'",
+            stdout=subprocess.PIPE,
+            text=True,
+            shell=True,
+        )
         versions_files = result.stdout.strip().split("\n")
         if versions_files == [""]:
-            stderr.print(f"[red] No versions.yml files found for the service {self.service_name}!")
+            stderr.print(
+                f"[red] No versions.yml files found for the service {self.service_name}!"
+            )
             return "No software versions data available for this service"
         else:
             versions_data = {}
             loaded_contents = []
             for versions_file in versions_files:
-                with open(versions_file, 'r') as f:
+                with open(versions_file, "r") as f:
                     content = yaml.safe_load(f)
                 if content not in loaded_contents:
                     versions_data[versions_file] = content
