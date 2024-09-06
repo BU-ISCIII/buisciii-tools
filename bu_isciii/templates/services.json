@@ -1,6 +1,6 @@
 {
     "assembly_annotation": {
-        "label": "",
+        "label": "Bacteria: De novo genome assembly and annotation",
         "template": "assembly",
         "url": "https://github.com/nf-core/bacass/tree/2.3.1",
         "order": 1,
@@ -17,7 +17,7 @@
         "results_md": "assets/reports/results/assembly.md"
     },
     "mtbseq": {
-        "label": "",
+        "label": "Bacteria: In-depth analysis of Mycobacterium species genomes (e.g. M. tuberculosis. M. bovis)",
         "template": "mtbseq",
         "order": 1,
         "begin": "base",
@@ -34,7 +34,7 @@
         "results_md": ""
     },
     "pikavirus": {
-      "label": "",
+      "label": "Viral: Detection and characterization of viral genomes within metagenomic data",
       "template": "pikavirus",
       "order": 1,
       "begin": "base",
@@ -51,7 +51,7 @@
       "results_md": "assets/reports/results/pikavirus.md"
   },
     "plasmidid_assembly": {
-      "label": "",
+      "label": "Bacteria: Plasmid analysis and characterization",
       "template": "plasmidid",
       "order": 1,
       "begin": "base",
@@ -85,7 +85,7 @@
         "results_md": ""
     },
     "wgmlst_chewbbaca": {
-        "label": "",
+        "label": "Bacteria: Core genome or whole genome Multi-Locus Sequence Typing analysis (cg/wgMLST)",
         "template": "chewbbaca",
         "order": 1,
         "begin": "base",
@@ -103,7 +103,7 @@
         "results_md": "assets/reports/results/wgmlst_chewbbaca.md"
     },
     "viralrecon": {
-        "label": "",
+        "label": "Viral: Genomic reconstruction, reference mapping and variant calling and/or de novo assembly",
         "template": "viralrecon",
         "url": "https://github.com/BU-ISCIII/viralrecon",
         "order": 1,
@@ -137,7 +137,7 @@
         "results_md": "assets/reports/results/rnaseq_deg.md"
     },
     "lowfreq_panel": {
-        "label": "",
+        "label": "Low-frequency variants detection and annotation for whole genome or sequencing panel (e.g. retinoblastoma gene panel)",
         "template": "lowfreq_panel",
         "url": "",
         "order": 1,
@@ -154,7 +154,7 @@
         "results_md": ""
     },
     "snippy": {
-      "label": "",
+      "label": "Fungal / bacteria / virus : Variant calling, annotation and SNP-based outbreak analysis (e.g. haploid fungal outbreak)",
       "template": "snippy",
       "order": 1,
       "begin": "base",
@@ -187,7 +187,7 @@
       "delivery_pdf": ""
     },
     "characterization": {
-      "label": "",
+      "label": "Bacteria: Multi-Locus Sequence Typing (MLST), analysis of virulence factors, antimicrobial resistance, and plasmids characterization",
       "template": "characterization",
       "url": "",
       "order": 1,
@@ -204,7 +204,7 @@
       "results_md": ""
     },
     "mag_met": {
-      "label": "",
+      "label": "Taxonomic based Identification and classification of organisms in complex communities",
       "template": "mag",
       "order": 2,
       "begin": "base",
@@ -221,7 +221,7 @@
       "results_md": "assets/reports/results/mag.md"
     },
     "exometrio": {
-      "label": "",
+      "label": "Human: Exome sequencing for variant calling, annotation and inheritance filtering (e.g. Exome sequencing of a human trio (two parents and one child))",
       "template": "exometrio",
       "url": "",
       "order": 1,
@@ -238,7 +238,7 @@
       "results_md": "assets/reports/results/trios.md"
     },
     "exomeeb": {
-      "label": "",
+      "label": "Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)",
       "template": "exomeeb",
       "url": "",
       "order": 1,
@@ -255,7 +255,7 @@
       "results_md": "assets/reports/results/exomeeb.md"
     },
     "wgstrio": {
-      "label": "",
+      "label": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering (e.g.WGS of a human trio )",
       "template": "wgstrio",
       "url": "",
       "order": 1,
@@ -272,7 +272,7 @@
       "results_md": "assets/reports/results/trios.md"
     },
     "freebayes_outbreak": {
-      "label": "",
+      "label": "Eukaria (non-human): Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)",
       "template": "freebayes_outbreak",
       "url": "",
       "order": 1,
@@ -289,7 +289,7 @@
       "results_md": ""
     },
     "IRMA": {
-      "label": "",
+      "label": "Viral Flu: Influenza fragment reconstruction and variant detection",
       "template": "IRMA",
       "url": "",
       "order": 1,
@@ -306,7 +306,7 @@
       "results_md": "assets/reports/results/irma_output.md"
     },
     "blast_nt": {
-      "label": "",
+      "label": "Alignment of de novo assembly contigs to database",
       "template": "blast_nt",
       "url": "",
       "order": 1,
