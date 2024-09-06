@@ -11,6 +11,7 @@ import jinja2
 import markdown
 import pdfkit
 import PyPDF2
+import yaml
 import subprocess
 import json
 import shutil
@@ -77,7 +78,7 @@ class BioinfoDoc:
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=True, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
         if self.resolution_info == 404:
             print("Received Error 404 from Iskylims API. Aborting")
@@ -92,7 +93,7 @@ class BioinfoDoc:
             else:
                 self.post_delivery_info()
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=True, resolution=self.resolution_id
+            request_info="service-data", safe=False, resolution=self.resolution_id
         )
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
@@ -184,6 +185,7 @@ class BioinfoDoc:
             self.path, self.conf["services_path"], year, self.service_name
         )
         self.samples = self.resolution_info.get("samples", None)
+        self.versions = self.load_versions()
         self.handled_services = None
         try:
             self.config_pdfkit = pdfkit.configuration()
@@ -205,6 +207,30 @@ class BioinfoDoc:
             self.email_psswd = bu_isciii.utils.ask_password("E-mail password: ")
         else:
             self.email_psswd = email_psswd
+
+        if self.type == "delivery":
+            service_list = {}
+            for service_id_requested in self.service_ids_requested_list:
+                service_list[service_id_requested] = bu_isciii.service_json.ServiceJson().get_find(service_id_requested, "label")
+            self.all_services = service_list 
+
+    def load_versions(self):
+        """Load and parse the versions.yml file."""
+        result = subprocess.run(f"find /data/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'", stdout=subprocess.PIPE, text=True, shell=True)
+        versions_files = result.stdout.strip().split("\n")
+        if versions_files == [""]:
+            stderr.print(f"[red] No versions.yml files found for the service {self.service_name}!")
+            return "No software versions data available for this service"
+        else:
+            versions_data = {}
+            loaded_contents = []
+            for versions_file in versions_files:
+                with open(versions_file, 'r') as f:
+                    content = yaml.safe_load(f)
+                if content not in loaded_contents:
+                    versions_data[versions_file] = content
+                    loaded_contents.append(content)
+            return versions_data
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -332,6 +358,8 @@ class BioinfoDoc:
         # service related information
         markdown_data["service"] = self.resolution_info
         markdown_data["user_data"] = self.resolution_info["service_user_id"]
+        markdown_data["software_versions"] = self.versions
+        markdown_data["services_list"] = self.all_services
         samples_in_service = {}
 
         if self.samples is not None:
