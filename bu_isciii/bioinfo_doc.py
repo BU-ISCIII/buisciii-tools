@@ -78,7 +78,7 @@ class BioinfoDoc:
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         if self.resolution_info == 404:
             print("Received Error 404 from Iskylims API. Aborting")
@@ -93,7 +93,7 @@ class BioinfoDoc:
             else:
                 self.post_delivery_info()
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
