@@ -212,7 +212,7 @@ class BioinfoDoc:
             service_list = {}
             for service_id_requested in self.service_ids_requested_list:
                 service_list[service_id_requested] = bu_isciii.service_json.ServiceJson().get_find(service_id_requested, "label")
-            self.all_services = service_list 
+            self.all_services = service_list
 
     def load_versions(self):
         """Load and parse the versions.yml file."""
