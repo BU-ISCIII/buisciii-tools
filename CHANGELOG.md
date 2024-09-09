@@ -67,6 +67,7 @@ Code contributions to the new version:
 - Added new template for comprehensive taxonomy profiling using the nf-core/taxprofiler pipeline [#320](https://github.com/BU-ISCIII/buisciii-tools/pull/320).
 - Added full execution support for the MAG template [#321](https://github.com/BU-ISCIII/buisciii-tools/pull/321).
 - Added labels to services.json and updated bioinfo_doc.py and jinja_template_delivery.j2 so that software versions data is displayed in the delivery pdf [#330](https://github.com/BU-ISCIII/buisciii-tools/pull/330).
+- Updated several templates (singularity images, outdated paths, improvements, etc) [#331](https://github.com/BU-ISCIII/buisciii-tools/pull/331)
 
 ### Modules
 
