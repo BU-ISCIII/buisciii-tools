@@ -206,27 +206,32 @@ def get_service_paths(conf, type, info, archived_status):
     """
     global_conf = conf.get_configuration("global")
     service_path = None
-    if type == "services_and_colaborations":
-        if archived_status == "archived_path":
-            service_path = os.path.join(
-                global_conf["archived_path"],
-                type,
-                info["service_user_id"]["profile"]["profile_center"],
-                info["service_user_id"]["profile"][
-                    "profile_classification_area"
-                ].lower(),
-            )
-        if archived_status == "non_archived_path":
-            service_path = os.path.join(
-                global_conf["data_path"],
-                type,
-                info["service_user_id"]["profile"]["profile_center"],
-                info["service_user_id"]["profile"][
-                    "profile_classification_area"
-                ].lower(),
-            )
-    return service_path
-
+    
+    try:
+        if type == "services_and_colaborations":
+            if archived_status == "archived_path":
+                service_path = os.path.join(
+                    global_conf["archived_path"],
+                    type,
+                    info["service_user_id"]["profile"]["profile_center"],
+                    info["service_user_id"]["profile"][
+                        "profile_classification_area"
+                    ].lower(),
+                )
+            if archived_status == "non_archived_path":
+                service_path = os.path.join(
+                    global_conf["data_path"],
+                    type,
+                    info["service_user_id"]["profile"]["profile_center"],
+                    info["service_user_id"]["profile"][
+                        "profile_classification_area"
+                    ].lower(),
+                )
+        return service_path
+    
+    except AttributeError:
+        stderr.print("[red]ERROR: the user associated with this service has no profile classification area selected in iskylims.isciii.es/admin. Please log in, go to the Profiles section and make sure every user has been assigned a profile classification area.")
+        sys.exit(1)
 
 def get_sftp_folder(conf, resolution_info):
     service_user = resolution_info["service_user_id"]["username"]
