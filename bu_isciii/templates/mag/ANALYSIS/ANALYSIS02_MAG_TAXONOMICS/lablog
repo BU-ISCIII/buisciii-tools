@@ -18,7 +18,7 @@ cat <<EOF > mag.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-2.5.3/workflow/main.nf \\
+nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-3.0.3/3_0_3/main.nf \\
           -c ../../DOC/mag.config \\
           --input '00-reads/*_R{1,2}.fastq.gz' \\
           --outdir $(date '+%Y%m%d')_mag \\
