@@ -230,7 +230,9 @@ def get_service_paths(conf, type, info, archived_status):
         return service_path
 
     except AttributeError:
-        stderr.print("[red]ERROR: the user associated with this service has no profile classification area selected in iskylims.isciii.es/admin. Please log in, go to the Profiles section and make sure every user has been assigned a profile classification area.")
+        stderr.print(
+            "[red]ERROR: the user associated with this service has no profile classification area selected in iskylims.isciii.es/admin. Please log in, go to the Profiles section and make sure every user has been assigned a profile classification area."
+        )
         sys.exit(1)
 
 
