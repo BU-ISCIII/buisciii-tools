@@ -19,7 +19,7 @@ cat <<EOF > rnaseq.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-/data/bi/pipelines/nf-core-rnaseq/nf-core-rnaseq-3.10.1/workflow/main.nf \\
+/data/bi/pipelines/nf-core-rnaseq/nf-core-rnaseq-3.14.0/main.nf \\
           -c ../../DOC/hpc_slurm_rnaseq.config \\
           -params-file ../../DOC/hg38_ensmbl_rnaseq.yml \\
           --input samplesheet.csv \\
