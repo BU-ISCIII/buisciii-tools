@@ -674,5 +674,6 @@ def fix_permissions(ctx, input_directory):
     )
     stderr.print(f"[green]Correct permissions were applied to {input_directory}")
 
+
 if __name__ == "__main__":
     run_bu_isciii()
