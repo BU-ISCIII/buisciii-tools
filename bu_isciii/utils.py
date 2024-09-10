@@ -7,6 +7,7 @@ import json
 import os
 import tarfile
 import sys
+import subprocess
 
 import questionary
 import rich
@@ -495,3 +496,30 @@ def process_yaml_file(yaml_file):
 
 def validate_date(date_previous, date_posterior):
     return
+
+
+def remake_permissions(copied_folder_path, permissions_config):
+    """
+    Change permissions of all files and directories in a given absolute path.
+
+    Args:
+        copied_folder_path: The path to the folder that was copied
+        permissions_config: Dictionary containing permissions configuration (e.g., {'directory_chmod': '755', 'file_chmod': '664'})
+    """
+    for root, dirs, files in os.walk(copied_folder_path):
+        # Full paths for directories
+        dirpaths = [os.path.join(root, dir) for dir in dirs]
+
+        # Full paths for files
+        filepaths = [os.path.join(root, file) for file in files]
+
+        # Change permissions for directories
+        for dir_path in dirpaths:
+            if "directory_chmod" in permissions_config:
+                subprocess.run(f"chown -R $(whoami):bi {copied_folder_path}", shell=True, check=True)
+                subprocess.run(f"find {copied_folder_path} -type d -exec chmod {permissions_config['directory_chmod']} {{}} \;", shell=True, check=True)
+
+        # Change permissions for files
+        for file_path in filepaths:
+            if "file_chmod" in permissions_config:
+                subprocess.run(f"find {copied_folder_path} -type f -exec chmod {permissions_config['file_chmod']} {{}} \;", shell=True, check=True)
