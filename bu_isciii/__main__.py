@@ -649,5 +649,30 @@ def autoclean_sftp(ctx, sftp_folder, days):
     sftp_clean.handle_autoclean_sftp()
 
 
+# FIX PERMISSIONS
+@bu_isciii_cli.command(help_priority=9)
+@click.option(
+    "-d",
+    "--input_directory",
+    type=click.Path(),
+    default=None,
+    required=True,
+    help="Input directory to fix permissions (absolute path)",
+)
+@click.pass_context
+def fix_permissions(ctx, input_directory):
+    """
+    Fix permissions
+    """
+    if not os.path.isdir(input_directory):
+        exit("Invalid input directory")
+    conf = bu_isciii.config_json.ConfigJson()
+    permissions = conf.get_configuration("global").get("permissions")
+    bu_isciii.utils.remake_permissions(input_directory, permissions)
+    stderr = rich.console.Console(
+        stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()
+    )
+    stderr.print(f"[green]Correct permissions were applied to {input_directory}")
+
 if __name__ == "__main__":
     run_bu_isciii()
