@@ -516,10 +516,22 @@ def remake_permissions(copied_folder_path, permissions_config):
         # Change permissions for directories
         for dir_path in dirpaths:
             if "directory_chmod" in permissions_config:
-                subprocess.run(f"chown -R $(whoami):bi {copied_folder_path}", shell=True, check=True)
-                subprocess.run(f"find {copied_folder_path} -type d -exec chmod {permissions_config['directory_chmod']} {{}} \;", shell=True, check=True)
+                subprocess.run(
+                    f"chown -R $(whoami):bi {copied_folder_path}",
+                    shell=True,
+                    check=True,
+                )
+                subprocess.run(
+                    f"find {copied_folder_path} -type d -exec chmod {permissions_config['directory_chmod']} {{}} \;",
+                    shell=True,
+                    check=True,
+                )
 
         # Change permissions for files
         for file_path in filepaths:
             if "file_chmod" in permissions_config:
-                subprocess.run(f"find {copied_folder_path} -type f -exec chmod {permissions_config['file_chmod']} {{}} \;", shell=True, check=True)
+                subprocess.run(
+                    f"find {copied_folder_path} -type f -exec chmod {permissions_config['file_chmod']} {{}} \;",
+                    shell=True,
+                    check=True,
+                )

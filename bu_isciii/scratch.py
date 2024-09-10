@@ -190,8 +190,12 @@ class Scratch:
 
                         # After successful rsync, apply correct permissions
                         conf = bu_isciii.config_json.ConfigJson()
-                        permissions_config = conf.get_configuration("global").get("permissions")
-                        bu_isciii.utils.remake_permissions(self.full_path, permissions_config)
+                        permissions_config = conf.get_configuration("global").get(
+                            "permissions"
+                        )
+                        bu_isciii.utils.remake_permissions(
+                            self.full_path, permissions_config
+                        )
 
                         stderr.print(
                             "[green]Successfully copied the directory to %s"
