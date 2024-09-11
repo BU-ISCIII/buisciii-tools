@@ -319,18 +319,15 @@ def uncompress_targz_directory(tar_name, directory):
     return
 
 
-def get_md5(file):
+def get_md5(file_path, chunk_size=1 * 1024 * 1024 * 1024):  # 1 GB
     """
     Given a file, open it and digest to get the md5
-    NOTE: might be troublesome when infile is too big
-    Based on:
-    https://www.quickprogrammingtips.com/python/how-to-calculate-md5-hash-of-a-file-in-python.html
     """
-    with open(file, "rb") as infile:
-        infile = infile.read()
-        file_md5 = hashlib.md5(infile).hexdigest()
-
-    return file_md5
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
