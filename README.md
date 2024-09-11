@@ -21,6 +21,7 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
       - [bioinfo\_doc](#bioinfo_doc)
       - [archive](#archive)
       - [autoclean\_sftp](#autoclean_sftp)
+      - [fix-permissions](#fix-permissions)
   - [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -94,6 +95,8 @@ Commands:
   finish       Service cleaning, remove big files, rename folders before...
   bioinfo-doc  Create the folder documentation structure in bioinfo_doc...
   archive      Archive services or retrieve services from archive
+  autoclean-sftp   Clean old sftp services
+  fix-permissions  Fix permissions
 ```
 
 #### list
@@ -386,6 +389,26 @@ Options:
   -s, --sftp_folder PATH  Absolute path to sftp folder
   -d, --days INTEGER      Integer, remove files older than a window of `-d
                           [int]` days. Default 14 days.
+  --help                  Show this message and exit.
+```
+
+#### fix-permissions
+
+Example of usage:
+
+```bash
+bu-isciii fix-permissions -d /data/bi
+```
+
+Help:
+
+```bash
+Usage: bu-isciii fix-permissions [OPTIONS]
+
+  Fix permissions
+
+Options:
+  -d, --input_directory PATH  Input directory to fix permissions (absolute path) [required]
   --help                  Show this message and exit.
 ```
 
