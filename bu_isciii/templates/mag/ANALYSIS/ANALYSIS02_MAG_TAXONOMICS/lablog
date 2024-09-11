@@ -1,5 +1,12 @@
+# SETUP INTPUT SAMPLE SHEET
 ln -s ../00-reads .
 ln -s ../samples_id.txt .
+
+# Setup samplesheet
+echo "sample,group,short_reads_1,short_reads_2,long_reads" > samplesheet.csv
+cat samples_id.txt | while read in; do
+        echo "${in},,00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,"
+done >> samplesheet.csv
 
 #module load Nextflow
 #module load singularity
@@ -20,7 +27,7 @@ export NXF_OPTS="-Xms500M -Xmx4G"
 
 nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-3.0.3/3_0_3/main.nf \\
           -c ../../DOC/mag.config \\
-          --input '00-reads/*_R{1,2}.fastq.gz' \\
+          --input samplesheet.csv \\
           --outdir $(date '+%Y%m%d')_mag \\
           --kraken2_db /data/bi/references/kraken/minikraken_8GB_20200312.tgz \\
           --skip_busco --skip_spades --skip_spadeshybrid --skip_megahit --skip_prodigal --skip_binning \\
