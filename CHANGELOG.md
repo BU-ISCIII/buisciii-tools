@@ -69,6 +69,7 @@ Code contributions to the new version:
 - Added labels to services.json and updated bioinfo_doc.py and jinja_template_delivery.j2 so that software versions data is displayed in the delivery pdf [#330](https://github.com/BU-ISCIII/buisciii-tools/pull/330).
 - Updated several templates (singularity images, outdated paths, improvements, etc) [#331](https://github.com/BU-ISCIII/buisciii-tools/pull/331)
 - Added permissions fixing after running scratch_copy, as well as a new fix-permissions module in the tools [#332](https://github.com/BU-ISCIII/buisciii-tools/pull/332).
+- Updated MAG lablogs and utils.py [#334](https://github.com/BU-ISCIII/buisciii-tools/pull/334).
 
 ### Modules
 
