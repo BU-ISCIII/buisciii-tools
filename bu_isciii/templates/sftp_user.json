@@ -53,5 +53,6 @@
     "mvmoneo": ["SpainUDP"],
     "bbaladron": ["SpainUDP"],
     "bioinfoadm": ["test"],
-    "s.varona": ["misc"]
+    "s.varona": ["misc"],
+    "nlabiod": ["Labarbovirus"]
 }
