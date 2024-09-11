@@ -187,6 +187,7 @@ class BioinfoDoc:
         self.samples = self.resolution_info.get("samples", None)
         self.versions = self.load_versions()
         self.handled_services = None
+        self.all_services = None
         try:
             self.config_pdfkit = pdfkit.configuration()
         except OSError as e:
