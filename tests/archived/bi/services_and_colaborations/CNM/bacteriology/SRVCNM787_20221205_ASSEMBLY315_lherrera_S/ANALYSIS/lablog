@@ -1,0 +1,9 @@
+mkdir -p 00-reads
+#ls ../RAW/*.gz | cut -d "/" -f3 | cut -d "_" -f1 | sort -u > samples_id.txt
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cd -
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
+CURRENT_DIR=$(pwd | cut -d '/' -f1,2,3,4,5,6,7)
+echo "srun --partition short_idx rsync -rlv ${CURRENT_DIR} /scratch/bi" > _01_copy_folder.sh
+SERVICE_ID=$(pwd | cut -d '/' -f7)
+echo "srun --partition short_idx rsync -rlv --exclude \"work\" /scratch/bi/${SERVICE_ID}/* ${CURRENT_DIR}/" > _02_copy_back.sh
+mv ANALYSIS01_ASSEMBLY $(date '+%Y%m%d')_ANALYSIS01_ASSEMBLY

@@ -24,7 +24,6 @@ class ConfigJson:
 
     def get_find(self, topic, found):
         """
-        Owner: Pablo
         Description:
             Obtain from topic any forward items from json data
         """

@@ -1,12 +1,19 @@
-DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
 
-mkdir -p $DELIVERY_FOLDER
-mkdir "${DELIVERY_FOLDER}/characterization"
+mkdir -p "${DELIVERY_FOLDER}/characterization/amrfinderplus"
+mkdir -p "${DELIVERY_FOLDER}/characterization/emmtyper"
 
 # ARIBA characterization service
 cd $DELIVERY_FOLDER/characterization
 ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/ariba_*.tsv .
 ln -s ../../../ANALYSIS/*CHARACTERIZATION/99-stats/ariba_*.csv .
-find . -xtype l -delete
 
-cd -
+cd amrfinderplus
+ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*amrfinderplus/*tsv .
+find .. -xtype l -delete
+
+cd ..
+cd emmtyper
+ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*emmtyper/01-typing/results_emmtyper.out .
+
+cd ../../

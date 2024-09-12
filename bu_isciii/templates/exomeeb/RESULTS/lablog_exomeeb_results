@@ -1,0 +1,12 @@
+mkdir $(date '+%Y%m%d')_entrega01
+cd $(date '+%Y%m%d')_entrega01
+
+#Create symbolic links depending on the analysis
+#Individual files
+
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out mapping_metrics.csv
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/01-sarek/multiqc/multiqc_report.html .
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/variants_annot_highModerate.tab .
+
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/exomiser/exomiser.html .
+

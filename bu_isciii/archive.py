@@ -37,6 +37,7 @@ class Archive:
         option=None,
         api_user=None,
         api_password=None,
+        conf=None,
         skip_prompts=False,
         date_from=None,
         date_until=None,
@@ -74,8 +75,8 @@ class Archive:
 
         # Get configuration params from configuration.json
         # Get data to connect to the API
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("archive")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        self.conf = conf.get_configuration("archive")
+        conf_api = conf.get_configuration("api_settings")
 
         # Initiate API
         rest_api = bu_isciii.drylab_api.RestServiceApi(
@@ -223,7 +224,7 @@ class Archive:
             try:
                 for service in rest_api.get_request(
                     request_info="services",
-                    safe=False,
+                    safe=True,
                     state="delivered",
                     date_from=str(self.date_from),
                     date_until=str(self.date_until),
@@ -258,7 +259,7 @@ class Archive:
                 if isinstance(
                     (
                         service_data := rest_api.get_request(
-                            request_info="service-data", safe=False, service=service
+                            request_info="service-data", safe=True, service=service
                         )
                     ),
                     int,
@@ -273,30 +274,26 @@ class Archive:
                     self.services[service]["found_in_system"] = True
                     self.services[service]["archived_path"] = os.path.join(
                         bu_isciii.utils.get_service_paths(
-                            self.ser_type, service_data, "archived_path"
+                            conf, self.ser_type, service_data, "archived_path"
                         ),
                         service_data["resolutions"][0]["resolution_full_number"],
                     )
 
                     self.services[service]["non_archived_path"] = os.path.join(
                         bu_isciii.utils.get_service_paths(
-                            self.ser_type, service_data, "non_archived_path"
+                            conf, self.ser_type, service_data, "non_archived_path"
                         ),
                         service_data["resolutions"][0]["resolution_full_number"],
                     )
             else:
                 self.services[service]["found_in_system"] = True
                 self.services[service]["archived_path"] = os.path.join(
-                    bu_isciii.config_json.ConfigJson().get_configuration("global")[
-                        "archived_path"
-                    ],
+                    conf.get_configuration("global")["archived_path"],
                     self.ser_type,
                     service_id,
                 )
                 self.services[service]["non_archived_path"] = os.path.join(
-                    bu_isciii.config_json.ConfigJson().get_configuration("global")[
-                        "data_path"
-                    ],
+                    conf.get_configuration("global")["data_path"],
                     self.ser_type,
                     service_id,
                 )
@@ -1037,7 +1034,7 @@ class Archive:
                     if self.services[service]["found_in_system"]
                     else "NOT found on iSkyLIMS"
                 )
-                csv_dict["Delivery date"] = ""
+                csv_dict["Delivery date"] = self.services[service]["delivery_date"]
 
                 # Fields for archive
                 csv_dict["Path in archive"] = (
@@ -1045,7 +1042,7 @@ class Archive:
                     if self.services[service]["archived_path"] is not None
                     else "Archived path could not be generated"
                 )
-                csv_dict["Found in archive"] = (
+                csv_dict["Found on archive"] = (
                     "Yes"
                     if "Archive" in self.services[service]["found"]
                     else "Not found in archive"
@@ -1077,12 +1074,12 @@ class Archive:
                     if "Data dir" in self.services[service]["found"]
                     else "Not found in data dir"
                 )
-                csv_dict["Compressed size in data directory"] = (
+                csv_dict["Uncompressed size in data directory"] = (
                     self.services[service]["non_archived_size"]
                     if self.services[service]["non_archived_size"] != 0
                     else "Not calculated"
                 )
-                csv_dict["Uncompressed size in data directory"] = (
+                csv_dict["Compressed size in data directory"] = (
                     self.services[service]["non_archived_compressed_size"]
                     if self.services[service]["non_archived_compressed_size"] != 0
                     else "Not calculated"

@@ -363,9 +363,17 @@ differential_plots <- function(res_de, de_results, ntd_subset, dds_subset){
   rownames(df) <- colnames(ntd_subset)
   to_plot <- assay_ntd[select,]
   to_plot_geneid <- as.data.frame(rownames(to_plot))
-  colnames(to_plot_geneid) <- "GeneID"
-  to_plot_geneid_merged <- merge(x = to_plot_geneid, y = gene_genename, by.x="GeneID", by.y = "GENEID", all.x = TRUE, all.y = FALSE)
-  rownames(to_plot) <- to_plot_geneid_merged$gene_name
+  if ( opt$differential_expression == "DEG") {
+    colnames(to_plot_geneid) <- "GeneID"
+    to_plot_geneid_merged <- merge(x = to_plot_geneid, y = gene_genename, by.x="GeneID", by.y = "GENEID", all.x = TRUE, all.y = FALSE)
+    rownames(to_plot) <- to_plot_geneid_merged$gene_name
+  }
+
+  if ( opt$differential_expression == "DET") { 
+    colnames(to_plot_geneid) <- "TranscriptID"
+    rownames(to_plot) <- to_plot_geneid$TranscriptID
+  }
+
   pdf(file="Differential_expression/DESeq2/heatmapCount_top20_differentially_expressed.pdf")
   pheatmap(to_plot, cluster_rows=TRUE, show_rownames=TRUE,
            cluster_cols=TRUE, annotation_col=df, main="Top 20 significant genes")
@@ -444,9 +452,16 @@ quality_plots <- function(data_subset){
   
   to_plot <- assay(data_subset$subset_ntd)[select,]
   to_plot_geneid <- as.data.frame(rownames(to_plot))
-  colnames(to_plot_geneid) <- "GeneID"
-  to_plot_geneid_merged <- merge(x = to_plot_geneid, y = gene_genename, by.x="GeneID", by.y = "GENEID", all.x = TRUE, all.y = FALSE)
-  rownames(to_plot) <- to_plot_geneid_merged$gene_name
+  if ( opt$differential_expression == "DEG") {
+    colnames(to_plot_geneid) <- "GeneID"
+    to_plot_geneid_merged <- merge(x = to_plot_geneid, y = gene_genename, by.x="GeneID", by.y = "GENEID", all.x = TRUE, all.y = FALSE)
+    rownames(to_plot) <- to_plot_geneid_merged$gene_name
+  }
+
+  if ( opt$differential_expression == "DET") { 
+    colnames(to_plot_geneid) <- "TranscriptID"
+    rownames(to_plot) <- to_plot_geneid$TranscriptID
+  }
   
   pdf(file="Quality_plots/DESeq2/heatmapCount_top20_highest_expression.pdf")
   pheatmap(to_plot, cluster_rows=FALSE, show_rownames=TRUE,
@@ -550,13 +565,14 @@ cat(blue("########################\nStarting with loading data\n################
 
 ####LOAD TRANSCRIPT RELATION DATA FILE #########################
 if (opt$differential_expression != "DEM") {
-  tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "salmon_tx2gene.tsv"), header = F)
+  tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "tx2gene.tsv"), header = F)
   colnames(tx2gene) <- c("TXNAME", "GENEID", "gene_name")
   if ( opt$differential_expression == "DEG") {
     gene_genename <- tx2gene[,c(2:3)]
     gene_genename <- gene_genename %>% distinct()
   }
 }
+
 ####LOAD CLINICAL DATA FILE #########################
 samples_clin_data <- load_sample_data(clinical_data = opt$sample_data, group = opt$group_col)
 

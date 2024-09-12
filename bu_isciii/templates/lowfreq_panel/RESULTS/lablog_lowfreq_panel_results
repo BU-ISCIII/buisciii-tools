@@ -1,0 +1,9 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+
+mkdir $DELIVERY_FOLDER
+
+# Lowfreq_panel service
+cd $DELIVERY_FOLDER
+
+# Links to reports
+ln -s ../../ANALYSIS/*RBPANEL/99-stats/multiqc_report.html .

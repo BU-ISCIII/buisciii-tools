@@ -31,6 +31,7 @@ class CleanUp:
         option=None,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         # access the api with the resolution name to obtain the data
         # ask away if no input given
@@ -40,15 +41,13 @@ class CleanUp:
             self.resolution_id = resolution_id
 
         # Obtain info from iskylims api
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("cleanning")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        self.conf = conf.get_configuration("cleanning")
+        conf_api = conf.get_configuration("xtutatis_api_settings")
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
@@ -56,7 +55,9 @@ class CleanUp:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.service_samples = self.resolution_info["samples"]
+        self.service_samples = [
+            sample_id["sample_name"] for sample_id in self.resolution_info["samples"]
+        ]
 
         if ask_path and path is None:
             stderr.print(
@@ -77,7 +78,10 @@ class CleanUp:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
@@ -92,14 +96,13 @@ class CleanUp:
         self.delete_files = self.get_clean_items(self.services_to_clean, type="files")
         # self.delete_list = [item for item in self.delete_list if item]
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
-        self.service_samples = self.resolution_info.get("Samples", None)
 
         if option is None:
             self.option = bu_isciii.utils.prompt_selection(
                 "Options",
                 [
                     "full_clean",
-                    "rename_nocopy",
+                    "rename",
                     "clean",
                     "revert_renaming",
                     "show_removable",
@@ -126,10 +129,16 @@ class CleanUp:
         for service in services_ids:
             try:
                 items = service_conf.get_find_deep(service, type)
-                if len(clean_items_list) == 0 and len(items) > 0:
-                    clean_items_list = items
-                elif len(items) > 0:
-                    clean_items_list.append(items)
+                if items is None:
+                    stderr.print(
+                        "[red]ERROR: Service type %s not found in services json file for service %s."
+                        % (type, service)
+                    )
+                    sys.exit()
+                else:
+                    for item in items:
+                        if item not in clean_items_list:
+                            clean_items_list.append(item)
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
@@ -310,10 +319,9 @@ class CleanUp:
             files_to_delete = []
             for sample_info in self.service_samples:
                 for file in self.delete_files:
-                    file_to_delete = file.replace(
-                        "sample_name", sample_info["sample_name"]
-                    )
-                    files_to_delete.append(file_to_delete)
+                    file_to_delete = file.replace("sample_name", sample_info)
+                    if file_to_delete not in files_to_delete:
+                        files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
             for file in path_content:
                 os.remove(file)
@@ -369,7 +377,7 @@ class CleanUp:
         else:
             stderr.print("There is no work folder here")
 
-    def delete_rename(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
+    def delete(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
             Remove both files and purge folders defined for the service, and rename to tag.
@@ -390,10 +398,8 @@ class CleanUp:
         # Purge folders
         if self.delete_folders != "":
             self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
-            # Rename to tag.
-            self.rename(add=add, to_find=self.delete_folders, verbose=verbose)
         else:
-            stderr.print("No folders to remove or rename")
+            stderr.print("No folders to remove")
         # Purge work
         self.delete_work()
         # Delete files
@@ -430,8 +436,10 @@ class CleanUp:
         Perform and handle the whole cleaning of the service
         """
 
-        self.delete_rename()
+        self.delete()
         self.rename(to_find=self.nocopy, add="_NC", verbose=True)
+        if self.delete_folders != "":
+            self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
 
     def handle_clean(self):
         """
@@ -443,9 +451,11 @@ class CleanUp:
             self.show_nocopy()
         if self.option == "full_clean":
             self.full_clean()
-        if self.option == "rename_nocopy":
+        if self.option == "rename":
             self.rename(to_find=self.nocopy, add="_NC", verbose=True)
+            if self.delete_folders != "":
+                self.rename(add="_DEL", to_find=self.delete_folders, verbose=True)
         if self.option == "clean":
-            self.delete_rename()
+            self.delete()
         if self.option == "revert_renaming":
             self.revert_renaming()

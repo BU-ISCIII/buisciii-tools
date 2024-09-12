@@ -9,5 +9,6 @@ cd $DELIVERY_FOLDER/mlst
 # Links to reports
 ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling_evaluation/allelecall_report.html .
 ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling_evaluation/distance_matrix_symmetric.tsv .
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling_evaluation/results_alleles.tsv .
 ln -s ../../../ANALYSIS/*CHEWBBACA/*-grapetree/*.nwk
 ln -s ../../../ANALYSIS/*CHEWBBACA/*-grapetree/*.svg

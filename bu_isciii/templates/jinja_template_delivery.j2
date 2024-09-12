@@ -74,9 +74,8 @@ Here we describe information about the resolution delivery.
 {% endif %}
 
 {% if samples %}
-## Samples sequenced at iSCIII:
-
-Here we describe information about the project associated to the service:
+## Samples sequenced at ISCIII:
+##Here we describe information about the project associated to the service:
 {% if service_sequencing_center -%} * Sequencing center: {{ service_sequencing_center }}{% endif %}
 {% for run , projects in samples.items() %}
 * Run name: {{ run }}
@@ -86,6 +85,43 @@ Here we describe information about the project associated to the service:
         {% set comma = joiner(", ") %}{% for samples_in_project in samples_in_project %}{{ comma() }}{{ samples_in_project }}{% endfor %}
     {% endfor %}
 {% endfor %}
+{% endif %}
+
+<style>
+    .page-break { page-break-before: always; }
+</style>
+
+<div class="page-break"></div>
+
+## Software versions:
+
+{% if services_list is mapping and software_versions is mapping %}
+{%- set service_list = services_list.items() | list %}
+{%- set file_version_list = software_versions.items() | list %}
+
+{%- for index in range(service_list | length) %}
+  {%- if index < file_version_list | length %}
+    {%- set service_id, description = service_list[index] %}
+* <b>{{ description }} ({{ service_id }})</b>:
+    {%- set file_path, processes = file_version_list[index] %}
+    {%- if processes | length > 0 %}
+      {%- for process, tools in processes.items() %}
+    - {{ process }}:
+          {%- for tool, version in tools.items() %}
+        - {{ tool }}: {{ version }}
+          {%- endfor %}
+      {%- endfor %}
+    {%- else %}
+    - No software versions data available for this file path.
+    {%- endif %}
+  {%- else %}
+    {%- set service_id, description = service_list[index] %}
+* <b>{{ description }} ({{ service_id }})</b>:
+    - No software versions data available for this service.
+  {%- endif %}
+{%- endfor %}
+{% else %}
+No software versions data available for this service.
 {% endif %}
 
 <!---

@@ -1,0 +1,13 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+
+mkdir -p $DELIVERY_FOLDER/mtbseq
+
+cd $DELIVERY_FOLDER/mtbseq
+
+ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/all_samples/Amend .
+ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/all_samples/Groups .
+ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/resistances_all/ .
+ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/stats_all/statistics_all.tab .
+ln -s ../../../ANALYSIS/*MTBSEQ/03-MTBSeq/classification_all/strain_classification_all.tab .
+
+find . -xtype l -delete

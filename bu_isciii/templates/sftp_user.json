@@ -49,5 +49,10 @@
     "svaldezate": ["Labtaxonomia"],
     "svazquez": ["Labvirusres"],
     "ycampos": ["LabUfiecMithocondrial"],
-    "anadonoso": ["Labenterovirus"]
+    "anadonoso": ["Labenterovirus"],
+    "mvmoneo": ["SpainUDP"],
+    "bbaladron": ["SpainUDP"],
+    "bioinfoadm": ["test"],
+    "s.varona": ["misc"],
+    "nlabiod": ["Labarbovirus"]
 }

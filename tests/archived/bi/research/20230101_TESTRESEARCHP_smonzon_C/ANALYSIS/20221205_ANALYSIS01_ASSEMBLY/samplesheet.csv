@@ -1,0 +1,4 @@
+sample,fastq_1,fastq_2
+Mfo20221680,00-reads/Mfo20221680_R1.fastq.gz,00-reads/Mfo20221680_R2.fastq.gz
+Mfo20221678,00-reads/Mfo20221678_R1.fastq.gz,00-reads/Mfo20221678_R2.fastq.gz
+Mfo20221679,00-reads/Mfo20221679_R1.fastq.gz,00-reads/Mfo20221679_R2.fastq.gz

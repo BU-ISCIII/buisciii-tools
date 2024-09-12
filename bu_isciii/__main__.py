@@ -2,6 +2,7 @@
 
 # import sys
 import logging
+import os
 
 import click
 import rich.console
@@ -9,6 +10,7 @@ import rich.logging
 import rich.traceback
 
 import bu_isciii
+import bu_isciii.config_json
 import bu_isciii.utils
 import bu_isciii.new_service
 import bu_isciii.scratch
@@ -55,7 +57,7 @@ def run_bu_isciii():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "2.0.0"
+    __version__ = "2.2.0"
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
@@ -133,8 +135,9 @@ class CustomHelpOrder(click.Group):
     required=False,
     default=None,
 )
+@click.option("-d", "--dev", help="Develop settings", is_flag=True, default=False)
 @click.pass_context
-def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file):
+def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev):
     # Set the base logger to output DEBUG
     log.setLevel(logging.INFO)
     # Initialize context
@@ -150,7 +153,18 @@ def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file):
         )
         log.addHandler(log_fh)
 
-    ctx.obj = bu_isciii.utils.get_yaml_config()
+    if dev:
+        conf = bu_isciii.config_json.ConfigJson(
+            json_file=os.path.join(
+                os.path.dirname(__file__), "conf", "configuration_dev.json"
+            )
+        )
+    else:
+        conf = bu_isciii.config_json.ConfigJson()
+
+    ctx.obj = bu_isciii.utils.get_yaml_config(conf, cred_file)
+    ctx.obj["conf"] = conf
+
     if bu_isciii.utils.validate_api_credentials(ctx.obj):
         print("API credentials successfully extracted from yaml config file")
     else:
@@ -212,6 +226,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     new_ser.create_new_service()
 
@@ -264,6 +279,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     scratch_copy.handle_scratch()
 
@@ -291,7 +307,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     type=click.Choice(
         [
             "full_clean",
-            "rename_nocopy",
+            "rename",
             "clean",
             "revert_renaming",
             "show_removable",
@@ -301,7 +317,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     multiple=False,
     help=(
         "Select what to do inside the cleanning step: full_clean: delete files and folders to clean,"
-        " rename no copy and deleted folders, rename_nocopy: just rename no copy folders, clean: "
+        " rename no copy and deleted folders, rename: just rename folders, clean: "
         "delete files and folders to clean,"
         "revert_renaming: remove no_copy and delete tags,"
         "show_removable: list folders and files to remove "
@@ -315,7 +331,13 @@ def clean(ctx, resolution, path, ask_path, option):
     show removable files or show folders for no copy.
     """
     clean = bu_isciii.clean.CleanUp(
-        resolution, path, ask_path, option, ctx.obj["api_user"], ctx.obj["api_password"]
+        resolution,
+        path,
+        ask_path,
+        option,
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     clean.handle_clean()
 
@@ -356,6 +378,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
         sftp_folder,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     new_del.copy_sftp()
 
@@ -404,6 +427,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         "clean",
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
@@ -415,6 +439,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         ask_path,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
@@ -422,9 +447,10 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         resolution,
         path,
         ask_path,
-        "rename_nocopy",
+        "rename",
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
@@ -435,6 +461,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         sftp_folder,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
     )
     copy_sftp.copy_sftp()
     print("Service correctly in SFTP folder")
@@ -518,6 +545,7 @@ def bioinfo_doc(
         results_md,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
         email_pass,
     )
     new_doc.create_documentation()
@@ -587,6 +615,7 @@ def archive(
         option,
         ctx.obj["api_user"],
         ctx.obj["api_password"],
+        ctx.obj["conf"],
         skip_prompts,
         date_from,
         date_until,
@@ -611,10 +640,39 @@ def archive(
     default=14,
     help="Integer, remove files older than a window of `-d [int]` days. Default 14 days.",
 )
-def autoclean_sftp(sftp_folder, days):
+@click.pass_context
+def autoclean_sftp(ctx, sftp_folder, days):
     """Clean old sftp services"""
-    sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(sftp_folder, days)
+    sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(
+        sftp_folder, days, ctx.obj["conf"]
+    )
     sftp_clean.handle_autoclean_sftp()
+
+
+# FIX PERMISSIONS
+@bu_isciii_cli.command(help_priority=9)
+@click.option(
+    "-d",
+    "--input_directory",
+    type=click.Path(),
+    default=None,
+    required=True,
+    help="Input directory to fix permissions (absolute path)",
+)
+@click.pass_context
+def fix_permissions(ctx, input_directory):
+    """
+    Fix permissions
+    """
+    if not os.path.isdir(input_directory):
+        exit("Invalid input directory")
+    conf = bu_isciii.config_json.ConfigJson()
+    permissions = conf.get_configuration("global").get("permissions")
+    bu_isciii.utils.remake_permissions(input_directory, permissions)
+    stderr = rich.console.Console(
+        stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()
+    )
+    stderr.print(f"[green]Correct permissions were applied to {input_directory}")
 
 
 if __name__ == "__main__":

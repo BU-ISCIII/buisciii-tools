@@ -2,7 +2,11 @@
     "global": {
         "data_path": "/data/bi",
         "archived_path": "/archived/bi",
-        "yaml_conf_path": "~/buisciii_config.yml"
+        "yaml_conf_path": "~/buisciii_config.yml",
+        "permissions": {
+        "directory_chmod": "2775",
+        "file_chmod": "664"
+        }
     },
     "sftp_copy": {
         "protocol": "rsync",
@@ -16,7 +20,8 @@
             "'.nextflow*'",
             "'*_DEL'",
             "'*.R'",
-            "'*.py'"
+            "'*.py'",
+            "'*.sbatch'"
         ]
     },
     "xtutatis_api_settings": {
@@ -35,7 +40,6 @@
         "delivery_template_path_file": "templates/jinja_template_delivery.j2",
         "html_template_path_file": "templates/html_service_template.html",
         "path_to_css": "assets/css",
-        "wkhtmltopdf_path": "/data/bi/pipelines/miniconda3/envs/buisciii-tools/bin/wkhtmltopdf",
         "email_host": "mx2.isciii.es",
         "email_port": "587",
         "email_host_user": "bioinformatica@isciii.es",
@@ -54,7 +58,7 @@
         ],
         "scratch_path": "/scratch/bi/",
         "srun_settings": {
-            "--partition": "middle_idx",
+            "--partition": "middle_obx,middle_idx",
             "--time": "24:00:00",
             "--chdir": "/scratch/bi/"
         }

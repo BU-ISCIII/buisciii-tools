@@ -1,0 +1,66 @@
+{
+    "global": {
+        "data_path": "tests/data/bi",
+        "archived_path": "tests/archived/bi",
+        "yaml_conf_path": "~/buisciii_config.yml"
+    },
+    "sftp_copy": {
+        "protocol": "rsync",
+        "options": ["-rlpv", "--update", "-L", "--inplace"],
+        "exclusions": [
+            "'*_NC'",
+            "'*lablog*'",
+            "'work'",
+            "'00-reads'",
+            "'*.sh'",
+            "'.nextflow*'",
+            "'*_DEL'",
+            "'*.R'",
+            "'*.py'",
+            "'*.sbatch'"
+        ]
+    },
+    "xtutatis_api_settings": {
+        "api_url": "/drylab/api/",
+        "server": "http://iskylims.isciiides.es"
+    },
+    "api_settings": {
+        "server": "http://iskylims.isciiides.es",
+        "api_url": "/drylab/api/"
+    },
+    "bioinfo_doc": {
+        "bioinfodoc_path": "tests/bioinfo_doc/",
+        "services_path": "services",
+        "service_folder": ["service_info", "result"],
+        "service_info_template_path_file": "templates/jinja_template_service_info.j2",
+        "delivery_template_path_file": "templates/jinja_template_delivery.j2",
+        "html_template_path_file": "templates/html_service_template.html",
+        "path_to_css": "assets/css",
+        "email_host": "mx2.isciii.es",
+        "email_port": "587",
+        "email_host_user": "bioinformatica@isciii.es",
+        "email_use_tls": "True"
+    },
+    "new_service": {
+        "fastq_repo": "tests/fastq_repo"
+    },
+    "scratch_copy": {
+        "protocol": "rsync",
+        "options": ["-rlpv"],
+        "exclusions": [
+            "'*_NC'",
+            "'service_info.txt'",
+            "'work'"
+        ],
+        "scratch_path": "tests/scratch/bi/",
+        "srun_settings": {
+            "--partition": "middle_obx,middle_idx",
+            "--time": "24:00:00",
+            "--chdir": "tests/scratch/bi/"
+        }
+    },
+    "archive": {
+        "protocol": "rsync",
+        "options": ["-rv"]
+    }
+}
