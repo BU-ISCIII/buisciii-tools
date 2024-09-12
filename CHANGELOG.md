@@ -90,6 +90,7 @@ Code contributions to the new version:
 - Updated several templates (singularity images, outdated paths, improvements, etc) [#331](https://github.com/BU-ISCIII/buisciii-tools/pull/331)
 - Added permissions fixing after running scratch_copy, as well as a new fix-permissions module in the tools [#332](https://github.com/BU-ISCIII/buisciii-tools/pull/332).
 - Updated MAG lablogs and utils.py [#334](https://github.com/BU-ISCIII/buisciii-tools/pull/334).
+- Updated some files (setup.py, __main__.py, README, etc) for the 2.2.0 release [#335](https://github.com/BU-ISCIII/buisciii-tools/pull/335).
 
 ### Modules
 
