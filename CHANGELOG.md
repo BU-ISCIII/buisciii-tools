@@ -9,8 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 Code contributions to the new version:
+- [Daniel Valle](https://github.com/Daniel-VM)
+
 
 ### Template fixes and updates
+- Fixed path to blast database and update Emmtyper params [#339](https://github.com/BU-ISCIII/buisciii-tools/pull/339)
 
 ### Modules
 
