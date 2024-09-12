@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+import logging
 import calendar
 import datetime
 import hashlib
 import json
 import os
 import tarfile
+import sys
+import subprocess
 
 import questionary
 import rich
@@ -28,6 +31,7 @@ def rich_force_colors():
     return None
 
 
+log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True, style="dim", highlight=False, force_terminal=rich_force_colors()
 )
@@ -165,6 +169,19 @@ def get_service_ids(services_requested):
         if services["service_id"] is not None:
             service_id_list.append(services["service_id"])
             service_id_list_all.append(services["service_id"])
+            services_json = bu_isciii.service_json.ServiceJson()
+            try:
+                service_end = services_json.get_find(services["service_id"], "end")
+            except KeyError as e:
+                stderr.print(
+                    "[red]ERROR: Service id %s not found in services json file."
+                    % services["service_id"]
+                )
+                stderr.print("traceback error %s" % e)
+                sys.exit()
+            if service_end not in service_id_list and service_end != "":
+                service_id_list.append(service_end)
+                service_id_list_all.append(service_end)
     service_id_list_all.append("all")
     stderr.print("Which selected service do you want to manage?")
     services_sel = [prompt_selection("Service label:", service_id_list_all)]
@@ -183,36 +200,44 @@ def ask_password(msg):
     return password
 
 
-def get_service_paths(type, info, archived_status):
+def get_service_paths(conf, type, info, archived_status):
     """
     Given a service, a conf and a type,
     get the path it would have service
     """
-    global_conf = bu_isciii.config_json.ConfigJson().get_configuration("global")
+    global_conf = conf.get_configuration("global")
     service_path = None
-    if type == "services_and_colaborations":
-        if archived_status == "archived_path":
-            service_path = os.path.join(
-                global_conf["archived_path"],
-                type,
-                info["service_user_id"]["profile"]["profile_center"],
-                info["service_user_id"]["profile"][
-                    "profile_classification_area"
-                ].lower(),
-            )
-        if archived_status == "non_archived_path":
-            service_path = os.path.join(
-                global_conf["data_path"],
-                type,
-                info["service_user_id"]["profile"]["profile_center"],
-                info["service_user_id"]["profile"][
-                    "profile_classification_area"
-                ].lower(),
-            )
-    return service_path
+
+    try:
+        if type == "services_and_colaborations":
+            if archived_status == "archived_path":
+                service_path = os.path.join(
+                    global_conf["archived_path"],
+                    type,
+                    info["service_user_id"]["profile"]["profile_center"],
+                    info["service_user_id"]["profile"][
+                        "profile_classification_area"
+                    ].lower(),
+                )
+            if archived_status == "non_archived_path":
+                service_path = os.path.join(
+                    global_conf["data_path"],
+                    type,
+                    info["service_user_id"]["profile"]["profile_center"],
+                    info["service_user_id"]["profile"][
+                        "profile_classification_area"
+                    ].lower(),
+                )
+        return service_path
+
+    except AttributeError:
+        stderr.print(
+            "[red]ERROR: the user associated with this service has no profile classification area selected in iskylims.isciii.es/admin. Please log in, go to the Profiles section and make sure every user has been assigned a profile classification area."
+        )
+        sys.exit(1)
 
 
-def get_sftp_folder(resolution_info):
+def get_sftp_folder(conf, resolution_info):
     service_user = resolution_info["service_user_id"]["username"]
     json_file = os.path.join(os.path.dirname(__file__), "templates", "sftp_user.json")
     user_sftp_file = open(json_file)
@@ -222,9 +247,7 @@ def get_sftp_folder(resolution_info):
     for user_sftp in json_data:
         if user_sftp == service_user:
             sftp_folders_list = json_data[user_sftp]
-    data_path = bu_isciii.config_json.ConfigJson().get_configuration("global")[
-        "data_path"
-    ]
+    data_path = conf.get_configuration("global")["data_path"]
     if not sftp_folders_list:
         print(f"User {service_user} does not have an assigned sftp folder. Aborting...")
         exit()
@@ -267,10 +290,13 @@ def get_dir_size(path):
 
     for path, dirs, files in os.walk(path):
         for file in files:
-            if os.path.islink(os.path.join(path, file)):
-                size += os.lstat(os.path.join(path, file)).st_size
-            else:
-                size += os.path.getsize(os.path.join(path, file))
+            try:
+                if os.path.islink(os.path.join(path, file)):
+                    size += os.lstat(os.path.join(path, file)).st_size
+                else:
+                    size += os.path.getsize(os.path.join(path, file))
+            except FileNotFoundError as e:
+                log.warning(f"File not found error while scouting size: {e}")
 
     return size
 
@@ -293,18 +319,15 @@ def uncompress_targz_directory(tar_name, directory):
     return
 
 
-def get_md5(file):
+def get_md5(file_path, chunk_size=1 * 1024 * 1024 * 1024):  # 1 GB
     """
     Given a file, open it and digest to get the md5
-    NOTE: might be troublesome when infile is too big
-    Based on:
-    https://www.quickprogrammingtips.com/python/how-to-calculate-md5-hash-of-a-file-in-python.html
     """
-    with open(file, "rb") as infile:
-        infile = infile.read()
-        file_md5 = hashlib.md5(infile).hexdigest()
-
-    return file_md5
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
@@ -391,7 +414,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     return datetime.date(int(year), int(chosen_month_number), int(day))
 
 
-def get_yaml_config():
+def get_yaml_config(conf, path):
     """Search the config yaml file described in configuration.json and extract fields
 
     Returns:
@@ -402,7 +425,11 @@ def get_yaml_config():
             "Other keys": "values"
         }
     """
-    yaml_path = bu_isciii.config_json.ConfigJson().get_find("global", "yaml_conf_path")
+    if path:
+        yaml_path = path
+    else:
+        yaml_path = conf.get_find("global", "yaml_conf_path")
+
     try:
         yaml_file = os.path.expanduser(yaml_path)
     except Exception:
@@ -466,3 +493,32 @@ def process_yaml_file(yaml_file):
 
 def validate_date(date_previous, date_posterior):
     return
+
+
+def remake_permissions(copied_folder_path, permissions_config):
+    """
+    Change permissions of all files and directories in a given absolute path.
+
+    Args:
+        copied_folder_path: The path to the folder that was copied
+        permissions_config: Dictionary containing permissions configuration (e.g., {'directory_chmod': '755', 'file_chmod': '664'})
+    """
+    subprocess.run(
+        f"chown -R $(whoami):bi {copied_folder_path}", shell=True, check=True
+    )
+
+    # Change permissions for directories
+    if "directory_chmod" in permissions_config:
+        subprocess.run(
+            f"find {copied_folder_path} -type d -exec chmod {permissions_config['directory_chmod']} {{}} \;",
+            shell=True,
+            check=True,
+        )
+
+    # Change permissions for files
+    if "file_chmod" in permissions_config:
+        subprocess.run(
+            f"find {copied_folder_path} -type f -exec chmod {permissions_config['file_chmod']} {{}} \;",
+            shell=True,
+            check=True,
+        )

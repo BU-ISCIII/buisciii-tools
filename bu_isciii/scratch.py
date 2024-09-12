@@ -36,6 +36,7 @@ class Scratch:
         ask_path=False,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -55,17 +56,15 @@ class Scratch:
         else:
             self.direction = direction
         # Load conf
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        conf_api = conf.get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
         rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("scratch_copy")
+        self.conf = conf.get_configuration("scratch_copy")
 
         self.resolution_info = rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
@@ -91,7 +90,10 @@ class Scratch:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
@@ -185,6 +187,16 @@ class Scratch:
                             sync_source_contents=False,
                         )
                         self.srun_command(self.srun_settings, rsync_command)
+
+                        # After successful rsync, apply correct permissions
+                        conf = bu_isciii.config_json.ConfigJson()
+                        permissions_config = conf.get_configuration("global").get(
+                            "permissions"
+                        )
+                        bu_isciii.utils.remake_permissions(
+                            self.full_path, permissions_config
+                        )
+
                         stderr.print(
                             "[green]Successfully copied the directory to %s"
                             % dest_folder,
@@ -199,7 +211,7 @@ class Scratch:
                 except Exception as e:
                     stderr.print(e)
                     stderr.print(
-                        "[red]ERROR: Copy of the directory %s failed"
+                        "[red]ERROR: Copy of directory %s failed"
                         % self.scratch_tmp_path,
                         highlight=False,
                     )
@@ -239,17 +251,17 @@ class Scratch:
         if self.service_folder in scratch_folder:
             shutil.rmtree(scratch_folder)
             stderr.print(
-                "[green]Successfully removed the directory %s" % scratch_folder,
+                "[green]Successfully removed directory %s" % scratch_folder,
                 highlight=False,
             )
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{scratch_folder}'"
+                f"Directory path is not the same as service resolution. Skip folder copy '{scratch_folder}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
                 + scratch_folder
-                + " not the same as "
+                + " is not the same as "
                 + self.scratch_tmp_path,
                 highlight=False,
             )

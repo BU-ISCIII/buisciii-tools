@@ -11,6 +11,7 @@ import jinja2
 import markdown
 import pdfkit
 import PyPDF2
+import yaml
 import subprocess
 import json
 import shutil
@@ -47,6 +48,7 @@ class BioinfoDoc:
         results_md=False,
         api_user=None,
         api_password=None,
+        conf=None,
         email_psswd=None,
     ):
         if type is None:
@@ -54,7 +56,7 @@ class BioinfoDoc:
                 msg="Select the documentation type you want to create",
                 choices=["service_info", "delivery"],
             )
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("bioinfo_doc")
+        self.conf = conf.get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
                 self.path = bu_isciii.utils.prompt_path(
@@ -71,12 +73,12 @@ class BioinfoDoc:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration("api_settings")
+        conf_api = conf.get_configuration("api_settings")
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         if self.resolution_info == 404:
             print("Received Error 404 from Iskylims API. Aborting")
@@ -91,7 +93,7 @@ class BioinfoDoc:
             else:
                 self.post_delivery_info()
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
@@ -157,7 +159,7 @@ class BioinfoDoc:
                         )
 
         if self.type == "delivery":
-            self.sftp_data = bu_isciii.utils.get_sftp_folder(self.resolution_info)
+            self.sftp_data = bu_isciii.utils.get_sftp_folder(conf, self.resolution_info)
         if self.type == "delivery" and sftp_folder is None:
             self.sftp_folder = self.sftp_data[0]
         else:
@@ -183,9 +185,18 @@ class BioinfoDoc:
             self.path, self.conf["services_path"], year, self.service_name
         )
         self.samples = self.resolution_info.get("samples", None)
+        self.versions = self.load_versions()
         self.handled_services = None
-        path_to_wkhtmltopdf = os.path.normpath(self.conf["wkhtmltopdf_path"])
-        self.config_pdfkit = pdfkit.configuration(wkhtmltopdf=path_to_wkhtmltopdf)
+        self.all_services = None
+        try:
+            self.config_pdfkit = pdfkit.configuration()
+        except OSError as e:
+            stderr.print(
+                "[red] wkhtmlpdf executable was not found. Install it using conda environment."
+            )
+            stderr.print(f"[red] Error: {e}")
+            sys.exit()
+
         if self.type == "service_info":
             self.template_file = self.conf["service_info_template_path_file"]
         else:
@@ -197,6 +208,41 @@ class BioinfoDoc:
             self.email_psswd = bu_isciii.utils.ask_password("E-mail password: ")
         else:
             self.email_psswd = email_psswd
+
+        if self.type == "delivery":
+            service_list = {}
+            for service_id_requested in self.service_ids_requested_list:
+                service_list[
+                    service_id_requested
+                ] = bu_isciii.service_json.ServiceJson().get_find(
+                    service_id_requested, "label"
+                )
+            self.all_services = service_list
+
+    def load_versions(self):
+        """Load and parse the versions.yml file."""
+        result = subprocess.run(
+            f"find /data/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'",
+            stdout=subprocess.PIPE,
+            text=True,
+            shell=True,
+        )
+        versions_files = result.stdout.strip().split("\n")
+        if versions_files == [""]:
+            stderr.print(
+                f"[red] No versions.yml files found for the service {self.service_name}!"
+            )
+            return "No software versions data available for this service"
+        else:
+            versions_data = {}
+            loaded_contents = []
+            for versions_file in versions_files:
+                with open(versions_file, "r") as f:
+                    content = yaml.safe_load(f)
+                if content not in loaded_contents:
+                    versions_data[versions_file] = content
+                    loaded_contents.append(content)
+            return versions_data
 
     def create_structure(self):
         if os.path.exists(self.service_folder):
@@ -282,7 +328,7 @@ class BioinfoDoc:
 
         if self.provided_txt:
             with open(os.path.expanduser(self.provided_txt)) as f:
-                self.delivery_notes = " ".join([x.strip() for x in f.readlines()])
+                self.delivery_notes = f.read()
         else:
             self.delivery_notes = bu_isciii.utils.ask_for_some_text(
                 msg="Write some delivery notes:"
@@ -324,6 +370,8 @@ class BioinfoDoc:
         # service related information
         markdown_data["service"] = self.resolution_info
         markdown_data["user_data"] = self.resolution_info["service_user_id"]
+        markdown_data["software_versions"] = self.versions
+        markdown_data["services_list"] = self.all_services
         samples_in_service = {}
 
         if self.samples is not None:
@@ -380,6 +428,7 @@ class BioinfoDoc:
                 "pymdownx.highlight",
                 "pymdownx.emoji",
                 "pymdownx.tilde",
+                "nl2br",
             ],
             extension_configs={
                 "pymdownx.b64": {
@@ -415,6 +464,7 @@ class BioinfoDoc:
             )
         except OSError as e:
             stderr.print("[red] Unable to convert to PDF")
+            stderr.print(f"[red] Error: {e}")
             log.exception("Unable to create pdf.", exc_info=e)
         return
 
@@ -593,11 +643,13 @@ class BioinfoDoc:
                 if bu_isciii.utils.prompt_yn_question(
                     f"Do you want to use notes from {self.provided_txt}?", dflt=False
                 ):
-                    email_data["email_notes"] = self.delivery_notes
+                    email_data["email_notes"] = self.delivery_notes.replace(
+                        "\n", "<br />"
+                    )
             else:
                 email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
                     msg="Write email notes"
-                )
+                ).replace("\n", "<br />")
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]

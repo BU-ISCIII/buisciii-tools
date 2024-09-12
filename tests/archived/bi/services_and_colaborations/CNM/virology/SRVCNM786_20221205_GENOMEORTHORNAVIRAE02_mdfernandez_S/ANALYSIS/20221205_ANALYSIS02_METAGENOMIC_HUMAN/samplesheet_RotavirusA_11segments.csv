@@ -1,0 +1,8 @@
+sample,fastq_1,fastq_2
+PTA201,00-reads/PTA201_R1.fastq.gz,00-reads/PTA201_R2.fastq.gz
+PTA203,00-reads/PTA203_R1.fastq.gz,00-reads/PTA203_R2.fastq.gz
+PTA205,00-reads/PTA205_R1.fastq.gz,00-reads/PTA205_R2.fastq.gz
+PTA200,00-reads/PTA200_R1.fastq.gz,00-reads/PTA200_R2.fastq.gz
+PTA202,00-reads/PTA202_R1.fastq.gz,00-reads/PTA202_R2.fastq.gz
+PTA204,00-reads/PTA204_R1.fastq.gz,00-reads/PTA204_R2.fastq.gz
+PTA206,00-reads/PTA206_R1.fastq.gz,00-reads/PTA206_R2.fastq.gz

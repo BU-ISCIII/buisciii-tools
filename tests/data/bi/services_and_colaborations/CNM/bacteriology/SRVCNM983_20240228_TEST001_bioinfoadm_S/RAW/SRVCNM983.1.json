@@ -1,0 +1,34 @@
+[
+    {
+        "run_name": "NextSeq_GEN_344",
+        "project_name": "NextSeq_GEN_344_20211223_ICasas",
+        "sample_name": "219907",
+        "sample_key": "41737",
+        "pk": 127551,
+        "sample_path": "211223_NS500454_0466_AHVW7LAFX2"
+    },
+    {
+        "run_name": "NextSeq_GEN_344",
+        "project_name": "NextSeq_GEN_344_20211223_ICasas",
+        "sample_name": "2110055",
+        "sample_key": "41752",
+        "pk": 127552,
+        "sample_path": "211223_NS500454_0466_AHVW7LAFX2"
+    },
+    {
+        "run_name": "NextSeq_GEN_344",
+        "project_name": "NextSeq_GEN_344_20211223_ICasas",
+        "sample_name": "2110065",
+        "sample_key": "41755",
+        "pk": 127553,
+        "sample_path": "211223_NS500454_0466_AHVW7LAFX2"
+    },
+    {
+        "run_name": "NextSeq_GEN_344",
+        "project_name": "NextSeq_GEN_344_20211223_ICasas",
+        "sample_name": "2110066",
+        "sample_key": "41758",
+        "pk": 127554,
+        "sample_path": "211223_NS500454_0466_AHVW7LAFX2"
+    }
+]

@@ -1,0 +1,7 @@
+#Template	Num	Score	Expected	Template_length	Query_Coverage	Template_Coverage	Depth	tot_query_Coverage	tot_template_Coverage	tot_depth	q_value	p_value
+NZ_CP011269.1 Mycobacterium fortuitum strain CT6, complete genome	6093	18680995	1747	142899	   66.81	   80.38	  130.73	   66.81	   80.38	  130.73	18675753.80	1.0e-26
+NZ_CP009914.1 Mycobacterium sp. VKM Ac-1817D, complete genome	11026	1457182	9190	144607	    5.21	    6.16	   10.08	   65.76	   78.52	  127.17	1429840.68	1.0e-26
+NZ_CP021122.1 Mycobacterium abscessus subsp. massiliense strain FLAC047 chromosome, complete genome	7999	239995	8718	130007	    0.86	    1.41	    1.85	    1.78	    2.57	    3.83	215062.96	1.0e-26
+NZ_CP016818.1 Mycobacterium avium subsp. hominissuis strain HP17 chromosome, complete genome	6083	61671	6618	98571	    0.22	    1.29	    0.63	    1.67	    3.76	    4.74	44381.26	1.0e-26
+NZ_CP015036.1 Burkholderia cenocepacia strain 895 chromosome 1, complete sequence	9047	43625	11610	176151	    0.16	   16.80	    0.25	    0.28	   16.96	    0.45	18556.15	1.0e-26
+NZ_HG938372.1 Burkholderia cenocepacia H111 chromosome 3, complete genome	9034	7903	1681	24596	    0.03	   17.90	    0.32	    0.06	   19.11	    0.64	 4038.61	1.0e-26

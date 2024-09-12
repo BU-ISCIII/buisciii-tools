@@ -34,6 +34,7 @@ class NewService:
         ask_path=False,
         api_user=None,
         api_password=None,
+        conf=None,
     ):
         if resolution_id is None:
             self.resolution_id = bu_isciii.utils.prompt_resolution_id()
@@ -46,16 +47,14 @@ class NewService:
             self.no_create_folder = no_create_folder
 
         # Load conf
-        self.conf = bu_isciii.config_json.ConfigJson().get_configuration("new_service")
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
-            "xtutatis_api_settings"
-        )
+        self.conf = conf.get_configuration("new_service")
+        conf_api = conf.get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
         self.rest_api = bu_isciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
-            request_info="service-data", safe=False, resolution=self.resolution_id
+            request_info="service-data", safe=True, resolution=self.resolution_id
         )
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
@@ -82,7 +81,10 @@ class NewService:
             sys.exit()
         else:
             self.path = bu_isciii.utils.get_service_paths(
-                "services_and_colaborations", self.resolution_info, "non_archived_path"
+                conf,
+                "services_and_colaborations",
+                self.resolution_info,
+                "non_archived_path",
             )
         self.full_path = os.path.join(self.path, self.service_folder)
 
@@ -123,13 +125,13 @@ class NewService:
         )
         services_ids = bu_isciii.utils.get_service_ids(self.services_requested)
         services_json = bu_isciii.service_json.ServiceJson()
-        if len(services_ids) == 1:
+        for service_id in services_ids:
             try:
-                service_template = services_json.get_find(services_ids[0], "template")
+                service_template = services_json.get_find(service_id, "template")
             except KeyError as e:
                 stderr.print(
                     "[red]ERROR: Service id %s not found in services json file."
-                    % services_ids[0]
+                    % service_id
                 )
                 stderr.print("traceback error %s" % e)
                 sys.exit()
@@ -151,13 +153,6 @@ class NewService:
                 stderr.print("[red]ERROR: Copying template failed.")
                 stderr.print("traceback error %s" % e)
                 sys.exit()
-        else:
-            stderr.print(
-                "[red] ERROR: I'm not already prepared for handling more than one error at the same time, sorry!"
-                "Please re-run and select one of the service ids."
-            )
-            sys.exit(1)
-            return False
         return True
 
     def create_samples_id(self):
@@ -212,11 +207,9 @@ class NewService:
                     )
                 except OSError as e:
                     stderr.print(
-                        "[red]ERROR: Symbolic links creation failed for sample %s."
-                        % sample["sampleName"]
+                        "[red]ERROR: Symbolic links creation failed for file %s." % file
                     )
                     stderr.print("Traceback: %s" % e)
-                    sys.exit()
 
     def samples_json(self):
         json_samples = json.dumps(self.service_samples, indent=4)
@@ -235,16 +228,7 @@ class NewService:
             self.create_samples_id()
             self.create_symbolic_links()
             self.samples_json()
-            self.rest_api.put_request(
-                "update-state", "resolution", self.resolution_id, "state", "in_progress"
-            )
-        else:
-            stderr.print(
-                "[yellow]WARN: No samples recorded in service: " + self.resolution_id
-            )
-            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
-                self.create_folder()
-                self.copy_template()
+            if self.resolution_info["service_state"] != "in_progress":
                 self.rest_api.put_request(
                     "update-state",
                     "resolution",
@@ -252,6 +236,22 @@ class NewService:
                     "state",
                     "in_progress",
                 )
+
+        else:
+            stderr.print(
+                "[yellow]WARN: No samples recorded in service: " + self.resolution_id
+            )
+            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
+                self.create_folder()
+                self.copy_template()
+                if self.resolution_info["service_state"] != "in_progress":
+                    self.rest_api.put_request(
+                        "update-state",
+                        "resolution",
+                        self.resolution_id,
+                        "state",
+                        "in_progress",
+                    )
             else:
                 stderr.print("Directory not created. Bye!")
                 sys.exit(1)

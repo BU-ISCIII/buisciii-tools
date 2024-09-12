@@ -1,0 +1,26 @@
+mkdir $(date '+%Y%m%d')_entrega01
+cd $(date '+%Y%m%d')_entrega01
+
+#Create directories depending on the analysis
+mkdir mapping_consensus 
+mkdir variants_annot
+mkdir assembly_spades
+mkdir abacas_assembly
+mkdir blast
+
+#Create symbolic links depending on the analysis
+#Individual files
+ln -s ../../ANALYSIS/*_MAG/99-stats/multiqc_report.html ./krona_results.html
+ln -s ../../ANALYSIS/*/mapping_illumina.xlsx ./mapping_illumina.xlsx
+ln -s ../../ANALYSIS/*/*/variants/ivar/variants_long_table.xlsx ./variants_long_table.xlsx
+ln -s ../../ANALYSIS/*/*/variants/ivar/consensus/bcftools/pangolin/pangolin.xlsx ./pangolin.xlsx
+ln -s ../../ANALYSIS/*/*/variants/ivar/consensus/bcftools/nextclade/nextclade.xlsx ./nextclade.xlsx
+ln -s ../../ANALYSIS/*/assembly_stats.xlsx ./assembly_stats.xlsx
+ln -s ../../ANALYSIS/*/01-PikaVirus-results/all_samples_virus_table_filtered.xlsx ./filtered_all_samples_virus_table.xlsx
+
+#Folders
+cd mapping_consensus;ln -s ../../../ANALYSIS/*/*/variants/ivar/consensus/bcftools/*.consensus.fa .; cd -
+cd variants_annot; ln -s ../../../ANALYSIS/*/*/variants/ivar/snpeff/*.snpsift.txt .; cd -
+cd assembly_spades; rsync -rlv ../../../ANALYSIS/*/*/assembly/spades/rnaviral/*.scaffolds.fa.gz .; gunzip *.scaffolds.fa.gz; cd -
+cd abacas_assembly; ln -s ../../../ANALYSIS/*/*/assembly/spades/rnaviral/abacas/*.abacas.fasta .; cd -
+cd blast; ln -s ../../../ANALYSIS/*/*.blast.filt.header.xlsx .; cd -

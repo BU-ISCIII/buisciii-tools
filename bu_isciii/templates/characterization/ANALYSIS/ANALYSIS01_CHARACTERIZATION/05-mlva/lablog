@@ -1,0 +1,23 @@
+# micromamba activate buisciii-tools_2.1.0
+
+mkdir logs
+mkdir assemblies
+mkdir MLVA_output
+scratch_dir=$(pwd | sed 's|/data/bi/scratch_tmp|/scratch|g')
+cp ../../*_ASSEMBLY/03-assembly/unicycler/*.fasta* assemblies/
+gzip -d assemblies/*.fasta.gz
+available_primers=$(ls /data/bi/references/MLVA/*primer* | rev | cut -d "/" -f1 | rev | cut -d "_" -f1)
+
+echo "Available primers:"
+select primer in $available_primers; do
+    if [ -n "$primer" ]; then
+        echo "You selected: $primer"
+        break
+    else
+        echo "Invalid selection. Please try again."
+    fi
+done
+
+primer_file=$(ls /data/bi/references/MLVA/${primer}*)
+
+echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/MLVA.log --job-name MLVA python /data/bi/pipelines/mlva/MLVA_finder.py -c -i assemblies -o MLVA_output -p ${primer_file} --full-locus-name --predicted-PCR-size-table --flanking-seq 20 &"  > _01_mlva.sh

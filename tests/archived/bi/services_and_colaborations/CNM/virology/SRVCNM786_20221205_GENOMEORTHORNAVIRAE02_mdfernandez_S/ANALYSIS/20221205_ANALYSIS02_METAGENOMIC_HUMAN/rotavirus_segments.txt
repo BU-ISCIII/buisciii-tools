@@ -1,0 +1,11 @@
+NC_011505.2 segment 11
+NC_011504.2 segment 10
+NC_011509.2 segment 6
+NC_011508.2 segment 3
+NC_011507.2 segment 1
+NC_011506.2 segment 2
+NC_011503.2 segment 9
+NC_011502.2 segment 8
+NC_011501.2 segment 7
+NC_011500.2 segment 5
+NC_011510.2 segment 4

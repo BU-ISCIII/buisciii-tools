@@ -1,0 +1,19 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+
+mkdir $DELIVERY_FOLDER
+
+# RNASEQ service
+cd $DELIVERY_FOLDER
+
+# Links to multiqc reports
+ln -s ../../ANALYSIS/*RNASEQ/*rnaseq/multiqc/star_salmon/multiqc_report.html .
+
+# Links to differential expression folders
+# REMINDER: please make sure that subfolders within /*_DIFFERENTIAL_EXPRESSION/ follow the structure [number]_*.
+# Otherwise, change the following command so that symlinks are created correctly.
+# Check this path: /ANALYSIS/[DATE]_ANALYSIS0X_DIFFERENTIAL_EXPRESSION/ to see the names of the folders  
+ln -s ../../ANALYSIS/*_DIFFERENTIAL_EXPRESSION/[0-9]*_* .
+
+# Links to counts files
+ln -s ../../ANALYSIS/*_RNASEQ/*_rnaseq/star_salmon/salmon.merged.gene_counts.tsv .
+ln -s ../../ANALYSIS/*_RNASEQ/02-differential_expression/99-stats/normalized_expression.csv .

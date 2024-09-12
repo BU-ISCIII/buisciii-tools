@@ -1,5 +1,7 @@
 channels:
 - conda-forge
 dependencies:
-- wkhtmltopdf
-- tree
+- wkhtmltopdf>=0.12.4
+- tree>=2.0.2
+- pip>22.0.2
+- python>3.9
