@@ -24,6 +24,26 @@ Code contributions to the new version:
 
 ### Requirements
 
+## [2.X.Xhot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.1
+
+### Credits
+
+Code contributions to the hotfix:
+
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.0] - 2024-09-12 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.0
 
 ### Credits
