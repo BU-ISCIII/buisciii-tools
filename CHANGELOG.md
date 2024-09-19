@@ -9,12 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 Code contributions to the new version:
-- [Daniel Valle](https://github.com/Daniel-VM)
 
+- [Daniel Valle](https://github.com/Daniel-VM)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Template fixes and updates
+
 - Fixed path to blast database and update Emmtyper params [#339](https://github.com/BU-ISCIII/buisciii-tools/pull/339)
 - Updated sarek version (v3.4.4) in ExomeEB-ExomeTrio-WGSTrio templates [#341] (https://github.com/BU-ISCIII/buisciii-tools/pull/341)
+- Fixed IRMAs config for amended consensus [#325](https://github.com/BU-ISCIII/buisciii-tools/pull/325).
+
 ### Modules
 
 #### Added enhancements
@@ -114,7 +118,6 @@ Code contributions to the new version:
 - Added permissions fixing after running scratch_copy, as well as a new fix-permissions module in the tools [#332](https://github.com/BU-ISCIII/buisciii-tools/pull/332).
 - Updated MAG lablogs and utils.py [#334](https://github.com/BU-ISCIII/buisciii-tools/pull/334).
 - Updated some files (setup.py, __main__.py, README, etc) for the 2.2.0 release [#335](https://github.com/BU-ISCIII/buisciii-tools/pull/335).
-- Fixed IRMAs config for amended consensus [#325](https://github.com/BU-ISCIII/buisciii-tools/pull/325).
 
 ### Modules
 
