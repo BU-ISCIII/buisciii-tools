@@ -12,58 +12,44 @@ cat ../samples_id.txt | while read sample; do
     ls ${sample}/amended_consensus/*.fa | cut -d '_' -f3 | cut -d '.' -f1 | while read fragment; do
         if [ $fragment == 1 ]; then
             if [ $FLUTYPE == "B" ]; then
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_1/_PB1/' >> ${FLUSUBTYPE}/B_PB1.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_1/_PB1/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_1/_PB1/' | tee -a ${FLUSUBTYPE}/B_PB1.txt all_samples_completo.txt > /dev/null
             else
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_1/_PB2/' >> ${FLUSUBTYPE}/${FLUTYPE}_PB2.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_1/_PB2/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_1/_PB2/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_PB2.txt all_samples_completo.txt > /dev/null
             fi
         elif [ $fragment == 2 ]; then
             if [ $FLUTYPE == "B" ]; then
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_2/_PB2/' >> ${FLUSUBTYPE}/B_PB2.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_2/_PB2/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_2/_PB2/' | tee -a ${FLUSUBTYPE}/B_PB2.txt all_samples_completo.txt > /dev/null
             else
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_2/_PB1/' >> ${FLUSUBTYPE}/${FLUTYPE}_PB1.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_2/_PB1/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_2/_PB1/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_PB1.txt all_samples_completo.txt > /dev/null
             fi
         elif [ $fragment == 3 ]; then
             if [ $FLUTYPE == "B" ] || [ $FLUTYPE == "A" ]; then
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_3/_PA/' >> ${FLUSUBTYPE}/${FLUTYPE}_PA.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_3/_PA/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_3/_PA/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_PA.txt all_samples_completo.txt > /dev/null
             else
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_3/_P3/' >> ${FLUSUBTYPE}/${FLUTYPE}_P3.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_3/_P3/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_3/_P3/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_P3.txt all_samples_completo.txt > /dev/null
             fi
         elif [ $fragment == 4 ]; then
             if [ $FLUTYPE == "B" ] || [ $FLUTYPE == "A" ]; then
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_4/_HA/' >> ${FLUSUBTYPE}/${FLUTYPE}_HA.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_4/_HA/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_4/_HA/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_HA.txt all_samples_completo.txt > /dev/null
             else
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_4/_HE/' >> ${FLUSUBTYPE}/${FLUTYPE}_HE.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_4/_HE/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_4/_HE/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_HE.txt all_samples_completo.txt > /dev/null
             fi
         elif [ $fragment == 5 ]; then
-            cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_5/_NP/' >> ${FLUSUBTYPE}/${FLUTYPE}_NP.txt
-            cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_5/_NP/' >> all_samples_completo.txt
+            cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_5/_NP/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_NP.txt all_samples_completo.txt > /dev/null
         elif [ $fragment == 6 ]; then
             if [ $FLUTYPE == "B" ] || [ $FLUTYPE == "A" ]; then
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_6/_NA/' >> ${FLUSUBTYPE}/${FLUTYPE}_NA.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_6/_NA/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_6/_NA/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_NA.txt all_samples_completo.txt > /dev/null
             else
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_6/_MP/' >> ${FLUSUBTYPE}/${FLUTYPE}_MP.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_6/_MP/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_6/_MP/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_MP.txt all_samples_completo.txt > /dev/null
             fi
         elif [ $fragment == 7 ]; then
             if [ $FLUTYPE == "B" ] || [ $FLUTYPE == "A" ]; then
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_7/_MP/' >> ${FLUSUBTYPE}/${FLUTYPE}_MP.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_7/_MP/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_7/_MP/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_MP.txt all_samples_completo.txt > /dev/null
             else
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_7/_NS/' >> ${FLUSUBTYPE}/${FLUTYPE}_NS.txt
-                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_7/_NS/' >> all_samples_completo.txt
+                cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_7/_NS/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_NS.txt all_samples_completo.txt > /dev/null
             fi
         elif [ $fragment == 8 ]; then
-            cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_8/_NS/' >> ${FLUSUBTYPE}/${FLUTYPE}_NS.txt
-            cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_8/_NS/' >> all_samples_completo.txt
+            cat ${sample}/amended_consensus/*_${fragment}.fa | sed 's/-/\//g' | sed 's/_8/_NS/' | tee -a ${FLUSUBTYPE}/${FLUTYPE}_NS.txt all_samples_completo.txt > /dev/null
         else
             echo "The sample $sample has a segment with number $fragment, but I don't know which segment it is."
         fi
