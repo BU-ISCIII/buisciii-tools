@@ -31,7 +31,7 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 
 # Run Vep without the plugin columns
 
-echo "srun --partition short_idx --mem 100G --time 12:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/ensembl-vep:103.1--pl5262h4a94de4_2 vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ${scratch_dir}/vep/variants_fil_mod.vcf -o ${scratch_dir}/vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab &" > _02_vep_annotation.sh
+echo "srun --partition short_idx --mem 100G --time 12:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP singularity exec -B /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/ -B /data/bi/references/eukaria/homo_sapiens/cache_vep/ -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/ensembl-vep:103.1--pl5262h4a94de4_2 vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ${scratch_dir}/vep/variants_fil_mod.vcf -o ${scratch_dir}/vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --assembly GRCh37 --tab &" > _02_vep_annotation.sh
 
 #--------------------------------------------------------------------------------------------------------------------
 
