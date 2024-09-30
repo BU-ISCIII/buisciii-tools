@@ -68,7 +68,7 @@ def merge_lineage_tables(
                 csvs_in_folder=csvs_in_folder, merged_csv_name=merged_csv_name
             )
         else:
-            print(f"No pangolin folder could be found for {ref}, omitting")
+            print(f"\033[93mNo pangolin folder could be found for {ref}, omitting\033[0m")
 
         if os.path.isdir(os.path.abspath(folder + "/nextclade")):
             nextcl_dir = os.path.join(folder, "nextclade")
@@ -82,17 +82,18 @@ def merge_lineage_tables(
                 csvs_in_folder=csvs_in_folder, merged_csv_name=merged_csv_name
             )
         else:
-            print(f"No nextclade folder could be found for {ref}, omitting")
+            print(f"\033[93mNo nextclade folder could be found for {ref}, omitting\033[0m\n")
 
     return
 
 
 def excel_generator(csv_files: List[str]):
+    #print("Proceeding")
     for file in csv_files:
         if not os.path.exists(file):
-            print(f"File {file} does not exist, omitting...")
+            print(f"\033[91mFile {file} does not exist, omitting...\033[0m")
             continue
-        print(f"Generating excel file for {file}")
+        print(f"\033[92mGenerating excel file for {file}\033[0m")
         output_name = os.path.splitext(os.path.basename(file))[0] + ".xlsx"
         # workbook = openpyxl.Workbook(output_name)
         if "nextclade" in str(file):
@@ -108,7 +109,7 @@ def excel_generator(csv_files: List[str]):
             try:
                 table = pd.read_csv(file)
             except pd.errors.EmptyDataError:
-                print("Could not parse table from ", str(file))
+                print("\033[91mCould not parse table from ", str(file), "\033[0m")
                 continue
         table = table.drop(["index"], axis=1, errors="ignore")
         table.to_excel(output_name, index=False)
@@ -119,22 +120,22 @@ def single_csv_to_excel(csv_file: str):
     try:
         excel_generator([csv_file])
     except FileNotFoundError as e:
-        print(f"Could not find file {e}")
+        print(f"\033[91mCould not find file {e}\033[0m")
 
 
 def main(args):
     if args.single_csv:
         # If single_csv is called, just convert target csv to excel and skip the rest
-        print("Single file convertion selected. Skipping main process...")
+        print("\033[92mSingle file convertion selected. Skipping main process...\033[0m")
         single_csv_to_excel(args.single_csv)
         exit(0)
 
     print(
-        "Extracting references used for analysis and the samples associated with each reference\n"
+        "\033[92mExtracting references used for analysis and the samples associated with each reference\033[0m"
     )
     with open(args.reference_file, "r") as file:
         references = [line.rstrip() for line in file]
-        print(f"\nFound {len(references)} references: {str(references).strip('[]')}")
+        print(f"\n\033[92mFound {len(references)} references: {str(references).strip('[]')}\033[0m")
 
     reference_folders = {ref: str("excel_files_" + ref) for ref in references}
     samples_ref_files = {
@@ -145,7 +146,7 @@ def main(args):
         # Merge pangolin and nextclade csv files separatedly and create excel files for them
         merge_lineage_tables(reference_folders, samples_ref_files)
         for reference, folder in reference_folders.items():
-            print(f"Creating excel files for reference {reference}")
+            print(f"\033[92mCreating excel files for reference {reference}\033[0m")
             csv_files = [
                 file.path for file in os.scandir(folder) if file.path.endswith(".csv")
             ]
@@ -160,8 +161,9 @@ def main(args):
             csvs_in_folder=variants_tables, merged_csv_name="variants_long_table.csv"
         )
     except FileNotFoundError as e:
-        print(str(e))
-        print("Merged variants_long_table.csv might be empty")
+        print("\033[93mWARNING!\033[0m")
+        print("\033[93mAt least one variants_long_table.csv file could not be found. Therefore, merged variants_long_table.csv will be incomplete.\033[0m")
+        print("\033[93mPlease, check the following report in order to know which links are broken and, therefore, which tables could not be found:\033[0m\n")
 
     # Create excel files for individual tables
     valid_extensions = [".csv", ".tsv", ".tab"]
@@ -173,6 +175,12 @@ def main(args):
     link_csvs = [file for file in rest_of_csvs if os.path.islink(file)]
     broken_links = [file for file in link_csvs if not os.path.exists(os.readlink(file))]
     valid_csvs = [file for file in rest_of_csvs if file not in broken_links]
+
+    if broken_links:
+     print(f"\033[93mWARNING! {len(broken_links)} broken links found (for .csv, .tsv or .tab files). Please fix them.\033[0m")
+     for broken_link in broken_links:
+         print(f"\033[93mBroken link: {broken_link} (target: {os.readlink(broken_link)})\033[0m")
+
     excel_generator(valid_csvs)
 
 
