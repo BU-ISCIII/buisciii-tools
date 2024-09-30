@@ -646,10 +646,34 @@ class BioinfoDoc:
                     email_data["email_notes"] = self.delivery_notes.replace(
                         "\n", "<br />"
                     )
+                else:
+                    email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
+                        msg="Write email notes"
+                    ).replace("\n", "<br />")
             else:
-                email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
-                    msg="Write email notes"
-                ).replace("\n", "<br />")
+                if bu_isciii.utils.prompt_yn_question(
+                    msg="Do you wish to provide a text file for email notes?", dflt=False
+                ):
+                    for i in range(3, -1, -1):
+                        email_data["email_notes"] = bu_isciii.utils.prompt_path(
+                            msg="Write the path to the file with RAW text as email notes"
+                        )
+                        if not os.path.isfile(os.path.expanduser(email_data["email_notes"])):
+                            stderr.print(f"Provided file doesn't exist. Attempts left: {i}")
+                        else:
+                            stderr.print(f"File selected: {email_data["email_notes"]}")
+                            break
+                    else:
+                        stderr.print("No more attempts. Email notes will be given by prompt")
+                        email_data["email_notes"] = None
+                else:
+                    email_data["email_notes"] = None
+
+                if email_data["email_notes"]:
+                    with open(os.path.expanduser(email_data["email_notes"])) as f:
+                        email_data["email_notes"] = f.read().replace("\n", "<br />")
+                else:
+                    email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(msg="Write email notes").replace("\n", "<br />")
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
