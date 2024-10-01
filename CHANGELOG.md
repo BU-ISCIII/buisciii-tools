@@ -10,14 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 Code contributions to the new version:
 
-- [Daniel Valle](https://github.com/Daniel-VM)
-- [Sarai Varona](https://github.com/svarona)
-
 ### Template fixes and updates
-
-- Fixed path to blast database and update Emmtyper params [#339](https://github.com/BU-ISCIII/buisciii-tools/pull/339)
-- Updated sarek version (v3.4.4) in ExomeEB-ExomeTrio-WGSTrio templates [#341] (https://github.com/BU-ISCIII/buisciii-tools/pull/341)
-- Fixed IRMAs config for amended consensus [#325](https://github.com/BU-ISCIII/buisciii-tools/pull/325).
 
 ### Modules
 
@@ -38,6 +31,36 @@ Code contributions to the new version:
 Code contributions to the hotfix:
 
 ### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [2.2.1] - 2024-10-01 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.1
+
+### Credits
+
+Code contributions to the new version:
+
+- [Daniel Valle](https://github.com/Daniel-VM)
+- [Sarai Varona](https://github.com/svarona)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Sergio Olmos](https://github.com/OPSergio)
+
+### Template fixes and updates
+
+- Fixed path to blast database and update Emmtyper params [#339](https://github.com/BU-ISCIII/buisciii-tools/pull/339)
+- Updated sarek version (v3.4.4) in ExomeEB-ExomeTrio-WGSTrio templates [#341] (https://github.com/BU-ISCIII/buisciii-tools/pull/341)
+- Fixed IRMAs config for amended consensus [#325](https://github.com/BU-ISCIII/buisciii-tools/pull/325).
+- Improved excel_generator.py and bioinfo_doc.py email creation function, and updated sftp_user.json, setup.py, main.py and some lablogs [#344](https://github.com/BU-ISCIII/buisciii-tools/pull/344).
 
 ### Modules
 
