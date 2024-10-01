@@ -1,4 +1,4 @@
-# module load Nextflow/22.10.1 singularity
+# module load Nextflow singularity
 
 ln -s ../00-reads/ .
 ln -s ../samples_id.txt .
@@ -44,7 +44,7 @@ cat <<EOF > sarek.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/nf-core-sarek/nf-core-sarek-3.4.2/workflow/main.nf \\
+nextflow run /data/bi/pipelines/nf-core-sarek/nf-core-sarek_3.4.4/3_4_4/main.nf \\
           -c ../../DOC/hpc_slurm_sarek.config \\
           --input 'samplesheet.csv' \\
           --outdir 01-sarek \\
