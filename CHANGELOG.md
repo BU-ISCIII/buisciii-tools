@@ -10,11 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 Code contributions to the new version:
 
+- [Pablo Mata](https://github.com/Shettland)
+
 ### Template fixes and updates
 
 ### Modules
 
 #### Added enhancements
+
+- Included a new github action to automatically publish releases to pypi [#351](https://github.com/BU-ISCIII/buisciii-tools/pull/351)
 
 #### Fixes
 
