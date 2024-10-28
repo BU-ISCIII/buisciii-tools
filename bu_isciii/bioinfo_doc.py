@@ -715,7 +715,7 @@ class BioinfoDoc:
             server.ehlo()
             server.login(user=email_host_user, password=email_host_password)
         except Exception as e:
-            stderr.print("[red] Unable to send e-mail" + e)
+            stderr.print("[red] Unable to send e-mail: " + str(e))
         default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart("alternative")
         msg["To"] = self.resolution_info["service_user_id"]["email"]
