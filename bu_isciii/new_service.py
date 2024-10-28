@@ -105,8 +105,8 @@ class NewService:
         stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
         try:
             subprocess.run(
-                ['md5sum', '-c', os.path.basename(md5_file_path)],
-                check=True)
+                ["md5sum", "-c", os.path.basename(md5_file_path)], check=True
+            )
             stderr.print("[green]MD5 check passed!")
         except subprocess.CalledProcessError as e:
             stderr.print(f"[red]ERROR: MD5 check failed: {e.stderr}")
