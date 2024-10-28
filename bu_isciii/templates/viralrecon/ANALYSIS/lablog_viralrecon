@@ -479,6 +479,7 @@ do
     cp create_summary_report.sh ${FOLDER_NAME}/
     cp deduplicate_long_table.sh ${FOLDER_NAME}/
     cp percentajeNs.py ${FOLDER_NAME}/
+    cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
