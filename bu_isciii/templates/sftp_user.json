@@ -54,5 +54,6 @@
     "bbaladron": ["SpainUDP"],
     "bioinfoadm": ["test"],
     "s.varona": ["misc"],
-    "nlabiod": ["Labarbovirus"]
+    "nlabiod": ["Labarbovirus"],
+    "jmgonzalez": ["Lablegionella"],
 }
