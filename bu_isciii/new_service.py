@@ -90,31 +90,29 @@ class NewService:
         self.full_path = os.path.join(self.path, self.service_folder)
 
     def check_md5(self):
-            # Path to the .md5 file
-            project_name = self.service_samples[0]["project_name"]
-            md5_file_path = f"/srv/fastq_repo/{project_name}/md5sum_{project_name}.md5"
-            if not os.path.exists(md5_file_path):
-                stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
-                sys.exit(1)
+        # Path to the .md5 file
+        project_name = self.service_samples[0]["project_name"]
+        md5_file_path = f"/srv/fastq_repo/{project_name}/md5sum_{project_name}.md5"
+        if not os.path.exists(md5_file_path):
+            stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
+            sys.exit(1)
 
-            original_dir = os.getcwd()
-            md5_dir = os.path.dirname(md5_file_path)
-            os.chdir(md5_dir)
+        original_dir = os.getcwd()
+        md5_dir = os.path.dirname(md5_file_path)
+        os.chdir(md5_dir)
 
-            # md5sum command
-            stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
-            try:
-                result = subprocess.run(
-                    ['md5sum', '-c', os.path.basename(md5_file_path)],
-                    check=True,
-                    )
-                stderr.print(f"[green]MD5 check passed!")
-            except subprocess.CalledProcessError as e:
-                stderr.print(f"[red]ERROR: MD5 check failed: {e.stderr}")
-                sys.exit(1)
-            finally:
-                os.chdir(original_dir)
-
+        # md5sum command
+        stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
+        try:
+            subprocess.run(
+                ['md5sum', '-c', os.path.basename(md5_file_path)],
+                check=True)
+            stderr.print("[green]MD5 check passed!")
+        except subprocess.CalledProcessError as e:
+            stderr.print(f"[red]ERROR: MD5 check failed: {e.stderr}")
+            sys.exit(1)
+        finally:
+            os.chdir(original_dir)
 
     def create_folder(self):
         self.check_md5()
