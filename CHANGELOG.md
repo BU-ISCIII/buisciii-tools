@@ -8,11 +8,56 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Credits
 
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [2.X.Xhot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.2
+
+### Credits
+
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [2.2.2] - 2024-10-28 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.2
+
+### Credits
+
 Code contributions to the new version:
 
 - [Pablo Mata](https://github.com/Shettland)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Template fixes and updates
+
+- Updated the fix-permissions module in __main__.py [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
+- Fixed the singularity cache directory in taxprofiler.config [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
+- Updated sftp_user.json [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
+- Fixed viralrecon's lablog and the remove_columns_mapping_table.sh auxiliary script [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
+- Updated the singularity image in the mtbseq templates [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
+- Fixed a bug in bioinfo_doc.py [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
+- Updated new_service.py to check FASTQ integrity via md5sum [#356](https://github.com/BU-ISCIII/buisciii-tools/pull/356).
 
 ### Modules
 
