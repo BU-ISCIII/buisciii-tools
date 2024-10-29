@@ -92,7 +92,7 @@ class NewService:
     def check_md5(self):
         # Path to the .md5 file
         project_name = self.service_samples[0]["project_name"]
-        md5_file_path = f"/srv/fastq_repo/{project_name}/md5sum_{project_name}.md5"
+        md5_file_path = f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
         if not os.path.exists(md5_file_path):
             stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
             sys.exit(1)
