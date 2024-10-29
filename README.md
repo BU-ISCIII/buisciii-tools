@@ -31,7 +31,7 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
 ```bash
 micromamba create -n buisciii -f environment.yml
 micromamba activate buisciii
-pip install --force-reinstall --upgrade git+https://github.com/bu-isciii/buisciii-tools.git@main
+pip install buisciii-tools
 ```
 
 or
@@ -40,7 +40,7 @@ or
 git checkout main
 conda create -n buisciii -f environment.yml
 conda activate 
-pip install .
+pip install buisciii-tools
 ```
 
 ### Dev version

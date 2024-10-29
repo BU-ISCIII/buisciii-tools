@@ -9,7 +9,7 @@ cat ../samples_id.txt | xargs -I % echo "mkdir %; ln -s ../../01-preprocessing/%
 cat ../samples_id.txt | xargs -I % echo "ln -s ../../01-preprocessing/%/%_R2_filtered.fastq.gz %/%_lib1_R2.fastq.gz" >> _00_prepareRaw.sh
 cat ../samples_id.txt | xargs -I % echo "cd %;ls *.fastq.gz | tr '_' '\t' | cut -f 1,2 | sort -u > samples.txt;cd -" > _01_preparesamples.sh
 
-cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 48G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/mtbseq:1.0.4--hdfd78af_2 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _02_mtbseq.sh
+cat ../samples_id.txt | xargs -I @@ echo -e "srun --job-name MTBSEQ.@@  --output logs/MTBSEQ.@@.%j.log --partition middle_idx --mem 48G --chdir ${scratch_dir}/@@ --cpus-per-task 10 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/mtbseq:1.1.0--hdfd78af_0 MTBseq --step TBfull --threads 10 --samples samples.txt &" > _02_mtbseq.sh
 
 # classification
 echo "mkdir classification_all" > _03_gather_results.sh 
