@@ -92,9 +92,7 @@ class NewService:
     def check_md5(self):
         # Path to the .md5 file
         project_name = self.service_samples[0]["project_name"]
-        md5_file_path = (
-            f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
-        )
+        md5_file_path = f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
         if not os.path.exists(md5_file_path):
             stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
             sys.exit(1)
@@ -103,11 +101,17 @@ class NewService:
         md5_dir = os.path.dirname(md5_file_path)
         os.chdir(md5_dir)
 
+        # Regex pattern to match sample names in .fastq.gz files
+        sample_names_pattern = "|".join(
+        [f"{sample['sample_name']}.*\\.fastq\\.gz" for sample in self.service_samples]
+    )
+
         # md5sum command
         stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
         try:
+            cmd = f"grep -E '{sample_names_pattern}' {md5_file_path} | md5sum -c"
             subprocess.run(
-                ["md5sum", "-c", os.path.basename(md5_file_path)], check=True
+                cmd, shell=True, check=True, executable='/bin/bash'
             )
             stderr.print("[green]MD5 check passed!")
         except subprocess.CalledProcessError as e:
