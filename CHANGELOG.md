@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Credits
 
+Code contributions to the new version:
+
+- [Victor Lopez](https://github.com/victor5lm)
+
 ### Template fixes and updates
+
+- Updated sftp_user.json, added the locus-tag option for the PROKKA process in the bacass config file and changed new_service.py so that integrity is checked only for the samples of interest [#363](https://github.com/BU-ISCIII/buisciii-tools/pull/363).
 
 ### Modules
 
