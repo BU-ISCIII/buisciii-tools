@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Code contributions to the new version:
 
 - [Victor Lopez](https://github.com/victor5lm)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Template fixes and updates
 
@@ -21,6 +22,8 @@ Code contributions to the new version:
 #### Added enhancements
 
 #### Fixes
+
+- Fixed new-service to correctly handle when there are no samples in service [#372](https://github.com/BU-ISCIII/buisciii-tools/pull/372). Fixes issue [#371](https://github.com/BU-ISCIII/buisciii-tools/issues/371)
 
 #### Changed
 
