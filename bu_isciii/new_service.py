@@ -277,7 +277,9 @@ class NewService:
             stderr.print(
                 "[yellow]WARN: No samples recorded in service: " + self.resolution_id
             )
-            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: ", dflt=True):
+            if bu_isciii.utils.prompt_yn_question(
+                "Do you want to proceed?: ", dflt=True
+            ):
                 self.create_folder()
                 self.copy_template()
                 if self.resolution_info["service_state"] != "in_progress":
