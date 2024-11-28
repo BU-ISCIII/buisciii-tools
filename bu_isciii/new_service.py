@@ -63,7 +63,7 @@ class NewService:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.service_samples = self.resolution_info.get("samples", None)
+        self.service_samples = self.resolution_info.get("samples")
 
         if ask_path and path is None:
             stderr.print("Directory where you want to create the service folder.")
@@ -124,7 +124,6 @@ class NewService:
             os.chdir(original_dir)
 
     def create_folder(self):
-        self.check_md5()
         if not self.no_create_folder:
             stderr.print(
                 "[blue]I will create the service folder for " + self.resolution_id + "!"
@@ -258,7 +257,8 @@ class NewService:
         f.close()
 
     def create_new_service(self):
-        if self.service_samples is not None:
+        if len(self.service_samples) > 0:
+            self.check_md5()
             self.create_folder()
             self.copy_template()
             self.create_samples_id()
@@ -277,7 +277,7 @@ class NewService:
             stderr.print(
                 "[yellow]WARN: No samples recorded in service: " + self.resolution_id
             )
-            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
+            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: ", dflt=True):
                 self.create_folder()
                 self.copy_template()
                 if self.resolution_info["service_state"] != "in_progress":
