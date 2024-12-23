@@ -4,4 +4,4 @@ scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
 
 mkdir logs
 
-echo "srun --partition short_idx --chdir $scratch_dir --output logs/SNPPHYLO.%j.log Rscript /data/bi/pipelines/snphylo/SNPhylo/scripts/generate_snp_sequence.R -o 'snphylo.output' -l 2 -M 0.5 -v ../06-freebayes/all_samples.vcf &" > _01_snpphylo.sh
+echo "srun --partition short_idx --chdir $scratch_dir --output logs/SNPPHYLO.%j.log Rscript /data/ucct/bi/pipelines/snphylo/SNPhylo/scripts/generate_snp_sequence.R -o 'snphylo.output' -l 2 -M 0.5 -v ../06-freebayes/all_samples.vcf &" > _01_snpphylo.sh

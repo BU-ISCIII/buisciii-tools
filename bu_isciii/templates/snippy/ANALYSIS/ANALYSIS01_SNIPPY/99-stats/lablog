@@ -4,9 +4,9 @@ ln -s ../../../REFERENCES/*.fna reference.fna
 mkdir logs
 scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
 
-cat ../samples_id.txt | xargs -I % echo "printf '%s\t' %;singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ${scratch_dir}/../04-snippy/%/snps.bam | grep 'mapped (' | head -n 1 | cut -d '(' -f 2 | cut -d ':' -f 1" | bash | sort -u > mapping_stats.txt
+cat ../samples_id.txt | xargs -I % echo "printf '%s\t' %;singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ${scratch_dir}/../04-snippy/%/snps.bam | grep 'mapped (' | head -n 1 | cut -d '(' -f 2 | cut -d ':' -f 1" | bash | sort -u > mapping_stats.txt
 
-cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ${scratch_dir}/../04-snippy/@@/snps.bam -O ${scratch_dir}/@@_collect_wgs_metrics.txt -R ${scratch_dir}/reference.fna &" > _00_wgsmetrics.sh
+cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ${scratch_dir}/../04-snippy/@@/snps.bam -O ${scratch_dir}/@@_collect_wgs_metrics.txt -R ${scratch_dir}/reference.fna &" > _00_wgsmetrics.sh
 
 echo "printf \"SAMPLENAME\t\$(grep \"GENOME_TERRITORY\" *collect_wgs_metrics.txt | cut -d\":\" -f2 | sed 's/ /_/g'| sort -u)\n\" > wgs_metrics_all.txt" > _01_gather_wgs_metrics.sh
 echo "cat ../samples_id.txt | xargs -I % echo \"printf '%s\t' %; head -n 8 %_collect_wgs_metrics.txt | grep '^[0-9]'\" | bash >> wgs_metrics_all.txt" >> _01_gather_wgs_metrics.sh

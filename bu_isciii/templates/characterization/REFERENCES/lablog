@@ -2,7 +2,7 @@
 
 mkdir logs
 
-scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+scratch_dir=$(echo $(pwd) | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
 
 # Function to print colored text
 print_color() {
@@ -31,12 +31,12 @@ print_color "This will take some seconds to display, please wait" 'blue'
 
 # Select genome from PMLST
 IFS=$'\n'
-bacterial_options=( $(singularity exec /data/bi/pipelines/singularity-images/ariba:2.14.6--py39heaaa4ec_6 ariba pubmlstspecies | sed 's/^/"/g' | sed 's/$/"/g') )
+bacterial_options=( $(singularity exec /data/ucct/bi/pipelines/singularity-images/ariba:2.14.6--py39heaaa4ec_6 ariba pubmlstspecies | sed 's/^/"/g' | sed 's/$/"/g') )
 print_color "Indicate the preferred bacterial genome:" 'blue'
 select BACTERIA in "${bacterial_options[@]}"; do
     if [ -n "$BACTERIA" ]; then
         print_color "Selected bacteria: $BACTERIA" 'green'
-        echo "srun --chdir ${scratch_dir} --mem 10G --time 1:00:00 --job-name PUBMLSTGET --output logs/PUBMLSTGET.%j.log --partition short_idx --cpus-per-task 5 singularity exec -B ${scratch_dir} /data/bi/pipelines/singularity-images/ariba:2.14.6--py39heaaa4ec_6 ariba pubmlstget $BACTERIA $(date '+%Y%m%d') &" > _01_download_pubmlst.sh
+        echo "srun --chdir ${scratch_dir} --mem 10G --time 1:00:00 --job-name PUBMLSTGET --output logs/PUBMLSTGET.%j.log --partition short_idx --cpus-per-task 5 singularity exec -B ${scratch_dir} /data/ucct/bi/pipelines/singularity-images/ariba:2.14.6--py39heaaa4ec_6 ariba pubmlstget $BACTERIA $(date '+%Y%m%d') &" > _01_download_pubmlst.sh
         break
     else
         print_color "Invalid input. Please select a valid option." 'red'

@@ -75,12 +75,12 @@ update_pangolin() {
     log_message "Latest version available of Pangolin:\e[1;38;5;220m $latest_version_pangolin" bold
 
     log_message "Checking if latest version of Pangolin image is already downloaded..."
-    if [ -e "/data/bi/pipelines/singularity-images/$latest_version_pangolin" ]; then
+    if [ -e "/data/ucct/bi/pipelines/singularity-images/$latest_version_pangolin" ]; then
         log_message "File $latest_version_pangolin already downloaded."
         log_message "Pangolin container is UP TO DATE. \xE2\x9C\x85"
     else
         log_message "Downloading $latest_version_pangolin file..."
-        wget -P "/data/bi/pipelines/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
+        wget -P "/data/ucct/bi/pipelines/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
         if [ $? -eq 0 ]; then
             log_message "$latest_version_pangolin file succesfully downloaded." green
         else
@@ -90,16 +90,16 @@ update_pangolin() {
 
     # Updating Pangolin database
     log_message "Setting datadir for Pangolin database."
-    cd /data/bi/references/pangolin/
+    cd /data/ucct/bi/references/pangolin/
     if [ -e "./$(date '+%Y%m%d')" ]; then
-        log_message "Directory /data/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
+        log_message "Directory /data/ucct/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
         log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
         log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
     else
         mkdir "$(date '+%Y%m%d')"
         echo -e "$(date +'%Y-%m-%d %H:%M:%S') - mkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/command.log
-        echo -e "$(date +'%Y-%m-%d %H:%M:%S') - srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/command.log
-        srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S') - srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/ucct/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/command.log
+        srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/ucct/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
         if [ $? -eq 0 ]; then
             log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
             log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
@@ -112,7 +112,7 @@ update_pangolin() {
     # Updating config file
     log_message "Updating $CONFIG_FILE file..."
     sed -i "s|pangolin:4.3--pyhdfd78af_2|$latest_version_pangolin|" "$CONFIG_FILE"
-    sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
+    sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/ucct/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
     log_message "File $CONFIG_FILE UPDATED."
 
     # Updating params file
@@ -134,12 +134,12 @@ update_nextclade() {
     log_message "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade" bold
 
     log_message "Checking if latest version of Nextclade image is already downloaded..."
-    if [ -e "/data/bi/pipelines/singularity-images/$latest_version_nextclade" ]; then
+    if [ -e "/data/ucct/bi/pipelines/singularity-images/$latest_version_nextclade" ]; then
         log_message "File $latest_version_nextclade already downloaded."
         log_message "Nextclade container is UP TO DATE. \xE2\x9C\x85"
     else
         log_message "Downloading $latest_version_nextclade file..."
-        wget -P "/data/bi/pipelines/singularity-images" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
+        wget -P "/data/ucct/bi/pipelines/singularity-images" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
         if [ $? -eq 0 ]; then
             log_message "$latest_version_nextclade file succesfully downloaded." green
         else
@@ -149,7 +149,7 @@ update_nextclade() {
 
     # Extracting the current Nextclade data TAG
     log_message "Extracting Nextclade data TAG..."
-    nextclade_tag=$(singularity run /data/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
+    nextclade_tag=$(singularity run /data/ucct/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
     log_message "Latest \e[1;38;5;220m${virus_tag^^} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag" bold
     
     # Updating config file
@@ -192,7 +192,7 @@ check_references() {
     }
 
     # Check if FASTA sequence is already downloaded
-    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
     if [ -z "$REF_FASTA" ]; then
         log_message "File ${ref}.fasta is not yet downloaded."
         obtain_family; if [ -z $family ]; then return; fi
@@ -214,20 +214,20 @@ check_references() {
             log_message "Refgenie environment is NOT ACTIVE. Exiting..." blk_red
             exit 1
         fi
-        if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
-            log_message "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/bi/references/refgenie/alias/${family}/fasta/${ref}."
+        if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
+            log_message "Creating new directory: /data/ucct/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}."
             digest=$(openssl rand -hex 24)
-            mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
-            wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then
-                log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}." green
-                gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                log_message "File ${ref}.fasta downloaded in /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}." green
+                gzip /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 log_message "Building asset for ${ref}.fasta file..."
-                refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
                 if grep -q "Created" "${ref}.fasta_build.log"; then
-                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
-                    bash /data/bi/references/refgenie/alias/ref.sh
-                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
                 fi
@@ -235,19 +235,19 @@ check_references() {
                 log_message "An error occurred during file downloading." blk_red
             fi
         else
-            log_message "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.fasta."
-            digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
-            mkdir -p /data/bi/references/refgenie/data/${digest}/fasta/${ref}/
-            wget -q -O "/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+            log_message "Directory /data/ucct/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.fasta."
+            digest=$(refgenie alias get -a ${family} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
             if [ $? -eq 0 ]; then 
-                log_message "File ${ref}.fasta downloaded in /data/bi/references/refgenie/data/${digest}/fasta/${ref}." green
-                gzip /data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                log_message "File ${ref}.fasta downloaded in /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}." green
+                gzip /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
                 log_message "Building asset for ${ref}.fasta file..."
-                refgenie build ${family}/fasta:${ref} --files fasta=/data/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
                 if grep -q "Created" "${ref}.fasta_build.log"; then
-                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
-                    bash /data/bi/references/refgenie/alias/ref.sh
-                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
                 fi
@@ -260,7 +260,7 @@ check_references() {
     fi
 
     # Check if GFF file is already downloaded
-    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
     if [ -z "$REF_GFF" ]; then
         log_message "File ${ref}.gff is not yet downloaded."
         if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
@@ -274,20 +274,20 @@ check_references() {
                 log_message "Refgenie environment is NOT ACTIVE. Exiting..." blk_red
             fi
         fi
-        if [ ! -e "/data/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
-            log_message "Creating new directory: /data/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/bi/references/refgenie/alias/${family}/gff/${ref}."
+        if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
+            log_message "Creating new directory: /data/ucct/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}."
             digest=$(openssl rand -hex 24)
-            refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/bi/references/refgenie/genome_config.yaml
-            mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
-            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/ucct/bi/references/refgenie/genome_config.yaml
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then
-                log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
+                log_message "File ${ref}.gff downloaded in /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
                 log_message "Adding asset for ${ref}.gff file..."
-                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
                 if grep -q "Created" "${ref}.gff_add.log"; then
-                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
-                    bash /data/bi/references/refgenie/alias/ref.sh
-                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
                 fi
@@ -295,18 +295,18 @@ check_references() {
                 log_message "An error occurred during file downloading." blk_red
             fi
          else
-            log_message "Directory /data/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
-            digest=$(refgenie alias get -a ${family} -c /data/bi/references/refgenie/genome_config.yaml)
-            mkdir -p /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
-            wget -q -O "/data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            log_message "Directory /data/ucct/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
+            digest=$(refgenie alias get -a ${family} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
             if [ $? -eq 0 ]; then 
-                log_message "File ${ref}.gff downloaded in /data/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
+                log_message "File ${ref}.gff downloaded in /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
                 log_message "Adding asset for ${ref}.gff file..."
-                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
                 if grep -q "Created" "${ref}.gff_add.log"; then
-                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
-                    bash /data/bi/references/refgenie/alias/ref.sh
-                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/bi/references/refgenie/alias/references.txt)
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
                 fi
@@ -455,7 +455,7 @@ else
         update_nextclade
         update_pangolin
 
-        echo "primer_bed: '/data/bi/references/refgenie/alias/coronaviridae/primer_schemes/NC_045512.2/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
+        echo "primer_bed: '/data/ucct/bi/references/refgenie/alias/coronaviridae/primer_schemes/NC_045512.2/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
 
     elif [ "$virus_tag" == "rsv" ]; then       
         # Update Nextclade
@@ -503,7 +503,7 @@ do
         echo "#SBATCH --output ${ref}_$(date '+%Y%m%d')_viralrecon.log" >> ${FOLDER_NAME}/lablog
         printf "#SBATCH --chdir \$scratch_dir\n\n" >> ${FOLDER_NAME}/lablog
         printf 'export NXF_OPTS="-Xms500M -Xmx4G"\n\n' >> ${FOLDER_NAME}/lablog
-        echo "nextflow run /data/bi/pipelines/nf-core-viralrecon/nf-core-viralrecon-2.6.0/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
+        echo "nextflow run /data/ucct/bi/pipelines/nf-core-viralrecon/nf-core-viralrecon-2.6.0/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
         echo "          -c ../${CONFIG_FILE} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          -params-file ../${PARAMS_FILE} \\\\" >> ${FOLDER_NAME}/lablog
         echo "          --input samplesheet_${ref}.csv \\\\" >> ${FOLDER_NAME}/lablog

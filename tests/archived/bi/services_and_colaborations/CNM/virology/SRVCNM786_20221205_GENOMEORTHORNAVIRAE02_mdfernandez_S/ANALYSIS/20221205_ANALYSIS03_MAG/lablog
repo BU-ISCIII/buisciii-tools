@@ -17,11 +17,11 @@ cat <<EOF > mag.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/nf-core-mag-2.1.1/workflow/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-mag-2.1.1/workflow/main.nf \\
           -c ../../DOC/mag.config \\
           --input '00-reads/*_R{1,2}.fastq.gz' \\
           --outdir $(date '+%Y%m%d')_mag \\
-          --kraken2_db /data/bi/references/kraken/minikraken_8GB_20200312.tgz \\
+          --kraken2_db /data/ucct/bi/references/kraken/minikraken_8GB_20200312.tgz \\
           --skip_busco --skip_spades --skip_spadeshybrid --skip_megahit --skip_prodigal --skip_binning \\
           -resume
 EOF

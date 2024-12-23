@@ -18,6 +18,6 @@ nextflow run /scratch/bi/pipelines/BU_ISCIII-bacterial-assembly/main.nf \
           --gram + \
           --reference_outdir ../../REFERENCES \
 	  --save_trimmed false \
-          --kmerfinder_bacteria_database '/data/bi/references/kmerfinder/20190108_stable_dirs/bacteria' \
-          --reference_ncbi_bacteria '/data/bi/references/bacteria/latest_db/assembly_summary_bacteria.txt' \
+          --kmerfinder_bacteria_database '/data/ucct/bi/references/kmerfinder/20190108_stable_dirs/bacteria' \
+          --reference_ncbi_bacteria '/data/ucct/bi/references/bacteria/latest_db/assembly_summary_bacteria.txt' \
           -resume

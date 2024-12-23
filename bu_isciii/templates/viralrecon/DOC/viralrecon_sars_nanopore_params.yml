@@ -2,10 +2,10 @@ platform: 'nanopore'
 protocol: 'amplicon'
 artic_scheme: 'nCoV-2019'
 primer_set_version: 5
-fasta: '/data/bi/references/virus/2019-nCoV/primer_schemes/nCoV-2019/V5/ESIB-EQA.reference.fasta'
-primer_bed: '/data/bi/references/virus/2019-nCoV/primer_schemes/nCoV-2019/V5/ESIB-EQA.primer.bed'
+fasta: '/data/ucct/bi/references/virus/2019-nCoV/primer_schemes/nCoV-2019/V5/ESIB-EQA.reference.fasta'
+primer_bed: '/data/ucct/bi/references/virus/2019-nCoV/primer_schemes/nCoV-2019/V5/ESIB-EQA.primer.bed'
 primer_fasta: '../../RAW/ESIB_EQA_2023.SARS1/ESIB_EQA_2023.SARS1.primers.fasta'
-kraken2_db: '/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz'
+kraken2_db: '/data/ucct/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz'
 nextclade_dataset_name: 'sars-cov-2'
 nextclade_dataset: false
 nextclade_dataset_tag: '2023-02-25T12:00:00Z'

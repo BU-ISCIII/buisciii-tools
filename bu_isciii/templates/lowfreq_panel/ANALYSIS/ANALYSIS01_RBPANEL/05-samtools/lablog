@@ -22,7 +22,7 @@ SAMPLE_LIST=(\$(<$samples_file))
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 
 mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools mpileup -A -d 20000 -Q 0 -f /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ${scratch_dir}/../04-mapping/\${SAMPLE}/\${SAMPLE}_sorted.bam > \${SAMPLE}/\${SAMPLE}.pileup
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools mpileup -A -d 20000 -Q 0 -f /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ${scratch_dir}/../04-mapping/\${SAMPLE}/\${SAMPLE}_sorted.bam > \${SAMPLE}/\${SAMPLE}.pileup
 
 EOF
 
