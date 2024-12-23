@@ -6,6 +6,7 @@ do
 SAMPLE_ID=$(echo ${in})
 TOTAL_READS=$(grep '1-initial' ${in}/tables/READ_COUNTS.txt | cut -f2)
 MAPPEDREADS=$(grep '3-match' ${in}/tables/READ_COUNTS.txt | cut -f2)
+PCTMAPPED=$(awk "BEGIN {printf \"%.2f\", ($MAPPEDREADS/$TOTAL_READS)*100}")
 FLU_TYPE=$(paste <(grep '4-[A-C]_MP' ${in}/tables/READ_COUNTS.txt | cut -f1 | cut -d '_' -f1 | cut -d '-' -f2) <(grep '4-[A-B]_HA' ${in}/tables/READ_COUNTS.txt | cut -f1 | cut -d '_' -f3 | cut -d '-' -f2) <(grep '4-[A-B]_NA' ${in}/tables/READ_COUNTS.txt | cut -f1 | cut -d '_' -f3) | tr '\t' '_')
 HA=$(grep '4-[A-C]_HA' ${in}/tables/READ_COUNTS.txt | cut -f2)
 MP=$(grep '4-[A-C]_MP' ${in}/tables/READ_COUNTS.txt | cut -f2)
