@@ -2,6 +2,6 @@
 
 mkdir logs
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat ../samples_id.txt | while read in; do echo "mkdir $in; srun --partition short_idx --chdir $scratch_dir --output logs/FASTQC.${in}.%j.log singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/fastqc:0.11.9--hdfd78af_1 fastqc -o ${scratch_dir}/$in --nogroup -t 8 -k 8 ${scratch_dir}/../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ${scratch_dir}/../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz &"; done > _01_preprofastqc.sh

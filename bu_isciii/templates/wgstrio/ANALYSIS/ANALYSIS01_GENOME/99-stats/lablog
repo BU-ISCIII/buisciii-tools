@@ -1,6 +1,6 @@
 # module load singularity
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 mkdir logs
 
 cat ../samples_id.txt | xargs -I @@ echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir ${scratch_dir} --output logs/PICARDHSMETRICS.@@.%j.log --job-name PICARDHSMETRICS singularity exec -B ${scratch_dir}/../../../ -B /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/ /data/ucct/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectHsMetrics -R /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37_decoy.fasta -BI ${scratch_dir}/../../../REFERENCES/exomiser_exome_mod.interval_list -TI ${scratch_dir}/../../../REFERENCES/exomiser_exome_mod.interval_list -I ${scratch_dir}/../01-sarek/preprocessing/recalibrated/@@/@@.recal.cram -O ${scratch_dir}/@@_hsMetrics.out -VALIDATION_STRINGENCY LENIENT &" > _01_picardHsMetrics.sh

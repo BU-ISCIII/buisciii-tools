@@ -51,7 +51,7 @@ cat samples_id.txt | while read in; do
 	echo "${in},run1,ILLUMINA,00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,"
 done >> samplesheet.csv
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 # slurm sbatch file setup
 cat <<EOF > taxprofiler.sbatch
