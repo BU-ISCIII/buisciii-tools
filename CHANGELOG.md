@@ -4,7 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.X.Xdev] - 2024-0X-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.X
+## [2.X.Xhot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.3
+
+### Credits
+
+Code contributions to the hotfix:
+
+### Template fixes and updates
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+## [2.2.3] - 2024-12-23 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.3
 
 ### Credits
 
@@ -16,6 +36,11 @@ Code contributions to the new version:
 ### Template fixes and updates
 
 - Updated sftp_user.json, added the locus-tag option for the PROKKA process in the bacass config file and changed new_service.py so that integrity is checked only for the samples of interest [#363](https://github.com/BU-ISCIII/buisciii-tools/pull/363).
+- Replaced /data/bi/ by /data/ucct/bi/ [#380](https://github.com/BU-ISCIII/buisciii-tools/pull/380).
+- Updated bacass version in all pertinent files [#380](https://github.com/BU-ISCIII/buisciii-tools/pull/380).
+- Updated read length variable definition when creating the mapping_illumina.tab file [#380](https://github.com/BU-ISCIII/buisciii-tools/pull/380).
+- Updated create_irma_stats.sh to include %mapped_reads [#380](https://github.com/BU-ISCIII/buisciii-tools/pull/380).
+- Changed "Buenas" by "Estimado/a" in email.j2 [#380](https://github.com/BU-ISCIII/buisciii-tools/pull/380).
 
 ### Modules
 
