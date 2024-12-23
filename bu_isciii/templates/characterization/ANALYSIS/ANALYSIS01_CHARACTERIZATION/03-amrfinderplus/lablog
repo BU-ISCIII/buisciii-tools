@@ -2,7 +2,7 @@
 
 # Only works with assemblies, prior to this you must have executed assembly pipeline
 
-scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+scratch_dir=$(echo $(pwd) | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
 
 mkdir logs	
 

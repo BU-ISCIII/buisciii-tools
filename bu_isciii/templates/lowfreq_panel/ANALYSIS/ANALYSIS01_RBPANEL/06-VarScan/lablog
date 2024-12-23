@@ -22,7 +22,7 @@ SAMPLE_LIST=(\$(<$samples_file))
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 
 mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/varscan:2.4.4--hdfd78af_1 varscan mpileup2cns ${scratch_dir}/../05-samtools/\${SAMPLE}/\${SAMPLE}.pileup --min-var-freq 0.05 --p-value 0.99 --variants --output-vcf 1 > \${SAMPLE}/\${SAMPLE}.vcf
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/varscan:2.4.4--hdfd78af_1 varscan mpileup2cns ${scratch_dir}/../05-samtools/\${SAMPLE}/\${SAMPLE}.pileup --min-var-freq 0.05 --p-value 0.99 --variants --output-vcf 1 > \${SAMPLE}/\${SAMPLE}.vcf
 bgzip \${SAMPLE}/\${SAMPLE}.vcf
 tabix \${SAMPLE}/\${SAMPLE}.vcf.gz
 EOF

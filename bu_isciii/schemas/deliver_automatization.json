@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "destination": {
-      "example": "/data/bi/sftp/Labvirusres",
+      "example": "/data/ucct/bi/sftp/Labvirusres",
       "description": "Folder at which the command will be executed",
       "type": "string"
     },
@@ -24,7 +24,7 @@
       "type": "string"
     },
     "source": {
-      "example": "/data/bi/services_and_colaborations/CNM/virologia/",
+      "example": "/data/ucct/bi/services_and_colaborations/CNM/virologia/",
       "description": "Folder from which the files are comming from",
       "type": "string"
     },

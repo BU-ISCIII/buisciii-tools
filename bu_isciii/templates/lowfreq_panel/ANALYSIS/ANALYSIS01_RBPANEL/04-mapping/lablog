@@ -24,9 +24,9 @@ SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 echo \$SAMPLE
 
 mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/bwa:0.7.17--he4a0461_11 bwa mem -t 4 /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ${scratch_dir}/../02-preprocessing/\$SAMPLE/\${SAMPLE}_R1_filtered.fastq.gz ${scratch_dir}/../02-preprocessing/\$SAMPLE/\${SAMPLE}_R2_filtered.fastq.gz | singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools view -bS -o ${scratch_dir}/\$SAMPLE/\${SAMPLE}.bam -
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools sort ${scratch_dir}/\${SAMPLE}/\${SAMPLE}.bam -T ${scratch_dir}/\${SAMPLE}_sorted -o ${scratch_dir}/\${SAMPLE}/\${SAMPLE}_sorted.bam
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools index ${scratch_dir}/\${SAMPLE}/\${SAMPLE}_sorted.bam
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bwa:0.7.17--he4a0461_11 bwa mem -t 4 /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ${scratch_dir}/../02-preprocessing/\$SAMPLE/\${SAMPLE}_R1_filtered.fastq.gz ${scratch_dir}/../02-preprocessing/\$SAMPLE/\${SAMPLE}_R2_filtered.fastq.gz | singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools view -bS -o ${scratch_dir}/\$SAMPLE/\${SAMPLE}.bam -
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools sort ${scratch_dir}/\${SAMPLE}/\${SAMPLE}.bam -T ${scratch_dir}/\${SAMPLE}_sorted -o ${scratch_dir}/\${SAMPLE}/\${SAMPLE}_sorted.bam
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools index ${scratch_dir}/\${SAMPLE}/\${SAMPLE}_sorted.bam
 rm \${SAMPLE}/\${SAMPLE}.bam
 
 EOF

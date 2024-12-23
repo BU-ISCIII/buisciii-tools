@@ -21,11 +21,11 @@ nextflow run /scratch/bi/pipelines/nf-core-viralrecon-2.5/workflow/main.nf \\
           -c ./viralrecon_metagenomic.config \\
           --input samplesheet_RotavirusA_11segments.csv \\
           --outdir RotavirusA_11segments_20221205_viralrecon_mapping \\
-          --fasta /data/bi/references/virus/reoviridae/RotavirusA_11segments.fasta \\
-          --gff /data/bi/references/virus/reoviridae/RotavirusA_11segments.gff \\
+          --fasta /data/ucct/bi/references/virus/reoviridae/RotavirusA_11segments.fasta \\
+          --gff /data/ucct/bi/references/virus/reoviridae/RotavirusA_11segments.gff \\
           --platform illumina \\
           --protocol metagenomic \\
-          --kraken2_db "/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz" \\
+          --kraken2_db "/data/ucct/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz" \\
           --variant_caller ivar \\
           --consensus_caller bcftools \\
           --skip_pangolin \\

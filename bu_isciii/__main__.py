@@ -252,8 +252,8 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
     "-t",
     "--tmp_dir",
     type=click.Path(),
-    default="/data/bi/scratch_tmp/bi/",
-    help="Directory to which the files will be transfered for execution. Default: /data/bi/scratch_tmp/bi/",
+    default="/data/ucct/bi/scratch_tmp/bi/",
+    help="Directory to which the files will be transfered for execution. Default: /data/ucct/bi/scratch_tmp/bi/",
 )
 @click.option(
     "-d",
@@ -262,8 +262,8 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
     multiple=False,
     help=(
         "Direction of the rsync command. service_to_scratch "
-        "from /data/bi/service to /data/bi/scratch_tmp/bi/."
-        "scratch_to_service: From /data/bi/scratch_tmp/bi/ to /data/bi/service"
+        "from /data/ucct/bi/service to /data/ucct/bi/scratch_tmp/bi/."
+        "scratch_to_service: From /data/ucct/bi/scratch_tmp/bi/ to /data/ucct/bi/service"
     ),
 )
 @click.pass_context
@@ -411,7 +411,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
     "-t",
     "--tmp_dir",
     type=click.Path(),
-    default="/data/bi/scratch_tmp/bi/",
+    default="/data/ucct/bi/scratch_tmp/bi/",
     help="Absolute path to the scratch directory containing the service.",
 )
 @click.pass_context

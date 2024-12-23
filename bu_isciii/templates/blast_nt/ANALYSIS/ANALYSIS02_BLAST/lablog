@@ -6,8 +6,8 @@ mkdir logs
 # Location of assemblies to a variable so it only has to be changed here
 LOCATION=../*/*/assembly/*/*
 # Other databases: 
-# /data/bi/references/BLAST_dbs/nt_20211025/nt
-BLAST_DATABASE="/data/bi/references/virus/BLAST/all_virus.fasta"
+# /data/ucct/bi/references/BLAST_dbs/nt_20211025/nt
+BLAST_DATABASE="/data/ucct/bi/references/BLAST_dbs/viral_ncbi/viral_genomes_ncbi"
 
 # if there are scaffolds, uncompress the scaffolds in its dir (zcat for decompression)
 # if there contigs and no scaffolds, uncompress the contigs as scaffolds in its dir
@@ -27,7 +27,7 @@ cat ../samples_id.txt | while read in; do
 done 
 
 # NOTE3: change the -query flag to meet your requirements
-cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 200G --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_%%_%j.log --job-name BLASTN_%% singularity exec -B ${scratch_dir}/../../ -B /data/bi/references/virus/BLAST/ /data/bi/pipelines/singularity-images/blast:2.11.0--pl5262h3289130_1 blastn -num_threads 10 -db ${BLAST_DATABASE} -query ${scratch_dir}/%%/%%.scaffolds.fa -out ${scratch_dir}/%%/%%_blast.tsv -outfmt '6 qseqid stitle qaccver saccver pident length mismatch gaps qstart qend sstart send evalue bitscore slen qlen qcovs' &" > _01_blast.sh
+cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 200G --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_%%_%j.log --job-name BLASTN_%% singularity exec -B ${scratch_dir}/../../ -B /data/ucct/bi/references/BLAST_dbs/viral_ncbi/ /data/ucct/bi/pipelines/singularity-images/blast:2.11.0--pl5262h3289130_1 blastn -num_threads 10 -db ${BLAST_DATABASE} -query ${scratch_dir}/%%/%%.scaffolds.fa -out ${scratch_dir}/%%/%%_blast.tsv -outfmt '6 qseqid stitle qaccver saccver pident length mismatch gaps qstart qend sstart send evalue bitscore slen qlen qcovs' &" > _01_blast.sh
 
 # Filtering criteria:
     # %refCovered > 0.7
@@ -71,5 +71,5 @@ echo "rm header" >> _03_gather_results_add_header.sh
 # 20: %refCovered: length/slen
 
 # conda activate 2excel
-cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition short_idx --mem 10G --time 1:00:00 --output logs/2excel_%%.log --job-name 2excel_%% python /data/bi/pipelines/utilities/export_excel_from_csv.py --input_file %%/%%_blast_filt.tsv --delimiter '\t' --output_filename %%/%%_blast_filt --it_has_index --it_has_header" > _04_to_excel.sh
-echo "srun --chdir ${scratch_dir} --partition short_idx --mem 10G --time 1:00:00 --output logs/2excel_all.log --job-name 2excel_all python /data/bi/pipelines/utilities/export_excel_from_csv.py --input_file all_samples_filtered_BLAST_results.tsv --delimiter '\t' --output_filename all_samples_filtered_BLAST_results --it_has_index --it_has_header" >> _04_to_excel.sh
+cat ../samples_id.txt | xargs -I %% echo "srun --chdir ${scratch_dir} --partition short_idx --mem 10G --time 1:00:00 --output logs/2excel_%%.log --job-name 2excel_%% python /data/ucct/bi/pipelines/utilities/export_excel_from_csv.py --input_file %%/%%_blast_filt.tsv --delimiter '\t' --output_filename %%/%%_blast_filt --it_has_index --it_has_header" > _04_to_excel.sh
+echo "srun --chdir ${scratch_dir} --partition short_idx --mem 10G --time 1:00:00 --output logs/2excel_all.log --job-name 2excel_all python /data/ucct/bi/pipelines/utilities/export_excel_from_csv.py --input_file all_samples_filtered_BLAST_results.tsv --delimiter '\t' --output_filename all_samples_filtered_BLAST_results --it_has_index --it_has_header" >> _04_to_excel.sh

@@ -1,6 +1,6 @@
 #conda activate python3
-python3 /data/bi/pipelines/bacterial-qc/parse_ariba.py --path ../02-ariba/summary/out_summary_card.csv --database card --output_bn ariba_card.bn --output_csv ariba_card.csv
-python3 /data/bi/pipelines/bacterial-qc/parse_ariba.py --path ../02-ariba/summary/out_summary_plasmidfinder.csv --database plasmidfinder --output_bn ariba_plasmidfinder.bn --output_csv ariba_plasmidfinder.csv
-python3 /data/bi/pipelines/bacterial-qc/parse_ariba.py --path ../02-ariba/summary/out_summary_vfdb_full.csv --database vfdb_full --output_bn ariba_vfdb_full.bn --output_csv ariba_vfdb_full.csv
+python3 /data/ucct/bi/pipelines/bacterial-qc/parse_ariba.py --path ../02-ariba/summary/out_summary_card.csv --database card --output_bn ariba_card.bn --output_csv ariba_card.csv
+python3 /data/ucct/bi/pipelines/bacterial-qc/parse_ariba.py --path ../02-ariba/summary/out_summary_plasmidfinder.csv --database plasmidfinder --output_bn ariba_plasmidfinder.bn --output_csv ariba_plasmidfinder.csv
+python3 /data/ucct/bi/pipelines/bacterial-qc/parse_ariba.py --path ../02-ariba/summary/out_summary_vfdb_full.csv --database vfdb_full --output_bn ariba_vfdb_full.bn --output_csv ariba_vfdb_full.csv
 
 paste <(echo "sample_id") <(cat ../02-ariba/run/*/out_pubmlst_*_run/mlst_report.tsv | head -n1) > ariba_mlst_full.tsv; cat ../samples_id.txt | while read in; do paste <(echo ${in}) <(tail -n1 ../02-ariba/run/${in}/out_pubmlst_${in}_run/mlst_report.tsv); done >> ariba_mlst_full.tsv

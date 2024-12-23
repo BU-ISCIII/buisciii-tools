@@ -16,7 +16,7 @@ cat <<EOF > multiqc.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/multiqc:1.9--py_1 multiqc -d . --config multiqc_config.yaml
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/multiqc:1.9--py_1 multiqc -d . --config multiqc_config.yaml
 
 EOF
 

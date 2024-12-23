@@ -25,11 +25,11 @@ cat <<EOF > mag.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-3.0.3/3_0_3/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-mag/nf-core-mag-3.0.3/3_0_3/main.nf \\
           -c ../../DOC/mag.config \\
           --input samplesheet.csv \\
           --outdir $(date '+%Y%m%d')_mag \\
-          --kraken2_db /data/bi/references/kraken/minikraken_8GB_20200312.tgz \\
+          --kraken2_db /data/ucct/bi/references/kraken/minikraken_8GB_20200312.tgz \\
           --skip_busco --skip_spades --skip_spadeshybrid --skip_megahit --skip_prodigal --skip_binning \\
           -resume
 EOF

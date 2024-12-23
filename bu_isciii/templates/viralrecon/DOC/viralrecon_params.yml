@@ -1,6 +1,6 @@
 platform: 'illumina'
 protocol: 'metagenomic'
-kraken2_db: '/data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz'
+kraken2_db: '/data/ucct/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz'
 variant_caller: 'ivar' 
 consensus_caller: 'bcftools'
 skip_pangolin: true

@@ -3,10 +3,10 @@
 mkdir logs
 mkdir assemblies
 mkdir MLVA_output
-scratch_dir=$(pwd | sed 's|/data/bi/scratch_tmp|/scratch|g')
+scratch_dir=$(pwd | sed 's|/data/ucct/bi/scratch_tmp|/scratch|g')
 cp ../../*_ASSEMBLY/03-assembly/unicycler/*.fasta* assemblies/
 gzip -d assemblies/*.fasta.gz
-available_primers=$(ls /data/bi/references/MLVA/*primer* | rev | cut -d "/" -f1 | rev | cut -d "_" -f1)
+available_primers=$(ls /data/ucct/bi/references/MLVA/*primer* | rev | cut -d "/" -f1 | rev | cut -d "_" -f1)
 
 echo "Available primers:"
 select primer in $available_primers; do
@@ -18,6 +18,6 @@ select primer in $available_primers; do
     fi
 done
 
-primer_file=$(ls /data/bi/references/MLVA/${primer}*)
+primer_file=$(ls /data/ucct/bi/references/MLVA/${primer}*)
 
-echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/MLVA.log --job-name MLVA python /data/bi/pipelines/mlva/MLVA_finder.py -c -i assemblies -o MLVA_output -p ${primer_file} --full-locus-name --predicted-PCR-size-table --flanking-seq 20 &"  > _01_mlva.sh
+echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/MLVA.log --job-name MLVA python /data/ucct/bi/pipelines/mlva/MLVA_finder.py -c -i assemblies -o MLVA_output -p ${primer_file} --full-locus-name --predicted-PCR-size-table --flanking-seq 20 &"  > _01_mlva.sh

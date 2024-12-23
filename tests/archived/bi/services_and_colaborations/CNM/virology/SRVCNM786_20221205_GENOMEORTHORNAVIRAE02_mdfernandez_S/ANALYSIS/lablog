@@ -24,8 +24,8 @@ do
         do
             arr=($samples); echo "${arr[0]},00-reads/${arr[0]}_R1.fastq.gz,00-reads/${arr[0]}_R2.fastq.gz" >> ${FOLDER_NAME}/samplesheet_${ref}.csv
         done
-        REF_FASTA=$(find /data/bi/references/virus/ -name ${ref}.fasta)
-        REF_GFF=$(find /data/bi/references/virus/ -name ${ref}.gff)
+        REF_FASTA=$(find /data/ucct/bi/references/virus/ -name ${ref}.fasta)
+        REF_GFF=$(find /data/ucct/bi/references/virus/ -name ${ref}.gff)
         echo "cat <<EOF > ${ref}_viralrecon.sbatch" >> ${FOLDER_NAME}/lablog
         echo "#!/bin/sh" >> ${FOLDER_NAME}/lablog
         echo "#SBATCH --ntasks 1" >> ${FOLDER_NAME}/lablog
