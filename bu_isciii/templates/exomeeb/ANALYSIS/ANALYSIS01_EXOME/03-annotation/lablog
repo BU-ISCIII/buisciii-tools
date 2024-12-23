@@ -3,7 +3,7 @@
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP_ENSG_gene_GRCh37.txt .
+ln -s /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP_ENSG_gene_GRCh37.txt .
 mkdir -p vep
 mkdir -p exomiser
 mkdir -p logs
@@ -15,14 +15,14 @@ echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> _01_bcftools_query.sh
 
 # 2-3. Create variant table.
 
-echo "singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ${scratch_dir}/vep/variants_fil_mod.vcf > ${scratch_dir}/vep/variants.table" >> _01_bcftools_query.sh
+echo "singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ${scratch_dir}/vep/variants_fil_mod.vcf > ${scratch_dir}/vep/variants.table" >> _01_bcftools_query.sh
 echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table" >> _01_bcftools_query.sh
 
 echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
 
 ## 4-5. Lablog for annotating whole genome samples using Variant Effect Predictor (VEP).
 
-echo "srun --partition short_idx --mem 100G --time 4:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP singularity exec -B /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/ -B /data/bi/references/eukaria/homo_sapiens/cache_vep/homo_sapiens -B /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/ -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/ensembl-vep:103.1--pl5262h4a94de4_2 vep --fasta /data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ${scratch_dir}/vep/variants_fil_mod.vcf -o ${scratch_dir}/vep/vep_annot.vcf --cache --offline --dir_cache /data/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --dir_plugins /data/bi/references/eukaria/homo_sapiens/cache_vep/Plugins/ --assembly GRCh37 --tab --plugin dbNSFP,/data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP4.1a_grch37.gz,clinvar_id,clinvar_trait,clinvar_OMIM_id,clinvar_Orphanet_id,HGVSc_snpEff,HGVSp_snpEff,SIFT_score,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_pred,MutationTaster_score,MutationTaster_pred,MutationAssessor_score,MutationAssessor_pred,FATHMM_score,FATHMM_pred,PROVEAN_score,PROVEAN_pred,VEST4_score,MetaSVM_score,MetaSVM_pred,MetaLR_score,MetaLR_pred,CADD_raw,CADD_phred,CADD_raw_hg19,CADD_phred_hg19,GERP++_NR,GERP++_RS,phyloP100way_vertebrate,phastCons100way_vertebrate &" > _02_vep_annotation.sh
+echo "srun --partition short_idx --mem 100G --time 4:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP singularity exec -B /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/ -B /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/homo_sapiens -B /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/ -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/ensembl-vep:103.1--pl5262h4a94de4_2 vep --fasta /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ${scratch_dir}/vep/variants_fil_mod.vcf -o ${scratch_dir}/vep/vep_annot.vcf --cache --offline --dir_cache /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --dir_plugins /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/Plugins/ --assembly GRCh37 --tab --plugin dbNSFP,/data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP4.1a_grch37.gz,clinvar_id,clinvar_trait,clinvar_OMIM_id,clinvar_Orphanet_id,HGVSc_snpEff,HGVSp_snpEff,SIFT_score,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_pred,MutationTaster_score,MutationTaster_pred,MutationAssessor_score,MutationAssessor_pred,FATHMM_score,FATHMM_pred,PROVEAN_score,PROVEAN_pred,VEST4_score,MetaSVM_score,MetaSVM_pred,MetaLR_score,MetaLR_pred,CADD_raw,CADD_phred,CADD_raw_hg19,CADD_phred_hg19,GERP++_NR,GERP++_RS,phyloP100way_vertebrate,phastCons100way_vertebrate &" > _02_vep_annotation.sh
 
 echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" > _03_merge_data1.sh
 echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_merge_data1.sh
@@ -49,7 +49,7 @@ sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
 # THE FILE "spring.log" MUST BE DELETED IN THE CORRESPONDING NODE
 echo "java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux_06_exomiser_exome.sh
-echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${scratch_dir}/aux_06_exomiser_exome.sh &" > _06_exomiser_exome.sh
+echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/ucct/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${scratch_dir}/aux_06_exomiser_exome.sh &" > _06_exomiser_exome.sh
 
 # annot_all table is huge, lets shrink it a little bit
 echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _07_gzip_table.sh

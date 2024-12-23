@@ -53,14 +53,14 @@ cat <<EOF > _01_emmtyper.sbatch
 # create results folder
 mkdir -p 01-typing
 mkdir -p 01-typing/tmps
-blastdb_path=/data/bi/references/cdc_emm_blastdb/20240509
+blastdb_path=/data/ucct/bi/references/cdc_emm_blastdb/20240509
 
 # Run emmtyper
 singularity exec \\
     --bind ${scratch_dir} \\
     --bind ${scratch_dir}/../../ \\
     --bind  \$blastdb_path \\
-    /data/bi/pipelines/singularity-images/singularity-emmtyper.0.2.0--py_0 emmtyper \\
+    /data/ucct/bi/pipelines/singularity-images/singularity-emmtyper.0.2.0--py_0 emmtyper \\
     -w blast \\
     --keep \\
     --blast_db "\${blastdb_path}/cdc_emm_database" \\

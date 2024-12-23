@@ -4,4 +4,4 @@ mkdir logs
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-cat ../samples_id.txt | while read in; do echo "mkdir $in; srun --partition short_idx --cpus-per-task 8 --time 01:00:00 --chdir $scratch_dir --output logs/FASTQC.${in}.%j.log singularity exec -B ${scratch_dir}/../../../ -B /srv/fastq_repo/ /data/bi/pipelines/singularity-images/fastqc:0.11.9--hdfd78af_1 fastqc -o ${scratch_dir}/$in --nogroup -t 8 -k 8 ${scratch_dir}/../00-reads/"$in"_R1.fastq.gz ${scratch_dir}/../00-reads/"$in"_R2.fastq.gz &"; done > _01_rawfastqc.sh
+cat ../samples_id.txt | while read in; do echo "mkdir $in; srun --partition short_idx --cpus-per-task 8 --time 01:00:00 --chdir $scratch_dir --output logs/FASTQC.${in}.%j.log singularity exec -B ${scratch_dir}/../../../ -B /srv/fastq_repo/ /data/ucct/bi/pipelines/singularity-images/fastqc:0.11.9--hdfd78af_1 fastqc -o ${scratch_dir}/$in --nogroup -t 8 -k 8 ${scratch_dir}/../00-reads/"$in"_R1.fastq.gz ${scratch_dir}/../00-reads/"$in"_R2.fastq.gz &"; done > _01_rawfastqc.sh

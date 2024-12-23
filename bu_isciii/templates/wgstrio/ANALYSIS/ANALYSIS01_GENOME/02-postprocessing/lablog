@@ -6,17 +6,17 @@ scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 mkdir -p logs
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTSNPS.log --job-name SELECTSNPS singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTSNPS.log --job-name SELECTSNPS singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
      -V ${scratch_dir}/../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \
      -select-type SNP \
      -O ${scratch_dir}/snps.vcf.gz &" > _01_separate_snps_indels.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTINDELS.log --job-name SELECTINDELS singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/SELECTINDELS.log --job-name SELECTINDELS singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk SelectVariants \
     -V ${scratch_dir}/../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \
     -select-type INDEL \
     -O ${scratch_dir}/indels.vcf.gz &" >> _01_separate_snps_indels.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILSNP.log --job-name FILSNP singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILSNP.log --job-name FILSNP singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
 	-V ${scratch_dir}/snps.vcf.gz \
 	-filter 'QD < 2.0' --filter-name 'QD2' \
 	-filter 'QUAL < 30.0' --filter-name 'QUAL30' \
@@ -27,7 +27,7 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 	-filter 'ReadPosRankSum < -8.0' --filter-name 'ReadPosRankSum-8' \
 	-O ${scratch_dir}/snps_filtered.vcf.gz &" > _02_filter.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILINDEL.log --job-name FILINDEL singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/FILINDEL.log --job-name FILINDEL singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk VariantFiltration \
 	-V ${scratch_dir}/indels.vcf.gz \
 	-filter 'QD < 2.0' --filter-name 'QD2' \
 	-filter 'QUAL < 30.0' --filter-name 'QUAL30' \
@@ -35,7 +35,7 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 	-filter 'ReadPosRankSum < -20.0' --filter-name 'ReadPosRankSum-20' \
 	-O ${scratch_dir}/indels_filtered.vcf.gz &" >> _02_filter.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEVCF.log --job-name MERGEVCF singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk MergeVcfs \
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEVCF.log --job-name MERGEVCF singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.2.0.0--hdfd78af_1 gatk MergeVcfs \
 	-I ${scratch_dir}/snps_filtered.vcf.gz \
 	-I ${scratch_dir}/indels_filtered.vcf.gz \
 	-O ${scratch_dir}/variants_fil.vcf.gz &" > _03_merge_vcfs.sh

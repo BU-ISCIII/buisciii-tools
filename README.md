@@ -202,13 +202,13 @@ Options:
   -a, --ask_path                  Please ask for service path.
   -t, --tmp_dir PATH              Directory to which the files will be
                                   transfered for execution. Default:
-                                  /data/bi/scratch_tmp/bi/
+                                  /data/ucct/bi/scratch_tmp/bi/
   -d, --direction [service_to_scratch|scratch_to_service|remove_scratch]
                                   Direction of the rsync command.
-                                  service_to_scratch from /data/bi/service to
-                                  /data/bi/scratch_tmp/bi/.scratch_to_service:
-                                  From /data/bi/scratch_tmp/bi/ to
-                                  /data/bi/service
+                                  service_to_scratch from /data/ucct/bi/service to
+                                  /data/ucct/bi/scratch_tmp/bi/.scratch_to_service:
+                                  From /data/ucct/bi/scratch_tmp/bi/ to
+                                  /data/ucct/bi/service
   --help                          Show this message and exit.
 ```
 

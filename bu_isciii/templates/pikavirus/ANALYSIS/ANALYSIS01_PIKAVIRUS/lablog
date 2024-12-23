@@ -20,7 +20,7 @@ cat <<EOF > pikavirus.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/pikavirus/pikavirus-1.0dev/main.nf \\
+nextflow run /data/ucct/bi/pipelines/pikavirus/pikavirus-1.0dev/main.nf \\
           -c ../../DOC/hpc_slurm_pikavirus.config \\
           --input samplesheet.csv \\
           --kraken_scouting false \\

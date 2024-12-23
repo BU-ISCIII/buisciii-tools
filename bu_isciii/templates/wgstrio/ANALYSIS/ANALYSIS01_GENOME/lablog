@@ -44,15 +44,15 @@ cat <<EOF > sarek.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/nf-core-sarek/nf-core-sarek_3.4.4/3_4_4/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-sarek/nf-core-sarek_3.4.4/3_4_4/main.nf \\
           -c ../../DOC/hpc_slurm_sarek.config \\
           --input 'samplesheet.csv' \\
           --outdir 01-sarek \\
           --genome GATK.GRCh37 \\
-          --dbsnp '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz' \\
-              --dbsnp_tbi '/data/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz.tbi' \\
+          --dbsnp '/data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz' \\
+              --dbsnp_tbi '/data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz.tbi' \\
               --igenomes_ignore \\
-              --igenomes_base '/data/bi/references/igenomes/' \\
+              --igenomes_base '/data/ucct/bi/references/igenomes/' \\
               --tools 'haplotypecaller' \\
           --joint_germline \\
                   -resume

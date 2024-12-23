@@ -1,4 +1,4 @@
-fasta: '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/Homo_sapiens.GRCh38.dna.toplevel.fa'
-gtf: '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/gene/Homo_sapiens.GRCh38.98.gtf'
-star_index: '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/star_V2.7.10a/'
-salmon_index: '/data/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/salmon_v1.9.0'
+fasta: '/data/ucct/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/Homo_sapiens.GRCh38.dna.toplevel.fa'
+gtf: '/data/ucct/bi/references/eukaria/homo_sapiens/hg38/ensemble/gene/Homo_sapiens.GRCh38.98.gtf'
+star_index: '/data/ucct/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/star_V2.7.10a/'
+salmon_index: '/data/ucct/bi/references/eukaria/homo_sapiens/hg38/ensemble/genome/salmon_v1.9.0'

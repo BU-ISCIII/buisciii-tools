@@ -1,6 +1,6 @@
 {
     "global": {
-        "data_path": "tests/data/bi",
+        "data_path": "tests/data/ucct/bi",
         "archived_path": "tests/archived/bi",
         "yaml_conf_path": "~/buisciii_config.yml"
     },

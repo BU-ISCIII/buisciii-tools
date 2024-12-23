@@ -1,4 +1,4 @@
-fasta: '/data/bi/references/fungi/Candida_tropicalis/GCF_000006335.3_ASM633v3_genomic.fna'
-gtf: '/data/bi/references/fungi/Candida_tropicalis/GCF_000006335.3_ASM633v3_genomic.gff'
-star_index: '/data/bi/references/fungi/Candida_tropicalis/star_V2.7.10a'
-salmon_index: '/data/bi/references/fungi/Candida_tropicalis/salmon_v1.9.0'
+fasta: '/data/ucct/bi/references/fungi/Candida_tropicalis/GCF_000006335.3_ASM633v3_genomic.fna'
+gtf: '/data/ucct/bi/references/fungi/Candida_tropicalis/GCF_000006335.3_ASM633v3_genomic.gff'
+star_index: '/data/ucct/bi/references/fungi/Candida_tropicalis/star_V2.7.10a'
+salmon_index: '/data/ucct/bi/references/fungi/Candida_tropicalis/salmon_v1.9.0'

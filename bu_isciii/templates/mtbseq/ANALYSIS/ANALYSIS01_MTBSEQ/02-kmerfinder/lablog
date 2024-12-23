@@ -4,8 +4,8 @@ scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 mkdir logs
 
-cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --chdir ${scratch_dir} --mem 50G --output logs/KMERFINDER.${in}.%j.log singularity run -B /scratch/bi/ -B /data/bi/references/kmerfinder/20190108_stable_dirs/bacteria /data/bi/pipelines/singularity-images/kmerfinder_v3.0.simg -i ../01-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../01-preprocessing/${in}/${in}_R2_filtered.fastq.gz -o ${scratch_dir}/${in} -db /data/bi/references/kmerfinder/20190108_stable_dirs/bacteria/bacteria.ATG -tax /data/bi/references/kmerfinder/20190108_stable_dirs/bacteria/bacteria.name -x &";done > _01_kmerfinder.sh
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --chdir ${scratch_dir} --mem 50G --output logs/KMERFINDER.${in}.%j.log singularity run -B /scratch/bi/ -B /data/ucct/bi/references/kmerfinder/20190108_stable_dirs/bacteria /data/ucct/bi/pipelines/singularity-images/kmerfinder_v3.0.simg -i ../01-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../01-preprocessing/${in}/${in}_R2_filtered.fastq.gz -o ${scratch_dir}/${in} -db /data/ucct/bi/references/kmerfinder/20190108_stable_dirs/bacteria/bacteria.ATG -tax /data/ucct/bi/references/kmerfinder/20190108_stable_dirs/bacteria/bacteria.name -x &";done > _01_kmerfinder.sh
 
 echo "cat ../samples_id.txt | xargs -I % awk '{FS=\"\t\"} NR==2 {print \$1}' %/results.txt | awk '{count[\$0]++} END{for (i in count) {print count[i], i}}' | sort -nr" > _02_find_common_reference.sh
 
-echo "bash _02_find_common_reference.sh | head -n1 | tr ' ' '\t' | cut -f2 | while read in; do bash /data/bi/references/bacteria/download_reference.sh \${in} ../../../REFERENCES/; done" > _03_download_reference.sh
+echo "bash _02_find_common_reference.sh | head -n1 | tr ' ' '\t' | cut -f2 | while read in; do bash /data/ucct/bi/references/bacteria/download_reference.sh \${in} ../../../REFERENCES/; done" > _03_download_reference.sh
