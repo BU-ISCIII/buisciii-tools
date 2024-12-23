@@ -63,7 +63,7 @@ class NewService:
         self.services_requested = self.resolution_info["resolutions"][0][
             "available_services"
         ]
-        self.service_samples = self.resolution_info.get("samples", None)
+        self.service_samples = self.resolution_info.get("samples")
 
         if ask_path and path is None:
             stderr.print("Directory where you want to create the service folder.")
@@ -103,12 +103,19 @@ class NewService:
         md5_dir = os.path.dirname(md5_file_path)
         os.chdir(md5_dir)
 
+        # Regex pattern to match sample names in .fastq.gz files
+        sample_names_pattern = "|".join(
+            [
+                f"{sample['sample_name']}.*\\.fastq\\.gz"
+                for sample in self.service_samples
+            ]
+        )
+
         # md5sum command
         stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
         try:
-            subprocess.run(
-                ["md5sum", "-c", os.path.basename(md5_file_path)], check=True
-            )
+            cmd = f"grep -E '{sample_names_pattern}' {md5_file_path} | md5sum -c"
+            subprocess.run(cmd, shell=True, check=True, executable="/bin/bash")
             stderr.print("[green]MD5 check passed!")
         except subprocess.CalledProcessError as e:
             stderr.print(f"[red]ERROR: MD5 check failed: {e.stderr}")
@@ -117,7 +124,6 @@ class NewService:
             os.chdir(original_dir)
 
     def create_folder(self):
-        self.check_md5()
         if not self.no_create_folder:
             stderr.print(
                 "[blue]I will create the service folder for " + self.resolution_id + "!"
@@ -251,7 +257,8 @@ class NewService:
         f.close()
 
     def create_new_service(self):
-        if self.service_samples is not None:
+        if len(self.service_samples) > 0:
+            self.check_md5()
             self.create_folder()
             self.copy_template()
             self.create_samples_id()
@@ -270,7 +277,9 @@ class NewService:
             stderr.print(
                 "[yellow]WARN: No samples recorded in service: " + self.resolution_id
             )
-            if bu_isciii.utils.prompt_yn_question("Do you want to proceed?: "):
+            if bu_isciii.utils.prompt_yn_question(
+                "Do you want to proceed?: ", dflt=True
+            ):
                 self.create_folder()
                 self.copy_template()
                 if self.resolution_info["service_state"] != "in_progress":

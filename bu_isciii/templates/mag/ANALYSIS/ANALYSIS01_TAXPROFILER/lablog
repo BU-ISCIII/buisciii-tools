@@ -67,7 +67,7 @@ cat <<EOF > taxprofiler.sbatch
 # module load Nextflow/23.10.0 singularity
 export NXF_OPTS="-Xms500M -Xmx6G"
 
-nextflow run /data/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.1.8 \\
+nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.1.8 \\
     -profile singularity \\
     -c ../../DOC/taxprofiler.config \\
     --input samplesheet.csv \\
@@ -78,7 +78,7 @@ nextflow run /data/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.1.8 \\
     --perform_shortread_qc true \\
     --shortread_qc_tool fastp \\
     --perform_shortread_hostremoval true \\
-    --hostremoval_reference /data/bi/references/eukaria/homo_sapiens/hg38/NCBI/genome/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz \\
+    --hostremoval_reference /data/ucct/bi/references/eukaria/homo_sapiens/hg38/NCBI/genome/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz \\
     --run_kraken2 true \\
     --run_bracken true \\
     --run_centrifuge true \\

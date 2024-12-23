@@ -23,11 +23,11 @@ cat <<EOF > mag_all.sbatch
 # module load Nextflow/23.10.0 singularity
 export NXF_OPTS="-Xms500M -Xmx8G"
 
-nextflow run /data/bi/pipelines/nf-core-mag/nf-core-mag-3.0.3/3_0_3/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-mag/nf-core-mag-3.0.3/3_0_3/main.nf \\
     -c ../../DOC/mag.config \\
     -profile singularity \\
     --input samplesheet.csv \\
-    --kraken2_db '/data/bi/references/kraken/minikraken_8GB_20200312.tgz' \\
+    --kraken2_db '/data/ucct/bi/references/kraken/minikraken_8GB_20200312.tgz' \\
     --skip_spadeshybrid true \\
     --skip_concoct true \\
     --refine_bins_dastool true \\

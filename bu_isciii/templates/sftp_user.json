@@ -55,5 +55,6 @@
     "bioinfoadm": ["test"],
     "s.varona": ["misc"],
     "nlabiod": ["Labarbovirus"],
-    "jmgonzalez": ["Lablegionella"]
+    "jmgonzalez": ["Lablegionella"],
+    "alberto.campoy": ["Labvirusres"]
 }

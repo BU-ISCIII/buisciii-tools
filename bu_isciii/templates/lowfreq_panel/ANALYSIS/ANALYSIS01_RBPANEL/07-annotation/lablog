@@ -20,14 +20,14 @@ SAMPLE_LIST=(\$(<$samples_file))
 SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
 
 mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H ${scratch_dir}/../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
+singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H ${scratch_dir}/../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
 EOF
 
 echo "sbatch bcftools_query.sbatch" > _01_bcftools_query.sh
 
 
 # module load Java/1.8.0_281 R/4.1.0-foss-2021a
-cat ../samples_id.txt | xargs -I @@ echo "mkdir @@;srun --chdir ${scratch_dir} --output logs/KGGSEQ.@@.%j.log --job-name KGGSEQ --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 java -jar -Xmx8g /data/bi/pipelines/kggseq/kggseqhg19/kggseq.jar --no-web --buildver hg19 --vcf-file ../06-VarScan/@@/@@.vcf.gz --db-gene refgene --db-score dbnsfp --genome-annot --db-filter ESP5400,dbsnp141,1kg201305 --rare-allele-freq 1 --mendel-causing-predict best --omim-annot --out @@/@@_annot.txt --no-qc &" > _02_kggseq.sh
+cat ../samples_id.txt | xargs -I @@ echo "mkdir @@;srun --chdir ${scratch_dir} --output logs/KGGSEQ.@@.%j.log --job-name KGGSEQ --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 java -jar -Xmx8g /data/ucct/bi/pipelines/kggseq/kggseqhg19/kggseq.jar --no-web --buildver hg19 --vcf-file ../06-VarScan/@@/@@.vcf.gz --db-gene refgene --db-score dbnsfp --genome-annot --db-filter ESP5400,dbsnp141,1kg201305 --rare-allele-freq 1 --mendel-causing-predict best --omim-annot --out @@/@@_annot.txt --no-qc &" > _02_kggseq.sh
 cat ../samples_id.txt | xargs -I % echo "gunzip %/%_annot.txt.flt.txt.gz" > _03_final_table.sh
 cat ../samples_id.txt | xargs -I % echo 'cp header %/%_header.table && tail -n +2 %/%.table >> %/%_header.table'  >> _03_final_table.sh
 cat ../samples_id.txt | xargs -I % echo "Rscript merge_parse.R %" >> _03_final_table.sh

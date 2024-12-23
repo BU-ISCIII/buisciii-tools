@@ -222,7 +222,7 @@ class BioinfoDoc:
     def load_versions(self):
         """Load and parse the versions.yml file."""
         result = subprocess.run(
-            f"find /data/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'",
+            f"find /data/ucct/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'",
             stdout=subprocess.PIPE,
             text=True,
             shell=True,

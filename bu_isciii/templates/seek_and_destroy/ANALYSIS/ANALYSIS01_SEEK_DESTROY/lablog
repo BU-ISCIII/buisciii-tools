@@ -21,11 +21,11 @@ cat <<EOF > seek_destroy.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/bi/pipelines/seek-destroy-nf/seek-destroy-nf-1.0dev/main.nf  \\
+nextflow run /data/ucct/bi/pipelines/seek-destroy-nf/seek-destroy-nf-1.0dev/main.nf  \\
           -c ../../DOC/seek_destroy.config \\
           --input samplesheet.csv \\
-	  --scout_database /data/bi/references/kraken/minikraken_8GB_20200312.tgz \\
-          --host_database  /data/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz \\
+	  --scout_database /data/ucct/bi/references/kraken/minikraken_8GB_20200312.tgz \\
+          --host_database  /data/ucct/bi/references/eukaria/homo_sapiens/hg38/UCSC/kraken2/kraken2_human.tar.gz \\
           --outdir seek_destroy_results \\
           -resume
 EOF

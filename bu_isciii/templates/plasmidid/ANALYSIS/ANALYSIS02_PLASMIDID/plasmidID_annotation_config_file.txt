@@ -14,24 +14,24 @@
 #DDBBFILE,NANE,P_IDENTITY,P_ALIGNMENT,Q_DIVISOR,Q_SIDE_LR,IS_UNIQUE,DOBLE_UNIQUE,DATABASE_TYPE,COLOR
 
 #INSERTION_SEQUENCES
-#/data/bi/research/20160530_ANTIBIOTICS_PSMP_T/ANALYSIS/PLASMIDID/databases/tn_ncbi.fasta_85,tn,95,50,_,l,n,n,nucl,vlgreen
-#/data/bi/research/20160530_ANTIBIOTICS_PSMP_T/REFERENCES/PLASMIDS/IS_ncbi.fasta_100_90,IS,90,80,_,l,n,n,nucl,vlblue
-#/data/bi/research/20160530_ANTIBIOTICS_PSMP_T/ANALYSIS/PLASMIDID/databases/aditional_IS.fasta,AD_IS,80,10,_,l,n,n,prot,blue
-/data/bi/references/plasmidID/plasmid_annotation/IS_PLASMID_ncbi_prot_90.fasta,IS_PL,90,90,_,l,n,n,prot,vlgreen
+#/data/ucct/bi/research/20160530_ANTIBIOTICS_PSMP_T/ANALYSIS/PLASMIDID/databases/tn_ncbi.fasta_85,tn,95,50,_,l,n,n,nucl,vlgreen
+#/data/ucct/bi/research/20160530_ANTIBIOTICS_PSMP_T/REFERENCES/PLASMIDS/IS_ncbi.fasta_100_90,IS,90,80,_,l,n,n,nucl,vlblue
+#/data/ucct/bi/research/20160530_ANTIBIOTICS_PSMP_T/ANALYSIS/PLASMIDID/databases/aditional_IS.fasta,AD_IS,80,10,_,l,n,n,prot,blue
+/data/ucct/bi/references/plasmidID/plasmid_annotation/IS_PLASMID_ncbi_prot_90.fasta,IS_PL,90,90,_,l,n,n,prot,vlgreen
 #VIRULENCE_FACTORS
-/data/bi/references/plasmidID/plasmid_annotation/virulence_ecoli_eaec_stx_ENT.fasta,VIR_E,80,90,:,l,y,n,nucl,vlorange
-#/data/bi/research/20160530_ANTIBIOTIC/Fatal_outbreak.fasta,VIR_F,50,50,_,l,y,n,prot,purple
-/data/bi/references/plasmidID/plasmid_annotation/ALL_Virulence.fasta,VIR,85,50,:,l,y,n,nucl,lpurple
-/data/bi/references/plasmidID/plasmid_annotation/virulence_plasmid.fasta_90,VIR_PL,50,90, ,l,y,n,prot,orange
-#/data/bi/research/20160530_ANTIBIOTICS_PSMP_T/REFERENCES/PLASMIDS/Yersinia_pestis/Yersinia_pestis_vir.fasta_100,VIR_YP,50,85, ,l,y,n,prot,red
+/data/ucct/bi/references/plasmidID/plasmid_annotation/virulence_ecoli_eaec_stx_ENT.fasta,VIR_E,80,90,:,l,y,n,nucl,vlorange
+#/data/ucct/bi/research/20160530_ANTIBIOTIC/Fatal_outbreak.fasta,VIR_F,50,50,_,l,y,n,prot,purple
+/data/ucct/bi/references/plasmidID/plasmid_annotation/ALL_Virulence.fasta,VIR,85,50,:,l,y,n,nucl,lpurple
+/data/ucct/bi/references/plasmidID/plasmid_annotation/virulence_plasmid.fasta_90,VIR_PL,50,90, ,l,y,n,prot,orange
+#/data/ucct/bi/research/20160530_ANTIBIOTICS_PSMP_T/REFERENCES/PLASMIDS/Yersinia_pestis/Yersinia_pestis_vir.fasta_100,VIR_YP,50,85, ,l,y,n,prot,red
 #PLASMID_TYPING
-/data/bi/references/plasmidID/plasmid_annotation/plasmidFinder_17_07_2018.fsa,inc,90,90,_,l,y,n,nucl,vlyellow
-#/data/bi/research/20160530_ANTIBIOTICS_PSMP_T/ANALYSIS/PLASMIDID/databases/MOB_AlexOrlek.fasta,MOB,30,50,_,l,n,n,prot,dgrey
-/data/bi/references/plasmidID/plasmid_annotation/MOB_ncbi_90.fasta,MOB_ncbi,95,80,_,l,y,n,prot,lgrey
-/data/bi/references/plasmidID/plasmid_annotation/INCLM.fasta,INCLM,30,50,_,l,n,n,prot,dgreen
-/data/bi/references/plasmidID/plasmid_annotation/IncA_C.fasta,INCAC,30,50,_,l,n,n,prot,dgreen
+/data/ucct/bi/references/plasmidID/plasmid_annotation/plasmidFinder_17_07_2018.fsa,inc,90,90,_,l,y,n,nucl,vlyellow
+#/data/ucct/bi/research/20160530_ANTIBIOTICS_PSMP_T/ANALYSIS/PLASMIDID/databases/MOB_AlexOrlek.fasta,MOB,30,50,_,l,n,n,prot,dgrey
+/data/ucct/bi/references/plasmidID/plasmid_annotation/MOB_ncbi_90.fasta,MOB_ncbi,95,80,_,l,y,n,prot,lgrey
+/data/ucct/bi/references/plasmidID/plasmid_annotation/INCLM.fasta,INCLM,30,50,_,l,n,n,prot,dgreen
+/data/ucct/bi/references/plasmidID/plasmid_annotation/IncA_C.fasta,INCAC,30,50,_,l,n,n,prot,dgreen
 #ABR
-/data/bi/references/plasmidID/plasmid_annotation/qacED1.fasta,qacED1,80,50,_,l,y,n,nucl,vlred
-#/data/bi/references/plasmidID/plasmid_annotation/ARGannot.pID.fasta,abr,98,90, ,r,y,-,nucl,vlred
+/data/ucct/bi/references/plasmidID/plasmid_annotation/qacED1.fasta,qacED1,80,50,_,l,y,n,nucl,vlred
+#/data/ucct/bi/references/plasmidID/plasmid_annotation/ARGannot.pID.fasta,abr,98,90, ,r,y,-,nucl,vlred
 #ARIBA CARD
-/data/bi/references/ariba/20191219/card/out.card.fa,card,98,90,.,l,y,-,nucl,vvlred
+/data/ucct/bi/references/ariba/20191219/card/out.card.fa,card,98,90,.,l,y,-,nucl,vvlred

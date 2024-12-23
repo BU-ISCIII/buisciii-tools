@@ -2,7 +2,7 @@
     "assembly_annotation": {
         "label": "Bacteria: De novo genome assembly and annotation",
         "template": "assembly",
-        "url": "https://github.com/nf-core/bacass/tree/2.3.1",
+        "url": "https://github.com/nf-core/bacass/tree/2.4.0",
         "order": 1,
         "begin": "",
         "end": "",
