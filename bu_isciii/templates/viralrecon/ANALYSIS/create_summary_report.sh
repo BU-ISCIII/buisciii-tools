@@ -42,7 +42,7 @@ do
     medianDPcov=$(echo "$metrics" | cut -d ',' -f8)
     cov10x=$(echo "$metrics" | cut -d ',' -f10)
 
-    read_length=$(cat ${arr[1]}*/multiqc/multiqc_data/multiqc_fastqc.yaml | grep -A5 "${arr[0]}_1:$" | grep "Sequence length:" | tr "-" " " | rev | cut -d " " -f1 | rev)
+    read_length=$(cat ${arr[1]}*/multiqc/multiqc_data/multiqc_fastqc.yaml | grep -A5 -E "'?${arr[0]}_1'?:$" | grep "Sequence length:" | tr "-" " " | rev | cut -d " " -f1 | rev)
 
     analysis_date=$(date '+%Y%m%d')
 
