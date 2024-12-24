@@ -1,6 +1,6 @@
 # module load singularity
 
-scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 mkdir logs
 
 cat ../samples_id.txt | xargs -I @@ echo "srun --chdir ${scratch_dir} --output logs/PICARD.@@.%j.log --job-name PICARD --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/picard:2.25.1--hdfd78af_1 picard CollectHsMetrics -BI ${scratch_dir}/../../../REFERENCES/idt_rb1_panel_20221123.interval_list -TI ${scratch_dir}/../../../REFERENCES/idt_rb1_panel_20221123.interval_list -I ${scratch_dir}/../04-mapping/@@/@@_sorted.bam -O ${scratch_dir}/@@_hsMetrics.out -VALIDATION_STRINGENCY 'LENIENT' &" > _01_picardHsMetrics.sh
