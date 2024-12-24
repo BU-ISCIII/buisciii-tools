@@ -2,7 +2,7 @@
 
 mkdir logs
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat ../samples_id.txt | while read in; do echo "mkdir $in; srun --partition short_idx --chdir $scratch_dir --output logs/BWAMEM.${in}.%j.log --cpus-per-task 20 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bwa:0.7.17--he4a0461_11 bwa mem -t 20 REFERENCE_GENOME ${scratch_dir}/../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ${scratch_dir}/../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz -o ${scratch_dir}/${in}/${in}.sam &"; done >> _01_bwamem.sh
 

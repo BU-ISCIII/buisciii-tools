@@ -2,7 +2,7 @@
 
 ln -s ../../../REFERENCES/*.fna reference.fna
 mkdir logs
-scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 
 cat ../samples_id.txt | xargs -I % echo "printf '%s\t' %;singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools flagstat ${scratch_dir}/../04-snippy/%/snps.bam | grep 'mapped (' | head -n 1 | cut -d '(' -f 2 | cut -d ':' -f 1" | bash | sort -u > mapping_stats.txt
 

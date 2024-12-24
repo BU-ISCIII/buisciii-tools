@@ -2,7 +2,7 @@
 
 cat ../../samples_id.txt | while read in; do ln -s ../*_mag/Taxonomy/kraken2/${in}/kraken2_report.txt ./${in}_kraken2_report.txt; done
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > multiqc.sbatch
 #!/bin/sh

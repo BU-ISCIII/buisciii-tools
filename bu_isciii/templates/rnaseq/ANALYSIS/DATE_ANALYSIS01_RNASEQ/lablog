@@ -5,7 +5,7 @@ cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00
 
 #module load Nextflow singularity
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > rnaseq.sbatch
 #!/bin/sh

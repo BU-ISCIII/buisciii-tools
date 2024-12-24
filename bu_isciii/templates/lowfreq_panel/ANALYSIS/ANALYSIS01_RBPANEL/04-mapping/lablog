@@ -2,7 +2,7 @@
 
 mkdir logs
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 echo "Use bash lablog ../samples_id.txt"
 

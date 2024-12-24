@@ -1,7 +1,7 @@
 # module load singularity
 
 mkdir logs
-scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 ln -s ../samples_id.txt .
 
 cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PLASMIDID.@@.%j.log --job-name PLASMIDID_@@ --partition short_idx --time 05:00:00 env - PATH="$PATH" singularity exec --bind /data/ucct/bi/references/ --bind ${scratch_dir} --bind ${scratch_dir}/../../ /data/ucct/bi/pipelines/singularity-images/depot.galaxyproject.org-singularity-plasmidid-1.6.5--hdfd78af_0.img plasmidID -1 ${scratch_dir}/../*ASSEMBLY/01-processing/fastp/@@_1.fastp.fastq.gz -2 ${scratch_dir}/../*ASSEMBLY/01-processing/fastp/@@_2.fastp.fastq.gz -d /data/ucct/bi/references/plasmidID/plasmid_ddbb/20200203/20200203_plasmids.fasta -s @@ -c ${scratch_dir}/../*ASSEMBLY/03-assembly/unicycler/@@.fasta -a ${scratch_dir}/plasmidID_annotation_config_file.txt --no-trim -o ${scratch_dir} &" > _01_plasmidID.sh

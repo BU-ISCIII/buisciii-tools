@@ -1,7 +1,7 @@
 # module load singularity
 
 mkdir logs
-scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 downloaded_ref=$(find ../../../../REFERENCES/ -type d -name 'ref_db')
 
 # Cartesian product of the two files to avoid double looping

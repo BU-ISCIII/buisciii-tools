@@ -11,7 +11,7 @@ done >> samplesheet.csv
 #module load Nextflow
 #module load singularity
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > mag.sbatch
 #!/bin/sh

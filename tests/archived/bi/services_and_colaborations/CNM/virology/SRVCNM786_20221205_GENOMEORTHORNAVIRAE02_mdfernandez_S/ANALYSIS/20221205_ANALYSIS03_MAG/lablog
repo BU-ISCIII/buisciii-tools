@@ -3,7 +3,7 @@ ln -s ../samples_id.txt .
 
 #module load Nextflow singularity
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > mag.sbatch
 #!/bin/sh

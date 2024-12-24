@@ -1,5 +1,5 @@
 # module load singularity
 
-scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 mkdir logs
 cat ../samples_id.txt | xargs -I @@ echo "mkdir @@;srun --chdir ${scratch_dir} --output logs/FASTQC.@@.%j.log --job-name FASTQC --cpus-per-task 8 --mem 8192 --partition short_idx --time 02:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/fastqc:0.11.9--hdfd78af_1 fastqc -o ${scratch_dir}/@@ --nogroup -t 8 -k 8 ${scratch_dir}/../02-preprocessing/@@/@@_R1_filtered.fastq ${scratch_dir}/../02-preprocessing/@@/@@_R2_filtered.fastq &" >> _01_fastqc.sh

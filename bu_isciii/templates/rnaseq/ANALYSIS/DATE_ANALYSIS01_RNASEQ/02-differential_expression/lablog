@@ -3,5 +3,5 @@
 COUNTS=$(find ../*rnaseq/ -maxdepth 0 -type d)
 cat comparatives.txt | tr '\t' '_' | while read in; do mkdir ${in}; cp differential_expression.R ${in}/ ; done
 cat comparatives.txt | while read in; do arr=($in); echo "mkdir logs" > ${arr[0]}_${arr[1]}_${arr[2]}/lablog; done
-cat comparatives.txt | while read in; do arr=($in); echo 'scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")' >> ${arr[0]}_${arr[1]}_${arr[2]}/lablog; done
+cat comparatives.txt | while read in; do arr=($in); echo 'scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")' >> ${arr[0]}_${arr[1]}_${arr[2]}/lablog; done
 cat comparatives.txt | sed 's/-/,/g' | while read in; do arr=($in); echo "echo \"srun --partition short_idx --chdir \$scratch_dir --output logs/DESEQ2.%j.log Rscript differential_expression.R -r ../${COUNTS} -d 'DEG' -t '${arr[1]}' -c '${arr[2]}' &\" > _01_deseq2.sh" >> ${arr[0]}_${arr[1]}_${arr[2]}/lablog; done

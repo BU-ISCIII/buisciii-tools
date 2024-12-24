@@ -14,7 +14,7 @@ done < ./samples_id.txt
 
 mkdir -p 02-postprocessing 03-annotation 99-stats
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > sarek.sbatch
 #!/bin/sh
