@@ -1,4 +1,4 @@
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 # module load singularity
 
