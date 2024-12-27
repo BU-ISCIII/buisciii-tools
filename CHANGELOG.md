@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.4dev] - 2024-0X-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.4
+## [2.2.4] - 2024-12-27 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.4
 
 ### Credits
 
@@ -14,26 +14,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Replaced /data/bi/ by /data/ucct/bi where necessary [#385](https://github.com/BU-ISCIII/buisciii-tools/pull/385).
 - Removed middle_obx from config files [#385](https://github.com/BU-ISCIII/buisciii-tools/pull/385).
-
-### Modules
-
-#### Added enhancements
-
-#### Fixes
-
-#### Changed
-
-#### Removed
-
-### Requirements
-
-## [2.X.Xhot] - 2024-0X-0X : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.3
-
-### Credits
-
-Code contributions to the hotfix:
-
-### Template fixes and updates
 
 ### Modules
 
