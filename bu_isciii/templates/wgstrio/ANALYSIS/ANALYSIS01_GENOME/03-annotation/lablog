@@ -1,7 +1,7 @@
 # module load singularity
 # module load Java/17.0.2.lua R/4.2.1
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 ln -s /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_gene_GRCh37.txt
 ln -s /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37-4.3/dbNSFP_ENSG_plugin_hg19.txt
@@ -62,10 +62,10 @@ echo "rm variants_annot_filterAF.tab" >> aux_03_awk.sh
 
 ## 7. Running exomiser
 
-vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-output_folder=$(realpath ./exomiser/exomiser/exomiser | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser/exomiser | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
 sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile.yml
@@ -78,11 +78,11 @@ echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/ucct/b
 
 ## 8. Running exomiser_exome
 
-vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../REFERENCES/exomiser_exome.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-output_folder=$(realpath ./exomiser/exomiser_exome/exomiser_exome | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+bed_file=$(realpath ../../../REFERENCES/exomiser_exome.bed | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser_exome/exomiser_exome | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_exome.yml
 sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile_exome.yml
@@ -95,11 +95,11 @@ echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir /data/ucct/b
 
 ## 9. Running exomiser_genes
 
-vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../REFERENCES/exomiser_genes.bed | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
-output_folder=$(realpath ./exomiser/exomiser_genes/exomiser_genes | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+bed_file=$(realpath ../../../REFERENCES/exomiser_genes.bed | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser_genes/exomiser_genes | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_genes.yml
 sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile_genes.yml

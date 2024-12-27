@@ -30,7 +30,7 @@ cat samples_id.txt | xargs -I % echo -e "%,XY,0,%,1,00-reads/%_R1.fastq.gz,00-re
 mkdir -p 02-postprocessing 03-annotation 99-stats
 
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > sarek.sbatch
 #!/bin/sh

@@ -15,7 +15,7 @@ echo "sample,fastq_1,fastq_2" > samplesheet.csv
 cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz"; done >> samplesheet.csv
 
 #module load Nextflow singularity
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF > assembly.sbatch
 #!/bin/sh

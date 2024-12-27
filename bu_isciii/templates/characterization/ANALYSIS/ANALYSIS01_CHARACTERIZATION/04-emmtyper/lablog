@@ -12,7 +12,7 @@ ASSEMBLY_LIST=fasta_inputs/assembly_file_list.txt
 # Get the number of files
 num_files=$(wc -l < $ASSEMBLY_LIST)
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 # STEP 1: Set up jobarray to unzip fasta files
 cat <<EOF > _00_unzip_jobarray.sbatch

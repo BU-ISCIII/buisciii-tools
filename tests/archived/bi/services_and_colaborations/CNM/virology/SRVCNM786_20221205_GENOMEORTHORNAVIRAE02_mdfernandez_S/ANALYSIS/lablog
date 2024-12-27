@@ -16,7 +16,7 @@ do
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
     echo "#module load Nextflow singularity" >> ${FOLDER_NAME}/lablog
     echo "" >> ${FOLDER_NAME}/lablog
-    printf 'scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")\n\n' >> ${FOLDER_NAME}/lablog
+    printf 'scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")\n\n' >> ${FOLDER_NAME}/lablog
     cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | while read ref
     do
         echo "sample,fastq_1,fastq_2" > ${FOLDER_NAME}/samplesheet_${ref}.csv
