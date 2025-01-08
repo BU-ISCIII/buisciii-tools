@@ -45,15 +45,15 @@ echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_Vep_pl
 
 echo "srun --partition short_idx --mem 200G --time 12:00:00 --chdir ${scratch_dir} --output logs/MERGE_ALL.log --job-name MERGE_ALL Rscript Merge_All.R" >> _03_Vep_plugin_dbNSFP_parse.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/AWK.log --job-name AWK bash ./aux_03_awk.sh &" >> _03_Vep_plugin_dbNSFP_parse.sh
 
 # 6. Filter variants_annot_all.tab
 
-echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> _03_awk.sh
+echo "awk 'NR>1 && \$58 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> aux_03_awk.sh
 
-echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> _03_awk.sh
+echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> aux_03_awk.sh
 
-echo "rm variants_annot_filterAF.tab" >> _03_awk.sh
+echo "rm variants_annot_filterAF.tab" >> aux_03_awk.sh
 
 #-------------------------------------------------------------------------------------------------------
 
@@ -71,23 +71,23 @@ sed -i "s|BED_FILE|${bed_file}|g" ./exomiser_configfile.yml
 sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
 
 # THE FILE "spring.log" MUST BE DELETED IN THE CORRESPONDING NODE
-echo "java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > _04_exomiser_exome.sh
-echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/ucct/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${scratch_dir}/_04_exomiser_exome.sh &" > _04_exomiser_exome.sh
+echo "java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux_04_exomiser_exome.sh
+echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/ucct/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${scratch_dir}/aux_04_exomiser_exome.sh &" > _04_exomiser_exome.sh
 
 #---------------------------------------------------------------------------------------------------------
 
 
 ## Lablog to modify the output reported by exomiser and create a final file with a personalized format.
-# Grep variant id for each ininheritance model
-cat ininheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./id_%.txt " >> _05_filter_inheritance.sh
+# Grep variant id for each inheritance model
+cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./id_%.txt " >> _05_filter_inheritance.sh
 
-# Grep variants for each ininheritance models from the full annotated variants file
-cat ininheritance_types.txt | xargs -I % echo "grep -f ./id_%.txt ./variants_annot_all.tab > ./vep_annot_%.txt" >> _05_filter_inheritance.sh
+# Grep variants for each inheritance models from the full annotated variants file
+cat inheritance_types.txt | xargs -I % echo "grep -f ./id_%.txt ./variants_annot_all.tab > ./vep_annot_%.txt" >> _05_filter_inheritance.sh
 
-cat ininheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./vep_annot_%.txt > ./vep_annot_%_final.txt" >> _05_filter_inheritance.sh
+cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./vep_annot_%.txt > ./vep_annot_%_final.txt" >> _05_filter_inheritance.sh
 
 echo "rm id_*" >> _05_filter_inheritance.sh
-cat ininheritance_types.txt | xargs -I % echo "rm ./vep_annot_%.txt" >> _05_filter_inheritance.sh
+cat inheritance_types.txt | xargs -I % echo "rm ./vep_annot_%.txt" >> _05_filter_inheritance.sh
 
 # annot_all table is huge, lets shrink it a little bit
 echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_inheritance.sh
