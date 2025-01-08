@@ -11,6 +11,3 @@ ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/variants_*filterAF*.tab .
 mkdir annotation_tables
 cd annotation_tables; ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot*.txt . ; cd -
 
-# For exomeEB services
-# ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/exomiser/exomiser.html .
-

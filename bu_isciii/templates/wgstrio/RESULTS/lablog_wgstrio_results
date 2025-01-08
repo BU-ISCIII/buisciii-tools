@@ -8,8 +8,4 @@ ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out mapping_metric
 ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/01-sarek/multiqc/multiqc_report.html .
 ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/variants_*filterAF*.tab .
 
-ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/filter_heritance annotation_tables
-
-# For exomeEB services
-# ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/exomiser/exomiser.html .
-
+ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/filter_inheritance annotation_tables .
