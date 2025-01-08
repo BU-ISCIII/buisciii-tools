@@ -5,10 +5,9 @@ mkdir -p $DELIVERY_FOLDER/taxprofiler
 cd $DELIVERY_FOLDER/taxprofiler
 
 # Links to reports
-ln -s ../../../ANALYSIS/*ANALYSIS01_TAXPROFILER/multiqc/multiqc_report.html .
+ln -s ../../../ANALYSIS/*_TAXPROFILER/multiqc/multiqc_report.html .
 mkdir -p krona
-for file in ../../../ANALYSIS/*ANALYSIS01_TAXPROFILER/krona/*.html; do
+for file in ../../../ANALYSIS/*_TAXPROFILER/krona/*.html; do
     base=$(basename "$file")
     ln -s "../$file" "krona/database_${base}"
 done
-
