@@ -1,5 +1,5 @@
 
-echo -e "sample_ID\tTotalReads\tMappedReads\t%MappedReads\tFlu_type\tReads_HA\tReads_MP\tReads_NA\tReads_NP\tReads_NS\tReads_PA\tReads_PB1\tReads_PB2" > irma_stats.txt
+echo -e "sample_ID\tTotalReads\tMappedReads\t%MappedReads\tFlu_type\tReads_HA\tReads_MP\tReads_NA\tReads_NP\tReads_NS\tReads_PA\tReads_PB1\tReads_PB2" > irma_stats_flu.txt
 
 cat ../samples_id.txt | while read in 
 do 
@@ -24,11 +24,11 @@ else
     LINE=$(paste <(echo $SAMPLE_ID) <(echo $TOTAL_READS) <(echo $MAPPEDREADS) <(echo $PCTMAPPED) <(echo $FLU_TYPE) <(echo $HA) <(echo $MP) <(echo $NA) <(echo $NP) <(echo $NS) <(echo $PA) <(echo $PB1) <(echo $PB2))
 fi
 
-echo "$LINE" >> irma_stats.txt
+echo "$LINE" >> irma_stats_flu.txt
 
 done
 
-ANY_C=$(grep "C_" irma_stats.txt)
+ANY_C=$(grep "C_" irma_stats_flu.txt)
 if [[ -n "$ANY_C" ]]; then
-    sed -i 's/Reads_PB2/Reads_PB2\tReads_HE/g' irma_stats.txt
+    sed -i 's/Reads_PB2/Reads_PB2\tReads_HE/g' irma_stats_flu.txt
 fi
