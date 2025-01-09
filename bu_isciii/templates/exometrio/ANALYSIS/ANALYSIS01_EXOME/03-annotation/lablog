@@ -13,15 +13,15 @@ mkdir -p logs
 #-----------------------------------------------------------------------------------------------------
 
 # 1 . Lablog to modify VCF ID field before running VEP.
-echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > aux_01_bcftools_query.sh
-echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> aux_01_bcftools_query.sh
+echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
+echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> _01_bcftools_query.sh
 
 # 2. Create variant table.
 
-echo "singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ${scratch_dir}/vep/variants_fil_mod.vcf > ${scratch_dir}/vep/variants.table" >> aux_01_bcftools_query.sh
-echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table " >> aux_01_bcftools_query.sh
+echo "singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%FILTER\t[%GT\t%DP\t%AD\t%GQ\t]\n' ${scratch_dir}/vep/variants_fil_mod.vcf > ${scratch_dir}/vep/variants.table" >> _01_bcftools_query.sh
+echo "sed -i -r 's/(#|\[[0-9]+\])//g' ./vep/variants.table;sed -i 's/:/_/g' ./vep/variants.table;sed -i 's/ //g' ./vep/variants.table;sed -i 's/\t*$//g' ./vep/variants.table " >> _01_bcftools_query.sh
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./aux_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/BCFTOOLSQUERY.log --job-name BCFTOOLSQUERY bash ./_01_bcftools_query.sh &" > _01_run_bcftools_query.sh
 
 #------------------------------------------------------------------------------------------------------
 
@@ -79,15 +79,15 @@ echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/ucct/bi
 
 ## Lablog to modify the output reported by exomiser and create a final file with a personalized format.
 # Grep variant id for each inheritance model
-cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./id_%.txt " >> _05_filter_heritance.sh
+cat inheritance_types.txt | xargs -I % echo "grep 'PASS' ./exomiser/exomiser_%.variants.tsv | awk '{print \$1\"_\"\$2\"_\"\$3\"_\"\$4}' > ./id_%.txt " >> _05_filter_inheritance.sh
 
 # Grep variants for each inheritance models from the full annotated variants file
-cat inheritance_types.txt | xargs -I % echo "grep -f ./id_%.txt ./variants_annot_all.tab > ./vep_annot_%.txt" >> _05_filter_heritance.sh
+cat inheritance_types.txt | xargs -I % echo "grep -f ./id_%.txt ./variants_annot_all.tab > ./vep_annot_%.txt" >> _05_filter_inheritance.sh
 
-cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./vep_annot_%.txt > ./vep_annot_%_final.txt" >> _05_filter_heritance.sh
+cat inheritance_types.txt | xargs -I % echo "cat header_vep_final_annot.txt ./vep_annot_%.txt > ./vep_annot_%_final.txt" >> _05_filter_inheritance.sh
 
-echo "rm id_*" >> _05_filter_heritance.sh
-cat inheritance_types.txt | xargs -I % echo "rm ./vep_annot_%.txt" >> _05_filter_heritance.sh
+echo "rm id_*" >> _05_filter_inheritance.sh
+cat inheritance_types.txt | xargs -I % echo "rm ./vep_annot_%.txt" >> _05_filter_inheritance.sh
 
 # annot_all table is huge, lets shrink it a little bit
-echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_heritance.sh
+echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_inheritance.sh

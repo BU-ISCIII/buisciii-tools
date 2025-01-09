@@ -1,0 +1,12 @@
+#module load R
+#Fix pearl warning, add "export LC_ALL="en_US.UTF8" to .basrhc or run it now
+
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 32 --mem 35000M --chdir $scratch_dir --time 01:00:00 --output logs/IRMA.${in}.%j.log /data/ucct/bi/pipelines/flu-amd/flu-amd-1.2.0/IRMA RSV ../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz ../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz ${in} --external-config ../../../DOC/irma_config.sh &"; done > _01_irma_rsv.sh
+
+echo 'bash create_irma_stats_rsv.sh' > _02_create_stats_rsv.sh
+
+echo 'bash postprocessing_rsv.sh' > _03_post_processing_rsv.sh

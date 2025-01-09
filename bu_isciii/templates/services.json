@@ -21,7 +21,7 @@
         "template": "mtbseq",
         "order": 1,
         "begin": "base",
-        "end": "mag_met",
+        "end": "taxprofiler",
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
@@ -38,7 +38,7 @@
       "template": "pikavirus",
       "order": 1,
       "begin": "base",
-      "end": "mag_met",
+      "end": "taxprofiler",
       "url": "https://github.com/BU-ISCIII/PikaVirus",
       "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus.",
       "clean": {
@@ -71,7 +71,7 @@
         "template": "taranis",
         "order": 1,
         "begin": "base",
-        "end": "mag_met",
+        "end": "taxprofiler",
         "url": "https://github.com/BU-ISCIII/taranis",
         "description": "Multilocus sequence typing (MLST) using Taranis",
         "depends_on": "assembly_annotation",
@@ -89,7 +89,7 @@
         "template": "chewbbaca",
         "order": 1,
         "begin": "base",
-        "end": "mag_met",
+        "end": "taxprofiler",
         "url": "https://github.com/B-UMMI/chewBBACA",
         "description": "Multilocus sequence typing (MLST) using chewBBACA",
         "depends_on": "assembly_annotation",
@@ -108,7 +108,7 @@
         "url": "https://github.com/BU-ISCIII/viralrecon",
         "order": 1,
         "begin": "",
-        "end": "mag_met",
+        "end": "taxprofiler",
         "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
         "clean": {
           "folders":[],
@@ -125,7 +125,7 @@
         "url": "https://github.com/nf-core/rnaseq",
         "order": 1,
         "begin": "",
-        "end": "mag_met",
+        "end": "taxprofiler",
         "description": "RNA-seq analysis",
         "clean": {
           "folders":[],
@@ -203,22 +203,22 @@
       "delivery_md": "",
       "results_md": ""
     },
-    "mag_met": {
+    "taxprofiler": {
       "label": "Taxonomic based Identification and classification of organisms in complex communities",
-      "template": "mag",
+      "template": "taxprofiler",
       "order": 2,
       "begin": "base",
       "end": "",
-      "url": "https://github.com/nf-core/mag or https://github.com/nf-core/taxprofiler",
-      "description": "1- Bioinformatics best-practise analysis for taxonomic classification and/or genome binning; 2- Bioinformatics best-practise analysis pipeline for assembly, binning and annotation of metagenomes.",
+      "url": "https://github.com/nf-core/taxprofiler",
+      "description": "Highly parallelised multi-taxonomic profiling of shotgun short- and long-read metagenomic data",
       "clean": {
         "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"RESULTS",
-      "delivery_md": "assets/reports/md/mag.md",
-      "results_md": "assets/reports/results/mag.md"
+      "delivery_md": "assets/reports/md/taxprofiler.md",
+      "results_md": "assets/reports/results/taxprofiler.md"
     },
     "exometrio": {
       "label": "Human: Exome sequencing for variant calling, annotation and inheritance filtering (e.g. Exome sequencing of a human trio (two parents and one child))",
@@ -294,7 +294,7 @@
       "url": "",
       "order": 1,
       "begin": "",
-      "end": "",
+      "end": "taxprofiler",
       "description": "",
       "clean": {
         "folders":["02-preprocessing"],

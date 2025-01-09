@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.5] - 2025-01-09 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.5
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Changed mag.md by taxprofiler.md in assets/reports [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Modified irma_output.md to include only taxprofiler [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated services.json with taxprofiler [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Created a lablog file for chewbbaca/REFERENCES [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated lablog_irma and renamed ANALYSIS01 folders [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated IRMA template and its files to include RSV [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated chewbbaca results' lablog to include cgMLST_MSA.fasta [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated exometrio and wgstrio results lablogs not to include exomiser's html [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Created plasmidid's results lablog [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated mtbseq's lablog to remove unnecessary single quotes [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Fixed snippy's lablog to be better explained and updated its results' lablog [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+- Updated version in pyproject.toml and __main__.py [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+- Replaced setup.py by pyproject.toml [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+
+#### Removed
+
+- Removed MAG template and replaced it with taxprofiler [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
+
+### Requirements
+
 ## [2.2.4] - 2024-12-27 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.4
 
 ### Credits

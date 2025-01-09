@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "buisciii-tools"
+version = "2.2.5"
+dynamic = ["dependencies"]
+
+authors = [
+    {name = "Sara Monzon", email = "smonzon@isciii.es"},
+    {name = "Luis Chapado", email = "lchapado@externos.isciii.es"},
+    {name = "Isabel Cuesta", email = "isabel.cuesta@isciii.es"},
+    {name = "Sarai Varona", email = "s.varona@isciii.es"},
+    {name = "Daniel Valle", email = "da.valle@externos.isciii.es"},
+    {name = "Pablo Mata", email = "pmata@externos.isciii.es"},
+    {name = "Victor Lopez", email = "vmlopez@isciii.es"},
+    {name = "Emi Arjona", email = "eiarjona@isciii.es"},
+    {name = "Jaime Ozaez", email = "jaime.ozaez@isciii.es"},
+    {name = "Juan Ledesma", email = "juan.ledesma@isciii.es"},
+    {name = "Sergio Olmos", email = "sergio.olmos@externos.isciii.es"},
+    {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
+    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"}
+]
+
+maintainers = [
+    {name = "Sara Monzon", email = "smonzon@isciii.es"},
+    {name = "Luis Chapado", email = "lchapado@externos.isciii.es"},
+    {name = "Isabel Cuesta", email = "isabel.cuesta@isciii.es"},
+    {name = "Sarai Varona", email = "s.varona@isciii.es"},
+    {name = "Daniel Valle", email = "da.valle@externos.isciii.es"},
+    {name = "Pablo Mata", email = "pmata@externos.isciii.es"},
+    {name = "Victor Lopez", email = "vmlopez@isciii.es"},
+    {name = "Emi Arjona", email = "eiarjona@isciii.es"},
+    {name = "Jaime Ozaez", email = "jaime.ozaez@isciii.es"},
+    {name = "Juan Ledesma", email = "juan.ledesma@isciii.es"},
+    {name = "Sergio Olmos", email = "sergio.olmos@externos.isciii.es"},
+    {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
+    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"}
+]
+
+description = "Tools for managing and resolution of buisciii services."
+readme = "README.md"
+license = {file = "GNU GENERAL PUBLIC LICENSE v.3"}
+keywords = [
+  "buisciii",
+  "bioinformatics",
+  "pipeline",
+  "sequencing",
+  "NGS",
+  "next generation sequencing"
+]
+
+[project.urls]
+Homepage = "https://github.com/BU-ISCIII/buisciii-tools"
+Issues = "https://github.com/BU-ISCIII/buisciii-tools/issues"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+bu_isciii = "bu_isciii.__main__:run_bu_isciii"
+
+[tool.setuptools.packages.find]
+exclude = ["docs"]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
