@@ -1,0 +1,10 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+
+mkdir -p "${DELIVERY_FOLDER}/plasmidid"
+
+cd ${DELIVERY_FOLDER}/plasmidid
+
+ln -s ../../../ANALYSIS/*_PLASMIDID/*/*/images/*.png .
+ln -s ../../../ANALYSIS/*_PLASMIDID/*/*/*.html .
+
+cd -

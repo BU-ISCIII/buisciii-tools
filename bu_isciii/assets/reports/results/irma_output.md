@@ -2,9 +2,9 @@
 
 This markdown briefly describes the files found in `RESULTS/` folder for IRMA services. As described [here]()
 
-## **`krona_results.html`** 
+## **`taxprofiler`**
 
-Includes the multiQC html report from MAG, you can find a further description in [MAG](https://github.com/BU-ISCIII/buisciii-tools/blob/main/bu_isciii/assets/reports/md/mag.md).
+Includes the results from Taxprofiler, you can find a further description in [Taxprofiler](https://github.com/BU-ISCIII/buisciii-tools/blob/main/bu_isciii/assets/reports/md/taxprofiler.md).
 
 ## Files in `fragment_name/`
 
