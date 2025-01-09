@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
 
 ### Template fixes and updates
 
@@ -24,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated mtbseq's lablog to remove unnecessary single quotes [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
 - Fixed snippy's lablog to be better explained and updated its results' lablog [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
 - Updated version in pyproject.toml and __main__.py [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
-
+- User added to sftp_user.json [#403] (https://github.com/BU-ISCIII/buisciii-tools/pull/402).
 ### Modules
 
 #### Added enhancements
