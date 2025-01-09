@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.6dev] - 2025-01-09 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.6dev
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/Aberdur)
+
+### Template fixes and updates
+
+- User added to sftp_user.json [#404] (https://github.com/BU-ISCIII/buisciii-tools/pull/404).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.5] - 2025-01-09 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.5
 
 ### Credits
@@ -24,7 +46,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated mtbseq's lablog to remove unnecessary single quotes [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
 - Fixed snippy's lablog to be better explained and updated its results' lablog [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
 - Updated version in pyproject.toml and __main__.py [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
-
 ### Modules
 
 #### Added enhancements
