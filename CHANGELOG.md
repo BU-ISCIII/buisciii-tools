@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Sara Monzón](https://github.com/saramonzon)
 
 ### Template fixes and updates
 
 - User added to sftp_user.json [#404] (https://github.com/BU-ISCIII/buisciii-tools/pull/404).
+- Fix archived path [#405](https://github.com/BU-ISCIII/buisciii-tools/pull/405)
 
 ### Modules
 
