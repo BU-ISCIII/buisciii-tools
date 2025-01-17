@@ -23,3 +23,15 @@ select bacteria in "${possible_organisms[@]}"; do
         echo -e "\n\033[0;31mInvalid input.\033[0m"
     fi
 done
+
+cat << "EOF" > _02_amrfinder_summary.sh
+#!/bin/bash
+output_file="amrfinder_summary.tsv"
+{ 
+  for file in *_out.tsv; do
+    sample_name=$(basename "$file" "_out.tsv")
+    [ "$header_added" ] || { head -n 1 "$file"; header_added=true; }
+    tail -n +2 "$file"
+  done
+} > "$output_file"
+EOF
