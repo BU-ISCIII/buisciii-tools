@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - User added to sftp_user.json [#404] (https://github.com/BU-ISCIII/buisciii-tools/pull/404).
 - Fix archived path [#405](https://github.com/BU-ISCIII/buisciii-tools/pull/405)
-- Updated characterization/03-amrfinderplus lablog with summary generator [#405](https://github.com/BU-ISCIII/buisciii-tools/pull/406)
+- Updated characterization/03-amrfinderplus lablog with summary generator [#406](https://github.com/BU-ISCIII/buisciii-tools/pull/406)
 
 ### Modules
 
