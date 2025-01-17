@@ -29,7 +29,6 @@ cat << "EOF" > _02_amrfinder_summary.sh
 output_file="amrfinder_summary.tsv"
 { 
   for file in *_out.tsv; do
-    sample_name=$(basename "$file" "_out.tsv")
     [ "$header_added" ] || { head -n 1 "$file"; header_added=true; }
     tail -n +2 "$file"
   done
