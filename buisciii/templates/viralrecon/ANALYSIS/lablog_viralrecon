@@ -365,9 +365,9 @@ while true; do
 done
 
 echo_bold "\nPlease specify the method to be performed."
-    echo_bold "1. Mapping"
-    echo_bold "2. De novo assembly"
-    echo_bold "3. Both"
+echo_bold "1. Mapping"
+echo_bold "2. De novo assembly"
+echo_bold "3. Both"
     while true; do
         echo -ne "\e[1;38;5;220m"; read -n 1 method; tput sgr0; echo
         if [ "$method" == "1" ]; then
