@@ -1,0 +1,9 @@
+#!/bin/bash
+
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\ucct/\/bi\/scratch_tmp/\/scratch/g")
+
+ls 00-reads/*.bam | cut -d '_' -f1 | while read in; do echo "srun --partition short_idx --cpus-per-task 4 --mem 3850M --chdir $scratch_dir --time 01:00:00 --output logs/BAM2FQ.${in}.%j.log singularity exec /data/ucct/bi/pipelines/singularity-images/bedtools:2.31.1--h13024bc_3 bedtools bamtofastq -i ${in}_R1.bam -fq ${in}.fastq &"; done > _01_bam2fq.sh
+
+echo "find . -name '*.fastq' -exec srun --partition short_idx --cpus-per-task 5 --mem 3850M --chdir $scratch_dir --time 01:00:00 --output logs/PIGZ.%j.log pigz -p 5 {} \;" > _02_pgzip.sh
