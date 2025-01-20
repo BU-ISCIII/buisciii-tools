@@ -8,7 +8,7 @@ mv $output_file mapping_illumina_$(date '+%Y%m%d').tab
 
 # Success message
 if [ $? -eq 0 ]; then
-    echo "Successfully removed the first three columns from the mapping_illumina file and saved the output to $output_file."
+    echo "Successfully removed the first three columns from the mapping_illumina file."
 else
     echo "An error occurred."
 fi
