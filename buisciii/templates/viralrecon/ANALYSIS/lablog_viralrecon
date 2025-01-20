@@ -294,7 +294,7 @@ check_references() {
             else
                 log_message "An error occurred during file downloading." blk_red
             fi
-         else
+        else
             log_message "Directory /data/ucct/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
             digest=$(refgenie alias get -a ${family} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
             mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
@@ -313,7 +313,7 @@ check_references() {
             else
                 log_message "An error occurred during file downloading." blk_red
             fi
-         fi
+        fi
     else
         log_message "File ${ref}.gff is ALREADY available in $(dirname $REF_GFF). \xE2\x9C\x85"
     fi
