@@ -371,22 +371,23 @@ echo_bold "2. De novo assembly"
 echo_bold "3. Both"
 while true; do
     echo -ne "\e[1;38;5;220m"; read -n 1 method; tput sgr0; echo
-    if [ "$method" == "1" ]; then
-        log_message "Mapping method selected." green
-        break
-    elif [ "$method" == "2" ]; then
-        log_message "De novo assembly method selected." green
-        sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
-        sed -i "s|skip_variants: false|skip_variants: true|" "$PARAMS_FILE"
-        break
-    elif [ "$method" == "3" ]; then
-        log_message "Mapping + de novo assembly methods selected." green
-        sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
-        break
-    else
+    if [[ "$method" != "1" && "$method" != "2" && "$method" != "3" ]]; then
         echo_red "Invalid input. Please select a valid number."
+    else
+        break
     fi
 done
+
+if [ "$method" == "1" ]; then
+    log_message "Mapping method selected." green
+elif [ "$method" == "2" ]; then
+    log_message "De novo assembly method selected." green
+    sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
+    sed -i "s|skip_variants: false|skip_variants: true|" "$PARAMS_FILE"
+elif [ "$method" == "3" ]; then
+    log_message "Mapping + de novo assembly methods selected." green
+    sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
+fi
 
 
 # Setting samples_ref.txt file
