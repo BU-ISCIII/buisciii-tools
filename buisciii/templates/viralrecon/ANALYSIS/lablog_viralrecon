@@ -351,18 +351,19 @@ echo_bold "1. METAGENOMICS"
 echo_bold "2. AMPLICONS"
 while true; do
     echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0; echo
-    if [ "$ANALYSIS_TYPE" == "1" ]; then
-        ANALYSIS_TYPE="METAGENOMIC"
-        log_message "$ANALYSIS_TYPE analysis selected." green
-        break
-    elif [ "$ANALYSIS_TYPE" == "2" ]; then
-        ANALYSIS_TYPE="AMPLICONS"
-        log_message "$ANALYSIS_TYPE analysis selected." green
-        break
-    else
+    if [[ "$ANALYSIS_TYPE" != "1" && "$ANALYSIS_TYPE" != "2" ]]; then
         echo_red "Invalid input. Please enter 1 or 2."
+    else
+        break
     fi
 done
+
+if [ "$ANALYSIS_TYPE" == "1" ]; then
+        ANALYSIS_TYPE="METAGENOMIC"
+elif [ "$ANALYSIS_TYPE" == "2" ]; then
+        ANALYSIS_TYPE="AMPLICONS"
+fi
+log_message "$ANALYSIS_TYPE analysis selected." green
 
 echo_bold "\nPlease specify the method to be performed."
 echo_bold "1. Mapping"
