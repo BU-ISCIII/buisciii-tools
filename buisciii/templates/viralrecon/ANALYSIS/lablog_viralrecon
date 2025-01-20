@@ -365,6 +365,7 @@ elif [ "$ANALYSIS_TYPE" == "2" ]; then
 fi
 log_message "$ANALYSIS_TYPE analysis selected." green
 
+# Setting the method to be performed
 echo_bold "\nPlease specify the method to be performed."
 echo_bold "1. Mapping"
 echo_bold "2. De novo assembly"
