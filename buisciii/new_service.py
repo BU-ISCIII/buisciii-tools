@@ -11,18 +11,18 @@ import rich
 import subprocess
 
 # Local imports
-import bu_isciii
-import bu_isciii.utils
-import bu_isciii.config_json
-import bu_isciii.service_json
-import bu_isciii.drylab_api
+import buisciii
+import buisciii.utils
+import buisciii.config_json
+import buisciii.service_json
+import buisciii.drylab_api
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -38,12 +38,12 @@ class NewService:
         conf=None,
     ):
         if resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
         if no_create_folder is None:
-            self.no_create_folder = bu_isciii.utils.prompt_skip_folder_creation()
+            self.no_create_folder = buisciii.utils.prompt_skip_folder_creation()
         else:
             self.no_create_folder = no_create_folder
 
@@ -51,7 +51,7 @@ class NewService:
         self.conf = conf.get_configuration("new_service")
         conf_api = conf.get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
-        self.rest_api = bu_isciii.drylab_api.RestServiceApi(
+        self.rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
@@ -67,7 +67,7 @@ class NewService:
 
         if ask_path and path is None:
             stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+            self.path = buisciii.utils.prompt_path(msg="Path")
         elif path == "-a":
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
@@ -81,7 +81,7 @@ class NewService:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(
+            self.path = buisciii.utils.get_service_paths(
                 conf,
                 "services_and_colaborations",
                 self.resolution_info,
@@ -158,8 +158,8 @@ class NewService:
         stderr.print(
             "[blue]I will copy the template service folders for %s !" % self.full_path
         )
-        services_ids = bu_isciii.utils.get_service_ids(self.services_requested)
-        services_json = bu_isciii.service_json.ServiceJson()
+        services_ids = buisciii.utils.get_service_ids(self.services_requested)
+        services_json = buisciii.service_json.ServiceJson()
         for service_id in services_ids:
             try:
                 service_template = services_json.get_find(service_id, "template")
@@ -228,7 +228,7 @@ class NewService:
             % len(samples_files)
         )
         if len(self.service_samples) != len(samples_files):
-            if not bu_isciii.utils.prompt_yn_question(
+            if not buisciii.utils.prompt_yn_question(
                 "Do you want to continue with the service creation?", dflt=True
             ):
                 stderr.print("Bye!")
@@ -277,7 +277,7 @@ class NewService:
             stderr.print(
                 "[yellow]WARN: No samples recorded in service: " + self.resolution_id
             )
-            if bu_isciii.utils.prompt_yn_question(
+            if buisciii.utils.prompt_yn_question(
                 "Do you want to proceed?: ", dflt=True
             ):
                 self.create_folder()

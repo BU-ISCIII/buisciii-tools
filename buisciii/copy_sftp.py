@@ -10,17 +10,17 @@ from sysrsync.exceptions import RsyncError
 from datetime import datetime
 
 # Local imports
-import bu_isciii
-import bu_isciii.utils
-import bu_isciii.drylab_api
-import bu_isciii.service_json
+import buisciii
+import buisciii.utils
+import buisciii.drylab_api
+import buisciii.service_json
 
 log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -36,7 +36,7 @@ class CopySftp:
         conf=None,
     ):
         if resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
@@ -45,7 +45,7 @@ class CopySftp:
         conf_api = conf.get_configuration("xtutatis_api_settings")
 
         # Obtain info from iskylims api
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
 
@@ -53,7 +53,7 @@ class CopySftp:
             request_info="service-data", safe=True, resolution=self.resolution_id
         )
         if sftp_folder is None:
-            self.sftp_folder = bu_isciii.utils.get_sftp_folder(
+            self.sftp_folder = buisciii.utils.get_sftp_folder(
                 conf, self.resolution_info
             )[0]
         else:
@@ -66,14 +66,14 @@ class CopySftp:
             "available_services"
         ]
         self.sftp_options = conf.get_find("sftp_copy", "options")
-        self.services_to_copy = bu_isciii.utils.get_service_ids(self.services_requested)
+        self.services_to_copy = buisciii.utils.get_service_ids(self.services_requested)
 
         self.last_folders = self.get_last_folders(
             self.services_to_copy, type="last_folder"
         )
         if ask_path and path is None:
             stderr.print("Directory where you want to create the service folder.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+            self.path = buisciii.utils.prompt_path(msg="Path")
         elif path == "-a":
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
@@ -87,7 +87,7 @@ class CopySftp:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(
+            self.path = buisciii.utils.get_service_paths(
                 conf,
                 "services_and_colaborations",
                 self.resolution_info,
@@ -108,7 +108,7 @@ class CopySftp:
             services_ids [list]: list with services ids selected.
             type [string]: "last_folder" for getting the param from service.json
         """
-        service_conf = bu_isciii.service_json.ServiceJson()
+        service_conf = buisciii.service_json.ServiceJson()
         last_folders_list = []
         for service in services_ids:
             try:

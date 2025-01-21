@@ -8,17 +8,17 @@ import shutil
 from rich.console import Console
 
 # Local imports
-import bu_isciii
-import bu_isciii.utils
-import bu_isciii.drylab_api
-import bu_isciii.service_json
+import buisciii
+import buisciii.utils
+import buisciii.drylab_api
+import buisciii.service_json
 
 log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -36,14 +36,14 @@ class CleanUp:
         # access the api with the resolution name to obtain the data
         # ask away if no input given
         if resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
         # Obtain info from iskylims api
         self.conf = conf.get_configuration("cleanning")
         conf_api = conf.get_configuration("xtutatis_api_settings")
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = rest_api.get_request(
@@ -63,7 +63,7 @@ class CleanUp:
             stderr.print(
                 "Absolute path to the directory containing the service to clean."
             )
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+            self.path = buisciii.utils.prompt_path(msg="Path")
         elif path == "-a":
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
@@ -77,7 +77,7 @@ class CleanUp:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(
+            self.path = buisciii.utils.get_service_paths(
                 conf,
                 "services_and_colaborations",
                 self.resolution_info,
@@ -87,7 +87,7 @@ class CleanUp:
         self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
-        self.services_to_clean = bu_isciii.utils.get_service_ids(
+        self.services_to_clean = buisciii.utils.get_service_ids(
             self.services_requested
         )
         self.delete_folders = self.get_clean_items(
@@ -98,7 +98,7 @@ class CleanUp:
         self.nocopy = self.get_clean_items(self.services_to_clean, type="no_copy")
 
         if option is None:
-            self.option = bu_isciii.utils.prompt_selection(
+            self.option = buisciii.utils.prompt_selection(
                 "Options",
                 [
                     "full_clean",
@@ -124,7 +124,7 @@ class CleanUp:
             services_ids [list]: list with services ids selected.
             type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
-        service_conf = bu_isciii.service_json.ServiceJson()
+        service_conf = buisciii.service_json.ServiceJson()
         clean_items_list = []
         for service in services_ids:
             try:
@@ -279,7 +279,7 @@ class CleanUp:
         elements = ", ".join(to_find)
         # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?", dflt=True):
+        if not buisciii.utils.prompt_yn_question("Is it okay?", dflt=True):
             stderr.print("You are the boss here.")
             sys.exit()
 
@@ -391,7 +391,7 @@ class CleanUp:
         self.show_removable()
 
         # Ask for confirmation
-        if not bu_isciii.utils.prompt_yn_question("Is it okay?", dflt=True):
+        if not buisciii.utils.prompt_yn_question("Is it okay?", dflt=True):
             stderr.print("You got it.")
             sys.exit()
 

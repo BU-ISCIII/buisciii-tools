@@ -13,9 +13,9 @@ import questionary
 import rich
 import yaml
 
-import bu_isciii
-import bu_isciii.config_json
-import bu_isciii.service_json
+import buisciii
+import buisciii.config_json
+import buisciii.service_json
 
 
 def rich_force_colors():
@@ -169,7 +169,7 @@ def get_service_ids(services_requested):
         if services["service_id"] is not None:
             service_id_list.append(services["service_id"])
             service_id_list_all.append(services["service_id"])
-            services_json = bu_isciii.service_json.ServiceJson()
+            services_json = buisciii.service_json.ServiceJson()
             try:
                 service_end = services_json.get_find(services["service_id"], "end")
             except KeyError as e:
@@ -255,7 +255,7 @@ def get_sftp_folder(conf, resolution_info):
         sftp_folder = os.path.join(data_path, "sftp", sftp_folders_list[0])
         sftp_final_folder = sftp_folders_list[0]
     else:
-        sftp_final_folder = bu_isciii.utils.prompt_selection(
+        sftp_final_folder = buisciii.utils.prompt_selection(
             msg="Select SFTP folder containing the service to make tree from.",
             choices=sftp_folders_list,
         )
@@ -271,12 +271,12 @@ def append_end_to_service_id_list(services_requested):
             service_ids_requested.append(service_id["service_id"])
     for service_id in service_ids_requested:
         if (
-            bu_isciii.service_json.ServiceJson().get_find(service_id, "end") != ""
-            and bu_isciii.service_json.ServiceJson().get_find(service_id, "end")
+            buisciii.service_json.ServiceJson().get_find(service_id, "end") != ""
+            and buisciii.service_json.ServiceJson().get_find(service_id, "end")
             not in service_ids_requested
         ):
             service_ids_requested.append(
-                bu_isciii.service_json.ServiceJson().get_find(service_id, "end")
+                buisciii.service_json.ServiceJson().get_find(service_id, "end")
             )
 
     return service_ids_requested
@@ -344,7 +344,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
     lower_limit_year = initial_year if previous_date is None else previous_date.year
 
     # Range: lower_limit_year - current year
-    year = bu_isciii.utils.prompt_year(
+    year = buisciii.utils.prompt_year(
         lower_limit=lower_limit_year, upper_limit=datetime.date.today().year
     )
 
@@ -366,7 +366,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
         month_list = month_list[previous_date.month - 1 :]
 
     chosen_month_number, chosen_month_name = (
-        bu_isciii.utils.prompt_selection(
+        buisciii.utils.prompt_selection(
             f"Choose the month of {year} from which start counting",
             [f"Month {num:02d}: {month}" for num, month in month_list],
         )
@@ -407,7 +407,7 @@ def ask_date(previous_date=None, posterior_date=None, initial_year=2010):
         day_list = day_list[previous_date.day - 1 :]
 
     # from the list, get the first and last item as limits for the function
-    day = bu_isciii.utils.prompt_day(
+    day = buisciii.utils.prompt_day(
         lower_limit=int(day_list[0]), upper_limit=int(day_list[-1])
     )
 
@@ -458,10 +458,10 @@ def validate_api_credentials(cred_fields):
         return True
         # This could include a test to the API to check that the credentials are correct
         """
-        conf_api = bu_isciii.config_json.ConfigJson().get_configuration(
+        conf_api = buisciii.config_json.ConfigJson().get_configuration(
             "xtutatis_api_settings"
         )
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], user, password,
         )
         # This doesn't work, returns error 404

@@ -4,7 +4,7 @@ This markdown briefly describes the files found in `RESULTS/` folder for IRMA se
 
 ## **`taxprofiler`**
 
-Includes the results from Taxprofiler, you can find a further description in [Taxprofiler](https://github.com/BU-ISCIII/buisciii-tools/blob/main/bu_isciii/assets/reports/md/taxprofiler.md).
+Includes the results from Taxprofiler, you can find a further description in [Taxprofiler](https://github.com/BU-ISCIII/buisciii-tools/blob/main/buisciii/assets/reports/md/taxprofiler.md).
 
 ## Files in `fragment_name/`
 

@@ -12,17 +12,17 @@ import rich
 import shutil
 
 # Local imports
-import bu_isciii
-import bu_isciii.utils
-import bu_isciii.drylab_api
-import bu_isciii.config_json
+import buisciii
+import buisciii.utils
+import buisciii.drylab_api
+import buisciii.config_json
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -39,17 +39,17 @@ class Scratch:
         conf=None,
     ):
         if resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
         if tmp_dir is None:
-            self.tmp_dir = bu_isciii.utils.prompt_tmp_dir_path()
+            self.tmp_dir = buisciii.utils.prompt_tmp_dir_path()
         else:
             self.tmp_dir = tmp_dir
 
         if direction is None:
-            self.direction = bu_isciii.utils.prompt_selection(
+            self.direction = buisciii.utils.prompt_selection(
                 "Select:",
                 ["service_to_scratch", "scratch_to_service", "remove_scratch"],
             )
@@ -58,7 +58,7 @@ class Scratch:
         # Load conf
         conf_api = conf.get_configuration("xtutatis_api_settings")
         # Obtain info from iskylims api
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.conf = conf.get_configuration("scratch_copy")
@@ -75,7 +75,7 @@ class Scratch:
         self.srun_settings = [arg for param in srun_params for arg in param]
         if ask_path and path is None:
             stderr.print("Directory where service folder is located.")
-            self.path = bu_isciii.utils.prompt_path(msg="Path")
+            self.path = buisciii.utils.prompt_path(msg="Path")
         elif path == "-a":
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
@@ -89,7 +89,7 @@ class Scratch:
             )
             sys.exit()
         else:
-            self.path = bu_isciii.utils.get_service_paths(
+            self.path = buisciii.utils.get_service_paths(
                 conf,
                 "services_and_colaborations",
                 self.resolution_info,
@@ -189,11 +189,11 @@ class Scratch:
                         self.srun_command(self.srun_settings, rsync_command)
 
                         # After successful rsync, apply correct permissions
-                        conf = bu_isciii.config_json.ConfigJson()
+                        conf = buisciii.config_json.ConfigJson()
                         permissions_config = conf.get_configuration("global").get(
                             "permissions"
                         )
-                        bu_isciii.utils.remake_permissions(
+                        buisciii.utils.remake_permissions(
                             self.full_path, permissions_config
                         )
 

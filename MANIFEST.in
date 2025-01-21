@@ -1,8 +1,8 @@
 include LICENSE
 include README.md
-graft bu_isciii/templates
-graft bu_isciii/schemas
-graft bu_isciii/conf
-graft bu_isciii/assets
+graft buisciii/templates
+graft buisciii/schemas
+graft buisciii/conf
+graft buisciii/assets
 include requirements.txt
 include environment.yml
