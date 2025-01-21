@@ -28,6 +28,54 @@ The functions performed by the script can be listed as follows:
 ####################################
 # Defining functions
 
+
+# Options processing
+while getopts "MAmash" opt; do
+    case $opt in
+        M)
+            if [[ $ANALYSIS_TYPE == "2" ]]; then
+                echo "Error: options -A and -M cannot be simultaneously selected."
+                exit 1
+            fi
+            ANALYSIS_TYPE="1" # METAGENOMICS
+            ;;
+        A)
+            if [[ $ANALYSIS_TYPE == "1" ]]; then
+                echo "Error: options -A and -M cannot be simultaneously selected."
+                exit 1
+            fi
+            ANALYSIS_TYPE="2" # AMPLICONS
+            ;;
+        m)
+            method="1" # MAPPING
+            ;;
+        a)
+            if [[ $method == "1" ]]; then
+                method="3" # MAPPING + ASSEMBLY
+            else
+                method="2" # ASSEMBLY
+            fi
+            ;;
+        h)
+            echo "Usage: $0 [options]"
+            echo ""
+            echo "Selectable options:"
+            echo "  -M    Select METAGENOMICS analysis type"
+            echo "  -A    Select AMPLICONS analysis type"
+            echo "  -m    Select MAPPING as method"
+            echo "  -a    Select DE NOVO ASSEMBLY as method"
+            echo "  -h    Display help menu"
+            echo
+            exit 0
+            ;;
+        *)
+            echo "Non valid option. Usa -h for help."
+            exit 1
+            ;;
+    esac
+done
+
+
 # Coloring messages and log saving
 logfile=$(echo "$PWD/lablog_viralrecon.log")
 timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
