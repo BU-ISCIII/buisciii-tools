@@ -30,7 +30,7 @@ The functions performed by the script can be listed as follows:
 
 
 # Options processing
-while getopts "MAmash" opt; do
+while getopts "MAmapsrh" opt; do
     case $opt in
         M)
             if [[ $ANALYSIS_TYPE == "2" ]]; then
@@ -57,7 +57,25 @@ while getopts "MAmash" opt; do
             fi
             ;;
         p)
+            if [[ -n $virus_tag || $monkeypox == "y" ]]; then
+                echo "Error: options -p, -s, and -r cannot be selected simultaneously."
+                exit 1
+            fi
             monkeypox="y" # Monkeypox virus
+            ;;
+        s)
+            if [[ -n $virus_tag || $monkeypox == "y" ]]; then
+                echo "Error: options -p, -s, and -r cannot be selected simultaneously."
+                exit 1
+            fi
+            virus_tag="1" # SARS-CoV-2
+            ;;
+        r)
+            if [[ -n $virus_tag || $monkeypox == "y" ]]; then
+                echo "Error: options -p, -s, and -r cannot be selected simultaneously."
+                exit 1
+            fi
+            virus_tag="2" # RSV
             ;;
         h)
             echo "Usage: $0 [options]"
@@ -67,6 +85,9 @@ while getopts "MAmash" opt; do
             echo "  -A    Select AMPLICONS analysis type"
             echo "  -m    Select MAPPING as method"
             echo "  -a    Select DE NOVO ASSEMBLY as method"
+            echo "  -p    Select monkeypox analysis"
+            echo "  -s    Select SARS-CoV-2 analysis"
+            echo "  -r    Select RSV analysis"
             echo "  -h    Display help menu"
             echo
             exit 0
@@ -487,28 +508,41 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    echo_bold "\nPlease specify the organism to which the sequences correspond."
-    echo_bold "1. SARS-CoV-2"
-    echo_bold "2. RSV"
-    echo_bold "3. Other"
-    while true; do
-        echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
-        if [ "$virus_tag" == "1" ]; then
-            virus_tag="sars-cov-2"
-            log_message "${virus_tag^^} virus selected." green
-            break
-        elif [ "$virus_tag" == "2" ]; then
-            virus_tag="rsv"
-            log_message "${virus_tag^^} virus selected." green
-            break
-        elif [ "$virus_tag" == "3" ]; then
-            virus_tag="Other"
-            log_message "$virus_tag virus selected." green
-            break
-        else
-            echo_red "Invalid input. Please select a valid number."
-        fi
-    done
+    if [[ ! -v virus_tag ]]; then
+        echo_bold "\nPlease specify the organism to which the sequences correspond."
+        echo_bold "1. SARS-CoV-2"
+        echo_bold "2. RSV"
+        echo_bold "3. Other"
+        while true; do
+            echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
+            if [ "$virus_tag" == "1" ]; then
+                virus_tag="sars-cov-2"
+                log_message "${virus_tag^^} virus selected." green
+                break
+            elif [ "$virus_tag" == "2" ]; then
+                virus_tag="rsv"
+                log_message "${virus_tag^^} virus selected." green
+                break
+            elif [ "$virus_tag" == "3" ]; then
+                virus_tag="Other"
+                log_message "$virus_tag virus selected." green
+                break
+            if [[ "$virus_tag" != "1" && "$virus_tag" != "2" && "$virus_tag" != "3" ]]; then
+                echo_red "Invalid input. Please select a valid number."
+            else
+                break
+            fi
+        done
+    fi
+
+    if [ "$virus_tag" == "1" ]; then
+        virus_tag="sars-cov-2"
+    elif [ "$virus_tag" == "2" ]; then
+        virus_tag="rsv"
+    elif [ "$virus_tag" == "3" ]; then
+        virus_tag="Other"
+    fi
+    log_message "${virus_tag^^} virus selected." green
 
     # Preparing the environment for SARS-CoV-2 analysis
     if [ "$virus_tag" == "sars-cov-2" ]; then
