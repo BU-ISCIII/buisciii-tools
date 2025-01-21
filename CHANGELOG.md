@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated characterization/03-amrfinderplus lablog with summary generator [#406](https://github.com/BU-ISCIII/buisciii-tools/pull/406)
 - Updated lablog_viralrecon to replace conda by micromamba, and updated the output message from remove_columns_mapping_table.sh [#409](https://github.com/BU-ISCIII/buisciii-tools/pull/409)
 - Created lablog_bam2fq in viralrecon's template [#409](https://github.com/BU-ISCIII/buisciii-tools/pull/409)
+- Replaced bu_isciii by buisciii where necessary, and bu_isciii by buisciii-tools in __init__.py [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
+- Added versions for all dependencies in requirements.txt [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
 
 ### Modules
 
