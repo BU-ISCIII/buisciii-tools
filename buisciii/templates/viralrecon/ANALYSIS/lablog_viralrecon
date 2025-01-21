@@ -56,6 +56,9 @@ while getopts "MAmash" opt; do
                 method="2" # ASSEMBLY
             fi
             ;;
+        p)
+            monkeypox="y" # Monkeypox virus
+            ;;
         h)
             echo "Usage: $0 [options]"
             echo ""
@@ -466,8 +469,10 @@ fi
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
     # Nextclade is able to analyze monkeypox virus
-    echo
-    read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
+    if [[ ! -v monkeypox ]]; then
+        echo
+        read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
+    fi
     if [ "$monkeypox" == "y" ]; then
 
         log_message "Monkeypox virus (MPV) analysis selected"
