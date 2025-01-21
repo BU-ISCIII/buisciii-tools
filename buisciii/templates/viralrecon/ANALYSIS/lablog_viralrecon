@@ -394,17 +394,19 @@ log_message "Created $PARAMS_FILE file."
 echo
 
 # Setting the type of analysis
-echo_bold "\nPlease specify the type of analysis."
-echo_bold "1. METAGENOMICS"
-echo_bold "2. AMPLICONS"
-while true; do
-    echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0; echo
-    if [[ "$ANALYSIS_TYPE" != "1" && "$ANALYSIS_TYPE" != "2" ]]; then
-        echo_red "Invalid input. Please enter 1 or 2."
-    else
-        break
-    fi
-done
+if [[ ! -v ANALYSIS_TYPE ]]; then
+    echo_bold "\nPlease specify the type of analysis."
+    echo_bold "1. METAGENOMICS"
+    echo_bold "2. AMPLICONS"
+    while true; do
+        echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0; echo
+        if [[ "$ANALYSIS_TYPE" != "1" && "$ANALYSIS_TYPE" != "2" ]]; then
+            echo_red "Invalid input. Please enter 1 or 2."
+        else
+            break
+        fi
+    done
+fi
 
 if [ "$ANALYSIS_TYPE" == "1" ]; then
         ANALYSIS_TYPE="METAGENOMIC"
