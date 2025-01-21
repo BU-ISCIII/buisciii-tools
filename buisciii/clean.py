@@ -87,9 +87,7 @@ class CleanUp:
         self.full_path = os.path.join(self.path, self.service_folder)
 
         # Load service conf
-        self.services_to_clean = buisciii.utils.get_service_ids(
-            self.services_requested
-        )
+        self.services_to_clean = buisciii.utils.get_service_ids(self.services_requested)
         self.delete_folders = self.get_clean_items(
             self.services_to_clean, type="folders"
         )
