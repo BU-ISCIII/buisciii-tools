@@ -4,14 +4,14 @@ import json
 import requests
 import sys
 import rich
-import bu_isciii.utils
+import buisciii.utils
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -24,10 +24,10 @@ class RestServiceApi:
         }
         if not user:
             stderr.print("[red]Missing user for api request")
-            bu_isciii.utils.ask_for_some_text("API user: ")
+            buisciii.utils.ask_for_some_text("API user: ")
         if not password:
             stderr.print("[red]Missing password for api request")
-            bu_isciii.utils.ask_password("User password: ")
+            buisciii.utils.ask_password("User password: ")
         else:
             self.auth = (user, password)
 

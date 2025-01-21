@@ -8,16 +8,16 @@ import rich.console
 from rich.console import Console
 
 # Local imports
-import bu_isciii
-import bu_isciii.utils
-from bu_isciii.service_json import ServiceJson
+import buisciii
+import buisciii.utils
+from buisciii.service_json import ServiceJson
 
 log = logging.getLogger(__name__)
 stderr = Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -63,7 +63,7 @@ class ListServices:
             stderr.print(f"No services with name {service} found.")
             return
 
-        sort_dataframe = bu_isciii.utils.prompt_selection(
+        sort_dataframe = buisciii.utils.prompt_selection(
             "Would you like to print a sorted list?",
             ["Yes", "No"],
         )

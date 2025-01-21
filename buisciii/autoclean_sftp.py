@@ -12,16 +12,16 @@ import rich
 from datetime import datetime, timedelta
 
 # local import
-import bu_isciii
-import bu_isciii.utils
-import bu_isciii.config_json
+import buisciii
+import buisciii.utils
+import buisciii.config_json
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -68,14 +68,14 @@ class AutoremoveSftpService:
     def __init__(self, path=None, days=14, conf=None):
         # Parse input path
         if path is None:
-            use_default = bu_isciii.utils.prompt_yn_question(
+            use_default = buisciii.utils.prompt_yn_question(
                 "Use default path?: ", dflt=False
             )
             if use_default:
                 data_path = conf.get_configuration("global")["data_path"]
                 self.path = os.path.join(data_path, "sftp")
             else:
-                self.path = bu_isciii.utils.prompt_path(
+                self.path = buisciii.utils.prompt_path(
                     msg="Directory where the sftp site is allocated:"
                 )
         else:
@@ -149,7 +149,7 @@ class AutoremoveSftpService:
                 "The following services are going to be deleted from the sftp:\n"
                 + service_elements
             )
-            confirm_sftp_delete = bu_isciii.utils.prompt_yn_question(
+            confirm_sftp_delete = buisciii.utils.prompt_yn_question(
                 "Are you sure?: ", dflt=False
             )
             if confirm_sftp_delete:

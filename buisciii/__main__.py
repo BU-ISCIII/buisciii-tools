@@ -9,25 +9,25 @@ import rich.console
 import rich.logging
 import rich.traceback
 
-import bu_isciii
-import bu_isciii.config_json
-import bu_isciii.utils
-import bu_isciii.new_service
-import bu_isciii.scratch
-import bu_isciii.list
-import bu_isciii.bioinfo_doc
-import bu_isciii.clean
-import bu_isciii.archive
-import bu_isciii.copy_sftp
-import bu_isciii.autoclean_sftp
+import buisciii
+import buisciii.config_json
+import buisciii.utils
+import buisciii.new_service
+import buisciii.scratch
+import buisciii.list
+import buisciii.bioinfo_doc
+import buisciii.clean
+import buisciii.archive
+import buisciii.copy_sftp
+import buisciii.autoclean_sftp
 
 log = logging.getLogger()
 
 
-def run_bu_isciii():
+def run_buisciii():
     # Set up rich stderr console
     stderr = rich.console.Console(
-        stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()
+        stderr=True, force_terminal=buisciii.utils.rich_force_colors()
     )
 
     # Set up the rich traceback
@@ -63,7 +63,7 @@ def run_bu_isciii():
     )
 
     # Lanch the click cli
-    bu_isciii_cli()
+    buisciii_cli()
 
 
 # Customise the order of subcommands for --help
@@ -103,7 +103,7 @@ class CustomHelpOrder(click.Group):
 
 
 @click.group(cls=CustomHelpOrder)
-@click.version_option(bu_isciii.__version__)
+@click.version_option(buisciii.__version__)
 @click.option(
     "-v",
     "--verbose",
@@ -137,7 +137,7 @@ class CustomHelpOrder(click.Group):
 )
 @click.option("-d", "--dev", help="Develop settings", is_flag=True, default=False)
 @click.pass_context
-def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev):
+def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev):
     # Set the base logger to output DEBUG
     log.setLevel(logging.INFO)
     # Initialize context
@@ -154,44 +154,44 @@ def bu_isciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev
         log.addHandler(log_fh)
 
     if dev:
-        conf = bu_isciii.config_json.ConfigJson(
+        conf = buisciii.config_json.ConfigJson(
             json_file=os.path.join(
                 os.path.dirname(__file__), "conf", "configuration_dev.json"
             )
         )
     else:
-        conf = bu_isciii.config_json.ConfigJson()
+        conf = buisciii.config_json.ConfigJson()
 
-    ctx.obj = bu_isciii.utils.get_yaml_config(conf, cred_file)
+    ctx.obj = buisciii.utils.get_yaml_config(conf, cred_file)
     ctx.obj["conf"] = conf
 
-    if bu_isciii.utils.validate_api_credentials(ctx.obj):
+    if buisciii.utils.validate_api_credentials(ctx.obj):
         print("API credentials successfully extracted from yaml config file")
     else:
         if api_user:
             ctx.obj["api_user"] = api_user
         else:
-            ctx.obj["api_user"] = bu_isciii.utils.ask_for_some_text("API user: ")
+            ctx.obj["api_user"] = buisciii.utils.ask_for_some_text("API user: ")
         if api_password:
             ctx.obj["api_password"] = api_password
         else:
-            ctx.obj["api_password"] = bu_isciii.utils.ask_password("API password: ")
+            ctx.obj["api_password"] = buisciii.utils.ask_password("API password: ")
 
 
 # SERVICE LIST
-@bu_isciii_cli.command(help_priority=1)
+@buisciii_cli.command(help_priority=1)
 @click.argument("service", required=False, default=None, metavar="<service>")
 @click.pass_context
 def list(ctx, service):
     """
     List available bu-isciii services.
     """
-    service_list = bu_isciii.list.ListServices()
+    service_list = buisciii.list.ListServices()
     service_list.print_table(service)
 
 
 # CREATE NEW SERVICE
-@bu_isciii_cli.command(help_priority=2)
+@buisciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
@@ -219,7 +219,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
     """
     Create new service, it will create folder and copy template depending on selected service.
     """
-    new_ser = bu_isciii.new_service.NewService(
+    new_ser = buisciii.new_service.NewService(
         resolution,
         path,
         no_create_folder,
@@ -232,7 +232,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
 
 
 # COPY SERVICE FOLDER TO SCRATCHS TMP
-@bu_isciii_cli.command(help_priority=3)
+@buisciii_cli.command(help_priority=3)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
@@ -271,7 +271,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     """
     Copy service folder to scratch directory for execution.
     """
-    scratch_copy = bu_isciii.scratch.Scratch(
+    scratch_copy = buisciii.scratch.Scratch(
         resolution,
         path,
         tmp_dir,
@@ -285,7 +285,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
 
 
 # CLEAN SERVICE
-@bu_isciii_cli.command(help_priority=2)
+@buisciii_cli.command(help_priority=2)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
@@ -330,7 +330,7 @@ def clean(ctx, resolution, path, ask_path, option):
     Service cleaning. It will either remove big files, rename folders before copy, revert this renaming,
     show removable files or show folders for no copy.
     """
-    clean = bu_isciii.clean.CleanUp(
+    clean = buisciii.clean.CleanUp(
         resolution,
         path,
         ask_path,
@@ -343,7 +343,7 @@ def clean(ctx, resolution, path, ask_path, option):
 
 
 # COPY RESULTS FOLDER TO SFTP
-@bu_isciii_cli.command(help_priority=4)
+@buisciii_cli.command(help_priority=4)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
@@ -371,7 +371,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
     """
     Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
     """
-    new_del = bu_isciii.copy_sftp.CopySftp(
+    new_del = buisciii.copy_sftp.CopySftp(
         resolution,
         path,
         ask_path,
@@ -384,7 +384,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
 
 
 # CLEAN SCRATCH, COPY TO SERVICE, RENAME SERVICE AND COPY RESULTS FOLDER TO SFTP
-@bu_isciii_cli.command(help_priority=5)
+@buisciii_cli.command(help_priority=5)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
@@ -420,7 +420,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
     print("Starting cleaning scratch directory: " + tmp_dir)
-    clean_scratch = bu_isciii.clean.CleanUp(
+    clean_scratch = buisciii.clean.CleanUp(
         resolution,
         tmp_dir,
         ask_path,
@@ -431,7 +431,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     )
     clean_scratch.handle_clean()
     print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
-    copy_scratch2service = bu_isciii.scratch.Scratch(
+    copy_scratch2service = buisciii.scratch.Scratch(
         resolution,
         path,
         tmp_dir,
@@ -443,7 +443,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     )
     copy_scratch2service.handle_scratch()
     print("Starting renaming of the service directory.")
-    rename_databi = bu_isciii.clean.CleanUp(
+    rename_databi = buisciii.clean.CleanUp(
         resolution,
         path,
         ask_path,
@@ -454,7 +454,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     )
     rename_databi.handle_clean()
     print("Starting copy of the service directory to the SFTP folder")
-    copy_sftp = bu_isciii.copy_sftp.CopySftp(
+    copy_sftp = buisciii.copy_sftp.CopySftp(
         resolution,
         path,
         ask_path,
@@ -469,7 +469,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
 
 
 # CREATE DOCS IN BIOINFO_DOC
-@bu_isciii_cli.command(help_priority=6)
+@buisciii_cli.command(help_priority=6)
 @click.argument("resolution", required=False, default=None, metavar="<resolution id>")
 @click.option(
     "-p",
@@ -535,7 +535,7 @@ def bioinfo_doc(
     Create the folder documentation structure in bioinfo_doc server
     """
     email_pass = email_psswd if email_psswd else ctx.obj.get("email_password")
-    new_doc = bu_isciii.bioinfo_doc.BioinfoDoc(
+    new_doc = buisciii.bioinfo_doc.BioinfoDoc(
         type,
         resolution,
         path,
@@ -552,7 +552,7 @@ def bioinfo_doc(
 
 
 # ARCHIVE SERVICES
-@bu_isciii_cli.command(help_priority=7)
+@buisciii_cli.command(help_priority=7)
 @click.option("-s", "--service_id", default=None, help="service id, pe SRVCNM787")
 @click.option(
     "-sf", "--service_file", default=None, help="file with services ids, one per line"
@@ -608,7 +608,7 @@ def archive(
     """
     Archive services or retrieve services from archive
     """
-    archive_ser = bu_isciii.archive.Archive(
+    archive_ser = buisciii.archive.Archive(
         service_id,
         service_file,
         ser_type,
@@ -625,7 +625,7 @@ def archive(
 
 
 # CLEAN OLD SFTP SERVICES
-@bu_isciii_cli.command(help_priority=8)
+@buisciii_cli.command(help_priority=8)
 @click.option(
     "-s",
     "--sftp_folder",
@@ -643,14 +643,14 @@ def archive(
 @click.pass_context
 def autoclean_sftp(ctx, sftp_folder, days):
     """Clean old sftp services"""
-    sftp_clean = bu_isciii.autoclean_sftp.AutoremoveSftpService(
+    sftp_clean = buisciii.autoclean_sftp.AutoremoveSftpService(
         sftp_folder, days, ctx.obj["conf"]
     )
     sftp_clean.handle_autoclean_sftp()
 
 
 # FIX PERMISSIONS
-@bu_isciii_cli.command(help_priority=9)
+@buisciii_cli.command(help_priority=9)
 @click.option(
     "-d",
     "--input_directory",
@@ -665,19 +665,19 @@ def fix_permissions(ctx, input_directory):
     """
     Fix permissions
     """
-    conf = bu_isciii.config_json.ConfigJson()
+    conf = buisciii.config_json.ConfigJson()
     permissions = conf.get_configuration("global").get("permissions")
     stderr = rich.console.Console(
-        stderr=True, force_terminal=bu_isciii.utils.rich_force_colors()
+        stderr=True, force_terminal=buisciii.utils.rich_force_colors()
     )
 
     for directory in input_directory:
         if not os.path.isdir(directory):
             stderr.print(f"[red]Invalid input directory: {directory}")
             continue
-        bu_isciii.utils.remake_permissions(directory, permissions)
+        buisciii.utils.remake_permissions(directory, permissions)
         stderr.print(f"[green]Correct permissions were applied to {directory}")
 
 
 if __name__ == "__main__":
-    run_bu_isciii()
+    run_buisciii()

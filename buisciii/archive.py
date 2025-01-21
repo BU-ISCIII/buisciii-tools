@@ -9,17 +9,17 @@ from math import pow
 import rich
 import sysrsync
 
-import bu_isciii
-import bu_isciii.config_json
-import bu_isciii.drylab_api
-import bu_isciii.utils
+import buisciii
+import buisciii.config_json
+import buisciii.drylab_api
+import buisciii.utils
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -48,7 +48,7 @@ class Archive:
         if output_name:
             self.output_name = output_name
         else:
-            self.output_name = bu_isciii.utils.prompt_path(
+            self.output_name = buisciii.utils.prompt_path(
                 "Write output path with filename for tsv output:"
             )
 
@@ -79,7 +79,7 @@ class Archive:
         conf_api = conf.get_configuration("api_settings")
 
         # Initiate API
-        rest_api = bu_isciii.drylab_api.RestServiceApi(
+        rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"],
             conf_api["api_url"],
             api_user,
@@ -96,7 +96,7 @@ class Archive:
             "research",
         ]:
             stderr.print("Working with a service, or a research resolution?")
-            self.ser_type = bu_isciii.utils.prompt_selection(
+            self.ser_type = buisciii.utils.prompt_selection(
                 "Type",
                 ["services_and_colaborations", "research"],
             )
@@ -130,7 +130,7 @@ class Archive:
             stderr.print(
                 "Both a date and a service ID or service list have been chosen. "
             )
-            prompt_response = bu_isciii.utils.prompt_selection(
+            prompt_response = buisciii.utils.prompt_selection(
                 "Which one would you like to keep?",
                 ["Search by date", "Search by ID", "Search using file"],
             )
@@ -153,7 +153,7 @@ class Archive:
             and (services_file is None)
         ):
             if self.ser_type == "services_and_colaborations":
-                prompt_response = bu_isciii.utils.prompt_selection(
+                prompt_response = buisciii.utils.prompt_selection(
                     "Search services by date, or by service ID?",
                     ["Search by date", "Service ID"],
                 )
@@ -163,11 +163,11 @@ class Archive:
             log.info("Services chosen by: " + prompt_response)
             if prompt_response == "Search by date":
                 stderr.print("Please state the initial date for filtering")
-                self.date_from = bu_isciii.utils.ask_date()
+                self.date_from = buisciii.utils.ask_date()
                 stderr.print(
                     "Please state the final date for filtering (must be posterior or identical to the initial date)"
                 )
-                self.date_until = bu_isciii.utils.ask_date(previous_date=self.date_from)
+                self.date_until = buisciii.utils.ask_date(previous_date=self.date_from)
 
                 log.info(f"Starting date: {self.date_from} (chosen through prompt)")
                 log.info(f"Ending date: {self.date_until} (chosen through prompt)")
@@ -175,7 +175,7 @@ class Archive:
                     f"Asking our trusty API about resolutions between: {self.date_from} and {self.date_until}"
                 )
             elif prompt_response == "Service ID":
-                service_id = bu_isciii.utils.prompt_service_id()
+                service_id = buisciii.utils.prompt_service_id()
                 self.services = {
                     service_id: {
                         key: value for key, value in dictionary_template.items()
@@ -185,14 +185,14 @@ class Archive:
 
                 # Ask if more services will be chosen
                 while True:
-                    prompt_response = bu_isciii.utils.prompt_selection(
+                    prompt_response = buisciii.utils.prompt_selection(
                         "Would you like to add any other service?",
                         ["Add more services", "Do not add more services"],
                     )
                     if prompt_response == "Do not add more services":
                         break
                     else:
-                        new_service = bu_isciii.utils.prompt_service_id()
+                        new_service = buisciii.utils.prompt_service_id()
                         self.services[new_service] = {
                             key: value for key, value in dictionary_template.items()
                         }
@@ -273,14 +273,14 @@ class Archive:
                 else:
                     self.services[service]["found_in_system"] = True
                     self.services[service]["archived_path"] = os.path.join(
-                        bu_isciii.utils.get_service_paths(
+                        buisciii.utils.get_service_paths(
                             conf, self.ser_type, service_data, "archived_path"
                         ),
                         service_data["resolutions"][0]["resolution_full_number"],
                     )
 
                     self.services[service]["non_archived_path"] = os.path.join(
-                        bu_isciii.utils.get_service_paths(
+                        buisciii.utils.get_service_paths(
                             conf, self.ser_type, service_data, "non_archived_path"
                         ),
                         service_data["resolutions"][0]["resolution_full_number"],
@@ -330,7 +330,7 @@ class Archive:
                 )
                 if not self.skip_prompts:
                     if (
-                        bu_isciii.utils.prompt_selection(
+                        buisciii.utils.prompt_selection(
                             "Continue?", ["Yes, continue", "Exit"]
                         )
                     ) == "Exit":
@@ -352,7 +352,7 @@ class Archive:
 
         if option is None:
             stderr.print("Willing to archive, or retrieve a resolution?")
-            self.option = bu_isciii.utils.prompt_selection(
+            self.option = buisciii.utils.prompt_selection(
                 "Options",
                 [
                     "Scout for service size",
@@ -392,13 +392,13 @@ class Archive:
         for service in self.services.keys():
             if "Data dir" in self.services[service]["found"]:
                 self.services[service]["non_archived_size"] = (
-                    bu_isciii.utils.get_dir_size(
+                    buisciii.utils.get_dir_size(
                         self.services[service]["non_archived_path"]
                     )
                     / pow(1024, 3)
                 )
             if "Archive" in self.services[service]["found"]:
-                self.services[service]["archived_size"] = bu_isciii.utils.get_dir_size(
+                self.services[service]["archived_size"] = buisciii.utils.get_dir_size(
                     self.services[service]["archived_path"]
                 ) / pow(1024, 3)
 
@@ -485,7 +485,7 @@ class Archive:
                     message = "automatically selected due to --skip-prompts"
                 else:
                     message = "selected throught prompt"
-                    prompt_response = bu_isciii.utils.prompt_selection(
+                    prompt_response = buisciii.utils.prompt_selection(
                         "What to do?",
                         [
                             "Just skip it",
@@ -512,7 +512,7 @@ class Archive:
                     == "Found already compressed"
                 ):
                     stderr.print(f"Compressing service {service}")
-                    bu_isciii.utils.targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
+                    buisciii.utils.targz_dir(dir_to_tar + ".tar.gz", dir_to_tar)
                     self.services[service]["compressed"] = "Successfully compressed"
 
             except Exception as e:
@@ -661,7 +661,7 @@ class Archive:
                     )
                     continue
                 else:
-                    prompt_response = bu_isciii.utils.prompt_selection(
+                    prompt_response = buisciii.utils.prompt_selection(
                         "What to do", ["Skip it", "Exit"]
                     )
                     if prompt_response == "Skip it":
@@ -690,7 +690,7 @@ class Archive:
                     prompt_response = f"Remove it and {direction} it again"
                     message = "(automatically option skip-prompts activated)"
                 else:
-                    prompt_response = bu_isciii.utils.prompt_selection(
+                    prompt_response = buisciii.utils.prompt_selection(
                         "What to do?",
                         [f"Remove it and {direction} it again", "Ignore this service"],
                     )
@@ -715,7 +715,7 @@ class Archive:
                     ] = "Compressed directory found in destiny. Skipped."
                     continue
 
-            origin_md5 = bu_isciii.utils.get_md5(origin + ".tar.gz")
+            origin_md5 = buisciii.utils.get_md5(origin + ".tar.gz")
 
             # save origin md5
             if direction == "archive":
@@ -730,7 +730,7 @@ class Archive:
                     options=self.conf["options"],
                     sync_source_contents=False,
                 )
-                destiny_md5 = bu_isciii.utils.get_md5(destiny + ".tar.gz")
+                destiny_md5 = buisciii.utils.get_md5(destiny + ".tar.gz")
 
                 # save destiny md5
                 if direction == "archive":
@@ -861,7 +861,7 @@ class Archive:
                             "(automatically delete and uncompress, --skip-prompts)"
                         )
                     else:
-                        prompt_response = bu_isciii.utils.prompt_selection(
+                        prompt_response = buisciii.utils.prompt_selection(
                             "What to do?",
                             [
                                 "Skip (dont uncompress)",
@@ -895,7 +895,7 @@ class Archive:
 
                 stderr.print(f"Uncompressing {dir_to_untar.split('/')[-1] + '.tar.gz'}")
 
-                bu_isciii.utils.uncompress_targz_directory(
+                buisciii.utils.uncompress_targz_directory(
                     dir_to_untar + ".tar.gz", dir_to_untar
                 )
 

@@ -22,17 +22,17 @@ from smtplib import SMTP
 import ssl
 
 # Local imports
-import bu_isciii.utils
-import bu_isciii.config_json
-import bu_isciii.drylab_api
-import bu_isciii.service_json
+import buisciii.utils
+import buisciii.config_json
+import buisciii.drylab_api
+import buisciii.service_json
 
 log = logging.getLogger(__name__)
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
     highlight=False,
-    force_terminal=bu_isciii.utils.rich_force_colors(),
+    force_terminal=buisciii.utils.rich_force_colors(),
 )
 
 
@@ -52,14 +52,14 @@ class BioinfoDoc:
         email_psswd=None,
     ):
         if type is None:
-            self.type = bu_isciii.utils.prompt_selection(
+            self.type = buisciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
                 choices=["service_info", "delivery"],
             )
         self.conf = conf.get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
-                self.path = bu_isciii.utils.prompt_path(
+                self.path = buisciii.utils.prompt_path(
                     msg="Path where bioinfo_doc folder is mounted in your local WS."
                 )
             else:
@@ -70,11 +70,11 @@ class BioinfoDoc:
             stderr.print("[red] Folder does not exist. " + self.path + "!")
             sys.exit(1)
         if resolution_id is None:
-            self.resolution_id = bu_isciii.utils.prompt_resolution_id()
+            self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
         conf_api = conf.get_configuration("api_settings")
-        self.rest_api = bu_isciii.drylab_api.RestServiceApi(
+        self.rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
         self.resolution_info = self.rest_api.get_request(
@@ -86,7 +86,7 @@ class BioinfoDoc:
         if self.type == "delivery":
             if len(self.resolution_info["resolutions"][0]["delivery"]) > 0:
                 print("Service delivery already exist.")
-                if bu_isciii.utils.prompt_yn_question(
+                if buisciii.utils.prompt_yn_question(
                     "Do you want to overwrite delivery info?", dflt=False
                 ):
                     self.post_delivery_info()
@@ -110,23 +110,23 @@ class BioinfoDoc:
                     sys.exit()
             else:
                 self.service_ids_requested_list = (
-                    bu_isciii.utils.append_end_to_service_id_list(
+                    buisciii.utils.append_end_to_service_id_list(
                         self.services_requested
                     )
                 )
                 for service_id_requested in self.service_ids_requested_list:
                     if (
-                        bu_isciii.service_json.ServiceJson().get_find(
+                        buisciii.service_json.ServiceJson().get_find(
                             service_id_requested, "delivery_md"
                         )
                         not in self.delivery_md_list
-                        and bu_isciii.service_json.ServiceJson().get_find(
+                        and buisciii.service_json.ServiceJson().get_find(
                             service_id_requested, "delivery_md"
                         )
                         != ""
                     ):
                         self.delivery_md_list.append(
-                            bu_isciii.service_json.ServiceJson().get_find(
+                            buisciii.service_json.ServiceJson().get_find(
                                 service_id_requested, "delivery_md"
                             )
                         )
@@ -143,23 +143,23 @@ class BioinfoDoc:
             else:
                 for service_id_requested in self.service_ids_requested_list:
                     if (
-                        bu_isciii.service_json.ServiceJson().get_find(
+                        buisciii.service_json.ServiceJson().get_find(
                             service_id_requested, "results_md"
                         )
                         not in self.results_md_list
-                        and bu_isciii.service_json.ServiceJson().get_find(
+                        and buisciii.service_json.ServiceJson().get_find(
                             service_id_requested, "results_md"
                         )
                         != ""
                     ):
                         self.results_md_list.append(
-                            bu_isciii.service_json.ServiceJson().get_find(
+                            buisciii.service_json.ServiceJson().get_find(
                                 service_id_requested, "results_md"
                             )
                         )
 
         if self.type == "delivery":
-            self.sftp_data = bu_isciii.utils.get_sftp_folder(conf, self.resolution_info)
+            self.sftp_data = buisciii.utils.get_sftp_folder(conf, self.resolution_info)
         if self.type == "delivery" and sftp_folder is None:
             self.sftp_folder = self.sftp_data[0]
         else:
@@ -205,7 +205,7 @@ class BioinfoDoc:
         self.service_result_folder = self.conf["service_folder"][1]
         if email_psswd is None and self.type == "delivery":
             stderr.print("Write password for bioinformatica@isciii.es")
-            self.email_psswd = bu_isciii.utils.ask_password("E-mail password: ")
+            self.email_psswd = buisciii.utils.ask_password("E-mail password: ")
         else:
             self.email_psswd = email_psswd
 
@@ -214,7 +214,7 @@ class BioinfoDoc:
             for service_id_requested in self.service_ids_requested_list:
                 service_list[
                     service_id_requested
-                ] = bu_isciii.service_json.ServiceJson().get_find(
+                ] = buisciii.service_json.ServiceJson().get_find(
                     service_id_requested, "label"
                 )
             self.all_services = service_list
@@ -308,11 +308,11 @@ class BioinfoDoc:
         return
 
     def post_delivery_info(self):
-        if bu_isciii.utils.prompt_yn_question(
+        if buisciii.utils.prompt_yn_question(
             msg="Do you wish to provide a text file for delivery notes?", dflt=False
         ):
             for i in range(3, -1, -1):
-                self.provided_txt = bu_isciii.utils.prompt_path(
+                self.provided_txt = buisciii.utils.prompt_path(
                     msg="Write the path to the file with RAW text as delivery notes"
                 )
                 if not os.path.isfile(os.path.expanduser(self.provided_txt)):
@@ -330,7 +330,7 @@ class BioinfoDoc:
             with open(os.path.expanduser(self.provided_txt)) as f:
                 self.delivery_notes = f.read()
         else:
-            self.delivery_notes = bu_isciii.utils.ask_for_some_text(
+            self.delivery_notes = buisciii.utils.ask_for_some_text(
                 msg="Write some delivery notes:"
             )
         delivery_dict = {
@@ -636,27 +636,27 @@ class BioinfoDoc:
 
     def email_creation(self):
         email_data = {}
-        if bu_isciii.utils.prompt_yn_question(
+        if buisciii.utils.prompt_yn_question(
             "Do you want to add some delivery notes to the e-mail?", dflt=False
         ):
             if self.provided_txt:
-                if bu_isciii.utils.prompt_yn_question(
+                if buisciii.utils.prompt_yn_question(
                     f"Do you want to use notes from {self.provided_txt}?", dflt=False
                 ):
                     email_data["email_notes"] = self.delivery_notes.replace(
                         "\n", "<br />"
                     )
                 else:
-                    email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
+                    email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                         msg="Write email notes"
                     ).replace("\n", "<br />")
             else:
-                if bu_isciii.utils.prompt_yn_question(
+                if buisciii.utils.prompt_yn_question(
                     msg="Do you wish to provide a text file for email notes?",
                     dflt=False,
                 ):
                     for i in range(3, -1, -1):
-                        email_data["email_notes"] = bu_isciii.utils.prompt_path(
+                        email_data["email_notes"] = buisciii.utils.prompt_path(
                             msg="Write the path to the file with RAW text as email notes"
                         )
                         if not os.path.isfile(
@@ -680,7 +680,7 @@ class BioinfoDoc:
                     with open(os.path.expanduser(email_data["email_notes"])) as f:
                         email_data["email_notes"] = f.read().replace("\n", "<br />")
                 else:
-                    email_data["email_notes"] = bu_isciii.utils.ask_for_some_text(
+                    email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                         msg="Write email notes"
                     ).replace("\n", "<br />")
 
@@ -728,7 +728,7 @@ class BioinfoDoc:
             + " - "
             + self.service_name.split("_", 5)[2]
         )
-        if bu_isciii.utils.prompt_yn_question(
+        if buisciii.utils.prompt_yn_question(
             "Do you want to add any other sender? apart from %s. Note: %s is the default CC."
             % (self.resolution_info["service_user_id"]["email"], default_cc),
             dflt=False,
@@ -736,7 +736,7 @@ class BioinfoDoc:
             stderr.print(
                 "[red] Write emails to be added in semicolon separated format: icuesta@isciii.es;user2@isciii.es"
             )
-            cc_address = bu_isciii.utils.ask_for_some_text(msg="E-mails:")
+            cc_address = buisciii.utils.ask_for_some_text(msg="E-mails:")
         else:
             cc_address = str()
         if cc_address:
@@ -774,7 +774,7 @@ class BioinfoDoc:
                 result_pdf = self.create_results_doc(self.results_md_list, "results")
             else:
                 stderr.print("Results markdown does not exist.")
-                if bu_isciii.utils.prompt_yn_question(
+                if buisciii.utils.prompt_yn_question(
                     "Do you want to continue without it?", dflt=True
                 ):
                     result_pdf = None
@@ -785,7 +785,7 @@ class BioinfoDoc:
                 service_pdf = self.create_results_doc(self.delivery_md_list, "service")
             else:
                 stderr.print("Delivery markdown does not exist.")
-                if bu_isciii.utils.prompt_yn_question(
+                if buisciii.utils.prompt_yn_question(
                     "Do you want to continue without it?", dflt=True
                 ):
                     service_pdf = None
@@ -796,7 +796,7 @@ class BioinfoDoc:
             self.clean_files()
             self.sftp_tree()
             email_html = self.email_creation()
-            if bu_isciii.utils.prompt_yn_question(
+            if buisciii.utils.prompt_yn_question(
                 "Do you want to send e-mail automatically?", dflt=True
             ):
                 self.send_email(email_html, results_pdf)
