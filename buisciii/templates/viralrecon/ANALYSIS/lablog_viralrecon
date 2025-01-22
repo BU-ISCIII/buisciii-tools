@@ -79,6 +79,7 @@ while getopts "MAmapsrfh" opt; do
             ;;
         f)
             samples_ref_prepared="y"
+            ;;
         h)
             echo "Usage: $0 [options]"
             echo ""
