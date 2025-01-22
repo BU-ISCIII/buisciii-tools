@@ -515,18 +515,6 @@ else
         echo_bold "3. Other"
         while true; do
             echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
-            if [ "$virus_tag" == "1" ]; then
-                virus_tag="sars-cov-2"
-                log_message "${virus_tag^^} virus selected." green
-                break
-            elif [ "$virus_tag" == "2" ]; then
-                virus_tag="rsv"
-                log_message "${virus_tag^^} virus selected." green
-                break
-            elif [ "$virus_tag" == "3" ]; then
-                virus_tag="Other"
-                log_message "$virus_tag virus selected." green
-                break
             if [[ "$virus_tag" != "1" && "$virus_tag" != "2" && "$virus_tag" != "3" ]]; then
                 echo_red "Invalid input. Please select a valid number."
             else
