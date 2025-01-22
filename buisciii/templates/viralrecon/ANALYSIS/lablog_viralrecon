@@ -30,7 +30,7 @@ The functions performed by the script can be listed as follows:
 
 
 # Options processing
-while getopts "MAmapsrh" opt; do
+while getopts "MAmapsrfh" opt; do
     case $opt in
         M)
             if [[ $ANALYSIS_TYPE == "2" ]]; then
@@ -77,6 +77,8 @@ while getopts "MAmapsrh" opt; do
             fi
             virus_tag="2" # RSV
             ;;
+        f)
+            samples_ref_prepared="y"
         h)
             echo "Usage: $0 [options]"
             echo ""
@@ -88,6 +90,7 @@ while getopts "MAmapsrh" opt; do
             echo "  -p    Select monkeypox analysis"
             echo "  -s    Select SARS-CoV-2 analysis"
             echo "  -r    Select RSV analysis"
+            echo "  -f    samples_ref.txt file ready"
             echo "  -h    Display help menu"
             echo
             exit 0
@@ -470,21 +473,29 @@ fi
 
 # Setting samples_ref.txt file
 echo
-read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0; echo
-if [ "$samples_ref_prepared" == "y" ]; then 
-    log_message "File samples_ref.txt READY. \xE2\x9C\x85"
-else
+if [[ ! -v samples_ref_prepared ]]; then
+    if [[  -z $2 && -z $3  ]]; then
+        read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0; echo
+        if [ "$samples_ref_prepared" == "y" ]; then 
+            log_message "File samples_ref.txt READY. \xE2\x9C\x85"
+        else
+            log_message "File samples_ref NOT prepared."
+            while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
+                read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
+                read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
+                read -p $'\e[1;37mAre reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] and host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
+            done
+        fi
+    else
+        reference=$2
+        host=$3
+    fi
     : > samples_ref.txt
-    log_message "File samples_ref NOT prepared."
-    while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
-        read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
-        read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
-        read -p $'\e[1;37mAre reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] and host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
-    done
     while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
     log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
+else
+    log_message "File samples_ref.txt READY. \xE2\x9C\x85"
 fi
-
 
 # Preparing enviroment for METAGENOMIC analysis
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
