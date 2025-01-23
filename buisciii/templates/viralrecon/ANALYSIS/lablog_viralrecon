@@ -43,7 +43,6 @@ while getopts "MAmapsrfh" opt; do
                 exit 1
             fi
             ANALYSIS_TYPE="1" # METAGENOMICS
-
             interactive_mode="off"
             ;;
         A)
@@ -52,9 +51,7 @@ while getopts "MAmapsrfh" opt; do
                 exit 1
             fi
             ANALYSIS_TYPE="2" # AMPLICONS
-
             if [[ ! -v virus_tag ]]; then virus_tag="No"; fi
-            
             interactive_mode="off"
             ;;
         m)
@@ -67,28 +64,16 @@ while getopts "MAmapsrfh" opt; do
                 method="2" # ASSEMBLY
             fi
             ;;
-        p)
+        p|s|r)
             if [[ $selected_virus == "yes" ]]; then
                 echo "Error: options -p, -s, and -r cannot be selected simultaneously."
                 exit 1
             fi
-            monkeypox="y" # Monkeypox virus
-            selected_virus="yes"
-            ;;
-        s)
-            if [[ $selected_virus == "yes" ]]; then
-                echo "Error: options -p, -s, and -r cannot be selected simultaneously."
-                exit 1
-            fi
-            virus_tag="sars-cov-2" # SARS-CoV-2
-            selected_virus="yes"
-            ;;
-        r)
-            if [[ $selected_virus == "yes" ]]; then
-                echo "Error: options -p, -s, and -r cannot be selected simultaneously."
-                exit 1
-            fi
-            virus_tag="rsv" # RSV
+            case $opt in
+                p) monkeypox="y";;
+                s) virus_tag="sars-cov-2";;
+                r) virus_tag="rsv";;
+            esac
             selected_virus="yes"
             ;;
         f)
