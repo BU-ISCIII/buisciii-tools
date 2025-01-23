@@ -38,6 +38,8 @@ while getopts "MAmapsrfh" opt; do
                 exit 1
             fi
             ANALYSIS_TYPE="1" # METAGENOMICS
+
+            if [[ ! -v virus_tag ]]; then virus_tag="No"; fi
             ;;
         A)
             if [[ $ANALYSIS_TYPE == "1" ]]; then
@@ -68,14 +70,14 @@ while getopts "MAmapsrfh" opt; do
                 echo "Error: options -p, -s, and -r cannot be selected simultaneously."
                 exit 1
             fi
-            virus_tag="1" # SARS-CoV-2
+            virus_tag="sars-cov-2" # SARS-CoV-2
             ;;
         r)
             if [[ -n $virus_tag || $monkeypox == "y" ]]; then
                 echo "Error: options -p, -s, and -r cannot be selected simultaneously."
                 exit 1
             fi
-            virus_tag="2" # RSV
+            virus_tag="rsv" # RSV
             ;;
         f)
             samples_ref_prepared="y"
@@ -533,15 +535,16 @@ else
                 break
             fi
         done
+
+        if [[ "$virus_tag" == "1" ]]; then
+            virus_tag="sars-cov-2"
+        elif [[ "$virus_tag" == "2" ]]; then
+            virus_tag="rsv"
+        else
+            virus_tag="No"
+        fi
     fi
 
-    if [ "$virus_tag" == "1" ]; then
-        virus_tag="sars-cov-2"
-    elif [ "$virus_tag" == "2" ]; then
-        virus_tag="rsv"
-    elif [ "$virus_tag" == "3" ]; then
-        virus_tag="Other"
-    fi
     log_message "${virus_tag^^} virus selected." green
 
     # Preparing the environment for SARS-CoV-2 analysis
