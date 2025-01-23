@@ -63,25 +63,28 @@ while getopts "MAmapsrfh" opt; do
             fi
             ;;
         p)
-            if [[ -n $virus_tag || $monkeypox == "y" ]]; then
+            if [[ $selected_virus == "yes" ]]; then
                 echo "Error: options -p, -s, and -r cannot be selected simultaneously."
                 exit 1
             fi
             monkeypox="y" # Monkeypox virus
+            selected_virus="yes"
             ;;
         s)
-            if [[ -n $virus_tag || $monkeypox == "y" ]]; then
+            if [[ $selected_virus == "yes" ]]; then
                 echo "Error: options -p, -s, and -r cannot be selected simultaneously."
                 exit 1
             fi
             virus_tag="sars-cov-2" # SARS-CoV-2
+            selected_virus="yes"
             ;;
         r)
-            if [[ -n $virus_tag || $monkeypox == "y" ]]; then
+            if [[ $selected_virus == "yes" ]]; then
                 echo "Error: options -p, -s, and -r cannot be selected simultaneously."
                 exit 1
             fi
             virus_tag="rsv" # RSV
+            selected_virus="yes"
             ;;
         f)
             samples_ref_prepared="y"
