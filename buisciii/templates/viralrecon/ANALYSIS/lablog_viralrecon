@@ -522,7 +522,7 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    if [[ "$interactive_mode" != "off" ]]; then
+    if [[ "$interactive_mode" == "off" || ! -v virus_tag ]]; then
         echo_bold "\nPlease specify the organism to which the sequences correspond."
         echo_bold "1. SARS-CoV-2"
         echo_bold "2. RSV"
