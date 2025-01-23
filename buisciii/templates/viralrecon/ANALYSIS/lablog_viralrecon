@@ -105,7 +105,7 @@ while getopts "MAmapsrfh" opt; do
             echo "  -p    Select monkeypox analysis"
             echo "  -s    Select SARS-CoV-2 analysis"
             echo "  -r    Select RSV analysis"
-            echo "  -f    samples_ref.txt file ready"
+            echo "  -f    File samples_ref.txt is ready"
             echo "  -h    Display help menu"
             echo
             exit 0
