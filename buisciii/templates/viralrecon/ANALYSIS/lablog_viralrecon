@@ -38,8 +38,6 @@ while getopts "MAmapsrfh" opt; do
                 exit 1
             fi
             ANALYSIS_TYPE="1" # METAGENOMICS
-
-            if [[ ! -v virus_tag ]]; then virus_tag="No"; fi
             ;;
         A)
             if [[ $ANALYSIS_TYPE == "1" ]]; then
@@ -47,6 +45,8 @@ while getopts "MAmapsrfh" opt; do
                 exit 1
             fi
             ANALYSIS_TYPE="2" # AMPLICONS
+
+            if [[ ! -v virus_tag ]]; then virus_tag="No"; fi
             ;;
         m)
             method="1" # MAPPING
