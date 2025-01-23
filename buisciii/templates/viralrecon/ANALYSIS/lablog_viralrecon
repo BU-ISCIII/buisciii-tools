@@ -488,14 +488,17 @@ if [[ ! -v samples_ref_prepared ]]; then
                 read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
                 read -p $'\e[1;37mAre reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] and host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
             done
+            : > samples_ref.txt
+            while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
+            log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
         fi
     else
         reference=$2
         host=$3
+        : > samples_ref.txt
+        while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
+        log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
     fi
-    : > samples_ref.txt
-    while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
-    log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
 else
     log_message "File samples_ref.txt READY. \xE2\x9C\x85"
 fi
