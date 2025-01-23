@@ -9,6 +9,11 @@ working environment, by preparing and updating the software to be used in the an
 as well as preparing and downloading the reference sequences required for the correct
 execution of the analysis.
 
+By default, an interactive mode prompts the user for all information needed to configure
+the pipeline environment. However, this script is able to accept some options when executed
+that provide all the information needed to configure the environment. All available options
+are displayed using “lablog_viralrecon -h”.
+
 The functions performed by the script can be listed as follows:
 - Preparation of the environment depending on the type of sequencing (metagenomics/amplicons),
   the method of analysis (mapping/assembly) as well as some presets depending on the microorganism (SARS, RSV or MPV).
