@@ -38,6 +38,8 @@ while getopts "MAmapsrfh" opt; do
                 exit 1
             fi
             ANALYSIS_TYPE="1" # METAGENOMICS
+
+            interactive_mode="off"
             ;;
         A)
             if [[ $ANALYSIS_TYPE == "1" ]]; then
@@ -47,6 +49,8 @@ while getopts "MAmapsrfh" opt; do
             ANALYSIS_TYPE="2" # AMPLICONS
 
             if [[ ! -v virus_tag ]]; then virus_tag="No"; fi
+            
+            interactive_mode="off"
             ;;
         m)
             method="1" # MAPPING
@@ -507,7 +511,7 @@ fi
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
     # Nextclade is able to analyze monkeypox virus
-    if [[ ! -v monkeypox ]]; then
+    if [[ "$interactive_mode" != "off" ]]; then
         echo
         read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
     fi
@@ -525,7 +529,7 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    if [[ ! -v virus_tag ]]; then
+    if [[ "$interactive_mode" != "off" ]]; then
         echo_bold "\nPlease specify the organism to which the sequences correspond."
         echo_bold "1. SARS-CoV-2"
         echo_bold "2. RSV"
