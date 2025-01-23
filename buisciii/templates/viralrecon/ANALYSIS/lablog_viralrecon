@@ -205,7 +205,7 @@ update_pangolin() {
     sed -i "s|skip_pangolin: true|skip_pangolin: false|" "$PARAMS_FILE"
     log_message "File $PARAMS_FILE UPDATED."
 
-    log_message "Finished PANGOLIN check/update" bold
+    log_message "Finished PANGOLIN check/update." bold
     echo
 }
 
@@ -248,7 +248,7 @@ update_nextclade() {
     echo "nextclade_dataset: false" >> $PARAMS_FILE
     log_message "File $PARAMS_FILE UPDATED."
 
-    log_message "Finished NEXTCLADE check/update" bold
+    log_message "Finished NEXTCLADE check/update." bold
     echo
 }
 
