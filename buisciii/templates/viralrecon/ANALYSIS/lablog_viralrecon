@@ -39,7 +39,7 @@ while getopts "MAmapsrfh" opt; do
     case $opt in
         M)
             if [[ $ANALYSIS_TYPE == "2" ]]; then
-                echo "Error: options -A and -M cannot be simultaneously selected."
+                echo "Error: options -A and -M cannot be selected simultaneously."
                 exit 1
             fi
             ANALYSIS_TYPE="1" # METAGENOMICS
@@ -47,7 +47,7 @@ while getopts "MAmapsrfh" opt; do
             ;;
         A)
             if [[ $ANALYSIS_TYPE == "1" ]]; then
-                echo "Error: options -A and -M cannot be simultaneously selected."
+                echo "Error: options -A and -M cannot be selected simultaneously."
                 exit 1
             fi
             ANALYSIS_TYPE="2" # AMPLICONS
@@ -80,19 +80,37 @@ while getopts "MAmapsrfh" opt; do
             samples_ref_prepared="y"
             ;;
         h)
-            echo "Usage: $0 [options]"
-            echo ""
-            echo "Selectable options:"
-            echo "  -M    Select METAGENOMICS analysis type"
-            echo "  -A    Select AMPLICONS analysis type"
-            echo "  -m    Select MAPPING as method"
-            echo "  -a    Select DE NOVO ASSEMBLY as method"
-            echo "  -p    Select monkeypox analysis"
-            echo "  -s    Select SARS-CoV-2 analysis"
-            echo "  -r    Select RSV analysis"
-            echo "  -f    File samples_ref.txt is ready"
-            echo "  -h    Display help menu"
-            echo
+            cat <<EOF
+Usage: $0 [options] [reference] [host]
+
+Selectable options:
+   · Analysis type:
+       -M     Select METAGENOMICS analysis type
+       -A     Select AMPLICONS analysis type
+   · Method:
+       -m     Select MAPPING as method
+       -a     Select DE NOVO ASSEMBLY as method
+   · Virus selection:
+       -p     Select monkeypox analysis
+       -s     Select SARS-CoV-2 analysis
+       -r     Select RSV analysis
+   · Other options:
+       -f     File samples_ref.txt is ready
+       -h     Display this help menu
+
+The available options allow to run the lablog_viralrecon in a non-interactive mode.
+Options -A and -M cannot be selected simultaneously.
+Options -p, -s, and -r cannot be selected simultaneously.
+It is not mandatory to select a virus, in which case it is assumed that the viruses
+present in the samples correspond to another viruses than the ones available here.
+In case the -f option is not selected, it is optional to enter the reference and
+the host as arguments following the options (for those cases where there is only 1
+reference and 1 host. Otherwise, the samples_ref.txt file must be previously prepared
+and the -f option must be selected).
+
+Example: bash lablog_viralrecon -Amasf (samples_ref.txt previously prepared)
+Example: bash lablog_viralrecon -Amas NC_045512.2 human
+EOF
             exit 0
             ;;
         *)
