@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sara Monzón](https://github.com/saramonzon)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Jaime Ozáez](https://github.com/jaimeozaezm)
 
 ### Template fixes and updates
 
@@ -21,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Created lablog_bam2fq in viralrecon's template [#409](https://github.com/BU-ISCIII/buisciii-tools/pull/409)
 - Replaced bu_isciii by buisciii where necessary, and bu_isciii by buisciii-tools in __init__.py [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
 - Added versions for all dependencies in requirements.txt [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
+- Implemented a non-interactive mode for running lablog_viralrecon [#410](https://github.com/BU-ISCIII/buisciii-tools/pull/410)
 
 ### Modules
 
