@@ -439,7 +439,7 @@ log_message "Created $PARAMS_FILE file."
 echo
 
 # Setting the type of analysis
-if [[ ! -v ANALYSIS_TYPE ]]; then
+if [[ ! -v ANALYSIS_TYPE ]]; then # If $ANALYSIS_TYPE is not specified with options -M or -A, ask the user
     echo_bold "\nPlease specify the type of analysis."
     echo_bold "1. METAGENOMICS"
     echo_bold "2. AMPLICONS"
@@ -462,7 +462,7 @@ log_message "$ANALYSIS_TYPE analysis selected." green
 
 
 # Setting the method to be performed
-if [[ ! -v method ]]; then
+if [[ ! -v method ]]; then # If $method is not specified with options -M or -A, ask the user
     echo_bold "\nPlease specify the method to be performed."
     echo_bold "1. Mapping"
     echo_bold "2. De novo assembly"
@@ -491,8 +491,8 @@ fi
 
 # Setting samples_ref.txt file
 echo
-if [[ ! -v samples_ref_prepared ]]; then
-    if [[  -z $2 && -z $3  ]]; then
+if [[ ! -v samples_ref_prepared ]]; then # If samples_ref.txt is NOT specified as ready (option -f), ask the user
+    if [[  -z $2 && -z $3  ]]; then # Only if reference and host are NOT specified in argument posititions 2 and 3
         read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0; echo
         if [ "$samples_ref_prepared" == "y" ]; then 
             log_message "File samples_ref.txt READY. \xE2\x9C\x85"
@@ -507,7 +507,7 @@ if [[ ! -v samples_ref_prepared ]]; then
             while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
             log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
         fi
-    else
+    else # In case reference and host have been provided by user by using argument positions 2 and 3
         reference=$2
         host=$3
         : > samples_ref.txt
@@ -522,8 +522,8 @@ fi
 if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
 
     # Nextclade is able to analyze monkeypox virus
-    if [[ "$interactive_mode" != "off" ]]; then
-        if [[ ! -v monkeypox ]]; then
+    if [[ "$interactive_mode" != "off" ]]; then # In case METAGENOMICS haven't been specified with -M option
+        if [[ ! -v monkeypox ]]; then # And monkeypoxvirus virus is also not specified with -p option, ask the user
             echo
             read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
         fi
@@ -542,8 +542,8 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    if [[ "$interactive_mode" != "off" ]]; then
-        if [[ ! -v virus_tag ]]; then
+    if [[ "$interactive_mode" != "off" ]]; then # In case AMPLICONS haven't been specified with -A option
+        if [[ ! -v virus_tag ]]; then # And no virus have been specified with -r or -s options, ask the user
             echo_bold "\nPlease specify the organism to which the sequences correspond."
             echo_bold "1. SARS-CoV-2"
             echo_bold "2. RSV"
