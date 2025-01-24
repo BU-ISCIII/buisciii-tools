@@ -524,26 +524,28 @@ else
 
     sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
 
-    if [[ "$interactive_mode" == "off" || ! -v virus_tag ]]; then
-        echo_bold "\nPlease specify the organism to which the sequences correspond."
-        echo_bold "1. SARS-CoV-2"
-        echo_bold "2. RSV"
-        echo_bold "3. Other"
-        while true; do
-            echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
-            if [[ "$virus_tag" != "1" && "$virus_tag" != "2" && "$virus_tag" != "3" ]]; then
-                echo_red "Invalid input. Please select a valid number."
-            else
-                break
-            fi
-        done
+    if [[ "$interactive_mode" != "off" ]]; then
+        if [[ ! -v virus_tag ]]; then
+            echo_bold "\nPlease specify the organism to which the sequences correspond."
+            echo_bold "1. SARS-CoV-2"
+            echo_bold "2. RSV"
+            echo_bold "3. Other"
+            while true; do
+                echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
+                if [[ "$virus_tag" != "1" && "$virus_tag" != "2" && "$virus_tag" != "3" ]]; then
+                    echo_red "Invalid input. Please select a valid number."
+                else
+                    break
+                fi
+            done
 
-        if [[ "$virus_tag" == "1" ]]; then
-            virus_tag="sars-cov-2"
-        elif [[ "$virus_tag" == "2" ]]; then
-            virus_tag="rsv"
-        else
-            virus_tag="No"
+            if [[ "$virus_tag" == "1" ]]; then
+                virus_tag="sars-cov-2"
+            elif [[ "$virus_tag" == "2" ]]; then
+                virus_tag="rsv"
+            else
+                virus_tag="No"
+            fi
         fi
     fi
 
