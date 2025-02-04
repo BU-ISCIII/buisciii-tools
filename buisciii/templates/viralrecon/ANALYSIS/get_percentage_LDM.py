@@ -30,7 +30,7 @@ parser.add_argument(
     "-other_lineages",
     type=int,
     default=0,
-    help="If set to 1, returns other lineages even when exists == 1 (default is 0)",
+    help="If set to 1, returns other lineages even when LDM == 1 (default is 0)",
 )
 args = parser.parse_args()
 other_lineages_flag = args.other_lineages
@@ -159,7 +159,7 @@ def process_sample(input_file, lineage_csv_outbreak, output_tsv, sample_name):
 
     lineage_df["mutation"] = lineage_df["mutation"].apply(normalize_string)
     # Mark mutation as present (1) if it is in the detected mutations list, else 0
-    lineage_df["exists"] = lineage_df["mutation"].apply(
+    lineage_df["LDM"] = lineage_df["mutation"].apply(
         lambda m: 1 if m in detected_mutations else 0
     )
 
@@ -193,7 +193,7 @@ def process_sample(input_file, lineage_csv_outbreak, output_tsv, sample_name):
         lineage_df["other_lineages"] = lineage_df.apply(
             lambda row: (
                 ""
-                if row["exists"] == 1
+                if row["LDM"] == 1
                 else get_other_lineages(row["mutation"], sample_lineage)
             ),
             axis=1,
@@ -226,9 +226,9 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
         )
 
         if lineage_df is not None:
-            detected_percentage = (lineage_df["exists"].sum() / len(lineage_df)) * 100
+            detected_percentage = (lineage_df["LDM"].sum() / len(lineage_df)) * 100
             summary_results.append(
-                {"sample": sample_name, "% LDMutations": detected_percentage}
+                {"sample": sample_name, "%LDMutations": detected_percentage}
             )
 
     # Read the combined TSV file to merge with summary results
