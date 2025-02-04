@@ -5,6 +5,7 @@ MATCH_PROC=8		# grid maximum processes for the MATCH
 SORT_PROC=8		# currently not used
 ALIGN_PROC=8		# grid maximum processes for the rough align
 ASSEM_PROC=8		# grid maximum processes for assembly
+TMP=/data/ucct/bi/tmp # use this path for temporal files instead of /tmp
 
 ### AMENDED CONSENSUS ###
 MIN_AMBIG=0.75          # Sets ambiguities to off
