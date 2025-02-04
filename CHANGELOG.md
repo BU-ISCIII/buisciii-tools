@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixes in several service templates [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/414)
 - Modified path for temporal files in irma_config.sh [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/421)
 - Modified field (cut) where extracted flu type information in lablog_irma_results [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/421)
+- Fixed minor mistakes in chewBBACA's template [#425](https://github.com/BU-ISCIII/buisciii-tools/pull/425).
 
 ### Modules
 
