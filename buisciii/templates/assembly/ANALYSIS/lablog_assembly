@@ -6,7 +6,7 @@ while IFS= read -r sample; do
     # Extract the file name with&without extension
     filename_noext=$(basename -s .fastq.gz ../../RAW/${sample}*)
 
-    ### Check if the file is a short read or long read
+    ### Check if reads are single o paired end
     for fileitem in $filename_noext; do
         if [[ "$fileitem" =~ _R[12] ]]; then
             ln -s -f ../../RAW/${sample}*_R1*.fastq.gz ${sample}_R1.fastq.gz

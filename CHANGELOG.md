@@ -23,6 +23,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Replaced bu_isciii by buisciii where necessary, and bu_isciii by buisciii-tools in __init__.py [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
 - Added versions for all dependencies in requirements.txt [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
 - Implemented a non-interactive mode for running lablog_viralrecon [#410](https://github.com/BU-ISCIII/buisciii-tools/pull/410)
+- Fixes in several service templates [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/414)
+- Modified path for temporal files in irma_config.sh [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/421)
+- Modified field (cut) where extracted flu type information in lablog_irma_results [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/421)
 
 ### Modules
 

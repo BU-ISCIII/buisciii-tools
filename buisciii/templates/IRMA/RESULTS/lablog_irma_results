@@ -16,7 +16,7 @@ while true; do
         ln -s ../../ANALYSIS/*_IRMA/04-irma/A_H* .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/B .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/C .
-        tail -n +2 ../../ANALYSIS/*_IRMA/04-irma/clean_irma_stats_flu.txt | cut -f4 | sort | uniq -c > flu_type_summary.txt
+        tail -n +2 ../../ANALYSIS/*_IRMA/04-irma/clean_irma_stats_flu.txt | cut -f5 | sort | uniq -c > flu_type_summary.txt
         break
     elif [ "$ORGANISM" == "2" ]; then
         ORGANISM="RSV"

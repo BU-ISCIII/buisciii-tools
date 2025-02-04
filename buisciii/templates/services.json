@@ -21,7 +21,7 @@
         "template": "mtbseq",
         "order": 1,
         "begin": "base",
-        "end": "taxprofiler",
+        "end": "",
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
