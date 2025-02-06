@@ -14,7 +14,7 @@ input_directory_pattern = (
     "./*_viralrecon_mapping/variants/ivar/consensus/bcftools/nextclade"
 )
 output_directory_pattern = "./*_viralrecon_mapping"
-lineage_csv_outbreak_pattern = "/data/ucct/bi/references/outbreakinfo/filtrado_20250123_mutaciones_definitorias_linaje.csv"
+lineage_csv_outbreak_pattern = "/data/ucct/bi/references/outbreakinfo/20250206_mutaciones_definitorias_linaje.csv"
 
 # Locate directories and files matching the specified patterns
 input_directories = glob.glob(input_directory_pattern)

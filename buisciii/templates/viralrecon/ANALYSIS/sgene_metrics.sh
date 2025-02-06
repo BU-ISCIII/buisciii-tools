@@ -51,7 +51,7 @@ for fasta_file in $input_fasta_dir/*.consensus.fa; do
   ambiguous_positions=()
   for ((i = 0; i < ${#s_gene_sequence}; i++)); do
     base=${s_gene_sequence:i:1}
-    if [[ ! "$base" =~ [ATCGN] ]]; then
+    if [[ ! "$base" =~ [ATCG] ]]; then
       ambiguous_positions+=($((s_gene_start + i)))
     fi
   done
