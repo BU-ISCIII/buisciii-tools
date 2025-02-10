@@ -44,14 +44,14 @@ for fasta_file in $input_fasta_dir/*.consensus.fa; do
 
   # Get the full consensus sequence
   full_sequence=$(grep -v '^>' "$fasta_file" | tr -d '\n')
-  total_unambiguous_count=$(echo "$full_sequence" | grep -o '[ATCG]' | wc -l)
+  total_unambiguous_count=$(echo "$full_sequence" | grep -o '[ATCGN]' | wc -l)
 
   # Calculate S-Gene Ambiguous Percentage
   s_gene_sequence=${full_sequence:$((s_gene_start-1)):s_gene_length}
   ambiguous_positions=()
   for ((i = 0; i < ${#s_gene_sequence}; i++)); do
     base=${s_gene_sequence:i:1}
-    if [[ ! "$base" =~ [ATCG] ]]; then
+    if [[ ! "$base" =~ [ATCGN] ]]; then
       ambiguous_positions+=($((s_gene_start + i)))
     fi
   done
