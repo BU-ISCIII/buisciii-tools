@@ -9,7 +9,7 @@ output_file="s_gene_combined_metrics.tsv"
 SGENE_OUTPUT="/data/ucct/bi/references/refgenie/alias/coronaviridae/fasta/NC_045512.2/sgene.fna"
 
 # Create output file with headers
-echo -e "sample\tS-Gene_Ambiguous_Percentage\tS-Gene_Coverage_Percentage\tS-Gene_Frameshifts\tTotal_Unambiguous_Bases" > $output_file
+echo -e "sample\tS-Gene_Ambiguous_Percentage\tS-Gene_Coverage_Percentage\tS-Gene_Frameshifts\tTotal_Unambiguous_Bases\tTotal_Ns_count" > $output_file
 
 # Read reference mappings into an associative array
 declare -A ref_map
@@ -45,6 +45,7 @@ for fasta_file in $input_fasta_dir/*.consensus.fa; do
   # Get the full consensus sequence
   full_sequence=$(grep -v '^>' "$fasta_file" | tr -d '\n')
   total_unambiguous_count=$(echo "$full_sequence" | grep -o '[ATCGN]' | wc -l)
+  total_ns_count=$(echo "$full_sequence" | grep -o 'N' | wc -l)
 
   # Calculate S-Gene Ambiguous Percentage
   s_gene_sequence=${full_sequence:$((s_gene_start-1)):s_gene_length}
@@ -71,7 +72,7 @@ for fasta_file in $input_fasta_dir/*.consensus.fa; do
   indels=$(bcftools view -r "$sample_name:$s_gene_start-$s_gene_end" -i 'TYPE="indel"' "$vcf_file" 2>/dev/null | wc -l)
 
   # Save results to output file
-  echo -e "$sample_name\t$ambiguous_percentage\t$coverage_percentage\t$indels\t$total_unambiguous_count" >> $output_file
+  echo -e "$sample_name\t$ambiguous_percentage\t$coverage_percentage\t$indels\t$total_unambiguous_count\t$total_ns_count" >> $output_file
 done
 
 echo "Process completed. File generated: $output_file"
