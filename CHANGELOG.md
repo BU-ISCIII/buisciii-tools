@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Implemented QC scripts into viralrecon template [#422](https://github.com/BU-ISCIII/buisciii-tools/pull/422)
 - Fixed minor mistakes in chewBBACA's template [#425](https://github.com/BU-ISCIII/buisciii-tools/pull/425).
 - Fixed some issues in outbreak services [#428](https://github.com/BU-ISCIII/buisciii-tools/pull/428)
+- Add micromamba activation comment to viralrecon template lablog [#432](https://github.com/BU-ISCIII/buisciii-tools/pull/432)
 
 ### Modules
 
