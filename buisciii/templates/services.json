@@ -63,6 +63,7 @@
         "files":["mapping/sample_name.sorted.bam", "kmer/database.msh"]
       },
       "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/plasmidid.md",
       "results_md": "assets/reports/results/plasmidid.md"
   },
