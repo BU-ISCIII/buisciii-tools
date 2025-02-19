@@ -639,7 +639,7 @@ class BioinfoDoc:
         if buisciii.utils.prompt_yn_question(
             "Do you want to add some delivery notes to the e-mail?", dflt=False
         ):
-            if self.provided_txt:
+            if hasattr(self, "provided_txt") and self.provided_txt is not None:
                 if buisciii.utils.prompt_yn_question(
                     f"Do you want to use notes from {self.provided_txt}?", dflt=False
                 ):
