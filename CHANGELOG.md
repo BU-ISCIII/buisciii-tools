@@ -40,6 +40,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Fixes
 
+- Fixed drylab_api.py to show a more descriptive message when the resolution ID does not exist [#437](https://github.com/BU-ISCIII/buisciii-tools/pull/437).
+
 #### Changed
 
 #### Removed
