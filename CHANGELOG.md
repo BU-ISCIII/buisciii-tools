@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Fixes
 
+- Fixed create_summary_report.sh to latest /data/ucct/bi/ layout [#436](https://github.com/BU-ISCIII/buisciii-tools/pull/436)
+
 #### Changed
 
 #### Removed
