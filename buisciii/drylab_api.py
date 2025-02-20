@@ -41,8 +41,12 @@ class RestServiceApi:
             if req.status_code > 201:
                 if safe:
                     resolution = kwargs.get("resolution", "unknown")
-                    log.info(f"Resolution {resolution} does not exist. Status code: {req.status_code}")
-                    stderr.print(f"Resolution {resolution} does not exist! Please make sure the resolution ID is correct and has been created")
+                    log.info(
+                        f"Resolution {resolution} does not exist. Status code: {req.status_code}"
+                    )
+                    stderr.print(
+                        f"Resolution {resolution} does not exist! Please make sure the resolution ID is correct and has been created"
+                    )
                     sys.exit(1)
                 else:
                     return req.status_code
