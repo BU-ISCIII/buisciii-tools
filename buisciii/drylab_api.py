@@ -40,8 +40,9 @@ class RestServiceApi:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
                 if safe:
-                    log.info(f"Query does not exist. Status code: {req.status_code}")
-                    stderr.print("Query not found")
+                    resolution = kwargs.get("resolution", "unknown")
+                    log.info(f"Resolution {resolution} does not exist. Status code: {req.status_code}")
+                    stderr.print(f"Resolution {resolution} does not exist! Please make sure the resolution ID is correct and has been created")
                     sys.exit(1)
                 else:
                     return req.status_code
