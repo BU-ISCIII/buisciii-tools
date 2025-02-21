@@ -81,9 +81,9 @@ nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.2
     --hostremoval_reference /data/ucct/bi/references/eukaria/homo_sapiens/hg38/NCBI/genome/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz \\
     --run_kraken2 true \\
     --run_bracken true \\
-    --run_centrifuge true \\
-    --run_kaiju true \\
-    --run_metaphlan true \\
+    --run_centrifuge false \\
+    --run_kaiju false \\
+    --run_metaphlan false \\
     --run_krona true \\
     -resume
 EOF
