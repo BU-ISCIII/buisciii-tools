@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added last_folder field to plasmidid_assembly service in services.json [#434](https://github.com/BU-ISCIII/buisciii-tools/pull/434)
 - Fixed bioinfo-doc crashing after resuming [#435](https://github.com/BU-ISCIII/buisciii-tools/pull/435)
 - Fixed create_summary_report.sh to latest /data/ucct/bi/ layout [#436](https://github.com/BU-ISCIII/buisciii-tools/pull/436)
+- Changed taxprofiler lablog to skip kaiju, centrifuge and metaphlan [#439](https://github.com/BU-ISCIII/buisciii-tools/pull/439)
 
 ### Modules
 
