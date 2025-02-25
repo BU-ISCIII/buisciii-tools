@@ -1,0 +1,11 @@
+# module load singularity
+# Usage: This lablog must be run twice. Lablog is ready to be run at first time. Once the _00_iqtreemfp.sh scritp is executed, then comment the lines from part #1 and uncomment lines from part #2. Then run the lablog again.
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
+
+#1
+mkdir logs
+echo "srun --chdir ${scratch_dir} --output logs/IQTREEMFP.%j.log --job-name IQTREEMFP --cpus-per-task 20 --mem 5G --partition short_idx --time 00:30:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/iqtree:2.1.4_beta--hdcc8f71_0 iqtree -s ${scratch_dir}/../04-snippy/phylo.aln -m MFP &" > _00_iqtreemfp.sh
+
+#2
+#bestfitmodel=$(grep Best logs/IQTREEMFP* | awk -F": " '{print $2}' | awk '{print $1}')
+#echo "srun --chdir ${scratch_dir} --output logs/IQTREEFULLALIGN.%j.log --job-name IQTREEFULLALIGN --cpus-per-task 20 --mem 15G --partition short_idx --time 08:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/iqtree:2.1.4_beta--hdcc8f71_0 iqtree -s ${scratch_dir}/../04-snippy/phylo.aln -m $bestfitmodel -T 20 -B 1000 -pre phylo.iqtree.bootstrap &" > _01_iqtreeall.sh

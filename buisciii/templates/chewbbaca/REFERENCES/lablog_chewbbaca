@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# module load singularity
+
+mkdir logs
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+# Schema creation
+# WARNING: You have to indicate manually the folder in which your .fasta files are for the schema creation
+echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-CREATE-SCHEMA.%j.log --job-name CHEWBBACA-CREATE-SCHEMA --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py CreateSchema -i  ${scratch_dir}/%% -o ./created_schema --cpu 4 &" > _01_create_schema.sh
+
+# cgMLST extraction
+echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-EXTRACT-CGMLST.%j.log --job-name CHEWBBACA-EXTRACT-CGMLST --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py ExtractCgMLST -i ${scratch_dir}/../ANALYSIS/*/*-chewbbaca/allele_calling/results_alleles.tsv -o ./results_cgmlst &" > _02_extract_cgmlst.sh

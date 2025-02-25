@@ -1,0 +1,680 @@
+# LABLOG_VIRALRECON
+
+: '
+The function of this script is to setup the initial configuration for the services that
+will be running the viralrecon pipeline. To do so, it sets up the required configuration
+files, as well as the necessary parameters depending on the type of analysis to be carried
+out (type of sequencing, processing method, etc.). It is in charge of creating a proper
+working environment, by preparing and updating the software to be used in the analysis,
+as well as preparing and downloading the reference sequences required for the correct
+execution of the analysis.
+
+By default, an interactive mode prompts the user for all information needed to configure
+the pipeline environment. However, this script is able to accept some options when executed
+that provide all the information needed to configure the environment. All available options
+are displayed using “lablog_viralrecon -h”.
+
+The functions performed by the script can be listed as follows:
+- Preparation of the environment depending on the type of sequencing (metagenomics/amplicons),
+  the method of analysis (mapping/assembly) as well as some presets depending on the microorganism (SARS, RSV or MPV).
+- Creation of the samples_ref.txt file.
+- Checking of the last available version of the Pangolin container. Download if necessary. Database update. File configuration.
+- Checking the last available version of the Nextclade container. Download if necessary. Extraction of the tag for the
+  analysis dataset. File configuration.
+- Checking if required references (fasta and gff) are locally available and downloading them from NCBI if necessary.
+- Creation of the necessary directories for the analysis hosts, and subdirectories for each of the references.
+
+'
+
+
+# If there is more than 1 reference, please prepare the samples_ref.txt file before running this lablog.
+
+
+####################################
+# Defining functions
+
+
+# Options processing
+while getopts "MAmapsrfh" opt; do
+    case $opt in
+        M)
+            if [[ $ANALYSIS_TYPE == "2" ]]; then
+                echo "Error: options -A and -M cannot be selected simultaneously."
+                exit 1
+            fi
+            ANALYSIS_TYPE="1" # METAGENOMICS
+            interactive_mode="off"
+            ;;
+        A)
+            if [[ $ANALYSIS_TYPE == "1" ]]; then
+                echo "Error: options -A and -M cannot be selected simultaneously."
+                exit 1
+            fi
+            ANALYSIS_TYPE="2" # AMPLICONS
+            if [[ ! -v virus_tag ]]; then virus_tag="No"; fi
+            interactive_mode="off"
+            ;;
+        m)
+            method="1" # MAPPING
+            ;;
+        a)
+            if [[ $method == "1" ]]; then
+                method="3" # MAPPING + ASSEMBLY
+            else
+                method="2" # ASSEMBLY
+            fi
+            ;;
+        p|s|r)
+            if [[ $selected_virus == "yes" ]]; then
+                echo "Error: options -p, -s, and -r cannot be selected simultaneously."
+                exit 1
+            fi
+            case $opt in
+                p) monkeypox="y";;
+                s) virus_tag="sars-cov-2";;
+                r) virus_tag="rsv";;
+            esac
+            selected_virus="yes"
+            ;;
+        f)
+            samples_ref_prepared="y"
+            ;;
+        h)
+            cat <<EOF
+
+Usage: $0 [options] [reference] [host]
+
+Selectable options:
+   · Analysis type:
+       -M     Select METAGENOMICS analysis type
+       -A     Select AMPLICONS analysis type
+   · Method:
+       -m     Select MAPPING as method
+       -a     Select DE NOVO ASSEMBLY as method
+   · Virus selection:
+       -p     Select monkeypox analysis
+       -s     Select SARS-CoV-2 analysis
+       -r     Select RSV analysis
+   · Other options:
+       -f     File samples_ref.txt is ready
+       -h     Display this help menu
+
+The available options allow to run the lablog_viralrecon in a non-interactive mode.
+Options -A and -M cannot be selected simultaneously.
+Options -p, -s, and -r cannot be selected simultaneously.
+It is not mandatory to select a virus, in which case it is assumed that the viruses
+present in the samples correspond to another viruses than the ones available here.
+In case the -f option is not selected, it is optional to enter the reference and
+the host as arguments following the options (for those cases where there is only 1
+reference and 1 host. Otherwise, the samples_ref.txt file must be previously prepared
+and the -f option must be selected).
+
+Example: bash lablog_viralrecon -Amasf (samples_ref.txt previously prepared)
+Example: bash lablog_viralrecon -Amas NC_045512.2 human
+
+EOF
+            exit 0
+            ;;
+        *)
+            echo "Non valid option. Use -h for help."
+            exit 1
+            ;;
+    esac
+done
+
+
+# Coloring messages and log saving
+logfile=$(echo "$PWD/lablog_viralrecon.log")
+timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+log_message() {
+    local message="$1"
+    case "$2" in
+        "bold")
+            echo -e "\e[1;37m$message\e[0m"
+            echo -e "$timestamp - \e[1;37m$message\e[0m" >> $logfile
+            ;;
+        "red")
+            echo -e "\e[31m$message\e[0m"
+            echo -e "$timestamp - \e[31m$message\e[0m" >> $logfile
+            ;;
+        "green")
+            echo -e "\e[32m$message\e[0m"
+            echo -e "$timestamp - \e[32m$message\e[0m" >> $logfile
+            ;;
+        "blk_red")
+            echo -e "\e[1;5;97;5;41m$message\e[0m"
+            echo -e "$timestamp - \e[1;5;97;5;41m$message\e[0m" >> $logfile
+            ;;
+        *)
+            echo -e "$message"
+            echo -e "$timestamp - $message" >> $logfile
+            ;;
+    esac
+}
+
+
+# Coloring messages
+echo_bold() { echo -e "\e[1;37m$1\e[0m"; }
+echo_red() { echo -e "\e[31m$1\e[0m"; }
+echo_green() { echo -e "\e[32m$1\e[0m"; }
+echo_blinking_red() { echo -e "\e[1;5;97;5;41m$1\e[0m"; }
+
+
+# Updating pangolin. Checks last image available and if is already downloaded. If not, downloads it. This function also updates pangolin database. Update related config files with pangolin info
+update_pangolin() {
+    echo
+    log_message "Starting PANGOLIN check/update." bold
+    log_message "Checking Pangolin container version..."
+    url=$(curl -s "https://depot.galaxyproject.org/singularity/")
+    latest_version_pangolin=$(echo "$url" | grep -oP 'pangolin:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+    log_message "Latest version available of Pangolin:\e[1;38;5;220m $latest_version_pangolin" bold
+
+    log_message "Checking if latest version of Pangolin image is already downloaded..."
+    if [ -e "/data/ucct/bi/pipelines/singularity-images/$latest_version_pangolin" ]; then
+        log_message "File $latest_version_pangolin already downloaded."
+        log_message "Pangolin container is UP TO DATE. \xE2\x9C\x85"
+    else
+        log_message "Downloading $latest_version_pangolin file..."
+        wget -P "/data/ucct/bi/pipelines/singularity-images/" "https://depot.galaxyproject.org/singularity/$latest_version_pangolin"
+        if [ $? -eq 0 ]; then
+            log_message "$latest_version_pangolin file succesfully downloaded." green
+        else
+            log_message "An error occurred during file downloading." blk_red
+        fi
+    fi
+
+    # Updating Pangolin database
+    log_message "Setting datadir for Pangolin database."
+    cd /data/ucct/bi/references/pangolin/
+    if [ -e "./$(date '+%Y%m%d')" ]; then
+        log_message "Directory /data/ucct/bi/references/pangolin/$(date '+%Y%m%d') already exists. Assuming that a BU-ISCIII member previously updated pangolin database today. \xE2\x9C\x85"
+        log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
+        log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
+    else
+        mkdir "$(date '+%Y%m%d')"
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S') - mkdir $(date '+%Y%m%d')" >> $(date '+%Y%m%d')/command.log
+        echo -e "$(date +'%Y-%m-%d %H:%M:%S') - srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/ucct/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/)" >> $(date '+%Y%m%d')/command.log
+        srun --partition short_idx --output ${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log singularity run -B ${PWD} /data/ucct/bi/pipelines/singularity-images/$latest_version_pangolin pangolin --update-data --datadir ${PWD}/$(date '+%Y%m%d')/
+        if [ $? -eq 0 ]; then
+            log_message "$(grep pangolin "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
+            log_message "$(grep constellations "${PWD}/$(date '+%Y%m%d')/$(date '+%Y%m%d')_pangolin.log")" green
+        else
+            log_message "Error during pangolin database update." blk_red
+        fi
+    fi
+    cd -
+
+    # Updating config file
+    log_message "Updating $CONFIG_FILE file..."
+    sed -i "s|pangolin:4.3--pyhdfd78af_2|$latest_version_pangolin|" "$CONFIG_FILE"
+    sed -i "s|--datadir XXXX|--datadir $(ls -dt /data/ucct/bi/references/pangolin/*/ | head -n 1)|" "$CONFIG_FILE"
+    log_message "File $CONFIG_FILE UPDATED."
+
+    # Updating params file
+    log_message "Updating $PARAMS_FILE file..."
+    sed -i "s|skip_pangolin: true|skip_pangolin: false|" "$PARAMS_FILE"
+    log_message "File $PARAMS_FILE UPDATED."
+
+    log_message "Finished PANGOLIN check/update." bold
+    echo
+}
+
+# Updating Nextclade. Checks last image available and if is already downloaded. If not, downloads it. Update related config files with nextclade info
+update_nextclade() {
+    echo
+    log_message "Starting NEXTCLADE check/update." bold
+    log_message "Checking Nextclade container version..."
+    url=$(curl -s "https://depot.galaxyproject.org/singularity/")
+    latest_version_nextclade=$(echo "$url" | grep -oP 'nextclade:[^"]+' | sort -V | tail -n 1 | awk -F'>' '{print $1}' | sed 's/<\/a//')
+    log_message "Latest version available of Nextclade:\e[1;38;5;220m $latest_version_nextclade" bold
+
+    log_message "Checking if latest version of Nextclade image is already downloaded..."
+    if [ -e "/data/ucct/bi/pipelines/singularity-images/$latest_version_nextclade" ]; then
+        log_message "File $latest_version_nextclade already downloaded."
+        log_message "Nextclade container is UP TO DATE. \xE2\x9C\x85"
+    else
+        log_message "Downloading $latest_version_nextclade file..."
+        wget -P "/data/ucct/bi/pipelines/singularity-images" "https://depot.galaxyproject.org/singularity/$latest_version_nextclade"
+        if [ $? -eq 0 ]; then
+            log_message "$latest_version_nextclade file succesfully downloaded." green
+        else
+            log_message "An error occurred during file downloading." blk_red
+        fi
+    fi
+
+    # Extracting the current Nextclade data TAG
+    log_message "Extracting Nextclade data TAG..."
+    nextclade_tag=$(singularity run /data/ucct/bi/pipelines/singularity-images/$latest_version_nextclade nextclade dataset list --json | grep -zoP "\"path\":\s*\"nextstrain/${virus_tag}[^\"]*\"[\s\S]*?\"tag\":\s*\"\K[^\"]*" | tr '\0' '\n' | head -n 1)
+    log_message "Latest \e[1;38;5;220m${virus_tag^^} \e[1;37mNextclade dataset version TAG:\e[1;38;5;220m $nextclade_tag" bold
+    
+    # Updating config file
+    log_message "Updating $CONFIG_FILE file..."
+    sed -i "s|nextclade:3.5.0--h9ee0642_0|$latest_version_nextclade|" "$CONFIG_FILE"
+    log_message "File $CONFIG_FILE UPDATED."
+
+    # Updating params file
+    log_message "Updating $PARAMS_FILE file..."
+    sed -i "s|skip_nextclade: true|skip_nextclade: false|" "$PARAMS_FILE"
+    echo "nextclade_dataset: false" >> $PARAMS_FILE
+    log_message "File $PARAMS_FILE UPDATED."
+
+    log_message "Finished NEXTCLADE check/update." bold
+    echo
+}
+
+# Checks if fasta and gff references are downloaded. If not, it downloads them (and creates family folder if neccesary)
+check_references() {
+    echo
+    log_message "Processing reference: ${ref}." bold
+
+    # Obtaining family information
+    obtain_family() {
+        organism_id=$(curl -s "https://www.ncbi.nlm.nih.gov/nuccore/${ref}" | grep -o 'ORGANISM=[0-9]\+' | head -n 1 | awk -F '=' '{print $2}')
+        if [ -z $organism_id ]; then
+            log_message "$ref not found in NCBI. Please download it manually." blk_red
+            return
+        fi
+        family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'TITLE="family">.*<' | awk -F 'TITLE="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
+        if [ -z $family ]; then
+            family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
+            if [ -z $family ]; then
+                family="miscellanous"
+                log_message "Reference $ref does not currently belong to any family. Assigned to $family."
+                return
+            fi
+        fi
+        log_message "Reference $ref belongs to $family family."
+    }
+
+    # Check if FASTA sequence is already downloaded
+    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
+    if [ -z "$REF_FASTA" ]; then
+        log_message "File ${ref}.fasta is not yet downloaded."
+        obtain_family; if [ -z $family ]; then return; fi
+        # Loading SAMtools module
+        module load SAMtools
+        SAMtools_loaded=$(module list | grep -o 'SAMtools/[0-9.]\+-GCC-[0-9.]\+')
+        if [ -n "$SAMtools_loaded" ]; then
+            log_message "$SAMtools_loaded module succesfully loaded." green
+        else
+            log_message "SAMtools module not loaded. Exiting..." blk_red
+            exit 1
+        fi
+        eval "$(micromamba shell hook --shell bash)"
+        micromamba activate refgenie_v0.12.1
+        environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
+        if [[ $environment == *"refgenie"* ]]; then
+            log_message "$environment environment succesfully activated." green
+        else
+            log_message "Refgenie environment is NOT ACTIVE. Exiting..." blk_red
+            exit 1
+        fi
+        if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
+            log_message "Creating new directory: /data/ucct/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}."
+            digest=$(openssl rand -hex 24)
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+            if [ $? -eq 0 ]; then
+                log_message "File ${ref}.fasta downloaded in /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}." green
+                gzip /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                log_message "Building asset for ${ref}.fasta file..."
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
+                if grep -q "Created" "${ref}.fasta_build.log"; then
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
+                else
+                    log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
+                fi
+            else
+                log_message "An error occurred during file downloading." blk_red
+            fi
+        else
+            log_message "Directory /data/ucct/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.fasta."
+            digest=$(refgenie alias get -a ${family} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=${ref}&rettype=fasta&retmode=text"
+            if [ $? -eq 0 ]; then 
+                log_message "File ${ref}.fasta downloaded in /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}." green
+                gzip /data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta
+                log_message "Building asset for ${ref}.fasta file..."
+                refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
+                if grep -q "Created" "${ref}.fasta_build.log"; then
+                    log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
+                else
+                    log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
+                fi
+            else
+                log_message "An error occurred during file downloading." blk_red
+            fi
+        fi
+    else
+        log_message "File ${ref}.fasta is ALREADY available in $(dirname $REF_FASTA). \xE2\x9C\x85"
+    fi
+
+    # Check if GFF file is already downloaded
+    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
+    if [ -z "$REF_GFF" ]; then
+        log_message "File ${ref}.gff is not yet downloaded."
+        if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
+        if [[ $environment != *"refgenie"* ]]; then
+            eval "$(micromamba shell hook --shell bash)"
+            micromamba activate refgenie_v0.12.1
+            environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
+            if [[ $environment == *"refgenie"* ]]; then
+                log_message "$environment environment succesfully activated." green
+            else
+                log_message "Refgenie environment is NOT ACTIVE. Exiting..." blk_red
+            fi
+        fi
+        if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
+            log_message "Creating new directory: /data/ucct/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}."
+            digest=$(openssl rand -hex 24)
+            refgenie alias set --aliases ${family} --digest ${digest} -f -c /data/ucct/bi/references/refgenie/genome_config.yaml
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            if [ $? -eq 0 ]; then
+                log_message "File ${ref}.gff downloaded in /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
+                log_message "Adding asset for ${ref}.gff file..."
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
+                if grep -q "Created" "${ref}.gff_add.log"; then
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
+                else
+                    log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
+                fi
+            else
+                log_message "An error occurred during file downloading." blk_red
+            fi
+        else
+            log_message "Directory /data/ucct/bi/references/refgenie/alias/${family}/ ALREADY EXISTS. Downloading ${ref}.gff."
+            digest=$(refgenie alias get -a ${family} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+            mkdir -p /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/
+            wget -q -O "/data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}/${family}.gff" "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=${ref}"
+            if [ $? -eq 0 ]; then 
+                log_message "File ${ref}.gff downloaded in /data/ucct/bi/references/refgenie/data/${digest}/ensembl_rb/${ref}." green
+                log_message "Adding asset for ${ref}.gff file..."
+                refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
+                if grep -q "Created" "${ref}.gff_add.log"; then
+                    log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
+                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
+                else
+                    log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
+                fi
+            else
+                log_message "An error occurred during file downloading." blk_red
+            fi
+        fi
+    else
+        log_message "File ${ref}.gff is ALREADY available in $(dirname $REF_GFF). \xE2\x9C\x85"
+    fi
+
+    unset family
+}
+####################################
+
+
+echo -e "\e[1;37mStarting lablog_viralrecon execution.\e[0m"
+echo -e "$(date +'%Y-%m-%d %H:%M:%S') - \e[1;37mStarting lablog_viralrecon execution.\e[0m" > $logfile
+
+# Loading singularity module
+module load singularity
+singularity_loaded=$(module list | grep singularity | awk '{print $2}')
+if [ -n "$singularity_loaded" ]; then
+    log_message "${singularity_loaded} module succesfully loaded." green
+else
+    log_message "Singularity module not loaded. Exiting..." blk_red
+    exit 1
+fi
+
+# Setting work variables
+cp ../DOC/viralrecon.config ../DOC/${timestamp}_viralrecon.config
+cp ../DOC/viralrecon_params.yml ../DOC/${timestamp}_viralrecon_params.yml
+CONFIG_FILE="../DOC/${timestamp}_viralrecon.config"
+PARAMS_FILE="../DOC/${timestamp}_viralrecon_params.yml"
+log_message "Created $CONFIG_FILE file."
+log_message "Created $PARAMS_FILE file."
+echo
+
+# Setting the type of analysis
+if [[ ! -v ANALYSIS_TYPE ]]; then # If $ANALYSIS_TYPE is not specified with options -M or -A, ask the user
+    echo_bold "\nPlease specify the type of analysis."
+    echo_bold "1. METAGENOMICS"
+    echo_bold "2. AMPLICONS"
+    while true; do
+        echo -ne "\e[1;38;5;220m"; read -n 1 ANALYSIS_TYPE; tput sgr0; echo
+        if [[ "$ANALYSIS_TYPE" != "1" && "$ANALYSIS_TYPE" != "2" ]]; then
+            echo_red "Invalid input. Please enter 1 or 2."
+        else
+            break
+        fi
+    done
+fi
+
+if [ "$ANALYSIS_TYPE" == "1" ]; then
+        ANALYSIS_TYPE="METAGENOMIC"
+elif [ "$ANALYSIS_TYPE" == "2" ]; then
+        ANALYSIS_TYPE="AMPLICONS"
+fi
+log_message "$ANALYSIS_TYPE analysis selected." green
+
+
+# Setting the method to be performed
+if [[ ! -v method ]]; then # If $method is not specified with options -M or -A, ask the user
+    echo_bold "\nPlease specify the method to be performed."
+    echo_bold "1. Mapping"
+    echo_bold "2. De novo assembly"
+    echo_bold "3. Both"
+    while true; do
+        echo -ne "\e[1;38;5;220m"; read -n 1 method; tput sgr0; echo
+        if [[ "$method" != "1" && "$method" != "2" && "$method" != "3" ]]; then
+            echo_red "Invalid input. Please select a valid number."
+        else
+            break
+        fi
+    done
+fi
+
+if [ "$method" == "1" ]; then
+    log_message "Mapping method selected." green
+elif [ "$method" == "2" ]; then
+    log_message "De novo assembly method selected." green
+    sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
+    sed -i "s|skip_variants: false|skip_variants: true|" "$PARAMS_FILE"
+elif [ "$method" == "3" ]; then
+    log_message "Mapping + de novo assembly methods selected." green
+    sed -i "s|skip_assembly: true|skip_assembly: false|" "$PARAMS_FILE"
+fi
+
+
+# Setting samples_ref.txt file
+echo
+if [[ ! -v samples_ref_prepared ]]; then # If samples_ref.txt is NOT specified as ready (option -f), ask the user
+    if [[  -z $2 && -z $3  ]]; then # Only if reference and host are NOT specified in argument posititions 2 and 3
+        read -p $'\e[1;37mIs samples_ref.txt file already prepared? [y/N]: \e[1;38;5;220m' -n 1 samples_ref_prepared; tput sgr0; echo
+        if [ "$samples_ref_prepared" == "y" ]; then 
+            log_message "File samples_ref.txt READY. \xE2\x9C\x85"
+        else
+            log_message "File samples_ref NOT prepared."
+            while [ -z "$host" ] || [ -z "$reference" ] || [ "$answer" = "n" ]; do
+                read -p $'\e[1;37mPlease specify the reference: \e[1;38;5;220m' reference
+                read -p $'\e[1;37mPlease specify the host: \e[1;38;5;220m' host
+                read -p $'\e[1;37mAre reference [\e[1;38;5;220m'"${reference}"$'\e[1;37m] and host [\e[1;38;5;220m'"${host^^}"$'\e[1;37m] correct? [Y/n]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
+            done
+            : > samples_ref.txt
+            while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
+            log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
+        fi
+    else # In case reference and host have been provided by user by using argument positions 2 and 3
+        reference=$2
+        host=$3
+        : > samples_ref.txt
+        while read in; do echo -e "${in}\t${reference}\t${host^^}" >> samples_ref.txt; done < samples_id.txt
+        log_message "File samples_ref.txt READY. \xE2\x9C\x85. Reference: ${reference}. Host: ${host^^}."
+    fi
+else
+    log_message "File samples_ref.txt READY. \xE2\x9C\x85"
+fi
+
+# Preparing enviroment for METAGENOMIC analysis
+if [ "$ANALYSIS_TYPE" = "METAGENOMIC" ]; then
+
+    # Nextclade is able to analyze monkeypox virus
+    if [[ "$interactive_mode" != "off" ]]; then # In case METAGENOMICS haven't been specified with -M option
+        if [[ ! -v monkeypox ]]; then # And monkeypoxvirus virus is also not specified with -p option, ask the user
+            echo
+            read -p $'\e[1;37mDo the sequences correspond to monkeypox virus (MPV)? [y/N]: \e[1;38;5;220m' -n 1 monkeypox; tput sgr0; echo
+        fi
+    fi
+    if [ "$monkeypox" == "y" ]; then
+
+        log_message "Monkeypox virus (MPV) analysis selected."
+        virus_tag='mpox'
+        # Update Nextclade
+        update_nextclade
+
+    fi
+
+# Preparing enviroment for AMPLICONS analysis
+else
+
+    sed -i "s|protocol: 'metagenomic'|protocol: 'amplicon'|" $PARAMS_FILE
+
+    if [[ "$interactive_mode" != "off" ]]; then # In case AMPLICONS haven't been specified with -A option
+        if [[ ! -v virus_tag ]]; then # And no virus have been specified with -r or -s options, ask the user
+            echo_bold "\nPlease specify the organism to which the sequences correspond."
+            echo_bold "1. SARS-CoV-2"
+            echo_bold "2. RSV"
+            echo_bold "3. Other"
+            while true; do
+                echo -ne "\e[1;38;5;220m"; read -n 1 virus_tag; tput sgr0; echo
+                if [[ "$virus_tag" != "1" && "$virus_tag" != "2" && "$virus_tag" != "3" ]]; then
+                    echo_red "Invalid input. Please select a valid number."
+                else
+                    break
+                fi
+            done
+
+            if [[ "$virus_tag" == "1" ]]; then
+                virus_tag="sars-cov-2"
+            elif [[ "$virus_tag" == "2" ]]; then
+                virus_tag="rsv"
+            else
+                virus_tag="No"
+            fi
+        fi
+    fi
+
+    log_message "${virus_tag^^} virus selected." green
+
+    # Preparing the environment for SARS-CoV-2 analysis
+    if [ "$virus_tag" == "sars-cov-2" ]; then
+        # Update Nextclade and Pangolin
+        update_nextclade
+        update_pangolin
+
+        echo "primer_bed: '/data/ucct/bi/references/refgenie/alias/coronaviridae/primer_schemes/NC_045512.2/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
+
+    elif [ "$virus_tag" == "rsv" ]; then       
+        # Update Nextclade
+        update_nextclade
+
+        log_message "Remember to provide the complete route to primer_bed and primer_fasta files, and specify the nextclade_dataset_name in every sbatch file before running the pipeline." bold
+
+    else
+        echo "primer_bed: '../REFERENCES/XXXX'" >> $PARAMS_FILE
+        log_message "Remember to provide the complete route to PRIMER_BED file in $PARAMS_FILE file before running the pipeline." bold
+    fi
+
+fi
+
+mkdir -p 00-reads
+cat samples_ref.txt | cut -f3 | sort -u | while read in; do echo ${in^^}; done > host_list.tmp
+i=1; cat host_list.tmp | while read in
+do
+    FOLDER_NAME=$(echo $(date '+%Y%m%d')_ANALYSIS0${i}_${ANALYSIS_TYPE}_${in})
+    mkdir ${FOLDER_NAME}
+    cp create_summary_report.sh ${FOLDER_NAME}/
+    cp deduplicate_long_table.sh ${FOLDER_NAME}/
+    cp percentajeNs.py ${FOLDER_NAME}/
+    cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
+    cp get_percentage_LDM.py ${FOLDER_NAME}/
+    cp sgene_metrics.sh ${FOLDER_NAME}/
+    grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
+    echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
+    printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
+    printf "#module load Nextflow singularity\n\n" >> ${FOLDER_NAME}/lablog
+    printf 'scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")\n\n' >> ${FOLDER_NAME}/lablog
+    cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | while read ref
+    do
+        echo "sample,fastq_1,fastq_2" > ${FOLDER_NAME}/samplesheet_${ref}.csv
+        grep -i ${ref} ${FOLDER_NAME}/samples_ref.txt | while read samples
+        do
+            arr=($samples); echo "${arr[0]},00-reads/${arr[0]}_R1.fastq.gz,00-reads/${arr[0]}_R2.fastq.gz" >> ${FOLDER_NAME}/samplesheet_${ref}.csv
+        done
+        check_references
+        echo "cat <<EOF > ${ref}_viralrecon.sbatch" >> ${FOLDER_NAME}/lablog
+        echo "#!/bin/sh" >> ${FOLDER_NAME}/lablog
+        echo "#SBATCH --ntasks 1" >> ${FOLDER_NAME}/lablog
+        echo "#SBATCH --cpus-per-task 2" >> ${FOLDER_NAME}/lablog
+        echo "#SBATCH --mem 4G" >> ${FOLDER_NAME}/lablog
+        echo "#SBATCH --time 2:00:00" >> ${FOLDER_NAME}/lablog
+        echo "#SBATCH --partition middle_idx" >> ${FOLDER_NAME}/lablog
+        echo "#SBATCH --output ${ref}_$(date '+%Y%m%d')_viralrecon.log" >> ${FOLDER_NAME}/lablog
+        printf "#SBATCH --chdir \$scratch_dir\n\n" >> ${FOLDER_NAME}/lablog
+        printf 'export NXF_OPTS="-Xms500M -Xmx4G"\n\n' >> ${FOLDER_NAME}/lablog
+        echo "nextflow run /data/ucct/bi/pipelines/nf-core-viralrecon/nf-core-viralrecon-2.6.0/workflow/main.nf \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -c ../${CONFIG_FILE} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          -params-file ../${PARAMS_FILE} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --input samplesheet_${ref}.csv \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --outdir ${ref}_$(date '+%Y%m%d')_viralrecon_mapping \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --fasta ${REF_FASTA} \\\\" >> ${FOLDER_NAME}/lablog
+        echo "          --gff ${REF_GFF} \\\\" >> ${FOLDER_NAME}/lablog
+        if [ -n "$virus_tag" ]; then
+            echo "          --nextclade_dataset_tag '$nextclade_tag' \\\\" >> ${FOLDER_NAME}/lablog
+            if [ "$virus_tag" == 'rsv' ]; then
+                echo "          --primer_bed ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
+                echo "          --primer_fasta ../../REFERENCES/XXXX \\\\" >> ${FOLDER_NAME}/lablog
+                if [ $ref == "EPI_ISL_18668201" ]; then
+                    echo "          --nextclade_dataset_name 'rsv_a' \\\\" >> ${FOLDER_NAME}/lablog
+                elif [ $ref == "EPI_ISL_1653999" ]; then
+                    echo "          --nextclade_dataset_name 'rsv_b' \\\\" >> ${FOLDER_NAME}/lablog
+                else
+                    echo "          --nextclade_dataset_name 'rsv_X' \\\\" >> ${FOLDER_NAME}/lablog
+                fi
+            else 
+                echo "          --nextclade_dataset_name '$virus_tag' \\\\" >> ${FOLDER_NAME}/lablog
+            fi
+        fi
+        echo "          -resume" >> ${FOLDER_NAME}/lablog
+        printf "EOF\n\n" >> ${FOLDER_NAME}/lablog
+        printf "echo 'sbatch ${ref}_viralrecon.sbatch' > _01_run_${ref}_viralrecon.sh\n\n" >> ${FOLDER_NAME}/lablog
+    done
+    echo "#micromamba activate biopython_v1.84" >> ${FOLDER_NAME}/lablog
+
+    cp _02_create_run_percentage_Ns.sh ${FOLDER_NAME}/
+    printf 'echo "bash create_summary_report.sh" > _04_create_stats_table.sh\n\n' >> ${FOLDER_NAME}/lablog
+    cp create_assembly_stats.R ${FOLDER_NAME}/
+    echo "#module load R/4.2.1" >> ${FOLDER_NAME}/lablog
+    printf 'echo "Rscript create_assembly_stats.R" > _05_create_stats_assembly.sh\n\n' >> ${FOLDER_NAME}/lablog
+    printf 'echo "bash deduplicate_long_table.sh" > _06_deduplicate_long_table.sh\n\n' >> ${FOLDER_NAME}/lablog
+    printf 'echo "# micromamba activate outbreakinfo"\n' >> ${FOLDER_NAME}/lablog
+    printf 'echo "bash sgene_metrics.sh" > _07_create_sgene_metrics.sh\n\n' >> ${FOLDER_NAME}/lablog
+    printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
+
+    i=$((i+1))
+done
+rm host_list.tmp
+rm create_summary_report.sh
+rm deduplicate_long_table.sh
+rm percentajeNs.py
+rm get_percentage_LDM.py
+rm Sgene_metrics.sh
+rm _02_create_run_percentage_Ns.sh
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
+
+log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly." bold

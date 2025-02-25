@@ -1,0 +1,91 @@
+# SETUP INTPUT SAMPLE SHEET
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+
+# Function to print colored text
+print_color() {
+    case "$2" in
+        "red")
+            echo -e "\e[1;31m$1\e[0m"
+            ;;
+        "green")
+            echo -e "\e[1;32m$1\e[0m"
+            ;;
+        "blue")
+            echo -e "\e[1;34m$1\e[0m"
+            ;;
+        *)
+            echo "$1"
+            ;;
+    esac
+}
+
+# Function to prompt with color
+prompt_with_color() {
+    read -p "$(print_color $1 'blue') $2" response
+}
+
+# Select whether to save trimmed reads
+trim_options=("Yes" "No")
+print_color "Do you want to save trimmed reads in outdir?" 'blue'
+select TRIMMED in "${trim_options[@]}"; do
+    if [ -n "$TRIMMED" ]; then
+        # rename trimmed
+        if [ "$TRIMMED" == "Yes" ] || [ "$TRIMMED" == "y" ]; then
+            SAVETRIMMED="true"
+        else 
+            SAVETRIMMED="false"
+        fi
+
+        break
+    else
+        print_color "Invalid input. Please select a valid option." 'red'
+    fi
+done
+print_color "Selected trimmed file option: $TRIMMED save trimmed" 'green'
+
+
+# Samples sheet setup
+echo "sample,run_accession,instrument_platform,fastq_1,fastq_2,fasta" > samplesheet.csv
+cat samples_id.txt | while read in; do
+	echo "${in},run1,ILLUMINA,00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,"
+done >> samplesheet.csv
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+# slurm sbatch file setup
+cat <<EOF > taxprofiler.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 24:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_taxprofiler.log
+#SBATCH --chdir $scratch_dir
+
+# module load Nextflow/24.04.2 singularity
+export NXF_OPTS="-Xms500M -Xmx6G"
+
+nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.2.1 \\
+    -profile singularity \\
+    -c ../../DOC/taxprofiler.config \\
+    --input samplesheet.csv \\
+    --outdir ./ \\
+    --databases ../../DOC/databasesheet.csv \\
+    --preprocessing_qc_tool fastqc \\
+    --save_preprocessed_reads ${SAVETRIMMED} \\
+    --perform_shortread_qc true \\
+    --shortread_qc_tool fastp \\
+    --perform_shortread_hostremoval true \\
+    --hostremoval_reference /data/ucct/bi/references/eukaria/homo_sapiens/hg38/NCBI/genome/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz \\
+    --run_kraken2 true \\
+    --run_bracken true \\
+    --run_centrifuge false \\
+    --run_kaiju false \\
+    --run_metaphlan false \\
+    --run_krona true \\
+    -resume
+EOF
+
+echo "sbatch taxprofiler.sbatch" > _01_nf_taxprofiler.sh

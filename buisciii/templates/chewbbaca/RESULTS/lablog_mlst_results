@@ -1,0 +1,15 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+
+mkdir -p $DELIVERY_FOLDER
+mkdir $DELIVERY_FOLDER/mlst
+
+# Assembly service
+cd $DELIVERY_FOLDER/mlst
+
+# Links to reports
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling_evaluation/allelecall_report.html .
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling_evaluation/distance_matrix_symmetric.tsv .
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling/results_alleles.tsv .
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-chewbbaca/allele_calling_evaluation/cgMLST_MSA.fasta .
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-grapetree/*.nwk
+ln -s ../../../ANALYSIS/*CHEWBBACA/*-grapetree/*.svg

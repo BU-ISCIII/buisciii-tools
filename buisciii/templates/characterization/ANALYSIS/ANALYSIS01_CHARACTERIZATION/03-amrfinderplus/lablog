@@ -1,0 +1,36 @@
+# conda activate amrfinder
+
+# Only works with assemblies, prior to this you must have executed assembly pipeline
+
+scratch_dir=$(echo $(pwd) | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
+
+mkdir logs	
+
+possible_organisms=("Acinetobacter_baumannii" "Burkholderia_cepacia" "Burkholderia_pseudomallei" "Campylobacter" "Citrobacter_freundii" "Clostridioides_difficile" "Enterobacter_asburiae" "Enterobacter_cloacae" "Enterococcus_faecalis" "Enterococcus_faecium" "Escherichia" "Klebsiella_oxytoca" "Klebsiella_pneumoniae" "Neisseria_gonorrhoeae" "Neisseria_meningitidis" "Pseudomonas_aeruginosa" "Salmonella" "Serratia_marcescens" "Staphylococcus_aureus" "Staphylococcus_pseudintermedius" "Streptococcus_agalactiae" "Streptococcus_pneumoniae" "Streptococcus_pyogenes" "Vibrio_cholerae" "Vibrio_parahaemolyticus" "Vibrio_vulnificus" "OTHER")
+echo
+echo -e "\n\033[1;37mPlease select your bacteria from the following list:\033[0m"
+PS3=$(echo -e "\n\033[1;37mSelect number:\033[0m ")
+select bacteria in "${possible_organisms[@]}"; do
+    if [[ -n "$bacteria" ]]; then
+        echo -e "\033[0;32mOrganism selected: ${bacteria}\033[0m"
+        if [ $bacteria = "OTHER" ]; then
+            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx --output logs/AMRFINDER_${in}.%j.log --job-name AMRFINDER_${in} amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh; done
+        else
+            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx --output logs/AMRFINDER_${in}.%j.log --job-name AMRFINDER_${in} amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --organism ${bacteria} --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh; done
+        fi
+        break
+    else
+        echo -e "\n\033[0;31mInvalid input.\033[0m"
+    fi
+done
+
+cat << "EOF" > _02_amrfinder_summary.sh
+#!/bin/bash
+output_file="amrfinder_summary.tsv"
+{ 
+  for file in *_out.tsv; do
+    [ "$header_added" ] || { head -n 1 "$file"; header_added=true; }
+    tail -n +2 "$file"
+  done
+} > "$output_file"
+EOF

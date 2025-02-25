@@ -1,0 +1,21 @@
+mkdir -p 00-reads
+cd 00-reads
+
+# Loop through each file in the directory
+while IFS= read -r sample; do
+    # Extract the file name with&without extension
+    filename_noext=$(basename -s .fastq.gz ../../RAW/${sample}*)
+
+    ### Check if reads are single o paired end
+    for fileitem in $filename_noext; do
+        if [[ "$fileitem" =~ _R[12] ]]; then
+            ln -s -f ../../RAW/${sample}*_R1*.fastq.gz ${sample}_R1.fastq.gz
+            ln -s -f ../../RAW/${sample}*_R2*.fastq.gz ${sample}_R2.fastq.gz
+        elif [[ ! "$fileitem" =~ _R[12] ]]; then
+            ln -s -f ../../RAW/${sample}.fastq.gz ${sample}.fastq.gz
+        fi
+    done
+done < ../samples_id.txt
+
+cd -
+mv ANALYSIS01_ASSEMBLY "$(date '+%Y%m%d')_ANALYSIS01_ASSEMBLY"

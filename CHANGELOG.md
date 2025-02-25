@@ -4,6 +4,51 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.6] - 2025-02-25 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.6
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Sara Monzón](https://github.com/saramonzon)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Jaime Ozáez](https://github.com/jaimeozaezm)
+
+### Template fixes and updates
+
+- User added to sftp_user.json [#404] (https://github.com/BU-ISCIII/buisciii-tools/pull/404).
+- Fix archived path [#405](https://github.com/BU-ISCIII/buisciii-tools/pull/405)
+- Updated characterization/03-amrfinderplus lablog with summary generator [#406](https://github.com/BU-ISCIII/buisciii-tools/pull/406)
+- Updated lablog_viralrecon to replace conda by micromamba, and updated the output message from remove_columns_mapping_table.sh [#409](https://github.com/BU-ISCIII/buisciii-tools/pull/409)
+- Created lablog_bam2fq in viralrecon's template [#409](https://github.com/BU-ISCIII/buisciii-tools/pull/409)
+- Replaced bu_isciii by buisciii where necessary, and bu_isciii by buisciii-tools in __init__.py [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
+- Added versions for all dependencies in requirements.txt [#411](https://github.com/BU-ISCIII/buisciii-tools/pull/411)
+- Implemented a non-interactive mode for running lablog_viralrecon [#410](https://github.com/BU-ISCIII/buisciii-tools/pull/410)
+- Fixes in several service templates [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/414)
+- Modified path for temporal files in irma_config.sh [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/421)
+- Modified field (cut) where extracted flu type information in lablog_irma_results [#414](https://github.com/BU-ISCIII/buisciii-tools/pull/421)
+- Implemented QC scripts into viralrecon template [#422](https://github.com/BU-ISCIII/buisciii-tools/pull/422)
+- Fixed minor mistakes in chewBBACA's template [#425](https://github.com/BU-ISCIII/buisciii-tools/pull/425).
+- Fixed some issues in outbreak services [#428](https://github.com/BU-ISCIII/buisciii-tools/pull/428)
+- Add micromamba activation comment to viralrecon template lablog and add total_N_count to sgene_metrics script[#432](https://github.com/BU-ISCIII/buisciii-tools/pull/432)
+- Added last_folder field to plasmidid_assembly service in services.json [#434](https://github.com/BU-ISCIII/buisciii-tools/pull/434)
+- Fixed bioinfo-doc crashing after resuming [#435](https://github.com/BU-ISCIII/buisciii-tools/pull/435)
+- Fixed create_summary_report.sh to latest /data/ucct/bi/ layout [#436](https://github.com/BU-ISCIII/buisciii-tools/pull/436)
+- Changed taxprofiler lablog to skip kaiju, centrifuge and metaphlan [#439](https://github.com/BU-ISCIII/buisciii-tools/pull/439)
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+- Fixed drylab_api.py to show a more descriptive message when the resolution ID does not exist [#437](https://github.com/BU-ISCIII/buisciii-tools/pull/437).
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.5] - 2025-01-09 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.5
 
 ### Credits
@@ -24,7 +69,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated mtbseq's lablog to remove unnecessary single quotes [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
 - Fixed snippy's lablog to be better explained and updated its results' lablog [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
 - Updated version in pyproject.toml and __main__.py [#396](https://github.com/BU-ISCIII/buisciii-tools/pull/396).
-
 ### Modules
 
 #### Added enhancements
@@ -392,9 +436,9 @@ Code contributions to the hotfix:
 
 ### Template fixes and updates
 
-- Added new line in `buisciii_tools/bu_isciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
-- Introduced handling of flu-C in `buisciii_tools/bu_isciii/templates/IRMA/ANALYSIS/ANALYSIS01_FLU_IRMA/04-irma/` `lablog` and `create_irma_stats.sh`
-- Small changes to `buisciii_tools/bu_isciii/templates/viralrecon/RESULTS/viralrecon_results` for blast and new excel_generator.py
+- Added new line in `buisciii_tools/buisciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+- Introduced handling of flu-C in `buisciii_tools/buisciii/templates/IRMA/ANALYSIS/ANALYSIS01_FLU_IRMA/04-irma/` `lablog` and `create_irma_stats.sh`
+- Small changes to `buisciii_tools/buisciii/templates/viralrecon/RESULTS/viralrecon_results` for blast and new excel_generator.py
 - Introduced better error handling in excel_generator.py. Now it can also be used for single files
 - Brought back `PASS_ONLY` to exometrio's `exomiser_configfile.yml`
 - [#187](https://github.com/BU-ISCIII/buisciii-tools/pull/187) - Added new template for bacterial assembly. Allowing for short, long and hybrid assembly.
