@@ -1,0 +1,326 @@
+{
+    "assembly_annotation": {
+        "label": "Bacteria: De novo genome assembly and annotation",
+        "template": "assembly",
+        "url": "https://github.com/nf-core/bacass/tree/2.4.0",
+        "order": 1,
+        "begin": "",
+        "end": "",
+        "description": "nf-core/bacass:  Simple bacterial assembly and annotation pipeline",
+        "clean": {
+          "folders":[],
+          "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
+        },
+        "no_copy": ["RAW", "TMP", "latest"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "assets/reports/md/assembly.md",
+        "results_md": "assets/reports/results/assembly.md"
+    },
+    "mtbseq": {
+        "label": "Bacteria: In-depth analysis of Mycobacterium species genomes (e.g. M. tuberculosis. M. bovis)",
+        "template": "mtbseq",
+        "order": 1,
+        "begin": "base",
+        "end": "",
+        "url": "https://github.com/ngs-fzb/MTBseq_source",
+        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
+        "clean": {
+          "folders":["Bam", "Mpileup"],
+          "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "results_md": ""
+    },
+    "pikavirus": {
+      "label": "Viral: Detection and characterization of viral genomes within metagenomic data",
+      "template": "pikavirus",
+      "order": 1,
+      "begin": "base",
+      "end": "taxprofiler",
+      "url": "https://github.com/BU-ISCIII/PikaVirus",
+      "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus.",
+      "clean": {
+        "folders":["virus_coverage/plots"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "01-PikaVirus-results"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/pikavirus.md",
+      "results_md": "assets/reports/results/pikavirus.md"
+  },
+    "plasmidid_assembly": {
+      "label": "Bacteria: Plasmid analysis and characterization",
+      "template": "plasmidid",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/BU-ISCIII/plasmidID",
+      "description": "Plasmid identification tool based on mapping and assisted by assembly",
+      "clean": {
+        "folders":["01-preprocessing/trimmed_sequences"],
+        "files":["mapping/sample_name.sorted.bam", "kmer/database.msh"]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/plasmidid.md",
+      "results_md": "assets/reports/results/plasmidid.md"
+  },
+    "wgmlst_taranis": {
+        "label": "",
+        "template": "taranis",
+        "order": 1,
+        "begin": "base",
+        "end": "taxprofiler",
+        "url": "https://github.com/BU-ISCIII/taranis",
+        "description": "Multilocus sequence typing (MLST) using Taranis",
+        "depends_on": "assembly_annotation",
+        "clean": {
+          "folders":[],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "results_md": ""
+    },
+    "wgmlst_chewbbaca": {
+        "label": "Bacteria: Core genome or whole genome Multi-Locus Sequence Typing analysis (cg/wgMLST)",
+        "template": "chewbbaca",
+        "order": 1,
+        "begin": "base",
+        "end": "taxprofiler",
+        "url": "https://github.com/B-UMMI/chewBBACA",
+        "description": "Multilocus sequence typing (MLST) using chewBBACA",
+        "depends_on": "assembly_annotation",
+        "clean": {
+          "folders":[],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "assets/reports/md/wgmlst_chewbbaca.md",
+        "results_md": "assets/reports/results/wgmlst_chewbbaca.md"
+    },
+    "viralrecon": {
+        "label": "Viral: Genomic reconstruction, reference mapping and variant calling and/or de novo assembly",
+        "template": "viralrecon",
+        "url": "https://github.com/BU-ISCIII/viralrecon",
+        "order": 1,
+        "begin": "",
+        "end": "taxprofiler",
+        "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
+        "clean": {
+          "folders":[],
+          "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
+        "delivery_md": "assets/reports/md/viralrecon.md",
+        "results_md": "assets/reports/results/viralrecon.md"
+    },
+    "rnaseq": {
+        "label": "",
+        "template": "rnaseq",
+        "url": "https://github.com/nf-core/rnaseq",
+        "order": 1,
+        "begin": "",
+        "end": "taxprofiler",
+        "description": "RNA-seq analysis",
+        "clean": {
+          "folders":[],
+          "files":["star_salmon/sample_name.Aligned.out.bam", "star_salmon/sample_name.Aligned.toTranscriptome.out.bam"]
+        },
+        "no_copy": ["RAW", "TMP"],
+        "last_folder":"RESULTS",
+        "delivery_md": "assets/reports/md/rnaseq_deg.md",
+        "results_md": "assets/reports/results/rnaseq_deg.md"
+    },
+    "lowfreq_panel": {
+        "label": "Low-frequency variants detection and annotation for whole genome or sequencing panel (e.g. retinoblastoma gene panel)",
+        "template": "lowfreq_panel",
+        "url": "",
+        "order": 1,
+        "begin": "",
+        "end": "",
+        "description": "Low frequency variant calling from enrichment panel.",
+        "clean": {
+          "folders":["02-preprocessing", "05-samtools"],
+          "files":[]
+        },
+        "no_copy": ["RAW", "TMP", "00-reads"],
+        "last_folder":"REFERENCES",
+        "delivery_md": "",
+        "results_md": ""
+    },
+    "snippy": {
+      "label": "Fungal / bacteria / virus : Variant calling, annotation and SNP-based outbreak analysis (e.g. haploid fungal outbreak)",
+      "template": "snippy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/tseemann/snippy",
+      "description": "Rapid haploid variant calling and core genome alignment",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "seek_and_destroy": {
+      "label": "",
+      "template": "seek_and_destroy",
+      "order": 1,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/GuilleGorines/Seek-Destroy",
+      "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads"],
+      "delivery_md": "",
+      "delivery_pdf": ""
+    },
+    "characterization": {
+      "label": "Bacteria: Multi-Locus Sequence Typing (MLST), analysis of virulence factors, antimicrobial resistance, and plasmids characterization",
+      "template": "characterization",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP", "00-reads", "fasta_inputs"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "taxprofiler": {
+      "label": "Taxonomic based Identification and classification of organisms in complex communities",
+      "template": "taxprofiler",
+      "order": 2,
+      "begin": "base",
+      "end": "",
+      "url": "https://github.com/nf-core/taxprofiler",
+      "description": "Highly parallelised multi-taxonomic profiling of shotgun short- and long-read metagenomic data",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"RESULTS",
+      "delivery_md": "assets/reports/md/taxprofiler.md",
+      "results_md": "assets/reports/results/taxprofiler.md"
+    },
+    "exometrio": {
+      "label": "Human: Exome sequencing for variant calling, annotation and inheritance filtering (e.g. Exome sequencing of a human trio (two parents and one child))",
+      "template": "exometrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates", "03-annotation/vep", "03-annotation/exomiser"],
+        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/sarek.md",
+      "results_md": "assets/reports/results/trios.md"
+    },
+    "exomeeb": {
+      "label": "Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)",
+      "template": "exomeeb",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing"],
+        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/sarek.md",
+      "results_md": "assets/reports/results/exomeeb.md"
+    },
+    "wgstrio": {
+      "label": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering (e.g.WGS of a human trio )",
+      "template": "wgstrio",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
+        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/sarek.md",
+      "results_md": "assets/reports/results/trios.md"
+    },
+    "freebayes_outbreak": {
+      "label": "Eukaria (non-human): Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)",
+      "template": "freebayes_outbreak",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"RESULTS",
+      "delivery_md": "",
+      "results_md": ""
+    },
+    "IRMA": {
+      "label": "Viral Flu: Influenza fragment reconstruction and variant detection",
+      "template": "IRMA",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "taxprofiler",
+      "description": "",
+      "clean": {
+        "folders":["02-preprocessing"],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/irma.md",
+      "results_md": "assets/reports/results/irma_output.md"
+    },
+    "blast_nt": {
+      "label": "Alignment of de novo assembly contigs to database",
+      "template": "blast_nt",
+      "url": "",
+      "order": 1,
+      "begin": "",
+      "end": "",
+      "description": "",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "",
+      "results_md": ""
+  }
+}

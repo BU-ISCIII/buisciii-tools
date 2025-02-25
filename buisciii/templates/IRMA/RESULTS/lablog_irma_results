@@ -1,0 +1,34 @@
+#!/bin/bash
+
+mkdir $(date '+%Y%m%d')_entrega01
+cd $(date '+%Y%m%d')_entrega01
+
+# Setting the organism
+echo "Please specify the organism that was analysed."
+echo "1. FLU"
+echo "2. RSV"
+while true; do
+    read -p "Enter your choice (1 or 2): " ORGANISM
+    if [ "$ORGANISM" == "1" ]; then
+        ORGANISM="FLU"
+        echo "You selected $ORGANISM."
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/all_samples_completo.txt .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/A_H* .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/B .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/C .
+        tail -n +2 ../../ANALYSIS/*_IRMA/04-irma/clean_irma_stats_flu.txt | cut -f5 | sort | uniq -c > flu_type_summary.txt
+        break
+    elif [ "$ORGANISM" == "2" ]; then
+        ORGANISM="RSV"
+        echo "You selected $ORGANISM."
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/all_samples_completo.txt .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/A .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/B .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/AD .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/BD .
+        tail -n +2 ../../ANALYSIS/*_IRMA/04-irma/irma_stats_rsv.txt | cut -f5 | sort | uniq -c > rsv_type_summary.txt
+        break
+    else
+        echo "Invalid input. Please enter 1 or 2."
+    fi
+done

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "buisciii-tools"
-version = "2.2.5"
+version = "2.2.6"
 dynamic = ["dependencies"]
 
 authors = [
@@ -59,7 +59,7 @@ Issues = "https://github.com/BU-ISCIII/buisciii-tools/issues"
 dependencies = {file = ["requirements.txt"]}
 
 [project.scripts]
-bu_isciii = "bu_isciii.__main__:run_bu_isciii"
+buisciii = "buisciii.__main__:run_buisciii"
 
 [tool.setuptools.packages.find]
 exclude = ["docs"]

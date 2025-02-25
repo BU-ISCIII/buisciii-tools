@@ -1,0 +1,60 @@
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+# module load singularity
+
+mkdir logs
+
+# Function to print colored text
+print_color() {
+    case "$2" in
+        "red")
+            echo -e "\e[1;31m$1\e[0m"
+            ;;
+        "green")
+            echo -e "\e[1;32m$1\e[0m"
+            ;;
+        "blue")
+            echo -e "\e[1;34m$1\e[0m"
+            ;;
+        *)
+            echo "$1"
+            ;;
+    esac
+}
+
+# Function to prompt with color
+prompt_with_color() {
+    read -p "$(print_color $1 'blue') $2" response
+}
+
+while true; do
+    read -p "Is your schema already prepared for ChewBBACA? (yes/no)" yesno
+    case $yesno in
+        [Yy]* ) 
+            print_color "Indicate the path to the schema:" 'blue'
+            read -e schema_path
+            print_color "Using schema from path: $schema_path" 'green'
+            
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-CALLING.%j.log --job-name CHEWBBACA-CALLING --cpus-per-task 20 --mem 20G --partition middle_idx --time 05:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py AlleleCall -i ../01-assemblies/ -g $schema_path -o allele_calling/ --cpu 20 &" > _01_chewbbaca_calling.sh
+            
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-ALLELECALL-EVALUATOR.%j.log --job-name CHEWBBACA-ALLELECALL-EVALUATOR --cpus-per-task 1 --mem 20G --partition middle_idx --time 05:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py AlleleCallEvaluator -i ./allele_calling/ -g $schema_path -o ./allele_calling_evaluation &" > _02_chewbacca_allelecall_evaluator.sh
+
+            break
+        ;;
+        [Nn]* ) 
+            print_color "Indicate the path to the schema:" 'blue'
+            read -e schema_path
+            print_color "Using schema from path: $schema_path" 'green'
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-PREPARE-SCHEMA.%j.log --job-name CHEWBBACA-PREPARE-SCHEMA --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py PrepExternalSchema --schema-directory $schema_path --output-directory prep_schema &" > _01_prep_schema.sh
+
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-SCHEMA-EVALUATOR.%j.log --job-name CHEWBBACA-SCHEMA-EVALUATOR --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py SchemaEvaluator --schema-directory schema_path --output-directory analyze_schema &" > _02_analyze_schema.sh
+
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-ALLELECALL.%j.log --job-name CHEWBBACA-ALLELECALL --cpus-per-task 4 --mem 64G --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py AlleleCall -i ../01-assemblies/ -g ./prep_schema/ -o ./allele_calling --cpu 4 &" > _03_allele_calling.sh
+
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-ALLELECALL-EVALUATOR.%j.log --job-name CHEWBBACA-ALLELECALL-EVALUATOR --cpus-per-task 1 --mem 20G --partition middle_idx --time 05:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py AlleleCallEvaluator -i ./allele_calling/ -g ./prep_schema/ -o ./allele_calling_evaluation &" > _04_chewbacca_allelecall_evaluator.sh
+
+            break
+        ;;
+        * ) echo "Answer either yes or no!";;
+    esac
+done
