@@ -602,8 +602,6 @@ do
     cp deduplicate_long_table.sh ${FOLDER_NAME}/
     cp percentajeNs.py ${FOLDER_NAME}/
     cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
-    cp get_percentage_LDM.py ${FOLDER_NAME}/
-    cp sgene_metrics.sh ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
@@ -662,10 +660,13 @@ do
     echo "#module load R/4.2.1" >> ${FOLDER_NAME}/lablog
     printf 'echo "Rscript create_assembly_stats.R" > _05_create_stats_assembly.sh\n\n' >> ${FOLDER_NAME}/lablog
     printf 'echo "bash deduplicate_long_table.sh" > _06_deduplicate_long_table.sh\n\n' >> ${FOLDER_NAME}/lablog
-    echo "# micromamba activate outbreakinfo" >> ${FOLDER_NAME}/lablog
-    printf 'echo "bash sgene_metrics.sh" > _07_create_sgene_metrics.sh\n\n' >> ${FOLDER_NAME}/lablog
-    printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
-
+    if [[ -n "$virus_tag" && "$virus_tag" == "sars-cov-2" ]]; then
+        cp get_percentage_LDM.py ${FOLDER_NAME}/
+        cp sgene_metrics.sh ${FOLDER_NAME}/
+        echo "# micromamba activate outbreakinfo" >> ${FOLDER_NAME}/lablog
+        printf 'echo "bash sgene_metrics.sh" > _07_create_sgene_metrics.sh\n\n' >> ${FOLDER_NAME}/lablog
+        printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
+    fi
     i=$((i+1))
 done
 rm host_list.tmp
@@ -673,7 +674,7 @@ rm create_summary_report.sh
 rm deduplicate_long_table.sh
 rm percentajeNs.py
 rm get_percentage_LDM.py
-rm Sgene_metrics.sh
+rm sgene_metrics.sh
 rm _02_create_run_percentage_Ns.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
 
