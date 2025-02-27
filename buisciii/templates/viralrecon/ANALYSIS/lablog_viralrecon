@@ -664,7 +664,7 @@ do
     printf 'echo "bash deduplicate_long_table.sh" > _06_deduplicate_long_table.sh\n\n' >> ${FOLDER_NAME}/lablog
     echo "# micromamba activate outbreakinfo" >> ${FOLDER_NAME}/lablog
     printf 'echo "bash sgene_metrics.sh" > _07_create_sgene_metrics.sh\n\n' >> ${FOLDER_NAME}/lablog
-    printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
+    printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
 
     i=$((i+1))
 done
