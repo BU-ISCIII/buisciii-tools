@@ -13,18 +13,30 @@ samples_file = "../ANALYSIS/samples_id.txt"
 tsv_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_mlst_full.tsv")
 csv_file = glob.glob("../ANALYSIS/*_ASSEMBLY/99-stats/kmerfinder_summary.csv")
 mapping_file = glob.glob("../ANALYSIS/*_SNIPPY/99-stats/mapping_stats_summary.txt")
-wgs_metrics_file = glob.glob("../ANALYSIS/*_SNIPPY/99-stats/wgs_metrics_all_filtered.txt")
+wgs_metrics_file = glob.glob(
+    "../ANALYSIS/*_SNIPPY/99-stats/wgs_metrics_all_filtered.txt"
+)
 variants_stats_file = glob.glob("../ANALYSIS/*_SNIPPY/99-stats/variants_stats.txt")
-quast_report_file = glob.glob("../ANALYSIS/*_ASSEMBLY/03-assembly/quast/global_report/transposed_report.tsv")
+quast_report_file = glob.glob(
+    "../ANALYSIS/*_ASSEMBLY/03-assembly/quast/global_report/transposed_report.tsv"
+)
 quast_dir = glob.glob("../ANALYSIS/*_ASSEMBLY/03-assembly/quast/per_reference_reports/")
-virulence_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_vfdb_full.csv")
+virulence_file = glob.glob(
+    "../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_vfdb_full.csv"
+)
 card_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_card.csv")
 amrfinder_dir = glob.glob("../ANALYSIS/*_CHARACTERIZATION/03-amrfinderplus")
-plasmid_file = glob.glob("../ANALYSIS/*_PLASMIDID/NO_GROUP/NO_GROUP_final_results_per_sample.tab")
-mlva_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/05-mlva/MLVA_output/MLVA_analysis_assemblies.csv")
+plasmid_file = glob.glob(
+    "../ANALYSIS/*_PLASMIDID/NO_GROUP/NO_GROUP_final_results_per_sample.tab"
+)
+mlva_file = glob.glob(
+    "../ANALYSIS/*_CHARACTERIZATION/05-mlva/MLVA_output/MLVA_analysis_assemblies.csv"
+)
+
 
 def get_first_match(file_list):
     return file_list[0] if file_list else None
+
 
 tsv_file = get_first_match(tsv_file)
 csv_file = get_first_match(csv_file)
@@ -43,6 +55,7 @@ mlva_file = get_first_match(mlva_file)
 # File Reading Functions
 # ------------------------------------------------------
 
+
 def read_samples(file_path):
     """
     Reads sample identifiers from a file and maps them to row numbers for the Excel sheet.
@@ -60,6 +73,7 @@ def read_samples(file_path):
             samples[sample_id] = index
     return samples
 
+
 def read_ariba_mlst(tsv_file):
     """
     Processes the MLST TSV file and extracts relevant sequence typing data.
@@ -74,9 +88,15 @@ def read_ariba_mlst(tsv_file):
     df_mlst = pd.read_csv(tsv_file, sep="\t")
     mlst_columns = df_mlst.columns[2:].tolist()
     mlst_header = "/".join(mlst_columns)
-    mlst_dict = {str(row["sample_id"]): {"ST": row["ST"], "genes": "/".join(map(str, row[mlst_columns].values))}
-                 for _, row in df_mlst.iterrows()}
+    mlst_dict = {
+        str(row["sample_id"]): {
+            "ST": row["ST"],
+            "genes": "/".join(map(str, row[mlst_columns].values)),
+        }
+        for _, row in df_mlst.iterrows()
+    }
     return mlst_dict, mlst_header
+
 
 def read_kmerfinder(csv_file):
     """
@@ -91,16 +111,27 @@ def read_kmerfinder(csv_file):
     """
     try:
         df_kmerfinder = pd.read_csv(csv_file)
-        
+
         # Ensure the expected columns exist
-        expected_columns = ["sample_name", df_kmerfinder.columns[1], df_kmerfinder.columns[2], df_kmerfinder.columns[4]]
+        expected_columns = [
+            "sample_name",
+            df_kmerfinder.columns[1],
+            df_kmerfinder.columns[2],
+            df_kmerfinder.columns[4],
+        ]
         for col in expected_columns:
             if col not in df_kmerfinder.columns:
                 raise KeyError(f"Missing expected column: {col}")
-        
-        return {str(row["sample_name"]): {"colE": row.iloc[1], "colF": row.iloc[2], "colG": row.iloc[4]}
-                for _, row in df_kmerfinder.iterrows()}
-    
+
+        return {
+            str(row["sample_name"]): {
+                "colE": row.iloc[1],
+                "colF": row.iloc[2],
+                "colG": row.iloc[4],
+            }
+            for _, row in df_kmerfinder.iterrows()
+        }
+
     except FileNotFoundError:
         print(f"Error: The file '{csv_file}' was not found.")
         return {}
@@ -113,6 +144,7 @@ def read_kmerfinder(csv_file):
     except KeyError as e:
         print(f"Error: {e}")
         return {}
+
 
 def read_mapping_stats(mapping_file):
     """
@@ -127,11 +159,16 @@ def read_mapping_stats(mapping_file):
     try:
         df_mapping = pd.read_csv(mapping_file, sep=";")
         df_mapping.columns = df_mapping.columns.str.strip()
-        
-        if "SAMPLENAME" not in df_mapping.columns or "MAPPING" not in df_mapping.columns:
+
+        if (
+            "SAMPLENAME" not in df_mapping.columns
+            or "MAPPING" not in df_mapping.columns
+        ):
             raise KeyError("Missing required columns: 'SAMPLENAME' or 'MAPPING'")
-        
-        return {str(row["SAMPLENAME"]): row["MAPPING"] for _, row in df_mapping.iterrows()}
+
+        return {
+            str(row["SAMPLENAME"]): row["MAPPING"] for _, row in df_mapping.iterrows()
+        }
     except FileNotFoundError:
         print(f"Error: The file '{mapping_file}' was not found.")
         return {}
@@ -144,6 +181,7 @@ def read_mapping_stats(mapping_file):
     except KeyError as e:
         print(f"Error: {e}")
         return {}
+
 
 def read_wgs_metrics(wgs_metrics_file):
     """
@@ -158,16 +196,28 @@ def read_wgs_metrics(wgs_metrics_file):
     """
     try:
         df_wgs = pd.read_csv(wgs_metrics_file, sep="\t", dtype={"SAMPLENAME": str})
-        
-        if "SAMPLENAME" not in df_wgs.columns or "MEAN_COVERAGE" not in df_wgs.columns or "PCT_10X" not in df_wgs.columns:
-            raise KeyError("Missing required columns: 'SAMPLENAME', 'MEAN_COVERAGE', or 'PCT_10X'")
-        
-        return {str(row["SAMPLENAME"]): {"MEAN_COVERAGE": row["MEAN_COVERAGE"], "PCT_10X": row["PCT_10X"]}
-                for _, row in df_wgs.iterrows()}
+
+        if (
+            "SAMPLENAME" not in df_wgs.columns
+            or "MEAN_COVERAGE" not in df_wgs.columns
+            or "PCT_10X" not in df_wgs.columns
+        ):
+            raise KeyError(
+                "Missing required columns: 'SAMPLENAME', 'MEAN_COVERAGE', or 'PCT_10X'"
+            )
+
+        return {
+            str(row["SAMPLENAME"]): {
+                "MEAN_COVERAGE": row["MEAN_COVERAGE"],
+                "PCT_10X": row["PCT_10X"],
+            }
+            for _, row in df_wgs.iterrows()
+        }
     except Exception as e:
         print(f"Error processing WGS metrics file: {e}")
         return {}
-    
+
+
 def read_virulence_stats(virulence_file):
     """
     Reads a virulence gene statistics file and processes the data.
@@ -181,22 +231,25 @@ def read_virulence_stats(virulence_file):
               - "count": The number of virulence genes detected.
     """
     df_virulence = pd.read_csv(virulence_file)
-    
+
     virulence_dict = {}
     for _, row in df_virulence.iterrows():
         sample = str(row["sample"])
-        
+
         # Process the virulence gene list, removing unnecessary characters
         virulence_genes = row["virulence"].strip("[]").replace("'", "").split(", ")
-        virulence_genes_cleaned = [gene.replace(".match", "") for gene in virulence_genes]
+        virulence_genes_cleaned = [
+            gene.replace(".match", "") for gene in virulence_genes
+        ]
         virulence_list = ", ".join(virulence_genes_cleaned)
-        
+
         # Get the virulence gene count
         virulence_count = row["virulence_genes_vfdb"]
-        
+
         virulence_dict[sample] = {"genes": virulence_list, "count": virulence_count}
-    
+
     return virulence_dict
+
 
 def read_card_stats(card_file):
     """
@@ -210,19 +263,22 @@ def read_card_stats(card_file):
               - "genes": A string with detected resistance genes.
     """
     df_card = pd.read_csv(card_file)
-    
+
     card_dict = {}
     for _, row in df_card.iterrows():
         sample = str(row["sample"])
-        
+
         # Process the resistance gene list, removing unnecessary characters
-        card_genes = row["resistance_genes_car"].strip("[]").replace("'", "").split(", ")
+        card_genes = (
+            row["resistance_genes_car"].strip("[]").replace("'", "").split(", ")
+        )
         card_genes_cleaned = [gene.replace(".match", "") for gene in card_genes]
         card_list = ", ".join(card_genes_cleaned)
-        
+
         card_dict[sample] = {"genes": card_list}
-    
+
     return card_dict
+
 
 def read_amrfinder_results(directory):
     """
@@ -240,7 +296,7 @@ def read_amrfinder_results(directory):
         if filename.endswith("_out.tsv"):
             sample_id = filename.replace("_out.tsv", "")
             file_path = os.path.join(directory, filename)
-            
+
             df = pd.read_csv(file_path, sep="\t")
 
             # Check if required columns exist
@@ -251,6 +307,7 @@ def read_amrfinder_results(directory):
                 resistance_dict[sample_id] = gene_list
 
     return resistance_dict
+
 
 def read_amrfinderplus_resistance(directory):
     """
@@ -268,12 +325,19 @@ def read_amrfinderplus_resistance(directory):
         if filename.endswith("_out.tsv"):
             sample_id = filename.replace("_out.tsv", "")
             file_path = os.path.join(directory, filename)
-            
+
             df = pd.read_csv(file_path, sep="\t")
 
             # Remove unnecessary columns
-            columns_to_remove = ["Name", "Protein identifier", "HMM id", "HMM description"]
-            df_filtered = df.drop(columns=[col for col in columns_to_remove if col in df.columns])
+            columns_to_remove = [
+                "Name",
+                "Protein identifier",
+                "HMM id",
+                "HMM description",
+            ]
+            df_filtered = df.drop(
+                columns=[col for col in columns_to_remove if col in df.columns]
+            )
 
             # Store the filtered DataFrame in the dictionary
             amr_data[sample_id] = df_filtered
@@ -294,19 +358,22 @@ def read_variants_stats(variants_stats_file):
     try:
         df_variants = pd.read_csv(variants_stats_file, sep=";")
         df_variants.columns = df_variants.columns.str.strip()
-        
+
         required_columns = ["SAMPLENAME", "SNP", "DEL", "INS", "HET"]
         for col in required_columns:
             if col not in df_variants.columns:
                 raise KeyError(f"Missing required column: {col}")
-        
+
         return {
-            str(row["SAMPLENAME"]): f"{row['SNP']};{row['DEL']};{row['INS']};{row['HET']}"
+            str(
+                row["SAMPLENAME"]
+            ): f"{row['SNP']};{row['DEL']};{row['INS']};{row['HET']}"
             for _, row in df_variants.iterrows()
         }
     except Exception as e:
         print(f"Error processing variants stats file: {e}")
         return {}
+
 
 def read_quast_report(quast_file):
     """
@@ -320,19 +387,27 @@ def read_quast_report(quast_file):
     """
     try:
         df_quast = pd.read_csv(quast_file, sep="\t", header=0)
-        required_columns = ['Assembly', '# contigs (>= 1000 bp)', 'GC (%)', 'L50', 'N50', 'Total length (>= 1000 bp)']
+        required_columns = [
+            "Assembly",
+            "# contigs (>= 1000 bp)",
+            "GC (%)",
+            "L50",
+            "N50",
+            "Total length (>= 1000 bp)",
+        ]
         for col in required_columns:
             if col not in df_quast.columns:
                 raise KeyError(f"Missing required column: {col}")
-        
+
         df_quast = df_quast.copy()
-        df_quast.loc[:, 'Sample'] = df_quast['Assembly'].str.replace('.scaffolds', '')
-        
-        return df_quast.set_index('Sample')[required_columns].to_dict(orient='index')
+        df_quast.loc[:, "Sample"] = df_quast["Assembly"].str.replace(".scaffolds", "")
+
+        return df_quast.set_index("Sample")[required_columns].to_dict(orient="index")
     except Exception as e:
         print(f"Error processing QUAST report file: {e}")
         return {}
-    
+
+
 def read_quast_per_reference(directory):
     """
     Reads all `transposed_report.tsv` files within subdirectories of the given directory.
@@ -359,20 +434,28 @@ def read_quast_per_reference(directory):
                     df = pd.read_csv(file_path, sep="\t", header=0)
 
                     # Verificar que las columnas necesarias existen
-                    required_columns = ["Assembly", "# genomic features", "Genome fraction (%)"]
+                    required_columns = [
+                        "Assembly",
+                        "# genomic features",
+                        "Genome fraction (%)",
+                    ]
                     for col in required_columns:
                         if col not in df.columns:
-                            raise KeyError(f"Missing required column: {col} in {file_path}")
+                            raise KeyError(
+                                f"Missing required column: {col} in {file_path}"
+                            )
 
                     # Limpiar el nombre de la muestra eliminando `.scaffolds`
-                    df["Sample"] = df["Assembly"].str.replace(".scaffolds", "", regex=False)
+                    df["Sample"] = df["Assembly"].str.replace(
+                        ".scaffolds", "", regex=False
+                    )
 
                     # Crear diccionario de resultados
                     for _, row in df.iterrows():
                         sample = row["Sample"]
                         quast_data[sample] = {
                             "genomic_features": row["# genomic features"],
-                            "genome_fraction": row["Genome fraction (%)"]
+                            "genome_fraction": row["Genome fraction (%)"],
                         }
 
                 except Exception as e:
@@ -403,7 +486,7 @@ def read_plasmid_data(plasmid_file):
             "description": "Description",
             "fraction_covered": "Fraction Covered",
             "contig_number": "Contig Number",
-            "% Mapping": "% Mapping"
+            "% Mapping": "% Mapping",
         }
 
         # Rename columns for clarity
@@ -412,6 +495,7 @@ def read_plasmid_data(plasmid_file):
     except Exception as e:
         print(f"Error processing plasmid ID file: {e}")
         return {}
+
 
 def read_mlva_results(mlva_file):
     """
@@ -432,7 +516,8 @@ def read_mlva_results(mlva_file):
         mlva_headers = df_mlva.columns[2:].tolist()
 
         mlva_dict = {
-            str(row["Access_number"]): row.iloc[2:].tolist() for _, row in df_mlva.iterrows()
+            str(row["Access_number"]): row.iloc[2:].tolist()
+            for _, row in df_mlva.iterrows()
         }
 
         return mlva_headers, mlva_dict
@@ -441,14 +526,16 @@ def read_mlva_results(mlva_file):
         print(f"Error reading MLVA file: {e}")
         return [], {}
 
+
 # ------------------------------------------------------
 # Excel Writing Functions
 # ------------------------------------------------------
 
+
 def add_samples(ws, samples):
     """
     Adds sample names to the first column of the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the samples will be added.
     samples (dict): Dictionary mapping sample names to their respective row numbers.
@@ -460,10 +547,11 @@ def add_samples(ws, samples):
         print(f"Error adding samples to xlsx: {e}")
         return {}
 
+
 def add_ariba_mlst_stats(ws, samples, mlst_dict, mlst_header):
     """
     Adds ARIBA MLST (Multi-Locus Sequence Typing) results to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the results will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -480,10 +568,11 @@ def add_ariba_mlst_stats(ws, samples, mlst_dict, mlst_header):
         print(f"Error adding ariba mlst to xlsx: {e}")
         return {}
 
+
 def add_kmerfinder_stats(ws, samples, kmerfinder_dict):
     """
     Adds KmerFinder results to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the results will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -499,10 +588,11 @@ def add_kmerfinder_stats(ws, samples, kmerfinder_dict):
         print(f"Error adding kmerfinder results to xlsx: {e}")
         return {}
 
+
 def add_mapping_stats(ws, samples, mapping_dict, wgs_metrics_dict):
     """
     Adds mapping statistics to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the statistics will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -512,16 +602,19 @@ def add_mapping_stats(ws, samples, mapping_dict, wgs_metrics_dict):
     try:
         for sample, row_num in samples.items():
             ws[f"H{row_num}"] = mapping_dict.get(sample, "NA")
-            ws[f"I{row_num}"] = wgs_metrics_dict.get(sample, {}).get("MEAN_COVERAGE", "NA")
+            ws[f"I{row_num}"] = wgs_metrics_dict.get(sample, {}).get(
+                "MEAN_COVERAGE", "NA"
+            )
             ws[f"J{row_num}"] = wgs_metrics_dict.get(sample, {}).get("PCT_10X", "NA")
     except Exception as e:
         print(f"Error adding mapping stats to xlsx: {e}")
         return {}
 
+
 def add_variants_stats(ws, samples, variants_dict):
     """
     Adds variant statistics to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the variant data will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -534,10 +627,11 @@ def add_variants_stats(ws, samples, variants_dict):
         print(f"Error adding variant stats to xlsx: {e}")
         return {}
 
+
 def add_quast_stats(ws, samples, quast_dict):
     """
     Adds QUAST assembly quality statistics to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the QUAST statistics will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -545,18 +639,19 @@ def add_quast_stats(ws, samples, quast_dict):
     """
     try:
         for sample, row_num in samples.items():
-            sample_without_scaffolds = sample.replace('.scaffolds', '')
+            sample_without_scaffolds = sample.replace(".scaffolds", "")
             if sample_without_scaffolds in quast_dict:
                 quast_stats = quast_dict[sample_without_scaffolds]
-                ws[f"L{row_num}"] = quast_stats.get('# contigs (>= 1000 bp)', 'NA')
-                ws[f"N{row_num}"] = quast_stats.get('GC (%)', 'NA')
-                ws[f"P{row_num}"] = quast_stats.get('L50', 'NA')
-                ws[f"Q{row_num}"] = quast_stats.get('N50', 'NA')
-                ws[f"R{row_num}"] = quast_stats.get('Total length (>= 1000 bp)', 'NA')
+                ws[f"L{row_num}"] = quast_stats.get("# contigs (>= 1000 bp)", "NA")
+                ws[f"N{row_num}"] = quast_stats.get("GC (%)", "NA")
+                ws[f"P{row_num}"] = quast_stats.get("L50", "NA")
+                ws[f"Q{row_num}"] = quast_stats.get("N50", "NA")
+                ws[f"R{row_num}"] = quast_stats.get("Total length (>= 1000 bp)", "NA")
     except Exception as e:
         print(f"Error adding quast stats to xlsx: {e}")
         return {}
-    
+
+
 def add_quast_per_reference(ws, samples, quast_dict):
     """
     Adds per-reference QUAST results to the worksheet.
@@ -578,7 +673,7 @@ def add_quast_per_reference(ws, samples, quast_dict):
 def add_virulence_stats(ws, samples, virulence_dict):
     """
     Adds virulence gene statistics to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the virulence statistics will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -594,10 +689,11 @@ def add_virulence_stats(ws, samples, virulence_dict):
         print(f"Error adding virulence stats to xlsx: {e}")
         return {}
 
+
 def add_resistance_stats(ws, samples, card_dict):
     """
     Adds antimicrobial resistance (AMR) gene statistics from CARD to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the AMR data will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -612,10 +708,11 @@ def add_resistance_stats(ws, samples, card_dict):
         print(f"Error adding resistance stats to xlsx: {e}")
         return {}
 
+
 def add_amrfinder_results(ws, samples, resistance_dict):
     """
     Adds AMRFinder resistance gene results to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the AMRFinder results will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -629,10 +726,11 @@ def add_amrfinder_results(ws, samples, resistance_dict):
         print(f"Error adding amrfinder results to xlsx: {e}")
         return {}
 
+
 def add_amrfinderplus_resistance(ws, samples, amr_data):
     """
     Adds AMRFinderPlus resistance gene results in a tabular format.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the AMRFinderPlus results will be added.
     samples (dict): Dictionary mapping sample names to row numbers.
@@ -653,10 +751,11 @@ def add_amrfinderplus_resistance(ws, samples, amr_data):
         print(f"Error adding amrfinder resistance stats to xlsx: {e}")
         return {}
 
+
 def add_plasmid_data(ws, df):
     """
     Adds plasmid data from a Pandas DataFrame to the worksheet.
-    
+
     Parameters:
     ws (Worksheet): The Excel worksheet where the plasmid data will be added.
     df (DataFrame): Pandas DataFrame containing plasmid information.
@@ -668,7 +767,8 @@ def add_plasmid_data(ws, df):
     except Exception as e:
         print(f"Error adding plasmidID stats to xlsx: {e}")
         return {}
-    
+
+
 def add_mlva_results(ws, mlva_headers, mlva_dict):
     """
     Adds MLVA results to the worksheet, creating new headers dynamically.
@@ -693,16 +793,17 @@ def add_mlva_results(ws, mlva_headers, mlva_dict):
 # Main Functions
 # ------------------------------------------------------
 
+
 def main():
     """
     Main function to process genomic data and populate an Excel report.
-    
-    Reads multiple data sources related to sample sequencing, including MLST, 
-    KmerFinder, mapping statistics, variant analysis, QUAST assembly stats, 
+
+    Reads multiple data sources related to sample sequencing, including MLST,
+    KmerFinder, mapping statistics, variant analysis, QUAST assembly stats,
     virulence factors, resistance genes, AMRFinder results, and plasmid data.
     Fills an Excel template with this information.
     """
-    
+
     # Read sample information
     samples = read_samples(samples_file)
 
@@ -731,7 +832,6 @@ def main():
     ws_resistance = wb["Resistance result"]
     ws_mlva = wb["MLVA"]
     ws_amrfinder_resistance = wb["AMRFinderPlus Resistance result"]
-
 
     add_samples(ws_summary, samples)
     add_ariba_mlst_stats(ws_summary, samples, mlst_dict, mlst_header)
