@@ -299,7 +299,7 @@
       "description": "",
       "clean": {
         "folders":["02-preprocessing", "intermediate"],
-        "files":[]
+        "files":["sample_name/RSV_AD.bam", "sample_name/RSV_BD.bam"]
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
