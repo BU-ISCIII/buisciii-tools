@@ -59,7 +59,7 @@
       "url": "https://github.com/BU-ISCIII/plasmidID",
       "description": "Plasmid identification tool based on mapping and assisted by assembly",
       "clean": {
-        "folders":["01-preprocessing/trimmed_sequences"],
+        "folders":[],
         "files":["mapping/sample_name.sorted.bam", "kmer/database.msh"]
       },
       "no_copy": ["RAW", "TMP"],
@@ -196,7 +196,7 @@
       "end": "",
       "description": "",
       "clean": {
-        "folders":["01-preprocessing"],
+        "folders":[],
         "files":[]
       },
       "no_copy": ["RAW", "TMP", "00-reads", "fasta_inputs"],
