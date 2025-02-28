@@ -21,6 +21,7 @@ virulence_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_vfdb_f
 card_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_card.csv")
 amrfinder_dir = glob.glob("../ANALYSIS/*_CHARACTERIZATION/03-amrfinderplus")
 plasmid_file = glob.glob("../ANALYSIS/*_PLASMIDID/NO_GROUP/NO_GROUP_final_results_per_sample.tab")
+mlva_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/05-mlva/MLVA_output/MLVA_analysis_assemblies.csv")
 
 def get_first_match(file_list):
     return file_list[0] if file_list else None
@@ -36,6 +37,7 @@ virulence_file = get_first_match(virulence_file)
 card_file = get_first_match(card_file)
 amrfinder_dir = get_first_match(amrfinder_dir)
 plasmid_file = get_first_match(plasmid_file)
+mlva_file = get_first_match(mlva_file)
 
 # ------------------------------------------------------
 # File Reading Functions
@@ -411,7 +413,33 @@ def read_plasmid_data(plasmid_file):
         print(f"Error processing plasmid ID file: {e}")
         return {}
 
+def read_mlva_results(mlva_file):
+    """
+    Reads the MLVA analysis CSV file and extracts relevant columns.
 
+    Args:
+        mlva_file (str): Path to the MLVA results file.
+
+    Returns:
+        tuple: (header list, dictionary where keys are sample IDs and values are lists of MLVA results).
+    """
+    try:
+        df_mlva = pd.read_csv(mlva_file)
+
+        if "Access_number" not in df_mlva.columns:
+            raise KeyError("Missing required column: 'Access_number' in MLVA file")
+
+        mlva_headers = df_mlva.columns[2:].tolist()
+
+        mlva_dict = {
+            str(row["Access_number"]): row.iloc[2:].tolist() for _, row in df_mlva.iterrows()
+        }
+
+        return mlva_headers, mlva_dict
+
+    except Exception as e:
+        print(f"Error reading MLVA file: {e}")
+        return [], {}
 
 # ------------------------------------------------------
 # Excel Writing Functions
@@ -640,6 +668,25 @@ def add_plasmid_data(ws, df):
     except Exception as e:
         print(f"Error adding plasmidID stats to xlsx: {e}")
         return {}
+    
+def add_mlva_results(ws, mlva_headers, mlva_dict):
+    """
+    Adds MLVA results to the worksheet, creating new headers dynamically.
+
+    Parameters:
+    ws (Worksheet): The Excel worksheet where the MLVA results will be added.
+    samples (dict): Dictionary mapping sample names to row numbers.
+    mlva_headers (list): List of MLVA column headers.
+    mlva_dict (dict): Dictionary containing MLVA results per sample.
+    """
+    try:
+        ws.append(["Sample ID"] + mlva_headers)
+
+        for sample_id, values in mlva_dict.items():
+            ws.append([sample_id] + values)
+
+    except Exception as e:
+        print(f"Error adding MLVA results to xlsx: {e}")
 
 
 # ------------------------------------------------------
@@ -672,6 +719,7 @@ def main():
     amrfinder_dict = read_amrfinder_results(amrfinder_dir)
     amr_resistance_data = read_amrfinderplus_resistance(amrfinder_dir)
     plasmid_data = read_plasmid_data(plasmid_file)
+    mlva_headers, mlva_dict = read_mlva_results(mlva_file)
 
     # Load the Excel template
     wb = load_workbook(xlsx_template)
@@ -681,6 +729,7 @@ def main():
     ws_plasmids = wb["plasmids"]
     ws_virulence = wb["virulence"]
     ws_resistance = wb["Resistance result"]
+    ws_mlva = wb["MLVA"]
     ws_amrfinder_resistance = wb["AMRFinderPlus Resistance result"]
 
 
@@ -700,6 +749,7 @@ def main():
     add_amrfinderplus_resistance(ws_amrfinder_resistance, samples, amr_resistance_data)
 
     add_plasmid_data(ws_plasmids, plasmid_data)
+    add_mlva_results(ws_mlva, mlva_headers, mlva_dict)
 
     output_xlsx = "summary_outbreak_filled.xlsx"
     wb.save(output_xlsx)
