@@ -57,6 +57,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed bioinfo-doc crashing after resuming [#435](https://github.com/BU-ISCIII/buisciii-tools/pull/435)
 - Fixed create_summary_report.sh to latest /data/ucct/bi/ layout [#436](https://github.com/BU-ISCIII/buisciii-tools/pull/436)
 - Changed taxprofiler lablog to skip kaiju, centrifuge and metaphlan [#439](https://github.com/BU-ISCIII/buisciii-tools/pull/439)
+- Add generate_summary_outbreak.py to Complete Template with Outbreak Analysis Results [#450](https://github.com/BU-ISCIII/buisciii-tools/pull/450)
 
 ### Modules
 
