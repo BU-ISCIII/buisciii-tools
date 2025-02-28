@@ -298,7 +298,7 @@
       "end": "taxprofiler",
       "description": "",
       "clean": {
-        "folders":["02-preprocessing"],
+        "folders":["02-preprocessing", "intermediate"],
         "files":[]
       },
       "no_copy": ["RAW", "TMP"],
