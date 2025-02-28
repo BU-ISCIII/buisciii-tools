@@ -1,5 +1,3 @@
-#!/bin/bash
-
 DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
 
 mkdir -p "${DELIVERY_FOLDER}/characterization/amrfinderplus"
@@ -19,12 +17,3 @@ cd emmtyper
 ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*emmtyper/01-typing/results_emmtyper.out .
 
 cd ../../
-
-eval "$(micromamba shell hook --shell=bash)"
-micromamba activate outbreakinfo
-
-python3 generate_summary_outbreak.py
-
-mv summary_outbreak_filled.xlsx $DELIVERY_FOLDER
-
-micromamba deactivate
