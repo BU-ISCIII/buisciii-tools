@@ -1,5 +1,3 @@
-# .libPaths("/home/abernabeu/tests/test_RELECOV_20241017_RLV_20241015_PANEL01_icasas_C/20241017_ANALYSIS01_AMPLICONS_HUMAN/LDMutations/20241205_variants/R_library")
-
 library(outbreakinfo)
 library(optparse)
 library(readxl)
