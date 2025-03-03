@@ -15,8 +15,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed bug in 08_create_quality_control_summary.sh (viralrecon template) [#447](https://github.com/BU-ISCIII/buisciii-tools/pull/447).
 - Updated `services.json` file in order to properly delete folders and files when running clean module [#451](https://github.com/BU-ISCIII/buisciii-tools/pull/451).
-- Fixed bug in 08_create_quality_control_summary.sh (viralrecon template) [#447] (https://github.com/BU-ISCIII/buisciii-tools/pull/447).
-- Updated `services.json` file in order to properly delete folders and files when running clean module [#451](https://github.com/BU-ISCIII/buisciii-tools/pull/451).
 - Add assets for Updating Lineage-Defining Mutations from outbreak-info [#452](https://github.com/BU-ISCIII/buisciii-tools/pull/452)
 
 ### Modules
