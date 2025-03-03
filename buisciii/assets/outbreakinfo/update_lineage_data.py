@@ -1,7 +1,6 @@
 import requests
 import os
 import pandas as pd
-from openpyxl import Workbook
 
 # URL Configuration
 TAGS_URL = "https://api.github.com/repos/cov-lineages/pango-designation/tags"
