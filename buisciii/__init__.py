@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-""" Main buisciii package file.
-"""
+"""Main buisciii package file."""
 
 import pkg_resources
 
