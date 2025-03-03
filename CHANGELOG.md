@@ -9,11 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Jaime Ozáez](https://github.com/jaimeozaezm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
 
 ### Template fixes and updates
 
 - Fixed bug in 08_create_quality_control_summary.sh (viralrecon template) [#447](https://github.com/BU-ISCIII/buisciii-tools/pull/447).
 - Updated `services.json` file in order to properly delete folders and files when running clean module [#451](https://github.com/BU-ISCIII/buisciii-tools/pull/451).
+- Fixed bug in 08_create_quality_control_summary.sh (viralrecon template) [#447] (https://github.com/BU-ISCIII/buisciii-tools/pull/447).
+- Add assets for Updating Lineage-Defining Mutations from outbreak-info [#452](https://github.com/BU-ISCIII/buisciii-tools/pull/452)
 
 ### Modules
 
@@ -60,7 +63,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed taxprofiler lablog to skip kaiju, centrifuge and metaphlan [#439](https://github.com/BU-ISCIII/buisciii-tools/pull/439)
 - Conditional Copy of QC Scripts in lablog_viralrecon and Fixes in 99-stats (SNIPPY) & parse_ariba.py [#449](https://github.com/BU-ISCIII/buisciii-tools/pull/449)
 - Add generate_summary_outbreak.py to Complete Template with Outbreak Analysis Results [#450](https://github.com/BU-ISCIII/buisciii-tools/pull/450)
-- Add assets for Updating Lineage-Defining Mutations from outbreak-info [#452](https://github.com/BU-ISCIII/buisciii-tools/pull/452)
 
 ### Modules
 
