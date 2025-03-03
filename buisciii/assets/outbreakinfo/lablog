@@ -1,0 +1,42 @@
+#!/bin/bash
+
+scratch_dir=$(echo $PWD)
+
+# micromamba activate outbreakinfo
+
+echo "python3 update_lineage_data.py" > _00_update_lineage_data.sh
+
+echo "Rscript get_mutations_outbreak_info.R --lineage_list ./lineages_data/latest.xlsx --output_folder /data/ucct/bi/references/outbreakinfo" > _01_get_mutations_outbreakinfo.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/GETLDM.log --job-name GETLDM bash ./_01_get_mutations_outbreakinfo.sh &" > _01_run_get_mutations_outbreakinfo.sh
+
+cat <<EOF > _02_version_mutations.sh
+#!/bin/bash
+
+BASE_DIR="lineages_data"
+DATE=$(date +%Y%m%d)  # Format YYYYMMDD
+OUTPUT_CSV="${DATE}_defining_lineage_mutations.csv"
+
+# Get the current Pango-Designation version from latest.csv
+LATEST_VERSION=$(readlink -f "$BASE_DIR/latest.csv" | awk -F'/' '{print $(NF-1)}')
+VERSION_DIR="$BASE_DIR/$LATEST_VERSION"
+
+# Verify that the mutation file exists in the current directory
+if [[ -f "$OUTPUT_CSV" ]]; then
+    echo "✅ Mutation file found: $OUTPUT_CSV"
+
+    ABSOLUTE_CSV_PATH="$(readlink -f "$OUTPUT_CSV")"
+
+    # Move the file to the version directory
+    mv "$ABSOLUTE_CSV_PATH" "$VERSION_DIR/"
+    echo "📂 File moved to: $VERSION_DIR/$OUTPUT_CSV"
+
+    # Create or update the symbolic link to the latest CSV file
+    ln -sf "$VERSION_DIR/$OUTPUT_CSV" "$BASE_DIR/latest_mutations.csv"
+    echo "🔗 Symbolic link updated: $BASE_DIR/latest_mutations.csv -> $VERSION_DIR/$OUTPUT_CSV"
+
+else
+    echo "❌ ERROR: Mutation file ($OUTPUT_CSV) not found. Make sure to run _01_ first."
+    exit 1
+fi
+
+EOF
