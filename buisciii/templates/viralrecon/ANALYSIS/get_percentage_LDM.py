@@ -15,7 +15,7 @@ input_directory_pattern = (
 )
 output_directory_pattern = "./*_viralrecon_mapping"
 lineage_csv_outbreak_pattern = (
-    "/data/ucct/bi/references/outbreakinfo/20250206_mutaciones_definitorias_linaje.csv"
+    "/data/ucct/bi/references/outbreakinfo/lineages_data/latest_mutations.csv"
 )
 
 # Locate directories and files matching the specified patterns
