@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Jaime Ozáez](https://github.com/jaimeozaezm)
 - [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Sergio Olmos](https://github.com/OPSergio)
 
 ### Template fixes and updates
 
@@ -17,7 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated `services.json` file in order to properly delete folders and files when running clean module [#451](https://github.com/BU-ISCIII/buisciii-tools/pull/451).
 - Add assets for Updating Lineage-Defining Mutations from outbreak-info [#452](https://github.com/BU-ISCIII/buisciii-tools/pull/452)
 - Fix get_percentage_LDM.py to Use Versioned CSV File[#453](https://github.com/BU-ISCIII/buisciii-tools/pull/453).
-
+- Moved `lablog_bam2fq.sh` to `RAW/`** to centralize BAM-to-FASTQ processing [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Updated `_01_bam2fq.sh` to correctly detect all BAM files in `RAW/` [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Refactored `_02_pgzip.sh` to compress `.fastq` files and remove uncompressed versions [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Created `_03_symlink.sh` to manage symbolic links in `ANALYSIS/00-reads/`, preventing broken links [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
 ### Modules
 
 #### Added enhancements
