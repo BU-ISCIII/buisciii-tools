@@ -12,16 +12,16 @@
         "protocol": "rsync",
         "options": ["-rlpv", "--update", "-L", "--inplace"],
         "exclusions": [
-            "'*_NC'",
-            "'*lablog*'",
-            "'work'",
-            "'00-reads'",
-            "'*.sh'",
-            "'.nextflow*'",
-            "'*_DEL'",
-            "'*.R'",
-            "'*.py'",
-            "'*.sbatch'"
+            "*_NC",
+            "*lablog*",
+            "work",
+            "00-reads",
+            "*.sh",
+            ".nextflow*",
+            "*_DEL",
+            "*.R",
+            "*.py",
+            "*.sbatch"
         ]
     },
     "xtutatis_api_settings": {
