@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Jaime Ozáez](https://github.com/jaimeozaezm)
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sergio Olmos](https://github.com/OPSergio)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Template fixes and updates
 
@@ -22,6 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated `_01_bam2fq.sh` to correctly detect all BAM files in `RAW/` [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
 - Refactored `_02_pgzip.sh` to compress `.fastq` files and remove uncompressed versions [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
 - Created `_03_symlink.sh` to manage symbolic links in `ANALYSIS/00-reads/`, preventing broken links [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Removed single quotes from sftp_copy in configuration.json [#458](https://github.com/BU-ISCIII/buisciii-tools/pull/458)
+
 ### Modules
 
 #### Added enhancements
