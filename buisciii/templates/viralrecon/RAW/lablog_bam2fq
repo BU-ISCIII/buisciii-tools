@@ -20,7 +20,7 @@ find . -maxdepth 1 -type f -name "*.bam" | while read -r filepath; do
         --output \"$output_log\" \
         singularity exec --bind \"${scratch_dir}/../\" \
         /data/ucct/bi/pipelines/singularity-images/bedtools:2.31.1--h13024bc_3 \
-        bedtools bamtofastq -i \"$filepath\" -fq \"${sample}.fastq\" &" > _01_bam2fq.sh
+        bedtools bamtofastq -i \"$filepath\" -fq \"${sample}.fastq\" &" >> _01_bam2fq.sh
 done
 
 if [[ ! -s _01_bam2fq.sh ]]; then
