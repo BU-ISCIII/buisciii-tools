@@ -367,6 +367,7 @@ check_references() {
                 log_message "$environment environment succesfully activated." green
             else
                 log_message "Refgenie environment is NOT ACTIVE. Exiting..." blk_red
+                exit 1
             fi
         fi
         if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
