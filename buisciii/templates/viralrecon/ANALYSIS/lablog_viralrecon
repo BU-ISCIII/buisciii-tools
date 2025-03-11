@@ -290,7 +290,7 @@ check_references() {
     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
     if [ -z "$REF_FASTA" ]; then
         log_message "File ${ref}.fasta is not yet downloaded."
-        obtain_family; if [ -z $family ]; then return; fi
+        obtain_family; if [ -z $family ]; then unset REF_GFF; return; fi
         # Loading SAMtools module
         module load SAMtools
         SAMtools_loaded=$(module list | grep -o 'SAMtools/[0-9.]\+-GCC-[0-9.]\+')
