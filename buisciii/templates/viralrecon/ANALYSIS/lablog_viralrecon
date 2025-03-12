@@ -321,7 +321,8 @@ check_references() {
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
                 if grep -q "Created" "${ref}.fasta_build.log"; then
                     log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tfasta\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}/${family}.fa" >> /data/ucct/bi/references/refgenie/alias/references.txt
+                    #bash /data/ucct/bi/references/refgenie/alias/ref.sh (this scritp should be run periodically)
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
@@ -341,7 +342,7 @@ check_references() {
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
                 if grep -q "Created" "${ref}.fasta_build.log"; then
                     log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tfasta\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}/${family}.fa" >> /data/ucct/bi/references/refgenie/alias/references.txt
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
@@ -382,7 +383,7 @@ check_references() {
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
                 if grep -q "Created" "${ref}.gff_add.log"; then
                     log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tgff\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}/${family}.gff" >> /data/ucct/bi/references/refgenie/alias/references.txt
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
@@ -401,7 +402,7 @@ check_references() {
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
                 if grep -q "Created" "${ref}.gff_add.log"; then
                     log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tgff\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}/${family}.gff" >> /data/ucct/bi/references/refgenie/alias/references.txt
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
