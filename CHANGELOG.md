@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Created `_03_symlink.sh` to manage symbolic links in `ANALYSIS/00-reads/`, preventing broken links [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
 - Removed single quotes from sftp_copy in configuration.json [#458](https://github.com/BU-ISCIII/buisciii-tools/pull/458)
 - Fixed and enhanced some issues for lablog_viralrecon [#461](https://github.com/BU-ISCIII/buisciii-tools/pull/461)
+- Update sftp_users.json with new user for e.abascal [#464](https://github.com/BU-ISCIII/buisciii-tools/pull/464)
 
 ### Modules
 
