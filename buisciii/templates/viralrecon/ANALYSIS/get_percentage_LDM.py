@@ -156,7 +156,7 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
     summary_results = []
 
     for csv_file in csv_files:
-        sample_name = os.path.splitext(csv_file)[0]
+        sample_name = str(os.path.splitext(csv_file)[0])
         input_file = os.path.join(input_directory, csv_file)
         output_tsv = os.path.join(
             output_directory, f"{sample_name}_verified_mutations.tsv"
