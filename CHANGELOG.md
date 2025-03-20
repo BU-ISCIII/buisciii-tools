@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Removed single quotes from sftp_copy in configuration.json [#458](https://github.com/BU-ISCIII/buisciii-tools/pull/458)
 - Fixed and enhanced some issues for lablog_viralrecon [#461](https://github.com/BU-ISCIII/buisciii-tools/pull/461)
 - Update sftp_users.json with new user for e.abascal [#464](https://github.com/BU-ISCIII/buisciii-tools/pull/464)
+- Update sample handling in get_percentage_LDM [#465](https://github.com/BU-ISCIII/buisciii-tools/pull/465)
 
 ### Modules
 
