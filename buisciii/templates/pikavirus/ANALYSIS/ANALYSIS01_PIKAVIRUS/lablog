@@ -36,3 +36,4 @@ nextflow run /data/ucct/bi/pipelines/pikavirus/pikavirus-1.0dev/main.nf \\
 EOF
 
 echo "sbatch pikavirus.sbatch" > _01_nf_pikavirus.sh
+echo "grep -v 'genome' 01-PikaVirus-results/all_samples_virus_table.tsv | grep -v 'phage' > 01-PikaVirus-results/all_samples_virus_table_filtered.tsv" > _02_filter_results.sh
