@@ -182,7 +182,9 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
     print(f"Summary file saved: {summary_tsv}")
 
     try:
-        tsv_df = pd.read_csv("./s_gene_combined_metrics.tsv", sep="\t", dtype={"sample": str})
+        tsv_df = pd.read_csv(
+            "./s_gene_combined_metrics.tsv", sep="\t", dtype={"sample": str}
+        )
     except FileNotFoundError:
         raise FileNotFoundError(
             "TSV file 's_gene_combined_metrics.tsv' not found in the current directory."
