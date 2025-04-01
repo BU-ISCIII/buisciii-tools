@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added _02_filter_results.sh script to pikavirus template [#466](https://github.com/BU-ISCIII/buisciii-tools/pull/466)
 - Changed short_obx for middle_idx in 02-clean.sh [#468](https://github.com/BU-ISCIII/buisciii-tools/pull/468)
 - Update exometrio lablog to Handle Fourth Individual [#469](https://github.com/BU-ISCIII/buisciii-tools/pull/469)
+- Update get_percentage_LDM.py to read sample column as string [#470](https://github.com/BU-ISCIII/buisciii-tools/pull/470)
 
 ### Modules
 
