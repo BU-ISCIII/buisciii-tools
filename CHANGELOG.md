@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Template fixes and updates
 
@@ -31,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed short_obx for middle_idx in 02-clean.sh [#468](https://github.com/BU-ISCIII/buisciii-tools/pull/468)
 - Update exometrio lablog to Handle Fourth Individual [#469](https://github.com/BU-ISCIII/buisciii-tools/pull/469)
 - Update get_percentage_LDM.py to read sample column as string [#470](https://github.com/BU-ISCIII/buisciii-tools/pull/470)
+- Updated ivar varsion in viralrecon template to makwe it work with IonTorrent data [#471](https://github.com/BU-ISCIII/buisciii-tools/pull/471)
 
 ### Modules
 
