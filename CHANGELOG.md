@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update exometrio lablog to Handle Fourth Individual [#469](https://github.com/BU-ISCIII/buisciii-tools/pull/469)
 - Update get_percentage_LDM.py to read sample column as string [#470](https://github.com/BU-ISCIII/buisciii-tools/pull/470)
 - Updated ivar varsion in viralrecon template to makwe it work with IonTorrent data [#471](https://github.com/BU-ISCIII/buisciii-tools/pull/471)
+-Update get_percentage_LDM.py to Handle Cases with No Lineage Found in outbreak.info CSV [#473](https://github.com/BU-ISCIII/buisciii-tools/pull/473)
 
 ### Modules
 
