@@ -605,7 +605,7 @@ do
     cp percentajeNs.py ${FOLDER_NAME}/
     cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
-    if [ $(cut -f2 ${FOLDER_NAME}/samples_ref.txt | wc -l) != 1 ]; then cp _00_autorun.sh ${FOLDER_NAME}/; fi
+    if [ $(cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | wc -l) != 1 ]; then cp _00_autorun.sh ${FOLDER_NAME}/; fi
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
     printf "#module load Nextflow singularity\n\n" >> ${FOLDER_NAME}/lablog
