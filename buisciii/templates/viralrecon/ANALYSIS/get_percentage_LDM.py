@@ -166,12 +166,16 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
             input_file, lineage_csv_outbreak, output_tsv, sample_name
         )
         if lineage_df is not None:
-            valid_mutations = lineage_df[lineage_df["LDM"].isin([0, 1])]
-            detected_percentage = (
-                (valid_mutations["LDM"].sum() / len(valid_mutations)) * 100
-                if len(valid_mutations) > 0
-                else 0.0
-            )
+            has_ldm_info = (lineage_df["in_lineage"] == "Yes").any()
+            if not has_ldm_info:
+                detected_percentage = "Data Not Evaluable [NCIT:C186292]"
+            else:
+                valid_mutations = lineage_df[lineage_df["LDM"].isin([0, 1])]
+                detected_percentage = (
+                    (valid_mutations["LDM"].sum() / len(valid_mutations)) * 100
+                    if len(valid_mutations) > 0
+                    else 0.0
+                )
             summary_results.append(
                 {"sample": sample_name, "%LDMutations": detected_percentage}
             )
