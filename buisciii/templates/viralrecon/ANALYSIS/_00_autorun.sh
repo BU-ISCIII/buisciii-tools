@@ -29,12 +29,12 @@ ls _01* | while read in; do
         echo -ne "\r${waiting_message[$index]}"
         index=$(( (index + 1) % 3 ))
         if grep -q "Succeeded" "${ref}_${date_str}_viralrecon.log" 2>/dev/null || [[ $(grep -c "Pipeline completed successfully-" "${ref}_${date_str}_viralrecon.log" 2>/dev/null) -ge 2 ]]; then
-            echo_green "${ref} finished succesfully!"
+            echo_green "\n${ref} finished succesfully!"
             echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${ref} finished succesfully!" >> logs/viralrecon_autorun_${date_str}.log
             break
         elif grep -q "nextflow.log" "${ref}_${date_str}_viralrecon.log" 2>/dev/null; then
             error_message=$(grep -m1 "ERROR" "${ref}_${date_str}_viralrecon.log")
-            echo_red "$error_message"
+            echo_red "\n$error_message"
             echo_red "${ref} aborted!"
             echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${error_message}" >> logs/viralrecon_autorun_${date_str}.log
             echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${ref} aborted!" >> logs/viralrecon_autorun_${date_str}.log
