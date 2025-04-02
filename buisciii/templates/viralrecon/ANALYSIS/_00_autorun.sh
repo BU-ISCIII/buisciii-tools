@@ -26,7 +26,7 @@ ls _01* | while read in; do
             error_message=$(grep -m1 "ERROR" "${ref}_${date_str}_viralrecon.log")
             echo_red "$error_message"
             echo_red "${ref} aborted!"
-            echo -e "$error_message" >> logs/viralrecon_autorun_${date_str}.log
+            echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${error_message}" >> logs/viralrecon_autorun_${date_str}.log
             echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${ref} aborted!" >> logs/viralrecon_autorun_${date_str}.log
             break
         else
