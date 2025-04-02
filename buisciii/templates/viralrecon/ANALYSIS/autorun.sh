@@ -1,0 +1,36 @@
+
+# This script automates the succesive execution of multiple sbatch for viralrecon pipeline.
+
+echo_bold() { echo -e "\e[1;37m$1\e[0m"; }
+echo_red() { echo -e "\e[31m$1\e[0m"; }
+echo_green() { echo -e "\e[32m$1\e[0m"; }
+
+mkdir logs
+date_str=$(date +"%Y%m%d")
+
+ls _01* | while read in; do
+    ref=$(echo "$in" | sed 's/_viralrecon.sh//' | cut -d "_" -f4-)
+    bash ${in}
+    echo_bold "${ref} launched!"
+    echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${ref} launched!" >> logs/viralrecon_autorun_${date_str}.log
+    waiting_message=("Processing ${ref}.  " "Processing ${ref}.. " "Processing ${ref}...")
+    index=0
+    while :; do
+        echo -ne "\r${waiting_message[$index]}"
+        index=$(( (index + 1) % 3 ))
+        if grep -q "Succeeded" "${ref}_${date_str}_viralrecon.log" 2>/dev/null || [[ $(grep -c "Pipeline completed successfully-" "${ref}_${date_str}_viralrecon.log" 2>/dev/null) -ge 2 ]]; then
+            echo_green "${ref} finished succesfully!"
+            echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${ref} finished succesfully!" >> logs/viralrecon_autorun_${date_str}.log
+            break
+        elif grep -q "nextflow.log" "${ref}_${date_str}_viralrecon.log" 2>/dev/null; then
+            echo_red "${ref} aborted!"
+            echo -e "$(date +"%Y-%m-%d_%H-%M-%S")\t-\t${ref} aborted!" >> logs/viralrecon_autorun_${date_str}.log
+            break
+        else
+        sleep 1
+        fi
+    done
+    echo
+    sleep 15
+done
+echo_bold "Autorun execution FINISHED!"
