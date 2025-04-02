@@ -8,6 +8,16 @@ echo_green() { echo -e "\e[32m$1\e[0m"; }
 mkdir logs
 date_str=$(date +"%Y%m%d")
 
+module purge
+module load Nextflow singularity
+modules_loaded=$(module -t list 2>&1 | grep -E "Nextflow|singularity")
+if [[ $(echo "$modules_loaded" | grep -c -E "Nextflow|singularity") -eq 2 ]]; then
+    echo_green "Nextflow and Singularity modules successfully loaded."
+else
+    echo_red "Modules not loaded correctly. Exiting..."
+    exit 1
+fi
+
 ls _01* | while read in; do
     ref=$(echo "$in" | sed 's/_viralrecon.sh//' | cut -d "_" -f4-)
     bash ${in}
