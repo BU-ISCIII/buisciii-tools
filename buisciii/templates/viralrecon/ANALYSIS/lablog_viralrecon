@@ -605,6 +605,7 @@ do
     cp percentajeNs.py ${FOLDER_NAME}/
     cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
+    if [ $(cut -f2 ${FOLDER_NAME}/samples_ref.txt | wc -l) != 1 ]; then cp _00_autorun.sh ${FOLDER_NAME}/; fi
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
     printf "#module load Nextflow singularity\n\n" >> ${FOLDER_NAME}/lablog
@@ -678,6 +679,7 @@ rm percentajeNs.py
 rm get_percentage_LDM.py
 rm sgene_metrics.sh
 rm _02_create_run_percentage_Ns.sh
+rm _00_autorun.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
 
 log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly." bold
