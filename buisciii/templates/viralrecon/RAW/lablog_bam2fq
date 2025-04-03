@@ -1,0 +1,34 @@
+#!/bin/bash
+
+mkdir -p logs
+
+scratch_dir=$(echo "$PWD" | sed "s|/data/ucct/bi/scratch_tmp|/scratch|g")
+
+if [[ ! -d "$scratch_dir" ]]; then
+    echo "[INFO] Creating scratch_dir: $scratch_dir"
+    mkdir -p "$scratch_dir"
+fi
+
+find . -maxdepth 1 -type f -name "*.bam" | while read -r filepath; do
+    filename=$(basename "$filepath")  
+    sample=$(echo "$filename" | cut -d '_' -f1)  
+
+    output_log="logs/BAM2FQ.${sample}.%j.log"  
+
+    echo "srun --partition short_idx --cpus-per-task 4 --mem 3850M \
+        --chdir \"$scratch_dir\" --time=01:00:00 \
+        --output \"$output_log\" \
+        singularity exec --bind \"${scratch_dir}/../\" \
+        /data/ucct/bi/pipelines/singularity-images/bedtools:2.31.1--h13024bc_3 \
+        bedtools bamtofastq -i \"$filepath\" -fq \"${sample}.fastq\" &" >> _01_bam2fq.sh
+done
+
+if [[ ! -s _01_bam2fq.sh ]]; then
+    echo "[ERROR] No commands were generated in _01_bam2fq.sh" >&2
+    exit 1
+else
+    echo "[INFO] BAM to FASTQ script generated successfully."
+fi
+
+echo "find . -name '*.fastq' -exec srun --partition short_idx --cpus-per-task 5 --mem 3850M --chdir \"$scratch_dir\" --time=01:00:00 --output logs/PIGZ.%j.log pigz -p 5 {} \;" > _02_pgzip.sh
+echo "find . -maxdepth 1 -name '*.fastq.gz' -exec ln -sf ../../RAW/{} ../ANALYSIS/00-reads/ \;" > _03_symlink.sh

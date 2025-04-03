@@ -220,12 +220,12 @@ class CleanUp:
         # I've tried to continue if found, but I guess there could be several work folders in the project.. Let's see how it goes
         for root, dirs, files in os.walk(self.full_path):
             for item_to_be_found in to_find:
-                if root.endswith(item_to_be_found):
+                if os.path.basename(root) == item_to_be_found:
                     pathlist.append(root)
                     found.append(item_to_be_found)
                 for file in files:
                     path = os.path.join(root, file)
-                    if path.endswith(item_to_be_found):
+                    if file == item_to_be_found:
                         pathlist.append(path)
                         found.append(item_to_be_found)
 

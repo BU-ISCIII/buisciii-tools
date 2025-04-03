@@ -15,7 +15,7 @@ input_directory_pattern = (
 )
 output_directory_pattern = "./*_viralrecon_mapping"
 lineage_csv_outbreak_pattern = (
-    "/data/ucct/bi/references/outbreakinfo/20250206_mutaciones_definitorias_linaje.csv"
+    "/data/ucct/bi/references/outbreakinfo/lineages_data/latest_mutations.csv"
 )
 
 # Locate directories and files matching the specified patterns
@@ -156,7 +156,7 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
     summary_results = []
 
     for csv_file in csv_files:
-        sample_name = os.path.splitext(csv_file)[0]
+        sample_name = str(os.path.splitext(csv_file)[0])
         input_file = os.path.join(input_directory, csv_file)
         output_tsv = os.path.join(
             output_directory, f"{sample_name}_verified_mutations.tsv"
@@ -166,12 +166,16 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
             input_file, lineage_csv_outbreak, output_tsv, sample_name
         )
         if lineage_df is not None:
-            valid_mutations = lineage_df[lineage_df["LDM"].isin([0, 1])]
-            detected_percentage = (
-                (valid_mutations["LDM"].sum() / len(valid_mutations)) * 100
-                if len(valid_mutations) > 0
-                else 0.0
-            )
+            has_ldm_info = (lineage_df["in_lineage"] == "Yes").any()
+            if not has_ldm_info:
+                detected_percentage = "Data Not Evaluable [NCIT:C186292]"
+            else:
+                valid_mutations = lineage_df[lineage_df["LDM"].isin([0, 1])]
+                detected_percentage = (
+                    (valid_mutations["LDM"].sum() / len(valid_mutations)) * 100
+                    if len(valid_mutations) > 0
+                    else 0.0
+                )
             summary_results.append(
                 {"sample": sample_name, "%LDMutations": detected_percentage}
             )
@@ -182,7 +186,9 @@ def process_directory(input_directory, lineage_csv_outbreak, output_directory):
     print(f"Summary file saved: {summary_tsv}")
 
     try:
-        tsv_df = pd.read_csv("./s_gene_combined_metrics.tsv", sep="\t")
+        tsv_df = pd.read_csv(
+            "./s_gene_combined_metrics.tsv", sep="\t", dtype={"sample": str}
+        )
     except FileNotFoundError:
         raise FileNotFoundError(
             "TSV file 's_gene_combined_metrics.tsv' not found in the current directory."

@@ -25,7 +25,7 @@
         "url": "https://github.com/ngs-fzb/MTBseq_source",
         "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
         "clean": {
-          "folders":["Bam", "Mpileup"],
+          "folders":["01-preprocessing", "Bam", "Mpileup"],
           "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
         },
         "no_copy": ["RAW", "TMP"],
@@ -59,7 +59,7 @@
       "url": "https://github.com/BU-ISCIII/plasmidID",
       "description": "Plasmid identification tool based on mapping and assisted by assembly",
       "clean": {
-        "folders":["01-preprocessing/trimmed_sequences"],
+        "folders":[],
         "files":["mapping/sample_name.sorted.bam", "kmer/database.msh"]
       },
       "no_copy": ["RAW", "TMP"],
@@ -298,8 +298,8 @@
       "end": "taxprofiler",
       "description": "",
       "clean": {
-        "folders":["02-preprocessing"],
-        "files":[]
+        "folders":["02-preprocessing", "intermediate"],
+        "files":["sample_name/RSV_AD.bam", "sample_name/RSV_BD.bam"]
       },
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",

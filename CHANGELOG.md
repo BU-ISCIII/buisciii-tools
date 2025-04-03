@@ -4,6 +4,54 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.7] - 2025-04-03 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.7
+
+### Credits
+
+- [Jaime Ozáez](https://github.com/jaimeozaezm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Sergio Olmos](https://github.com/OPSergio)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Sarai Varona](https://github.com/svarona)
+- [Pablo Mata](https://github.com/Shettland)
+
+### Template fixes and updates
+
+- Fixed bug in 08_create_quality_control_summary.sh (viralrecon template) [#447](https://github.com/BU-ISCIII/buisciii-tools/pull/447).
+- Updated `services.json` file in order to properly delete folders and files when running clean module [#451](https://github.com/BU-ISCIII/buisciii-tools/pull/451).
+- Add assets for Updating Lineage-Defining Mutations from outbreak-info [#452](https://github.com/BU-ISCIII/buisciii-tools/pull/452)
+- Fix get_percentage_LDM.py to Use Versioned CSV File[#453](https://github.com/BU-ISCIII/buisciii-tools/pull/453).
+- Moved `lablog_bam2fq.sh` to `RAW/`** to centralize BAM-to-FASTQ processing [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Updated `_01_bam2fq.sh` to correctly detect all BAM files in `RAW/` [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Refactored `_02_pgzip.sh` to compress `.fastq` files and remove uncompressed versions [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Created `_03_symlink.sh` to manage symbolic links in `ANALYSIS/00-reads/`, preventing broken links [#455](https://github.com/BU-ISCIII/buisciii-tools/pull/455)
+- Removed single quotes from sftp_copy in configuration.json [#458](https://github.com/BU-ISCIII/buisciii-tools/pull/458)
+- Fixed and enhanced some issues for lablog_viralrecon [#461](https://github.com/BU-ISCIII/buisciii-tools/pull/461)
+- Update sftp_users.json with new user for e.abascal [#464](https://github.com/BU-ISCIII/buisciii-tools/pull/464)
+- Update sample handling in get_percentage_LDM [#465](https://github.com/BU-ISCIII/buisciii-tools/pull/465)
+- Added _02_filter_results.sh script to pikavirus template [#466](https://github.com/BU-ISCIII/buisciii-tools/pull/466)
+- Changed short_obx for middle_idx in 02-clean.sh [#468](https://github.com/BU-ISCIII/buisciii-tools/pull/468)
+- Update exometrio lablog to Handle Fourth Individual [#469](https://github.com/BU-ISCIII/buisciii-tools/pull/469)
+- Update get_percentage_LDM.py to read sample column as string [#470](https://github.com/BU-ISCIII/buisciii-tools/pull/470)
+- Updated ivar varsion in viralrecon template to makwe it work with IonTorrent data [#471](https://github.com/BU-ISCIII/buisciii-tools/pull/471)
+- Update get_percentage_LDM.py to Handle Cases with No Lineage Found in outbreak.info CSV [#473](https://github.com/BU-ISCIII/buisciii-tools/pull/473)
+- Added autorun.sh script for automation of multiple sbatch running in viralrecon pipeline [#474](https://github.com/BU-ISCIII/buisciii-tools/pull/474)
+- Modified clean.py in order to properly delete exact matching-name folders and files [#476](https://github.com/BU-ISCIII/buisciii-tools/pull/476)
+- Added information on the period of permanence of the results in the sftp folder in email template [#477](https://github.com/BU-ISCIII/buisciii-tools/pull/477)
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+
 ## [2.2.6] - 2025-02-25 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.6
 
 ### Credits
@@ -34,6 +82,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed bioinfo-doc crashing after resuming [#435](https://github.com/BU-ISCIII/buisciii-tools/pull/435)
 - Fixed create_summary_report.sh to latest /data/ucct/bi/ layout [#436](https://github.com/BU-ISCIII/buisciii-tools/pull/436)
 - Changed taxprofiler lablog to skip kaiju, centrifuge and metaphlan [#439](https://github.com/BU-ISCIII/buisciii-tools/pull/439)
+- Conditional Copy of QC Scripts in lablog_viralrecon and Fixes in 99-stats (SNIPPY) & parse_ariba.py [#449](https://github.com/BU-ISCIII/buisciii-tools/pull/449)
+- Add generate_summary_outbreak.py to Complete Template with Outbreak Analysis Results [#450](https://github.com/BU-ISCIII/buisciii-tools/pull/450)
 
 ### Modules
 

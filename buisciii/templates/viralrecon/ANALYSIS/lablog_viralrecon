@@ -290,7 +290,7 @@ check_references() {
     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
     if [ -z "$REF_FASTA" ]; then
         log_message "File ${ref}.fasta is not yet downloaded."
-        obtain_family; if [ -z $family ]; then return; fi
+        obtain_family; if [ -z $family ]; then unset REF_GFF; return; fi
         # Loading SAMtools module
         module load SAMtools
         SAMtools_loaded=$(module list | grep -o 'SAMtools/[0-9.]\+-GCC-[0-9.]\+')
@@ -321,7 +321,8 @@ check_references() {
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
                 if grep -q "Created" "${ref}.fasta_build.log"; then
                     log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tfasta\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}/${family}.fa" >> /data/ucct/bi/references/refgenie/alias/references.txt
+                    #bash /data/ucct/bi/references/refgenie/alias/ref.sh (this scritp should be run periodically)
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
@@ -341,7 +342,7 @@ check_references() {
                 refgenie build ${family}/fasta:${ref} --files fasta=/data/ucct/bi/references/refgenie/data/${digest}/fasta/${ref}/${ref}.fasta.gz -c /data/ucct/bi/references/refgenie/genome_config.yaml -R > ${ref}.fasta_build.log 2>&1
                 if grep -q "Created" "${ref}.fasta_build.log"; then
                     log_message "$(grep Created ${ref}.fasta_build.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.fasta_build.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tfasta\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}/${family}.fa" >> /data/ucct/bi/references/refgenie/alias/references.txt
                     REF_FASTA=$(awk -v ref="$ref" '$0 ~ ref && /fasta/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during building asset for ${ref}.fasta file." blk_red
@@ -367,6 +368,7 @@ check_references() {
                 log_message "$environment environment succesfully activated." green
             else
                 log_message "Refgenie environment is NOT ACTIVE. Exiting..." blk_red
+                exit 1
             fi
         fi
         if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
@@ -381,7 +383,7 @@ check_references() {
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
                 if grep -q "Created" "${ref}.gff_add.log"; then
                     log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tgff\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}/${family}.gff" >> /data/ucct/bi/references/refgenie/alias/references.txt
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
@@ -400,7 +402,7 @@ check_references() {
                 refgenie add ${family}/gff:${ref} --path data/${digest}/ensembl_rb/${ref}/ --seek-keys '{"gff" : "'"${family}.gff"'"}' -c /data/ucct/bi/references/refgenie/genome_config.yaml > ${ref}.gff_add.log 2>&1
                 if grep -q "Created" "${ref}.gff_add.log"; then
                     log_message "$(grep Created ${ref}.gff_add.log) $(grep "/data/ucct/bi/references/refgenie/alias/" ${ref}.gff_add.log)" bold
-                    bash /data/ucct/bi/references/refgenie/alias/ref.sh
+                    echo -e "${ref}\tgff\t${family}\t/data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}/${family}.gff" >> /data/ucct/bi/references/refgenie/alias/references.txt
                     REF_GFF=$(awk -v ref="$ref" '$0 ~ ref && /gff/ {print $4}' /data/ucct/bi/references/refgenie/alias/references.txt)
                 else
                     log_message "An error ocurred during adding asset for ${ref}.gff file." blk_red
@@ -602,9 +604,8 @@ do
     cp deduplicate_long_table.sh ${FOLDER_NAME}/
     cp percentajeNs.py ${FOLDER_NAME}/
     cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
-    cp get_percentage_LDM.py ${FOLDER_NAME}/
-    cp sgene_metrics.sh ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
+    if [ $(cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | wc -l) -gt 1 ]; then cp _00_autorun.sh ${FOLDER_NAME}/; fi
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
     printf "ln -s ../samples_id.txt .\n\n" >> ${FOLDER_NAME}/lablog
     printf "#module load Nextflow singularity\n\n" >> ${FOLDER_NAME}/lablog
@@ -662,10 +663,13 @@ do
     echo "#module load R/4.2.1" >> ${FOLDER_NAME}/lablog
     printf 'echo "Rscript create_assembly_stats.R" > _05_create_stats_assembly.sh\n\n' >> ${FOLDER_NAME}/lablog
     printf 'echo "bash deduplicate_long_table.sh" > _06_deduplicate_long_table.sh\n\n' >> ${FOLDER_NAME}/lablog
-    printf 'echo "# micromamba activate outbreakinfo"\n' >> ${FOLDER_NAME}/lablog
-    printf 'echo "bash sgene_metrics.sh" > _07_create_sgene_metrics.sh\n\n' >> ${FOLDER_NAME}/lablog
-    printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
-
+    if [[ -n "$virus_tag" && "$virus_tag" == "sars-cov-2" ]]; then
+        cp get_percentage_LDM.py ${FOLDER_NAME}/
+        cp sgene_metrics.sh ${FOLDER_NAME}/
+        echo "# micromamba activate outbreakinfo" >> ${FOLDER_NAME}/lablog
+        printf 'echo "bash sgene_metrics.sh" > _07_create_sgene_metrics.sh\n\n' >> ${FOLDER_NAME}/lablog
+        printf 'echo "srun --partition short_idx --chdir ${scratch_dir} --output LDM.log --job-name LDM python3 ${scratch_dir}/get_percentage_LDM.py -other_lineages 0" > _08_create_quality_control_summary.sh\n\n' >> ${FOLDER_NAME}/lablog
+    fi
     i=$((i+1))
 done
 rm host_list.tmp
@@ -673,8 +677,9 @@ rm create_summary_report.sh
 rm deduplicate_long_table.sh
 rm percentajeNs.py
 rm get_percentage_LDM.py
-rm Sgene_metrics.sh
+rm sgene_metrics.sh
 rm _02_create_run_percentage_Ns.sh
+rm _00_autorun.sh
 cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd ..
 
 log_message "Lablog_viralrecon execution has been completed. Please verify all the configurations are set up correctly." bold
