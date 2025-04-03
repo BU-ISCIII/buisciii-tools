@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated ivar varsion in viralrecon template to makwe it work with IonTorrent data [#471](https://github.com/BU-ISCIII/buisciii-tools/pull/471)
 - Update get_percentage_LDM.py to Handle Cases with No Lineage Found in outbreak.info CSV [#473](https://github.com/BU-ISCIII/buisciii-tools/pull/473)
 - Added autorun.sh script for automation of multiple sbatch running in viralrecon pipeline [#474](https://github.com/BU-ISCIII/buisciii-tools/pull/474)
+- Modified clean.py in order to properly delete exact matching-name folders and files [#476](https://github.com/BU-ISCIII/buisciii-tools/pull/476)
 
 ### Modules
 
