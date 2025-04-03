@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Sarai Varona](https://github.com/svarona)
+- [Pablo Mata](https://github.com/Shettland)
 
 ### Template fixes and updates
 
