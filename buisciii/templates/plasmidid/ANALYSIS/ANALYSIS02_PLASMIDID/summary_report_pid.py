@@ -563,7 +563,7 @@ def main():
     logger.addHandler(stream_handler)
     # logger.addHandler(file_handler)
 
-    ##################### START PIPELINE ################
+    # ============== START PIPELINE ==============
 
     logger.info(args)
     # CALCULATE MASH DISTANCE
