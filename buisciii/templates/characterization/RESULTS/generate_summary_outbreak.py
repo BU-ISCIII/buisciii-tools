@@ -801,13 +801,17 @@ def main():
     kmerfinder_dict = read_kmerfinder(csv_file) if csv_file else {}
     mapping_dict = read_mapping_stats(mapping_file) if mapping_file else {}
     wgs_metrics_dict = read_wgs_metrics(wgs_metrics_file) if wgs_metrics_file else {}
-    variants_dict = read_variants_stats(variants_stats_file) if variants_stats_file else {}
+    variants_dict = (
+        read_variants_stats(variants_stats_file) if variants_stats_file else {}
+    )
     quast_dict = read_quast_report(quast_report_file) if quast_report_file else {}
     quast_per_reference_dict = read_quast_per_reference(quast_dir) if quast_dir else {}
     virulence_dict = read_virulence_stats(virulence_file) if virulence_file else {}
     resistance_dic = read_card_stats(card_file) if card_file else {}
     amrfinder_dict = read_amrfinder_results(amrfinder_dir) if amrfinder_dir else {}
-    amr_resistance_data = read_amrfinderplus_resistance(amrfinder_dir) if amrfinder_dir else {}
+    amr_resistance_data = (
+        read_amrfinderplus_resistance(amrfinder_dir) if amrfinder_dir else {}
+    )
     plasmid_data = read_plasmid_data(plasmid_file) if plasmid_file else pd.DataFrame()
     mlva_headers, mlva_dict = read_mlva_results(mlva_file) if mlva_file else ([], {})
 
