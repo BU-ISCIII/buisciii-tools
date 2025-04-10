@@ -3,18 +3,13 @@
 # Standard library imports
 import os
 import sys
-import re
 import logging
-import subprocess
 import html
 
 
 # Third party imports
 import argparse
-import datetime
 import pandas as pd
-import numpy as np
-from Bio import Entrez
 from Bio import SeqIO
 from tabulate import tabulate
 
@@ -568,13 +563,13 @@ def main():
     logger.addHandler(stream_handler)
     # logger.addHandler(file_handler)
 
-    #####################START PIPELINE################
+    ##################### START PIPELINE ################
 
     logger.info(args)
     # CALCULATE MASH DISTANCE
     logger.info("Creating summary")
 
-    if args.group == True:
+    if args.group is True:
         summary_to_html_group(input_folder, html_template)
         summary_to_tab_group(input_folder)
     else:
