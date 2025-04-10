@@ -467,11 +467,12 @@ def summary_to_tab_group(group_folder):
         individual_dfs.append(df_merged)
 
         df_sample = df.copy()
-        df_sample.drop(
-            columns=["images"], axis=1, inplace=True, errors="ignore"
-        )
+        df_sample.drop(columns=["images"], axis=1, inplace=True, errors="ignore")
         df_sample.insert(0, "sample", sample)
-        df_sample.rename(columns={"percentage": "% Mapping", "contig_name": "contig_number"}, inplace=True)
+        df_sample.rename(
+            columns={"percentage": "% Mapping", "contig_name": "contig_number"},
+            inplace=True,
+        )
         individual_dfs_per_sample.append(df_sample)
 
     dfm = individual_dfs[0]
