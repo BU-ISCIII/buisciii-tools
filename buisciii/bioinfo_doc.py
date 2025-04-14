@@ -754,6 +754,16 @@ class BioinfoDoc:
             filename=str(os.path.basename(results_pdf_file)),
         )
         msg.attach(attach)
+        
+        if buisciii.utils.prompt_yn_question("Do you want to attach additional files?", dflt=False):
+                stderr.print("[cyan] Provide additional files separated by semicolons (;)")
+                extra_files_input = buisciii.utils.ask_for_some_text(msg="Attachment paths:")
+                attachment_files = [
+                    os.path.expanduser(p.strip())
+                    for p in extra_files_input.split(";")
+                    if p.strip()
+                ]
+        
         server.sendmail(
             email_host_user,
             rcpt,
