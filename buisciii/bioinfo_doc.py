@@ -699,7 +699,7 @@ class BioinfoDoc:
         email_html = template.render(email_data)
         return email_html
 
-    def send_email(self, html_text, results_pdf_file):
+    def send_email(self, html_text, results_pdf_file, attachment_files=None):
         email_host = self.conf["email_host"]
         email_port = self.conf["email_port"]
         email_host_user = self.conf["email_host_user"]
