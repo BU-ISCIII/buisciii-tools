@@ -76,14 +76,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
-- Implemented multi-attachment support in Bioinfo-doc email sending workflow [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
-
 #### Fixes
 
 #### Changed
-
-- Expanded the maximum width of email body to 1000px for better desktop display [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
-- Corrected the logo URL to use a direct raw link for proper rendering in email clients [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
 
 #### Removed
 
