@@ -17,7 +17,7 @@ cat ../samples_id.txt | while read in; do echo -e "${in}\t${scratch_dir}/../02-p
 ## Bear in mind this line considers the .fasta files are inside a certain folder from REFERENCES! Change this line accordingly.
 ## ls ../../../REFERENCES/*/*.fasta | cut -d '/' -f6 | sed 's/.fasta//g' | while read in; do paste <(echo ${in}) <(echo ${scratch_dir}/../../../REFERENCES/*/${in}.fasta); done >> input.tab
 
- snippy-multi ${scratch_dir}/input.tab --mincov 10 --mapqual 10 --basequal 5 --minqual 30 --ref ${scratch_dir}/../../../REFERENCES/GCF_016027375.1_ASM1602737v1_genomic.fna --cpus 5 > commands.out
+ls ../../../REFERENCES/*.fna | xargs -I %%  snippy-multi ${scratch_dir}/input.tab --mincov 10 --mapqual 10 --basequal 5 --minqual 30 --ref %% --cpus 5 > commands.out
 
 # BLOCK 2: CREATION OF _00_snippy.sh
 
@@ -30,7 +30,7 @@ tail -n 1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/S
 
 ## B) If you want to mask complex variants, uncomment these lines:
 #echo "grep \"complex\" ./*/snps.vcf | cut -f 1,2,4,5 | cut -d \":\" -f 2 | sort -u | awk '{pos1=\$2; len_ref=length(\$3); printf \"%s\t%s\t%s\n\", \$1, pos1-1, pos1+len_ref+1}' | grep -v \"^#\" > mask_complex_variants.bed" > _01_snippy_core.sh
-## ls ${scratch_dir}/../../../REFERENCES/*.fna | xargs -I %% echo "snippy-core --debug --mask ./mask_complex_variants.bed --mask-char 'N' --ref '../../../REFERENCES/%%' $(cat ../samples_id.txt | xargs)" >> _01_snippy_core.sh
+## ls ${scratch_dir}/../../../REFERENCES/*.fna | xargs -I %% echo "snippy-core --debug --mask ./mask_complex_variants.bed --mask-char 'N' --ref '%%' $(cat ../samples_id.txt | xargs)" >> _01_snippy_core.sh
 
 ## C) If you want to mask low-coverage variants, uncomment these lines:
 #echo "awk -F'\t' '/^NZ_/ {split(\$9, format, \":\"); split(\$10, values, \":\"); for (i in format) if (format[i] == \"DP\" && values[i] < 10) print \$1, \$2 - 1, \$2}' OFS='\t' ./*/snps.vcf > mask_low_coverage_variants.bed" >> _01_snippy_core.sh
