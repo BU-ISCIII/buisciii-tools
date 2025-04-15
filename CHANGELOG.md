@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.8dev] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.8dev
+
+### Credits
+
+- [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Sergio Olmos](https://github.com/OPSergio)
+- [Sara Monzon](https://github.com/saramonzon)
+
+### Template fixes and updates
+
+- Updated snippy template, now using a modified version of snippy with different low coverage masking[#489](https://github.com/BU-ISCIII/buisciii-tools/pull/489)
+- Update PlasmidID Report Generation to Output Summary by Sample [#483](https://github.com/BU-ISCIII/buisciii-tools/pull/483)
+- Update of the execution of summary_report_pid.py in plasmidID lablog [#484](https://github.com/BU-ISCIII/buisciii-tools/pull/484)
+
+### Modules
+
+#### Added enhancements
+
+- Implemented multi-attachment support in Bioinfo-doc email sending workflow [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
+
+#### Fixes
+
+#### Changed
+
+- Expanded the maximum width of email body to 1000px for better desktop display [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
+- Corrected the logo URL to use a direct raw link for proper rendering in email clients [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
+
+#### Removed
+
+### Requirements
+
 ## [2.2.7] - 2025-04-03 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.7
 
 ### Credits
@@ -91,8 +122,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed taxprofiler lablog to skip kaiju, centrifuge and metaphlan [#439](https://github.com/BU-ISCIII/buisciii-tools/pull/439)
 - Conditional Copy of QC Scripts in lablog_viralrecon and Fixes in 99-stats (SNIPPY) & parse_ariba.py [#449](https://github.com/BU-ISCIII/buisciii-tools/pull/449)
 - Add generate_summary_outbreak.py to Complete Template with Outbreak Analysis Results [#450](https://github.com/BU-ISCIII/buisciii-tools/pull/450)
-- Update PlasmidID Report Generation to Output Summary by Sample [#483](https://github.com/BU-ISCIII/buisciii-tools/pull/483)
-- Update of the execution of summary_report_pid.py in plasmidID lablog [#484](https://github.com/BU-ISCIII/buisciii-tools/pull/484)
 
 ### Modules
 
