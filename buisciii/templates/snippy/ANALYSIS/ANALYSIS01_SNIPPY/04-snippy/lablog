@@ -1,5 +1,9 @@
 # micromamba activate snippy_v4.6.0
 
+## We are using micrommaba because snippy perl script is manually modified.
+## Now mincov is only used for low coverage masking, and freebayes is run with min-coverage 0, same as bcftools filter. This way all variants are called, but are then filtered in the masking.
+# This analysis prevents from calling REF in positions of samples that have limit depth, so freebayes does not call the variant due to depth threshold, but it's not mask either because of different depth calculation between freebayes and samtools.
+# SNIPPY ISSUE: https://github.com/tseemann/snippy/issues/268#issuecomment-2804520905
 scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 
 mkdir logs
