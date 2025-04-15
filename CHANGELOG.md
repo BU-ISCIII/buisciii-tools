@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Victor Lopez](https://github.com/victor5lm)
 - [Sarai Varona](https://github.com/svarona)
 - [Pablo Mata](https://github.com/Shettland)
+- [Sara Monzon](https://github.com/saramonzon)
 
 ### Template fixes and updates
 
@@ -38,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added autorun.sh script for automation of multiple sbatch running in viralrecon pipeline [#474](https://github.com/BU-ISCIII/buisciii-tools/pull/474)
 - Modified clean.py in order to properly delete exact matching-name folders and files [#476](https://github.com/BU-ISCIII/buisciii-tools/pull/476)
 - Added information on the period of permanence of the results in the sftp folder in email template [#477](https://github.com/BU-ISCIII/buisciii-tools/pull/477)
+- Updated snippy template, now using a modified version of snippy with different low coverage masking[#489](https://github.com/BU-ISCIII/buisciii-tools/pull/489)
 
 ### Modules
 
@@ -402,9 +404,9 @@ Code contributions to the new version:
 
 ### Template fixes and updates
 
-- Added blast_nt template to services.json [#208](https://github.com/BU-ISCIII/buisciii-tools/pull/208) 
+- Added blast_nt template to services.json [#208](https://github.com/BU-ISCIII/buisciii-tools/pull/208)
 - Included new user to sftp_user.json
-- Included a missing sed inside IRMA's 04-irma/lablog [#213](https://github.com/BU-ISCIII/buisciii-tools/pull/213) 
+- Included a missing sed inside IRMA's 04-irma/lablog [#213](https://github.com/BU-ISCIII/buisciii-tools/pull/213)
 - Changed singularity mount options in Viralrecon template to fix errors with Nextflow v23.10.0
 - excel_generator.py reverted to last state, now lineage tables are merged when argument -l is given
 - Adapted viralrecon_results lablog to new excel_generator.py argument
@@ -423,7 +425,7 @@ Code contributions to the new version:
 #### Fixes
 
 - Added missing url for service assembly_annotation in module list
-- Autoclean-sftp refined folder name parsing with regex label adjustment 
+- Autoclean-sftp refined folder name parsing with regex label adjustment
 - Autoclean_sftp does not crash anymore. New argument from 'utils.prompt_yn_question()' in v2.0.0 was missing: 'dflt'
 - Bioinfo-doc now sends email correctly to multiple CCs
 
@@ -463,7 +465,7 @@ Code contributions to the release:
 - Added json files: sftp_user.json
 - Added delivery jinja templates
 - Added IRMA template to services.json
-- Scratch module now executes rsync using SLURM's srun 
+- Scratch module now executes rsync using SLURM's srun
 
 #### Fixes
 
@@ -493,7 +495,7 @@ Code contributions to the hotfix:
 
 ### Template fixes and updates
 
-- Added new line in `buisciii_tools/buisciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date. 
+- Added new line in `buisciii_tools/buisciii/templates/viralrecon/ANALYSIS/lablog_viralrecon`, in order to automatically rename `ANALYSIS0X_MAG` directory with the current date.
 - Introduced handling of flu-C in `buisciii_tools/buisciii/templates/IRMA/ANALYSIS/ANALYSIS01_FLU_IRMA/04-irma/` `lablog` and `create_irma_stats.sh`
 - Small changes to `buisciii_tools/buisciii/templates/viralrecon/RESULTS/viralrecon_results` for blast and new excel_generator.py
 - Introduced better error handling in excel_generator.py. Now it can also be used for single files
