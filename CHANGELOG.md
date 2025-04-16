@@ -11,12 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Juan Ledesma](https://github.com/juanledesma78)
 
 ### Template fixes and updates
 
 - Updated snippy template, now using a modified version of snippy with different low coverage masking[#489](https://github.com/BU-ISCIII/buisciii-tools/pull/489)
 - Update PlasmidID Report Generation to Output Summary by Sample [#483](https://github.com/BU-ISCIII/buisciii-tools/pull/483)
 - Update of the execution of summary_report_pid.py in plasmidID lablog [#484](https://github.com/BU-ISCIII/buisciii-tools/pull/484)
+- Added sed to lablog_bam2fq so that _R1.bam is removed and the variable sample is created properly for those sample ids having several underscores (i.e. EPI_ISL_666)[#490](https://github.com/BU-ISCIII/buisciii-tools/pull/490)
 
 ### Modules
 
