@@ -1,6 +1,10 @@
 #CLEAN
 if test -f all_samples_completo.txt; then rm all_samples_completo.txt; fi
-if test -d A_*; then rm -rf A_*; fi
+for dir in A_*; do
+    if [ -d "$dir" ]; then
+        rm -rf "$dir"
+    fi
+done
 if test -d B; then rm -rf B; fi
 if test -d C; then rm -rf C; fi
 if test -d D; then rm -rf D; fi
