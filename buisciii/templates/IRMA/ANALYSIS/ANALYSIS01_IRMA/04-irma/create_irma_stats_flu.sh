@@ -28,7 +28,7 @@ echo "$LINE" >> irma_stats_flu.txt
 
 done
 
-ANY_C=$(grep "C_" irma_stats_flu.txt)
+ANY_C=$(grep "C" irma_stats_flu.txt)
 if [[ -n "$ANY_C" ]]; then
     sed -i 's/Reads_PB2/Reads_PB2\tReads_HE/g' irma_stats_flu.txt
 fi
