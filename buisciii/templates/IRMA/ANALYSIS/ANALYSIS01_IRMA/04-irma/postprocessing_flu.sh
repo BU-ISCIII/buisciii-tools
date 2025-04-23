@@ -10,8 +10,8 @@ if test -d C; then rm -rf C; fi
 if test -d D; then rm -rf D; fi
 
 cat ../samples_id.txt | while read sample; do
-    FLUSUBTYPE=$(ls ${sample}/*H*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | cut -d '_' -f1,3 | sort -u)
-    FLUTYPE=$(ls ${sample}/*H*.fasta | cut -d '/' -f2 | cut -d '.' -f1 | cut -d '_' -f1 | sort -u)
+    FLUSUBTYPE=$(grep -w ${sample} irma_stats_flu.txt | cut -f5 | cut -d '_' -f1,2)
+    FLUTYPE=$(grep -w ${sample} irma_stats_flu.txt | cut -f5 | cut -d '_' -f1)
     if [ -z $FLUTYPE ]; then
         echo "Sample ${sample} doesn't have any fragment. Skipping"
     else
