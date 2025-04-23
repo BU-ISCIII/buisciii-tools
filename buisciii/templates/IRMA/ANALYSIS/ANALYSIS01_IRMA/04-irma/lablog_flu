@@ -10,5 +10,3 @@ cat ../samples_id.txt | while read in; do echo "srun --partition short_idx --cpu
 echo 'bash create_irma_stats_flu.sh' > _02_create_stats_flu.sh
 
 echo 'bash postprocessing_flu.sh' > _03_post_processing_flu.sh
-
-echo 'sed "s/__//g" irma_stats_flu.txt | sed "s/_\t/\t/g" > clean_irma_stats_flu.txt' >> _03_post_processing_flu.sh
