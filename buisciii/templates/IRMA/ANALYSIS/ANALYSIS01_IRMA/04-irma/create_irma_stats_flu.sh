@@ -6,6 +6,7 @@ do
 SAMPLE_ID=$(echo ${in})
     TOTAL_READS=""; MAPPEDREADS=""; PCTMAPPED=""; FLU_TYPE=""; HA=""; MP=""; NA=""; NP=""; NS=""; PA=""; PB1=""; PB2=""; HE=""
 
+    if test -f ${in}/tables/READ_COUNTS.txt; then
 TOTAL_READS=$(grep '1-initial' ${in}/tables/READ_COUNTS.txt | cut -f2)
 MAPPEDREADS=$(grep '3-match' ${in}/tables/READ_COUNTS.txt | cut -f2)
 PCTMAPPED=$(awk "BEGIN {printf \"%.2f\", ($MAPPEDREADS/$TOTAL_READS)*100}")
@@ -24,10 +25,16 @@ if [[ -n "$HE" ]]; then
     LINE=$(paste <(echo $SAMPLE_ID) <(echo $TOTAL_READS) <(echo $MAPPEDREADS) <(echo $PCTMAPPED) <(echo $FLU_TYPE) <(echo $HA) <(echo $MP) <(echo $NA) <(echo $NP) <(echo $NS) <(echo $PA) <(echo $PB1) <(echo $PB2) <(echo $HE))
 else
     LINE=$(paste <(echo $SAMPLE_ID) <(echo $TOTAL_READS) <(echo $MAPPEDREADS) <(echo $PCTMAPPED) <(echo $FLU_TYPE) <(echo $HA) <(echo $MP) <(echo $NA) <(echo $NP) <(echo $NS) <(echo $PA) <(echo $PB1) <(echo $PB2))
+        fi
+    else
+        echo "Sample $SAMPLE_ID doesn't have READ_COUNTS.txt file. Skipping"
+        TOTAL_READS=NA
+        MAPPEDREADS=0
+        PCTMAPPED=0
+        LINE=$(paste <(echo $SAMPLE_ID) <(echo $TOTAL_READS) <(echo $MAPPEDREADS) <(echo $PCTMAPPED))
 fi
 
 echo "$LINE" >> irma_stats_flu.txt
-
 done
 
 ANY_C=$(grep "C" irma_stats_flu.txt)
