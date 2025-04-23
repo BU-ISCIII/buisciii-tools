@@ -4,6 +4,8 @@ echo -e "sample_ID\tTotalReads\tMappedReads\t%MappedReads\tFlu_type\tReads_HA\tR
 cat ../samples_id.txt | while read in 
 do 
 SAMPLE_ID=$(echo ${in})
+    TOTAL_READS=""; MAPPEDREADS=""; PCTMAPPED=""; FLU_TYPE=""; HA=""; MP=""; NA=""; NP=""; NS=""; PA=""; PB1=""; PB2=""; HE=""
+
 TOTAL_READS=$(grep '1-initial' ${in}/tables/READ_COUNTS.txt | cut -f2)
 MAPPEDREADS=$(grep '3-match' ${in}/tables/READ_COUNTS.txt | cut -f2)
 PCTMAPPED=$(awk "BEGIN {printf \"%.2f\", ($MAPPEDREADS/$TOTAL_READS)*100}")
