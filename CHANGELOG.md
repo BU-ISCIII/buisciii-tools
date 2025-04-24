@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update PlasmidID Report Generation to Output Summary by Sample [#483](https://github.com/BU-ISCIII/buisciii-tools/pull/483)
 - Update of the execution of summary_report_pid.py in plasmidID lablog [#484](https://github.com/BU-ISCIII/buisciii-tools/pull/484)
 - Added `sort -u` to wgs_metrics_all.txt file generation command in 99-stats lablog (snippy template) [#494](https://github.com/BU-ISCIII/buisciii-tools/pull/494)
+- Avoided error messages when running 99-stats lablog several times (snippy template) [#495](https://github.com/BU-ISCIII/buisciii-tools/pull/495)
 
 ### Modules
 
