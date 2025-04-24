@@ -11,12 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 
 ### Template fixes and updates
 
 - Updated snippy template, now using a modified version of snippy with different low coverage masking[#489](https://github.com/BU-ISCIII/buisciii-tools/pull/489)
 - Update PlasmidID Report Generation to Output Summary by Sample [#483](https://github.com/BU-ISCIII/buisciii-tools/pull/483)
 - Update of the execution of summary_report_pid.py in plasmidID lablog [#484](https://github.com/BU-ISCIII/buisciii-tools/pull/484)
+- Added `sort -u` to wgs_metrics_all.txt file generation command in 99-stats lablog (snippy template) [#494](https://github.com/BU-ISCIII/buisciii-tools/pull/494)
 
 ### Modules
 
@@ -39,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Credits
 
-- [Jaime Ozáez](https://github.com/jaimeozaezm)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sergio Olmos](https://github.com/OPSergio)
 - [Victor Lopez](https://github.com/victor5lm)
@@ -92,7 +94,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Alejandro Bernabeu](https://github.com/Aberdur)
 - [Sara Monzón](https://github.com/saramonzon)
 - [Victor Lopez](https://github.com/victor5lm)
-- [Jaime Ozáez](https://github.com/jaimeozaezm)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 
 ### Template fixes and updates
 
