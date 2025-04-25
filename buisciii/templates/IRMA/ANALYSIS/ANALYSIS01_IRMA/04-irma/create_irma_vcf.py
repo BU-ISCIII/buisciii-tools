@@ -1055,7 +1055,26 @@ def main(args=None):
 
     af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
     combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp, total_dp)
-    create_vcf(combined_vcf_dict, output_vcf, alignment)
+
+    if not combined_vcf_dict:
+        print("\033[91mERROR: No variants found, so no vcf is generated.\033[0m")
+        sys.exit()
+
+    # Sort by reference position
+    # If reference position is the same, we will sort by TYPE (DEL, INS, SNP).
+    # We took this decission in order to manage the case that a consensus SNP ys followed by a consensus DEL
+    # In DEL, the previous alleles information is taken, usually REF information, so SNP and DEL will share same position
+    # If the SNP goes prior to DEL in the vcf, a downstream tool like bctools, won't work, as SNP will be overwritten while including deletion.
+
+    sorted_dict = dict(
+        sorted(
+            combined_vcf_dict.items(),
+            key=lambda item: (item[1]["REF_POS"], item[1]["TYPE"]),
+        )
+    )
+
+    # Create VCF
+    create_vcf(sorted_dict, output_vcf, alignment)
 
 
 if __name__ == "__main__":
