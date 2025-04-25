@@ -213,8 +213,6 @@ def align2dict(alignment_file):
     ref_position = 0
     align_dict = {}
     CHROM = ref_id
-    ALT = ""
-    SAMPLE_POS = []
 
     for i, (sample_base, ref_base) in enumerate(zip(sample_seq, ref_seq)):
         align_position = i + 1
@@ -225,18 +223,22 @@ def align2dict(alignment_file):
             ref_position += 1
 
         condition = (
+            # Insertions in the sample respect to the reference
             (
                 ref_base == "-" and sample_base != "N"
-            )  ## Insertions in the sample respect to the reference
+            )
+            # Delettions in the sample respect to the reference
             or (
                 sample_base == "-" and ref_base != "N"
-            )  # Delettions in the sample respect to the reference
+            )
+            # Low coverage region in the sample
             or (
                 sample_base == "N" and ref_base != "-"
-            )  # Low coverage region in the sample
+            ) 
+            # Do not consider Ns aligned with gaps.
             or (
                 ref_base not in {"N", "-"} and sample_base not in {"N", "-"}
-            )  # Do not consider Ns aligned with gaps.
+            )  
         )
 
         if condition:
@@ -391,13 +393,15 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
                 allele_type = (
                     "REF"
                     if val["Allele"] == pos_values["REF"]
-                    else "INS"
-                    if pos_values["REF"] == "-"
-                    else "DEL"
-                    if val["Allele"] == "-"
-                    else "low_cov"
-                    if pos_values["ALT"] == "N"
-                    else "SNP"
+                    else (
+                        "INS"
+                        if pos_values["REF"] == "-"
+                        else (
+                            "DEL"
+                        if val["Allele"] == "-"
+                        else "low_cov" if pos_values["ALT"] == "N" else "SNP"
+                        )
+                    )
                 )
 
                 # create the data for those positons
