@@ -6,6 +6,7 @@ import sys
 import copy
 import os
 
+
 def parse_args(args=None):
     Description = "Convert alignment between IRMA consensus and reference fasta to VCF file using IRMA stats"
     Epilog = """Example usage: python create_irma_vcf.py -a <alignment> -i <irma_alleles> -o <out_vcf>"""
@@ -58,6 +59,8 @@ def parse_args(args=None):
     )
 
     return parser.parse_args(args)
+
+
 def alleles_to_dict(alleles_file):
     """Convert IRMA's allAlleles file to dictionary.
 
@@ -1213,6 +1216,7 @@ def main(args=None):
         sys.exit()
 
     # Start analysis
+    # Convert allAlleles file to dictionary
     alleles_dict = alleles_to_dict(all_alleles)
     alleles_frag = next(iter(alleles_dict.values()))["Reference_Name"].split("_")[1]
 
@@ -1233,8 +1237,12 @@ def main(args=None):
         if response not in ("y", "yes", ""):
             print("Exiting.")
             exit()
+    # Merge info from allAlleles and alignment
+    af_merged_dict = merge_allele_aligment(
+        alignment_dict, alleles_dict
+    )
 
-    af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
+    # Convert merged info into reference based position format prior to vcf, merge INDELS and filter based on thresholds
     combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp, total_dp)
 
     if not combined_vcf_dict:
