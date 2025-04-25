@@ -153,7 +153,7 @@ echo "
     reads_hostR1=\$(cat ../../*_TAXPROFILER/kraken2/*/\${in}_*.kraken2.report.txt | grep \"Homo sapiens\" | awk '{print \$2}')
     reads_host_x2=\$((reads_hostR1 * 2))
     pc_reads_host=\$(awk -v v1=\$total_reads -v v2=\$reads_host_x2 'BEGIN {printf \"%.2f\", (v2*100)/v1}')
-    reads_virus=\$(awk -F\"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' ../04-irma/clean_irma_stats_flu.txt)
+    reads_virus=\$(awk -F\"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' ../04-irma/irma_stats_flu.txt)
     pc_reads_virus=\$(awk -v v1=\$reads_virus -v v2=\$total_reads 'BEGIN {if (v2 > 0) printf \"%.2f\", (v1 / v2) * 100; else print \"NA\"}')
     unmapped_reads=\$((total_reads - (reads_host_x2+reads_virus)))
     pc_unmapped=\$(awk -v v1=\$total_reads -v v2=\$unmapped_reads  'BEGIN {printf \"%.2f\", (v2/v1)*100}')
