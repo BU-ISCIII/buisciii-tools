@@ -868,6 +868,7 @@ def get_vcf_header(chromosome, sample_name):
     header_info = [
         '##INFO=<ID=TYPE,Number=1,Type=String,Description="Either SNP (Single Nucleotide Polymorphism), DEL (deletion) or INS (Insertion)">',
         '##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">',
+        '##INFO=<ID=consensus,Number=1,Type=String,Description="present if variant is included in consensus fasta">',
     ]
     header_filter = [
         '##FILTER=<ID=PASS,Description="All filters passed">',
@@ -924,7 +925,15 @@ def create_vcf(variants_dict, out_vcf, alignment):
             else:
                 TOTAL_DP = "NA"
 
-            INFO = "TYPE=" + value["TYPE"] + ";" + "DP=" + TOTAL_DP
+            INFO = (
+                "TYPE="
+                + value["TYPE"]
+                + ";"
+                + "DP="
+                + TOTAL_DP
+                + ";"
+                + ("consensus" if value["CONSENSUS"] else "")
+            )
             ALT_QUAL_list = []
             for number in value["QUAL"]:
                 if number != "NA":
