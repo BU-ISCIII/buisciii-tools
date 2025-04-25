@@ -85,6 +85,11 @@ def calc_mean(values, cast=float, precision=2):
     return number
 
 def exit_with_error(msg, sample, details=None):
+    print(f"\033[91mERROR: {msg} for \033[1;91m{sample}\033[0m")
+    if details:
+        print(details)
+    print("Please review this sample")
+    sys.exit()
 
 def alleles_to_dict(alleles_file):
     """Convert IRMA's allAlleles file to dictionary.
@@ -187,33 +192,11 @@ def align2dict(alignment_file):
     frag_name = list(sequences_dict.keys())[0].split("_")[-1]
     # Check the number of sequences in alignment. Only two sequences should be in the aligment
     if len(sequences_dict) == 0:
-        print(
-            "\033[91mERROR: No sequences in alignment for \033[1;91m"
-            + sample
-            + "\033[0m"
-        )
-        print("Please review this sample")
-        sys.exit()
+        exit_with_error("No sequences in alignment", sample)
     elif len(sequences_dict) == 1:
-        print(
-            "\033[91mERROR: Only one sequence in alignment for \033[1;91m"
-            + sample
-            + "\033[0m"
-        )
-        print(list(sequences_dict.keys())[0])
-        print("Please review this sample")
-        sys.exit()
-    elif len(sequences_dict) == 2:
-        pass
-    else:
-        print(
-            "\033[91mERROR: More than two sequences in alignment \033[1;91m"
-            + sample
-            + "\033[0m"
-        )
-        print(list(sequences_dict.keys()))
-        print("Please review this sample")
-        sys.exit()
+        exit_with_error("Only one sequence in alignment", sample, list(sequences_dict.keys())[0])
+    elif len(sequences_dict) > 2:
+        exit_with_error("More than two sequences in alignment", sample, list(sequences_dict.keys()))
 
     _, sample_seq = list(sequences_dict.items())[0]
     ref_id, ref_seq = list(sequences_dict.items())[1]
@@ -1142,22 +1125,10 @@ def main(args=None):
     total_dp = args.total_depth
 
     if not os.path.exists(alignment):
-        print(
-            "\033[91mERROR: Alignment file does not exist: \033[1;91m"
-            + alignment
-            + "\033[0m"
-        )
-        print("Please review this sample")
-        sys.exit()
+        exit_with_error("Alignment file does not exist:", alignment)
 
     if not os.path.exists(all_alleles):
-        print(
-            "\033[91mERROR: Alleles file does not exist: \033[1;91m"
-            + all_alleles
-            + "\033[0m"
-        )
-        print("Please review this sample")
-        sys.exit()
+        exit_with_error("Alleles file does not exist:", all_alleles)
 
     # Start analysis
     # Convert allAlleles file to dictionary
