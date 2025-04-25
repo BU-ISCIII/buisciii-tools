@@ -370,69 +370,48 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
     for align_pos, pos_values in alignment_dict.items():
         # If deletion in sample (only found in alignment)
         if pos_values["REF_POS"] >= 1 and pos_values["ALT"] == "-":
-            content_dict = {
-                "CHROM": pos_values["CHROM"],
-                "REF_POS": pos_values["REF_POS"],
+            variant = f"{pos_values['CHROM']}_{align_pos}_{pos_values['ALT']}"
+            af_merged_dict[variant] = {
+                **pos_values,
                 "CONSENSUS": True,
-                "SAMPLE_POS": pos_values["SAMPLE_POS"],
-                "REF": pos_values["REF"],
-                "ALT": pos_values["ALT"],
                 "TYPE": "DEL",
                 "DP": ["NA"],
                 "TOTAL_DP": ["NA"],
                 "AF": ["NA"],
-                "QUAL": ["NA"],
+                "QUAL": ["NA"]
             }
-            variant = (
-                content_dict["CHROM"] + "_" + str(align_pos) + "_" + content_dict["ALT"]
-            )
-            af_merged_dict[variant] = content_dict
         else:
             # For non deletion positions MUST exist in the AllAlleles file, find all the data available for that sample's position
-            alle_data = {
-                k: v
-                for k, v in alleles_dict.items()
-                if int(v["Position"]) in pos_values["SAMPLE_POS"]
-            }
-            for _, value in alle_data.items():
+            sample_positions = set(pos_values["SAMPLE_POS"])
+            matching = (
+                v for v in alleles_dict.values()
+                if int(v["Position"]) in sample_positions
+            )
+            for val in matching:
                 # Define the type of allele
-                if value["Allele"] == pos_values["REF"]:
-                    allele_type = "REF"
-                elif pos_values["REF"] == "-":
-                    allele_type = "INS"
-                elif value["Allele"] == "-":
-                    allele_type = "DEL"
-                elif pos_values["ALT"] == "N":
-                    allele_type = "low_cov"
-                else:
-                    allele_type = "SNP"
+                allele_type = (
+                    "REF" if val["Allele"] == pos_values["REF"] else
+                    "INS" if pos_values["REF"] == "-" else
+                    "DEL" if val["Allele"] == "-" else
+                    "low_cov" if pos_values["ALT"] == "N" else
+                    "SNP"
+                )
 
                 # create the data for those positons
                 content_dict = {
-                    "CHROM": pos_values["CHROM"],
-                    "REF_POS": pos_values["REF_POS"],
-                    "CONSENSUS": value["Allele_Type"] == "Consensus",
-                    "SAMPLE_POS": pos_values["SAMPLE_POS"],
-                    "REF": pos_values["REF"],
-                    "ALT": value["Allele"],
+                    **pos_values,
+                    "CONSENSUS": val["Allele_Type"] == "Consensus",
+                    "ALT": val["Allele"],
                     "TYPE": allele_type,
-                    "DP": [value["Count"]],
-                    "TOTAL_DP": [value["Total"]],
-                    "AF": [value["Frequency"]],
-                    "QUAL": [value["Frequency"]],
+                    "DP": [val["Count"]],
+                    "TOTAL_DP": [val["Total"]],
+                    "AF": [val["Frequency"]],
+                    "QUAL": [val["Frequency"]],
                 }
-
-                if content_dict["TYPE"] == "low_cov" and content_dict["CONSENSUS"]:
+                if allele_type == "low_cov" and content_dict["CONSENSUS"]:
                     content_dict["ALT"] = "N"
-
                 # create a unique key to store the data in the dictionary
-                variant = (
-                    content_dict["CHROM"]
-                    + "_"
-                    + str(align_pos)
-                    + "_"
-                    + content_dict["ALT"]
-                )
+                variant = f"{pos_values['CHROM']}_{align_pos}_{val['Allele']}"
 
                 # Add the position to the dictionary
                 af_merged_dict[variant] = content_dict
