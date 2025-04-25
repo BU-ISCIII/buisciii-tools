@@ -57,6 +57,34 @@ def parse_args(args=None):
 
     return parser.parse_args(args)
 
+def calc_mean(values, cast=float, precision=2):
+    """Calculate lists means
+
+    Parameters
+    ----------
+    values : list
+        List of values to calculate mean.
+    cast : 
+        Type of number (float, int)
+    precusion: int
+        Number of decimals in the results.
+
+    Returns
+    -------
+    number
+        Number with the mean rounded
+    """
+    valid = [cast(v) for v in values if v != "NA"]
+    if not valid:
+        return "NA"
+    mean_val = statistics.mean(valid)
+    if precision == 0:
+        number = str(int(round(mean_val)))
+    else:
+        number = str(round(mean_val, precision))
+    return number
+
+def exit_with_error(msg, sample, details=None):
 
 def alleles_to_dict(alleles_file):
     """Convert IRMA's allAlleles file to dictionary.
@@ -1112,14 +1140,11 @@ def create_vcf(variants_dict, out_vcf, alignment):
             POS = value["REF_POS"]
             REF = value["REF"]
             ALT = value["ALT"]
-            TOTAL_DP_list = []
-            for number in value["TOTAL_DP"]:
-                if number != "NA":
-                    TOTAL_DP_list.append(int(number))
-            if TOTAL_DP_list:
-                TOTAL_DP = str(round(statistics.mean(TOTAL_DP_list)))
-            else:
-                TOTAL_DP = "NA"
+
+            TOTAL_DP = calc_mean(value["TOTAL_DP"], int, 0)
+            ALT_QUAL = calc_mean(value["QUAL"], float, 2)
+            ALT_DP = calc_mean(value["DP"], int, 0)
+            AF = calc_mean(value["AF"], float, 4)
 
             INFO = (
                 "TYPE="
@@ -1130,32 +1155,6 @@ def create_vcf(variants_dict, out_vcf, alignment):
                 + ";"
                 + ("consensus" if value["CONSENSUS"] else "")
             )
-            ALT_QUAL_list = []
-            for number in value["QUAL"]:
-                if number != "NA":
-                    ALT_QUAL_list.append(float(number))
-            if ALT_QUAL_list:
-                ALT_QUAL = str(round(statistics.mean(ALT_QUAL_list), 2))
-            else:
-                ALT_QUAL = "NA"
-
-            ALT_DP_list = []
-            for number in value["DP"]:
-                if number != "NA":
-                    ALT_DP_list.append(int(number))
-            if ALT_DP_list:
-                ALT_DP = str(round(statistics.mean(ALT_DP_list), 0))
-            else:
-                ALT_DP = "NA"
-
-            AF_list = []
-            for number in value["AF"]:
-                if number != "NA":
-                    AF_list.append(float(number))
-            if AF_list:
-                AF = str(round(statistics.mean(AF_list), 4))
-            else:
-                AF = "NA"
 
             SAMPLE = GT + ":" + ALT_DP + ":" + ALT_QUAL + ":" + AF
             oline = (
