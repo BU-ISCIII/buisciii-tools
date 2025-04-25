@@ -256,13 +256,13 @@ def align2dict(alignment_file):
     return align_dict, frag_name
 
 
-def merge_allele_aligment(vcf_dictionary, alleles_dictionary):
-    """Add stats to VCF dictionary.
+def merge_allele_aligment(alignment_dict, alleles_dict):
+    """Merges all alleles file and aligment, based in aligment positions
 
     Parameters
     ----------
-    vcf_dictionary : dict
-        Dictionary containing VCF information.
+    alignment_dict : dict
+        Dictionary containing aligment information.
     alleles_dictionary : dict
         Dictionary containing alleles information.
 
@@ -272,300 +272,173 @@ def merge_allele_aligment(vcf_dictionary, alleles_dictionary):
         Updated dictionary with allele frequencies and other metrics.
         E.g:
         {
-            "EPI_ISL_18668201_1_AAA": {
-                "CHROM": "EPI_ISL_18668201",
+            "NC_007372.1_1_-": {
+                "CHROM": "NC_007372.1",
                 "REF_POS": 1,
+                "CONSENSUS": true,
                 "SAMPLE_POS": [
-                    8,
-                    9
+                    0
                 ],
                 "REF": "A",
-                "ALT": "AAA",
-                "TYPE": "INS",
-                "DP": [
-                    "9",
-                    "10"
-                ],
-                "TOTAL_DP": [
-                    "9",
-                    "10"
-                ],
-                "AF": [
-                    "1",
-                    "1"
-                ],
-                "QUAL": [
-                    "33.7777777777778",
-                    "34"
-                ]
-            },
-            "EPI_ISL_18668201_10_A": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10,
-                "SAMPLE_POS": [
-                    19
-                ],
-                "REF": "T",
-                "ALT": "A",
-                "TYPE": "SNP",
-                "DP": [
-                    "60"
-                ],
-                "TOTAL_DP": [
-                    "72"
-                ],
-                "AF": [
-                    "0.833333333333333"
-                ],
-                "QUAL": [
-                    "34.0166666666667"
-                ]
-            },
-            "EPI_ISL_18668201_7531_TT": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7542
-                ],
-                "REF": "T",
-                "ALT": "TT",
-                "TYPE": "INS",
-                "DP": [
-                    "74"
-                ],
-                "TOTAL_DP": [
-                    "75"
-                ],
-                "AF": [
-                    "0.986666666666667"
-                ],
-                "QUAL": [
-                    "34.8648648648649"
-                ]
-            },
-            "EPI_ISL_18668201_7531_TC": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7543
-                ],
-                "REF": "T",
-                "ALT": "TC",
-                "TYPE": "INS",
-                "DP": [
-                    "75"
-                ],
-                "TOTAL_DP": [
-                    "75"
-                ],
-                "AF": [
-                    "1"
-                ],
-                "QUAL": [
-                    "35.04"
-                ]
-            },
-            "EPI_ISL_18668201_7531_CA": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7544
-                ],
-                "REF": "C",
-                "ALT": "CA",
-                "TYPE": "INS",
-                "DP": [
-                    "75"
-                ],
-                "TOTAL_DP": [
-                    "75"
-                ],
-                "AF": [
-                    "1"
-                ],
-                "QUAL": [
-                    "33.8533333333333"
-                ]
-            },
-            "EPI_ISL_18668201_10067_A": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10067,
-                "SAMPLE_POS": [
-                    10079
-                ],
-                "REF": "AA",
-                "ALT": "A",
-                "TYPE": "DEL",
-                "DP": [
-                    "10"
-                ],
-                "TOTAL_DP": [
-                    "10"
-                ],
-                "AF": [
-                    "1"
-                ],
-                "QUAL": [
-                    "34.3"
-                ]
-            },
-            "EPI_ISL_18668201_10068_-": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10068,
-                "SAMPLE_POS": [
-                    10079
-                ],
-                "REF": "-C",
                 "ALT": "-",
                 "TYPE": "DEL",
                 "DP": [
-                    "10"
+                    "NA"
                 ],
                 "TOTAL_DP": [
-                    "10"
+                    "NA"
                 ],
                 "AF": [
-                    "1"
+                    "NA"
                 ],
                 "QUAL": [
-                    "34.3"
+                    "NA"
                 ]
             },
-            "EPI_ISL_18668201_10069_-": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10069,
+            "NC_007372.1_53_T": {
+                "CHROM": "NC_007372.1",
+                "REF_POS": 52,
+                "CONSENSUS": true,
                 "SAMPLE_POS": [
-                    10079
+                    29
                 ],
-                "REF": "-T",
+                "REF": "-",
+                "ALT": "T",
+                "TYPE": "INS",
+                "DP": [
+                    "11776"
+                ],
+                "TOTAL_DP": [
+                    "17038"
+                ],
+                "AF": [
+                    "0.69116093438197"
+                ],
+                "QUAL": [
+                    "0.69116093438197"
+                ]
+            },
+            "NC_007372.1_53_-": {
+                "CHROM": "NC_007372.1",
+                "REF_POS": 52,
+                "CONSENSUS": false,
+                "SAMPLE_POS": [
+                    29
+                ],
+                "REF": "-",
+                "ALT": "-",
+                "TYPE": "REF",
+                "DP": [
+                    "5245"
+                ],
+                "TOTAL_DP": [
+                    "17038"
+                ],
+                "AF": [
+                    "0.307841295926752"
+                ],
+                "QUAL": [
+                    "0.307841295926752"
+                ]
+            },
+            "NC_007372.1_2364_-": {
+                "CHROM": "NC_007372.1",
+                "REF_POS": 2341,
+                "CONSENSUS": true,
+                "SAMPLE_POS": [
+                    2297
+                ],
+                "REF": "T",
                 "ALT": "-",
                 "TYPE": "DEL",
                 "DP": [
-                    "10"
+                    "NA"
                 ],
                 "TOTAL_DP": [
-                    "10"
+                    "NA"
                 ],
                 "AF": [
-                    "1"
+                    "NA"
                 ],
                 "QUAL": [
-                    "34.3"
+                    "NA"
                 ]
             }
         }
     """
 
     af_merged_dict = {}
-    for _, value in alleles_dictionary.items():
-        pos = value["Position"]
-        chrom = next(iter(vcf_dictionary.values()))["CHROM"]
 
+    # Iterate over the alignment dictionary, where align_pos is the key, pos_values is a dictionary with the values for that key/position
+    for align_pos, pos_values in alignment_dict.items():
+        # If deletion in sample (only found in alignment)
+        if pos_values["REF_POS"] >= 1 and pos_values["ALT"] == "-":
+            content_dict = {
+                "CHROM": pos_values["CHROM"],
+                "REF_POS": pos_values["REF_POS"],
+                "CONSENSUS": True,
+                "SAMPLE_POS": pos_values["SAMPLE_POS"],
+                "REF": pos_values["REF"],
+                "ALT": pos_values["ALT"],
+                "TYPE": "DEL",
+                "DP": ["NA"],
+                "TOTAL_DP": ["NA"],
+                "AF": ["NA"],
+                "QUAL": ["NA"],
+            }
             variant = (
-                content_dict["CHROM"]
-                + "_"
-                + str(content_dict["REF_POS"])
-                + "_"
-                + "final_ins"
+                content_dict["CHROM"] + "_" + str(align_pos) + "_" + content_dict["ALT"]
             )
-
-            if variant in af_merged_dict:
-                af_merged_dict[variant]["DP"] += content_dict["DP"]
-                af_merged_dict[variant]["TOTAL_DP"] += content_dict["TOTAL_DP"]
-                af_merged_dict[variant]["AF"] += content_dict["AF"]
-                af_merged_dict[variant]["QUAL"] += content_dict["QUAL"]
-                af_merged_dict[variant]["SAMPLE_POS"] += content_dict["SAMPLE_POS"]
-                af_merged_dict[variant]["ALT"] += value["Allele"]
-            else:
-                af_merged_dict[variant] = content_dict
-            pass
-
-        for align_pos, subdict in vcf_dictionary.items():
-            if (value["Allele_Type"] == "Consensus" and subdict["TYPE"] == "REF") or (
-                value["Allele"] == subdict["REF"]
-                and subdict["TYPE"] not in ["DEL", "INS"]
-            ):
-                continue
-            if 0 in subdict["SAMPLE_POS"] and len(subdict["SAMPLE_POS"]) == 1:
-                content_dict = {
-                    "CHROM": subdict["CHROM"],
-                    "REF_POS": subdict["REF_POS"],
-                    "SAMPLE_POS": subdict["SAMPLE_POS"],
-                    "REF": subdict["REF"],
-                    "ALT": subdict["ALT"],
-                    "TYPE": subdict["TYPE"],
-                    "DP": ["NA"],
-                    "TOTAL_DP": ["NA"],
-                    "AF": ["NA"],
-                    "QUAL": ["NA"],
-                }
-                variant = (
-                    content_dict["CHROM"]
-                    + "_"
-                    + str(content_dict["REF_POS"])
-                    + "_"
-                    + content_dict["ALT"]
-                )
-                af_merged_dict[variant] = content_dict
-                pass
-
-            if "SAMPLE_POS" in subdict and int(pos) in subdict["SAMPLE_POS"]:
-                DP = []
-                TOTAL_DP = []
-                AF = []
-                QUAL = []
-                content_dict = {
-                    "CHROM": subdict["CHROM"],
-                    "REF_POS": subdict["REF_POS"],
-                    "SAMPLE_POS": subdict["SAMPLE_POS"],
-                    "REF": subdict["REF"],
-                    "ALT": subdict["ALT"],
-                    "TYPE": subdict["TYPE"],
-                }
-                if (
-                    value["Allele"] == content_dict["ALT"]
-                    or value["Allele_Type"] == "Minority"
-                    or content_dict["TYPE"] in ["INS", "DEL", "REF"]
-                ):
-                    if value["Allele_Type"] == "Minority":
-                        content_dict.update({"ALT": value["Allele"]})
-                        content_dict.update({"TYPE": "SNP"})
-                    if value["Allele"] == "-" and value["Allele_Type"] == "Minority":
-                        REF = vcf_dictionary[align_pos - 1]["REF"] + subdict["REF"]
-                        ALT = vcf_dictionary[align_pos - 1]["REF"]
-                        content_dict.update(
-                            {"REF_POS": vcf_dictionary[align_pos - 1]["REF_POS"]}
-                        )
-                        content_dict.update({"REF": REF})
-                        content_dict.update({"ALT": ALT})
-                        content_dict.update({"TYPE": "DEL"})
-                    DP.append(value["Count"])
-                    TOTAL_DP.append(value["Total"])
-                    AF.append(value["Frequency"])
-                    QUAL.append(value["Average_Quality"])
+            af_merged_dict[variant] = content_dict
+        else:
+            # For non deletion positions MUST exist in the AllAlleles file, find all the data available for that sample's position
+            alle_data = {
+                k: v
+                for k, v in alleles_dict.items()
+                if int(v["Position"]) in pos_values["SAMPLE_POS"]
+            }
+            for _, value in alle_data.items():
+                # Define the type of allele
+                if value["Allele"] == pos_values["REF"]:
+                    allele_type = "REF"
+                elif pos_values["REF"] == "-":
+                    allele_type = "INS"
+                elif value["Allele"] == "-":
+                    allele_type = "DEL"
+                elif pos_values["ALT"] == "N":
+                    allele_type = "low_cov"
                 else:
-                    print("SNP not the same in .fasta file and alleles file")
-                    print(value)
-                    print(content_dict)
-                content_dict.update(
-                    {"DP": DP, "TOTAL_DP": TOTAL_DP, "AF": AF, "QUAL": QUAL}
-                )
+                    allele_type = "SNP"
+
+                # create the data for those positons
+                content_dict = {
+                    "CHROM": pos_values["CHROM"],
+                    "REF_POS": pos_values["REF_POS"],
+                    "CONSENSUS": value["Allele_Type"] == "Consensus",
+                    "SAMPLE_POS": pos_values["SAMPLE_POS"],
+                    "REF": pos_values["REF"],
+                    "ALT": value["Allele"],
+                    "TYPE": allele_type,
+                    "DP": [value["Count"]],
+                    "TOTAL_DP": [value["Total"]],
+                    "AF": [value["Frequency"]],
+                    "QUAL": [value["Frequency"]],
+                }
+
+                if content_dict["TYPE"] == "low_cov" and content_dict["CONSENSUS"]:
+                    content_dict["ALT"] = "N"
+
+                # create a unique key to store the data in the dictionary
                 variant = (
                     content_dict["CHROM"]
                     + "_"
-                    + str(content_dict["REF_POS"])
+                    + str(align_pos)
                     + "_"
                     + content_dict["ALT"]
                 )
 
-                if variant in af_merged_dict:
-                    af_merged_dict[variant]["DP"] += DP
-                    af_merged_dict[variant]["TOTAL_DP"] += TOTAL_DP
-                    af_merged_dict[variant]["AF"] += AF
-                    af_merged_dict[variant]["QUAL"] += QUAL
-                else:
-                    af_merged_dict[variant] = content_dict
-                pass
+                # Add the position to the dictionary
+                af_merged_dict[variant] = content_dict
 
     return af_merged_dict
 
