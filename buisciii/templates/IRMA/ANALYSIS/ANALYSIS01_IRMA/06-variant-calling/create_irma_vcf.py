@@ -234,52 +234,21 @@ def align2dict(alignment_file):
         if ref_base != "-":
             ref_position += 1
 
-        ## Insertions in the sample respect to the reference
-        if ref_base == "-" and sample_base != "N":
-            content_dict = {
-                "CHROM": CHROM,
-                "REF_POS": ref_position,
-                "SAMPLE_POS": [sample_position],
-                "REF": ref_base,
-                "ALT": sample_base,
-            }
-            align_dict[align_position] = content_dict
-        # Delettions in the sample respect to the reference
-        elif sample_base == "-" and ref_base != "N":
-            content_dict = {
-                "CHROM": CHROM,
-                "REF_POS": ref_position,
-                "SAMPLE_POS": [sample_position],
-                "REF": ref_base,
-                "ALT": sample_base,
-            }
-            align_dict[align_position] = content_dict
+        condition = (
+            (ref_base == "-" and sample_base != "N") ## Insertions in the sample respect to the reference
+            or (sample_base == "-" and ref_base != "N") # Delettions in the sample respect to the reference
+            or (sample_base == "N" and ref_base != "-") # Low coverage region in the sample
+            or (ref_base not in {"N", "-"} and sample_base not in {"N", "-"}) # Do not consider Ns aligned with gaps.
+        )
 
-        # Low coverage region in the sample
-        elif sample_base == "N" and ref_base != "-":
-            content_dict = {
+        if condition:
+            align_dict[align_position] = {
                 "CHROM": CHROM,
                 "REF_POS": ref_position,
                 "SAMPLE_POS": [sample_position],
                 "REF": ref_base,
                 "ALT": sample_base,
             }
-            align_dict[align_position] = content_dict
-
-        elif (
-            ref_base != "N"
-            and ref_base != "-"
-            and sample_base != "N"
-            and sample_base != "-"
-        ):
-            content_dict = {
-                "CHROM": CHROM,
-                "REF_POS": ref_position,
-                "SAMPLE_POS": [sample_position],
-                "REF": ref_base,
-                "ALT": sample_base,
-            }
-            align_dict[align_position] = content_dict
 
     return align_dict, frag_name
 
