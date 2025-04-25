@@ -3,7 +3,8 @@ from Bio import SeqIO
 import statistics
 import argparse
 import sys
-
+import copy
+import os
 
 def parse_args(args=None):
     Description = "Convert alignment between IRMA consensus and reference fasta to VCF file using IRMA stats"
@@ -759,18 +760,7 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
 
     combined_vcf_dict = {}
     for _, value in vcf_dictionary.items():
-        content_dict = {
-            "CHROM": value["CHROM"],
-            "REF_POS": value["REF_POS"],
-            "SAMPLE_POS": value["SAMPLE_POS"],
-            "REF": value["REF"],
-            "ALT": value["ALT"],
-            "DP": value["DP"],
-            "TOTAL_DP": value["TOTAL_DP"],
-            "AF": value["AF"],
-            "QUAL": value["QUAL"],
-            "TYPE": value["TYPE"],
-        }
+        content_dict = copy.deepcopy(value)
 
         dp = value["DP"][0]
         af = value["AF"][0]
