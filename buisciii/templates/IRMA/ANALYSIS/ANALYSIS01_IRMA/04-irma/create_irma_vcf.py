@@ -318,7 +318,7 @@ def align2dict(alignment_file):
     return vcf_dict
 
 
-def merge_allele_aligment(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
+def merge_allele_aligment(vcf_dictionary, alleles_dictionary):
     """Add stats to VCF dictionary.
 
     Parameters
@@ -522,20 +522,6 @@ def merge_allele_aligment(vcf_dictionary, alleles_dictionary, last_pos, last_all
     for _, value in alleles_dictionary.items():
         pos = value["Position"]
         chrom = next(iter(vcf_dictionary.values()))["CHROM"]
-
-        if int(pos) > last_pos and value["Allele_Type"] == "Minority":
-            content_dict = {
-                "CHROM": chrom,
-                "REF_POS": last_pos,
-                "SAMPLE_POS": [pos],
-                "REF": last_allele,
-                "ALT": last_allele + value["Allele"],
-                "TYPE": "INS",
-                "DP": [value["Count"]],
-                "TOTAL_DP": [value["Total"]],
-                "AF": [value["Frequency"]],
-                "QUAL": [value["Frequency"]],
-            }
 
             variant = (
                 content_dict["CHROM"]
@@ -1005,13 +991,8 @@ def main(args=None):
     # Start analysis
     alleles_dict = alleles_to_dict(all_alleles, freq, dp)
     alignment_dict = align2dict(alignment)
-    last_ref_pos = max(position["REF_POS"] for position in alignment_dict.values())
-    last_ref_allele = None
-    for _, value in alignment_dict.items():
-        if value["REF_POS"] == last_ref_pos:
-            last_ref_allele = value["REF"]
-            break
-    af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict, last_ref_pos, last_ref_allele)
+
+    af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
     combined_vcf_dict = ref_based_dict(af_merged_dict)
     create_vcf(combined_vcf_dict, output_vcf, alignment)
 
