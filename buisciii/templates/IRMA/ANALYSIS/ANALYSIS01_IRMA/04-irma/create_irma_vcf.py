@@ -443,8 +443,171 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
     return af_merged_dict
 
 
+def handle_initial_insertion(vcf_dictionary, consensus):
+    """Generates the dictionary for insertions at the begining of sequence
+
+    Parameters
+    ----------
+    vcf_dictionary : dict
+        Dictionary containing VCF information.
+    consensus: boolean
+        If the insertion is included in the consensus sequence or not
+
+    Returns
+    -------
+    initial_dict
+        Dictionary with all the insertion data
+        {
+            "CHROM": "MW626062.1",
+            "CONSENSUS": true,
+            "AF": [
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332"
+            ],
+            "ALT": "GGAAAACAAAAGCAACAAAAA",
+            "DP": [
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770"
+            ],
+            "QUAL": [
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332"
+            ],
+            "REF": "A",
+            "REF_POS": 1,
+            "SAMPLE_POS": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+            ],
+            "TOTAL_DP": [
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772"
+            ],
+            "TYPE": "INS"
+        }
+    """
+    initial_dict = {}
+    # Get all the insertion data at the begining of sequence for the same frequency/consensus
+    initial_ins_data = {
+        k: v
+        for k, v in vcf_dictionary.items()
+        if v["REF_POS"] == 0 and v["CONSENSUS"] == consensus and v["TYPE"] == "INS"
+    }
+
+    # Get data for the first reference nucleotide
+    first_ref_data = next(v for v in vcf_dictionary.values() if v["REF_POS"] == 1)
+
+    for data in initial_ins_data.values():
+        # If the first nucleotide, copy dictionary, else, just add new info
+        if 1 in data["SAMPLE_POS"]:
+            initial_dict = copy.deepcopy(data)
+        else:
+            initial_dict["SAMPLE_POS"].append(data["SAMPLE_POS"][0])
+            initial_dict["DP"].append(data["DP"][0])
+            initial_dict["TOTAL_DP"].append(data["TOTAL_DP"][0])
+            initial_dict["AF"].append(data["AF"][0])
+            initial_dict["QUAL"].append(data["QUAL"][0])
+            initial_dict["ALT"] += data["ALT"]
+
+    # Add reference data
+    initial_dict["REF_POS"] = 1
+    initial_dict["REF"] = first_ref_data["REF"]
+    initial_dict["ALT"] += first_ref_data["REF"]
+    return initial_dict
+
+
 def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
-    """Combine insertion and deletion pñositons in the VCF dictionary.
+    """Converts information in variants to reference based positions. Combines insertion and deletion to be reference based.
 
     Parameters
     ----------
@@ -462,114 +625,182 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
     combined_vcf_dict
         Updated dictionary with combined insertion and deletion variants.
         {
-            "1": {
-                "CHROM": "EPI_ISL_18668201",
+            "INIT_INS_CONS": {
+                "CHROM": "MW626062.1",
                 "REF_POS": 1,
+                "CONSENSUS": true,
                 "SAMPLE_POS": [
-                    8,
-                    9
+                    1,
+                    2,
+                    3,
+                    4
                 ],
                 "REF": "A",
-                "ALT": "AAA",
+                "ALT": "GGAAA",
+                "TYPE": "INS",
                 "DP": [
-                    "9"
+                    "1761",
+                    "1764",
+                    "1768",
+                    "1770"
                 ],
                 "TOTAL_DP": [
-                    "9",
-                    "10"
+                    "1761",
+                    "1764",
+                    "1768",
+                    "1772"
                 ],
                 "AF": [
-                    "1"
-                ],
-                "QUAL": [
-                    "33.7777777777778"
-                ],
-                "TYPE": "INS"
-            },
-            "10": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10,
-                "SAMPLE_POS": [
-                    19
-                ],
-                "REF": "T",
-                "ALT": "A",
-                "DP": [
-                    "72"
-                ],
-                "TOTAL_DP": [
-                    "10"
-                ],
-                "AF": [
-                    "0.833333333333333"
-                ],
-                "QUAL": [
-                    "34.0166666666667"
-                ],
-                "TYPE": "SNP"
-            },
-            "7531": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7542,
-                    7543,
-                    7544
-                ],
-                "REF": "T",
-                "ALT": "TTCA",
-                "DP": [
-                    "74",
-                    "75",
-                    "75"
-                ],
-                "TOTAL_DP": [
-                    "75",
-                    "75",
-                    "75"
-                ],
-                "AF": [
-                    "0.986666666666667",
                     "1",
-                    "1"
+                    "1",
+                    "1",
+                    "0.998871332"
                 ],
                 "QUAL": [
-                    "34.8648648648649",
-                    "35.04",
-                    "33.8533333333333"
-                ],
-                "TYPE": "INS"
+                    "1",
+                    "1",
+                    "1",
+                    "0.998871332"
+                ]
             },
-            "10067": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10067,
+            "INIT_INS_MIN": {
+                "CHROM": "MW626062.1",
+                "REF_POS": 1,
+                "CONSENSUS": false,
                 "SAMPLE_POS": [
-                    10079
+                    1,
+                    2,
+                    3,
+                    4
                 ],
-                "REF": "AACT",
-                "ALT": "A",
+                "REF": "A",
+                "ALT": "AAGGA",
+                "TYPE": "INS",
                 "DP": [
-                    "10"
+                    "1761",
+                    "1764",
+                    "1768",
+                    "1770"
                 ],
                 "TOTAL_DP": [
-                    "10",
+                    "1761",
+                    "1764",
+                    "1768",
+                    "1772"
                 ],
                 "AF": [
-                    "1"
+                    "0.0001",
+                    "0.0001",
+                    "0.0001",
+                    "0.0001"
                 ],
                 "QUAL": [
-                    "34.3"
+                    "0.0001",
+                    "0.0001",
+                    "0.0001",
+                    "0.0001"
+                ]
+            },
+            "4_G": {
+                "CHROM": "MW626062.1",
+                "REF_POS": 4,
+                "CONSENSUS": false,
+                "SAMPLE_POS": [
+                    24
                 ],
-                "TYPE": "DEL"
+                "REF": "A",
+                "ALT": "G",
+                "TYPE": "SNP",
+                "DP": [
+                    "1"
+                ],
+                "TOTAL_DP": [
+                    "1772"
+                ],
+                "AF": [
+                    "0.000564334"
+                ],
+                "QUAL": [
+                    "0.000564334"
+                ]
+            },
+            "4_T": {
+                "CHROM": "MW626062.1",
+                "REF_POS": 4,
+                "CONSENSUS": false,
+                "SAMPLE_POS": [
+                    24
+                ],
+                "REF": "A",
+                "ALT": "T",
+                "TYPE": "SNP",
+                "DP": [
+                    "1"
+                ],
+                "TOTAL_DP": [
+                    "1772"
+                ],
+                "AF": [
+                    "0.000564334"
+                ],
+                "QUAL": [
+                    "0.000564334"
+                ]
+            },
+            "44_T": {
+                "CHROM": "MW626062.1",
+                "REF_POS": 44,
+                "CONSENSUS": true,
+                "SAMPLE_POS": [
+                    64
+                ],
+                "REF": "C",
+                "ALT": "T",
+                "TYPE": "SNP",
+                "DP": [
+                    "3356"
+                ],
+                "TOTAL_DP": [
+                    "3357"
+                ],
+                "AF": [
+                    "0.999702115"
+                ],
+                "QUAL": [
+                    "0.999702115"
+                ]
+            },
+            "1701_DEL": {
+                "CHROM": "MW626062.1",
+                "REF_POS": 1701,
+                "CONSENSUS": true,
+                "SAMPLE_POS": [
+                    1720
+                ],
+                "REF": "ACATTAGGATTTCAGAATCATGAGAAAAACAC",
+                "ALT": "A",
+                "TYPE": "DEL",
+                "DP": [
+                    "NA"
+                ],
+                "TOTAL_DP": [
+                    "NA"
+                ],
+                "AF": [
+                    "NA"
+                ],
+                "QUAL": [
+                    "NA"
+                ]
             }
         }
-
     """
 
     combined_vcf_dict = {}
-    for _, value in vcf_dictionary.items():
+    for key, value in vcf_dictionary.items():
         content_dict = copy.deepcopy(value)
 
+        # Only process variants passing filters
         dp = value["DP"][0]
         af = value["AF"][0]
         tot_dp = value["TOTAL_DP"][0]
@@ -583,83 +814,230 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                 or int(dp) >= alt_depth
             )
         ) or (dp == "NA" and af == "NA"):
+            # Manage insertions
             if value["TYPE"] == "INS":
-                if value["REF_POS"] in combined_vcf_dict:
-                    if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
-                        NEW_ALT = value["ALT"][len(value["REF"]) :]
-                        combined_vcf_dict[value["REF_POS"]]["ALT"] += NEW_ALT
-                        combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(
-                            value["SAMPLE_POS"][0]
+                # If the insertion is at the begining of the sequence, we use the first reference nucleotide at the end of ALT
+                # For example REF='-' and ALT='G' TO REF="A" and ALT='GA'
+                if value["REF_POS"] == 0:
+                    if value["CONSENSUS"] and "INIT_INS_CONS" not in combined_vcf_dict:
+                        initial_dict = handle_initial_insertion(
+                            vcf_dictionary, consensus=True
                         )
-                        combined_vcf_dict[value["REF_POS"]]["DP"].append(value["DP"][0])
-                        combined_vcf_dict[value["REF_POS"]]["TOTAL_DP"].append(
-                            value["TOTAL_DP"][0]
+                        combined_vcf_dict["INIT_INS_CONS"] = initial_dict
+                    elif (
+                        not value["CONSENSUS"]
+                        and "INIT_INS_MIN" not in combined_vcf_dict
+                    ):
+                        initial_dict = handle_initial_insertion(
+                            vcf_dictionary, consensus=False
                         )
-                        combined_vcf_dict[value["REF_POS"]]["AF"].append(value["AF"][0])
-                        combined_vcf_dict[value["REF_POS"]]["QUAL"].append(value["QUAL"][0])
-                    else:
-                        print("Same position annotated with multiple variant types")
-                        print("value")
-                        print(value)
-                        print("combined_vcf_dict")
-                        print(combined_vcf_dict[value["REF_POS"]])
+                        combined_vcf_dict["INIT_INS_MIN"] = initial_dict
                 else:
-                    combined_vcf_dict[value["REF_POS"]] = content_dict
-            elif value["TYPE"] == "DEL":
-                sample_found = False
-                minority = False
-                for af in value["AF"]:
-                    if float(af) < 0.5:
-                        minority = True
-                prev_sample_pos = ""
-                if minority and len(value["SAMPLE_POS"]) == 1:
-                    sample_pos = value["SAMPLE_POS"][0]
-                    prev_sample_pos = sample_pos - 1
-                for _, data in combined_vcf_dict.items():
-                    if data["TYPE"] == "DEL":
-                        if value["SAMPLE_POS"] == data["SAMPLE_POS"]:
-                            if value["TYPE"] == data["TYPE"]:
-                                sample_found = data["REF_POS"]
+                    # Check if it is a minority insertion. In that case,
+                    minority_ins = not value["CONSENSUS"]
+                    # we will keep the consenus and the minority insertion with the highest allele frequency and quality.
+                    if minority_ins:
+                        # Check if top minority insertion for that sample position was already introduced in the combined dictionary
+                        ins_found = False
+                        position_data = {
+                            k: v
+                            for k, v in combined_vcf_dict.items()
+                            if content_dict["SAMPLE_POS"][0] in v["SAMPLE_POS"]
+                        }
+                        for key, data in position_data.items():
+                            if (
+                                value["TYPE"] == data["TYPE"]
+                                and value["CONSENSUS"] == data["CONSENSUS"]
+                            ):
+                                ins_found = key
                                 break
-                            else:
-                                print("Same position annotated with multiple variant types")
-                                print("value")
-                                print(value)
-                                print("combined_vcf_dict")
-                                print(combined_vcf_dict[value["REF_POS"]])
-                        elif minority and prev_sample_pos in data["SAMPLE_POS"]:
-                            sample_found = data["REF_POS"]
+
+                        # If insertion is not found, look for the insetion with highest AF and QUAL for that position in the sample
+                        if not ins_found:
+                            insertion_data = {
+                                k: v
+                                for k, v in vcf_dictionary.items()
+                                if value["SAMPLE_POS"] == v["SAMPLE_POS"]
+                                and value["TYPE"] == v["TYPE"]
+                                and value["CONSENSUS"] == v["CONSENSUS"]
+                            }
+                            max_key = max(
+                                insertion_data,
+                                key=lambda k: (
+                                    float(insertion_data[k]["AF"][0]),
+                                    float(insertion_data[k]["QUAL"][0]),
+                                ),
+                            )
+                            # Replace the data with the top insertion
+                            value = vcf_dictionary[max_key]
+                            content_dict["ALT"] = value["ALT"]
+                            content_dict["DP"] = value["DP"].copy()
+                            content_dict["AF"] = value["AF"].copy()
+                            content_dict["QUAL"] = value["QUAL"].copy()
+
+                        # If insertion is found, continue, as highest one was already introduced
+                        else:
+                            continue
+
+                    # Transform REF and ALT values to make sense with INS format
+                    # If the insertion is in the middle or at the end
+                    # We use the last reference nucleotide as the begining of ALT
+                    # For example REF='-' and ALT='G' TO REF="A" and ALT='AG'
+                    else:
+                        ref_pos_data = {
+                            k: v
+                            for k, v in vcf_dictionary.items()
+                            if v["REF_POS"] == value["REF_POS"]
+                        }
+                        prev_pos_allele = list(ref_pos_data.values())[0]["REF"]
+                        content_dict["ALT"] = prev_pos_allele + value["ALT"]
+                        content_dict["REF"] = prev_pos_allele
+
+                    variant_found = False
+
+                    # Once data is ready, check if another previous nucleotide part of that insertion was already in the dictionary.
+                    # Thay share the sample reference position as they are insertions not present in the reference.
+                    position_data = {
+                        k: v
+                        for k, v in combined_vcf_dict.items()
+                        if content_dict["REF_POS"] == v["REF_POS"]
+                    }
+                    for key, data in position_data.items():
+                        if (
+                            content_dict["TYPE"] == data["TYPE"]
+                            and content_dict["CONSENSUS"] == data["CONSENSUS"]
+                        ):
+                            variant_found = key
                             break
-                if sample_found:
-                    if 0 in value["SAMPLE_POS"] and len(value["SAMPLE_POS"]) == 1:
-                        combined_vcf_dict[sample_found]["REF"] += value["ALT"]
-                        combined_vcf_dict[sample_found]["ALT"] = value["ALT"]
+
+                    # If variant is found, merge data.
+                    if variant_found:
+                        NEW_ALT = content_dict["ALT"][len(content_dict["REF"]) :]
+                        combined_vcf_dict[variant_found]["ALT"] += NEW_ALT
+                        combined_vcf_dict[variant_found]["SAMPLE_POS"].append(
+                            content_dict["SAMPLE_POS"][0]
+                        )
+                        combined_vcf_dict[variant_found]["DP"].append(
+                            content_dict["DP"][0]
+                        )
+                        combined_vcf_dict[variant_found]["TOTAL_DP"].append(
+                            content_dict["TOTAL_DP"][0]
+                        )
+                        combined_vcf_dict[variant_found]["AF"].append(
+                            content_dict["AF"][0]
+                        )
+                        combined_vcf_dict[variant_found]["QUAL"].append(
+                            content_dict["QUAL"][0]
+                        )
                     else:
-                        NEW_REF = value["REF"][len(value["ALT"]) :]
-                        combined_vcf_dict[sample_found]["REF"] += NEW_REF
-                        if minority:
-                            combined_vcf_dict[sample_found]["SAMPLE_POS"] += value[
-                                "SAMPLE_POS"
-                            ]
-                            combined_vcf_dict[sample_found]["DP"] += value["DP"]
-                            combined_vcf_dict[sample_found]["TOTAL_DP"] += value["TOTAL_DP"]
-                            combined_vcf_dict[sample_found]["AF"] += value["AF"]
+                        # If variant is not found, it is the first nucleitode of the insertion, so it is added to the dictionary
+                        variant = (
+                            str(content_dict["REF_POS"])
+                            + "_"
+                            + content_dict["ALT"]
+                            + "_"
+                            + "INS"
+                        )
+                        combined_vcf_dict[variant] = content_dict
+
+            elif value["TYPE"] == "DEL":
+                # Transform REF and ALT values to make sense with DEL format
+                # If the deletion is at the begining of the sequence, the needed allele is the next one
+                # For example REF='A' and ALT='-' to REF="AG" and ALT='G'
+                if 0 in value["SAMPLE_POS"]:
+                    next_pos_data = {
+                        k: v
+                        for k, v in vcf_dictionary.items()
+                        if v["REF_POS"] == value["REF_POS"] + 1
+                    }
+                    next_pos_allele = list(next_pos_data.values())[0]["REF"]
+                    content_dict["ALT"] = next_pos_allele
+                    content_dict["REF"] = value["REF"] + next_pos_allele
+                # If the deletion is in the middle or at the end, we use the previous nucleotide
+                # For example REF='A' and ALT='-' to REF="GA" and ALT='G'
                 else:
-                    combined_vcf_dict[value["REF_POS"]] = content_dict
+                    prev_pos_data = {
+                        k: v
+                        for k, v in vcf_dictionary.items()
+                        if v["REF_POS"] == value["REF_POS"] - 1
+                    }
+                    prev_pos_allele = list(prev_pos_data.values())[0]["REF"]
+                    content_dict["REF_POS"] = value["REF_POS"] - 1
+                    content_dict["ALT"] = prev_pos_allele
+                    content_dict["REF"] = prev_pos_allele + value["REF"]
+
+                # Handle minority variants whose SAMPLE_POS might differ as it is represented in the alignment
+                minority_del = not value["CONSENSUS"]
+                position_data = {}
+                if minority_del:
+                    # Check wether that deletion is already included in the combined dictionary.
+                    # We look for the previous sample position as the consensus is still moving forward, they have to bee same type (DEL) and same frequency (Minority) in order to be merged
+                    position_data = {
+                        k: v
+                        for k, v in combined_vcf_dict.items()
+                        if content_dict["SAMPLE_POS"][0] - 1 in v["SAMPLE_POS"]
+                        and content_dict["TYPE"] == v["TYPE"]
+                        and content_dict["CONSENSUS"] == v["CONSENSUS"]
+                    }
+                else:
+                    # Check wether that deletion is already included in the combined dictionary.
+                    # We look for the sample position which is the same for all the deletions, they have to bee same type (DEL) and same frequency (Consensus) in order to be merged
+                    # We only remove one position to sample_pos when handling consensus deletions, to be consistent with AllAlleles which does not contain Consensus deletions
+                    if 0 not in content_dict["SAMPLE_POS"]:  # else it will be negative
+                        content_dict["SAMPLE_POS"] = [value["SAMPLE_POS"][0] - 1]
+                    position_data = {
+                        k: v
+                        for k, v in combined_vcf_dict.items()
+                        if content_dict["SAMPLE_POS"][0] in v["SAMPLE_POS"]
+                        and content_dict["TYPE"] == v["TYPE"]
+                        and content_dict["CONSENSUS"] == v["CONSENSUS"]
+                    }
+
+                if position_data:
+                    if len(position_data) > 1:
+                        print("Más de un hit igual")
+                        print("Is this even possible?")
+                        break
+                    variant_found = list(position_data.keys())[0]
+                    # Check before merging that the reference position makes sense with the length of the deletion, else add deletion, don't merge
+                    if 0 in content_dict["SAMPLE_POS"]:
+                        combined_vcf_dict[variant_found]["REF"] += content_dict["ALT"]
+                        combined_vcf_dict[variant_found]["ALT"] = content_dict["ALT"]
+                    else:
+                        ref = list(position_data.values())[0]["REF"]
+                        ref_pos = list(position_data.values())[0]["REF_POS"]
+                        if content_dict["REF_POS"] == ref_pos + len(ref) - 1:
+                            new_ref = content_dict["REF"][len(content_dict["ALT"]) :]
+                            combined_vcf_dict[variant_found]["REF"] += new_ref
+                            if minority_del:
+                                combined_vcf_dict[variant_found][
+                                    "SAMPLE_POS"
+                                ] += content_dict["SAMPLE_POS"]
+                                combined_vcf_dict[variant_found]["DP"] += content_dict[
+                                    "DP"
+                                ]
+                                combined_vcf_dict[variant_found][
+                                    "TOTAL_DP"
+                                ] += content_dict["TOTAL_DP"]
+                                combined_vcf_dict[variant_found]["AF"] += content_dict[
+                                    "AF"
+                                ]
+                        else:
+                            variant = str(content_dict["REF_POS"]) + "_DEL"
+                            combined_vcf_dict[variant] = content_dict
+                else:
+                    variant = str(content_dict["REF_POS"]) + "_DEL"
+                    combined_vcf_dict[variant] = content_dict
+
             elif value["TYPE"] == "SNP":
-                if value["REF_POS"] in combined_vcf_dict:
-                    if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
-                        print("Repeated SNP!!!")
-                    else:
-                        print("Same position annotated with multiple variant types")
-                        print("value")
-                        print(value)
-                        print("combined_vcf_dict")
-                        print(combined_vcf_dict[value["REF_POS"]])
-                else:
-                    combined_vcf_dict[value["REF_POS"]] = content_dict
+                variant = str(content_dict["REF_POS"]) + "_" + content_dict["ALT"]
+                combined_vcf_dict[variant] = content_dict
+            elif value["TYPE"] == "REF":
+                continue
             else:
-                print("Different annotation type found")
+                print("Different annotation type found for:")
+                print(value)
+
     return combined_vcf_dict
 
 
