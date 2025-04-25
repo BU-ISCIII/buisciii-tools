@@ -33,24 +33,31 @@ def parse_args(args=None):
     )
     parser.add_argument(
         "-f",
-        "--frequency",
+        "--min_freq",
         type=float,
         default=0.25,
-        required=True,
-        help="Minimum Allele Frequency for a variant to be included in the .vcf file. Default 0.25.",
+        required=False,
+        help="Minimum Allele Frequency for a variant to be included in the .vcf file, when that position has a dpeth>= total_depth. Default 0.25. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
+    )
+    parser.add_argument(
+        "-t",
+        "--total_depth",
+        type=int,
+        default=10,
+        required=False,
+        help="Minimum position depth for a variant to be included in the .vcf file when Alle Frequency >= min_freq. Default 10. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
     parser.add_argument(
         "-d",
-        "--depth",
+        "--alt_depth",
         type=int,
-        default=10,
-        required=True,
-        help="Minimum depth for a variant to be included in the .vcf file. Default 10X.",
+        default=150,
+        required=False,
+        help="Minimum depth for a variant to be included in the .vcf file. Default 150X. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
+
     return parser.parse_args(args)
-
-
-def alleles_to_dict(alleles_file, frequency, depth):
+def alleles_to_dict(alleles_file):
     """Convert IRMA's allAlleles file to dictionary.
 
     Parameters
@@ -113,14 +120,9 @@ def alleles_to_dict(alleles_file, frequency, depth):
                 line += file.readline()
             line_data = line.strip().split("\t")
             position = int(line_data[1])
-            variant_af = float(line_data[5])
-            position_dp = float(line_data[4])
-            if variant_af >= frequency and position_dp >= depth:
-                entry_dict = {header[i]: line_data[i] for i in range(len(header))}
-                variant = (
-                    str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
-                )
-                alleles_dict[variant] = entry_dict
+            entry_dict = {header[i]: line_data[i] for i in range(len(header))}
+            variant = str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
+            alleles_dict[variant] = entry_dict
     return alleles_dict
 
 
@@ -632,13 +634,19 @@ def merge_allele_aligment(vcf_dictionary, alleles_dictionary):
     return af_merged_dict
 
 
-def ref_based_dict(vcf_dictionary):
+def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
     """Combine insertion and deletion pñositons in the VCF dictionary.
 
     Parameters
     ----------
     vcf_dictionary : dict
         Dictionary containing VCF information.
+    freq : float
+        Minimum allele frequency to consider a variant
+    alt_depth : int
+        Minimum allele depth to consider a variant
+    total_depth : int
+        Minimum total depth to consider a variant
 
     Returns
     -------
@@ -763,83 +771,97 @@ def ref_based_dict(vcf_dictionary):
             "QUAL": value["QUAL"],
             "TYPE": value["TYPE"],
         }
-        if value["TYPE"] == "INS":
-            if value["REF_POS"] in combined_vcf_dict:
-                if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
-                    NEW_ALT = value["ALT"][len(value["REF"]) :]
-                    combined_vcf_dict[value["REF_POS"]]["ALT"] += NEW_ALT
-                    combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(
-                        value["SAMPLE_POS"][0]
-                    )
-                    combined_vcf_dict[value["REF_POS"]]["DP"].append(value["DP"][0])
-                    combined_vcf_dict[value["REF_POS"]]["TOTAL_DP"].append(
-                        value["TOTAL_DP"][0]
-                    )
-                    combined_vcf_dict[value["REF_POS"]]["AF"].append(value["AF"][0])
-                    combined_vcf_dict[value["REF_POS"]]["QUAL"].append(value["QUAL"][0])
+
+        dp = value["DP"][0]
+        af = value["AF"][0]
+        tot_dp = value["TOTAL_DP"][0]
+
+        if (
+            dp != "NA"
+            and af != "NA"
+            and tot_dp != "NA"
+            and (
+                (int(tot_dp) >= total_depth and float(af) >= freq)
+                or int(dp) >= alt_depth
+            )
+        ) or (dp == "NA" and af == "NA"):
+            if value["TYPE"] == "INS":
+                if value["REF_POS"] in combined_vcf_dict:
+                    if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
+                        NEW_ALT = value["ALT"][len(value["REF"]) :]
+                        combined_vcf_dict[value["REF_POS"]]["ALT"] += NEW_ALT
+                        combined_vcf_dict[value["REF_POS"]]["SAMPLE_POS"].append(
+                            value["SAMPLE_POS"][0]
+                        )
+                        combined_vcf_dict[value["REF_POS"]]["DP"].append(value["DP"][0])
+                        combined_vcf_dict[value["REF_POS"]]["TOTAL_DP"].append(
+                            value["TOTAL_DP"][0]
+                        )
+                        combined_vcf_dict[value["REF_POS"]]["AF"].append(value["AF"][0])
+                        combined_vcf_dict[value["REF_POS"]]["QUAL"].append(value["QUAL"][0])
+                    else:
+                        print("Same position annotated with multiple variant types")
+                        print("value")
+                        print(value)
+                        print("combined_vcf_dict")
+                        print(combined_vcf_dict[value["REF_POS"]])
                 else:
-                    print("Same position annotated with multiple variant types")
-                    print("value")
-                    print(value)
-                    print("combined_vcf_dict")
-                    print(combined_vcf_dict[value["REF_POS"]])
-            else:
-                combined_vcf_dict[value["REF_POS"]] = content_dict
-        elif value["TYPE"] == "DEL":
-            sample_found = False
-            minority = False
-            for af in value["AF"]:
-                if float(af) < 0.5:
-                    minority = True
-            prev_sample_pos = ""
-            if minority and len(value["SAMPLE_POS"]) == 1:
-                sample_pos = value["SAMPLE_POS"][0]
-                prev_sample_pos = sample_pos - 1
-            for _, data in combined_vcf_dict.items():
-                if data["TYPE"] == "DEL":
-                    if value["SAMPLE_POS"] == data["SAMPLE_POS"]:
-                        if value["TYPE"] == data["TYPE"]:
+                    combined_vcf_dict[value["REF_POS"]] = content_dict
+            elif value["TYPE"] == "DEL":
+                sample_found = False
+                minority = False
+                for af in value["AF"]:
+                    if float(af) < 0.5:
+                        minority = True
+                prev_sample_pos = ""
+                if minority and len(value["SAMPLE_POS"]) == 1:
+                    sample_pos = value["SAMPLE_POS"][0]
+                    prev_sample_pos = sample_pos - 1
+                for _, data in combined_vcf_dict.items():
+                    if data["TYPE"] == "DEL":
+                        if value["SAMPLE_POS"] == data["SAMPLE_POS"]:
+                            if value["TYPE"] == data["TYPE"]:
+                                sample_found = data["REF_POS"]
+                                break
+                            else:
+                                print("Same position annotated with multiple variant types")
+                                print("value")
+                                print(value)
+                                print("combined_vcf_dict")
+                                print(combined_vcf_dict[value["REF_POS"]])
+                        elif minority and prev_sample_pos in data["SAMPLE_POS"]:
                             sample_found = data["REF_POS"]
                             break
-                        else:
-                            print("Same position annotated with multiple variant types")
-                            print("value")
-                            print(value)
-                            print("combined_vcf_dict")
-                            print(combined_vcf_dict[value["REF_POS"]])
-                    elif minority and prev_sample_pos in data["SAMPLE_POS"]:
-                        sample_found = data["REF_POS"]
-                        break
-            if sample_found:
-                if 0 in value["SAMPLE_POS"] and len(value["SAMPLE_POS"]) == 1:
-                    combined_vcf_dict[sample_found]["REF"] += value["ALT"]
-                    combined_vcf_dict[sample_found]["ALT"] = value["ALT"]
+                if sample_found:
+                    if 0 in value["SAMPLE_POS"] and len(value["SAMPLE_POS"]) == 1:
+                        combined_vcf_dict[sample_found]["REF"] += value["ALT"]
+                        combined_vcf_dict[sample_found]["ALT"] = value["ALT"]
+                    else:
+                        NEW_REF = value["REF"][len(value["ALT"]) :]
+                        combined_vcf_dict[sample_found]["REF"] += NEW_REF
+                        if minority:
+                            combined_vcf_dict[sample_found]["SAMPLE_POS"] += value[
+                                "SAMPLE_POS"
+                            ]
+                            combined_vcf_dict[sample_found]["DP"] += value["DP"]
+                            combined_vcf_dict[sample_found]["TOTAL_DP"] += value["TOTAL_DP"]
+                            combined_vcf_dict[sample_found]["AF"] += value["AF"]
                 else:
-                    NEW_REF = value["REF"][len(value["ALT"]) :]
-                    combined_vcf_dict[sample_found]["REF"] += NEW_REF
-                    if minority:
-                        combined_vcf_dict[sample_found]["SAMPLE_POS"] += value[
-                            "SAMPLE_POS"
-                        ]
-                        combined_vcf_dict[sample_found]["DP"] += value["DP"]
-                        combined_vcf_dict[sample_found]["TOTAL_DP"] += value["TOTAL_DP"]
-                        combined_vcf_dict[sample_found]["AF"] += value["AF"]
-            else:
-                combined_vcf_dict[value["REF_POS"]] = content_dict
-        elif value["TYPE"] == "SNP":
-            if value["REF_POS"] in combined_vcf_dict:
-                if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
-                    print("Repeated SNP!!!")
+                    combined_vcf_dict[value["REF_POS"]] = content_dict
+            elif value["TYPE"] == "SNP":
+                if value["REF_POS"] in combined_vcf_dict:
+                    if value["TYPE"] == combined_vcf_dict[value["REF_POS"]]["TYPE"]:
+                        print("Repeated SNP!!!")
+                    else:
+                        print("Same position annotated with multiple variant types")
+                        print("value")
+                        print(value)
+                        print("combined_vcf_dict")
+                        print(combined_vcf_dict[value["REF_POS"]])
                 else:
-                    print("Same position annotated with multiple variant types")
-                    print("value")
-                    print(value)
-                    print("combined_vcf_dict")
-                    print(combined_vcf_dict[value["REF_POS"]])
+                    combined_vcf_dict[value["REF_POS"]] = content_dict
             else:
-                combined_vcf_dict[value["REF_POS"]] = content_dict
-        else:
-            print("Different annotation type found")
+                print("Different annotation type found")
     return combined_vcf_dict
 
 
@@ -895,14 +917,12 @@ def create_vcf(variants_dict, out_vcf, alignment):
         Path to the output VCF file.
     alignment : str
         Path to the alignment file.
-
     Returns
     -------
     None
     """
-
     chrom = next(iter(variants_dict.values()))["CHROM"]
-    sample = alignment.replace(".align.fasta", "")
+    sample = os.path.basename(alignment).split("_ref.fasta")[0]
     vcf_header = "\n".join(get_vcf_header(chrom, sample))
     FORMAT = "GT:ALT_DP:ALT_QUAL:ALT_FREQ"
     ID = "."
@@ -911,7 +931,7 @@ def create_vcf(variants_dict, out_vcf, alignment):
     GT = "1"
     with open(out_vcf, "w") as file_out:
         file_out.write(vcf_header + "\n")
-        for key, value in variants_dict.items():
+        for _, value in variants_dict.items():
             CHROM = value["CHROM"]
             POS = value["REF_POS"]
             REF = value["REF"]
@@ -994,15 +1014,16 @@ def main(args=None):
     alignment = args.alignment
     all_alleles = args.irma_alleles
     output_vcf = args.out_vcf
-    freq = args.frequency
-    dp = args.depth
+    freq = args.min_freq
+    alt_dp = args.alt_depth
+    total_dp = args.total_depth
 
     # Start analysis
-    alleles_dict = alleles_to_dict(all_alleles, freq, dp)
+    alleles_dict = alleles_to_dict(all_alleles)
     alignment_dict = align2dict(alignment)
 
     af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
-    combined_vcf_dict = ref_based_dict(af_merged_dict)
+    combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp, total_dp)
     create_vcf(combined_vcf_dict, output_vcf, alignment)
 
 
