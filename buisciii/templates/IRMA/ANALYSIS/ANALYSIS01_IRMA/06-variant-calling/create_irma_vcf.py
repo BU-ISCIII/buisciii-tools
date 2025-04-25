@@ -224,21 +224,13 @@ def align2dict(alignment_file):
 
         condition = (
             # Insertions in the sample respect to the reference
-            (
-                ref_base == "-" and sample_base != "N"
-            )
+            (ref_base == "-" and sample_base != "N")
             # Delettions in the sample respect to the reference
-            or (
-                sample_base == "-" and ref_base != "N"
-            )
+            or (sample_base == "-" and ref_base != "N")
             # Low coverage region in the sample
-            or (
-                sample_base == "N" and ref_base != "-"
-            )
+            or (sample_base == "N" and ref_base != "-")
             # Do not consider Ns aligned with gaps.
-            or (
-                ref_base not in {"N", "-"} and sample_base not in {"N", "-"}
-            )
+            or (ref_base not in {"N", "-"} and sample_base not in {"N", "-"})
         )
 
         if condition:
