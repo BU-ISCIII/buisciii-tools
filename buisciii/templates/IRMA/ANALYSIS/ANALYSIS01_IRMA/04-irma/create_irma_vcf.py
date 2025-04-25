@@ -223,11 +223,16 @@ def align2dict(alignment_file):
                 "TYPE": "DEL"
             }
         }
+    frag_name
+        Fragment name
+        E.g.: "PB1"
     """
     sequences_dict = {}
+    frag_name = ""
     with open(alignment_file, "r") as alignment:
         for sequence in SeqIO.parse(alignment, "fasta"):
             sequences_dict[sequence.id] = str(sequence.seq)
+    frag_name = list(sequences_dict.keys())[0].split("_")[-1]
     sample_id, sample_seq = list(sequences_dict.items())[0]
     ref_id, ref_seq = list(sequences_dict.items())[1]
     sample_position = 0
@@ -318,7 +323,7 @@ def align2dict(alignment_file):
                 "TYPE": "REF",
             }
             vcf_dict[align_position] = content_dict
-    return vcf_dict
+    return vcf_dict, frag_name
 
 
 def merge_allele_aligment(vcf_dictionary, alleles_dictionary):
@@ -1028,7 +1033,25 @@ def main(args=None):
 
     # Start analysis
     alleles_dict = alleles_to_dict(all_alleles)
-    alignment_dict = align2dict(alignment)
+    alleles_frag = next(iter(alleles_dict.values()))["Reference_Name"].split("_")[1]
+
+    # Convert alignment to dictionary
+    alignment_dict, align_frag = align2dict(
+        alignment
+    )
+
+    if alleles_frag != align_frag:
+        print(
+            "\033[93mWARNING: Fragment in allAlleles file is not the same as the one in alignment file.\033[0m"
+        )
+        print("You are comparing these files:")
+        print(f"Alignment: {alignment}")
+        print(f"All alleles: {all_alleles}")
+        response = input("Are you sure you want to continue? [Y/n]: ").strip().lower()
+
+        if response not in ("y", "yes", ""):
+            print("Exiting.")
+            exit()
 
     af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
     combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp, total_dp)
