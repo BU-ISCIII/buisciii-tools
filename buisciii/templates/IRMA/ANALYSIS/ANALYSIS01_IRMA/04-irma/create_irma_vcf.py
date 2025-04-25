@@ -318,7 +318,7 @@ def align2dict(alignment_file):
     return vcf_dict
 
 
-def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
+def merge_allele_aligment(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
     """Add stats to VCF dictionary.
 
     Parameters
@@ -330,7 +330,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
 
     Returns
     -------
-    af_vcf_dict
+    af_merged_dict
         Updated dictionary with allele frequencies and other metrics.
         E.g:
         {
@@ -518,7 +518,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
         }
     """
 
-    af_vcf_dict = {}
+    af_merged_dict = {}
     for _, value in alleles_dictionary.items():
         pos = value["Position"]
         chrom = next(iter(vcf_dictionary.values()))["CHROM"]
@@ -545,15 +545,15 @@ def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
                 + "final_ins"
             )
 
-            if variant in af_vcf_dict:
-                af_vcf_dict[variant]["DP"] += content_dict["DP"]
-                af_vcf_dict[variant]["TOTAL_DP"] += content_dict["TOTAL_DP"]
-                af_vcf_dict[variant]["AF"] += content_dict["AF"]
-                af_vcf_dict[variant]["QUAL"] += content_dict["QUAL"]
-                af_vcf_dict[variant]["SAMPLE_POS"] += content_dict["SAMPLE_POS"]
-                af_vcf_dict[variant]["ALT"] += value["Allele"]
+            if variant in af_merged_dict:
+                af_merged_dict[variant]["DP"] += content_dict["DP"]
+                af_merged_dict[variant]["TOTAL_DP"] += content_dict["TOTAL_DP"]
+                af_merged_dict[variant]["AF"] += content_dict["AF"]
+                af_merged_dict[variant]["QUAL"] += content_dict["QUAL"]
+                af_merged_dict[variant]["SAMPLE_POS"] += content_dict["SAMPLE_POS"]
+                af_merged_dict[variant]["ALT"] += value["Allele"]
             else:
-                af_vcf_dict[variant] = content_dict
+                af_merged_dict[variant] = content_dict
             pass
 
         for align_pos, subdict in vcf_dictionary.items():
@@ -582,7 +582,7 @@ def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
                     + "_"
                     + content_dict["ALT"]
                 )
-                af_vcf_dict[variant] = content_dict
+                af_merged_dict[variant] = content_dict
                 pass
 
             if "SAMPLE_POS" in subdict and int(pos) in subdict["SAMPLE_POS"]:
@@ -634,19 +634,19 @@ def stats_vcf(vcf_dictionary, alleles_dictionary, last_pos, last_allele):
                     + content_dict["ALT"]
                 )
 
-                if variant in af_vcf_dict:
-                    af_vcf_dict[variant]["DP"] += DP
-                    af_vcf_dict[variant]["TOTAL_DP"] += TOTAL_DP
-                    af_vcf_dict[variant]["AF"] += AF
-                    af_vcf_dict[variant]["QUAL"] += QUAL
+                if variant in af_merged_dict:
+                    af_merged_dict[variant]["DP"] += DP
+                    af_merged_dict[variant]["TOTAL_DP"] += TOTAL_DP
+                    af_merged_dict[variant]["AF"] += AF
+                    af_merged_dict[variant]["QUAL"] += QUAL
                 else:
-                    af_vcf_dict[variant] = content_dict
+                    af_merged_dict[variant] = content_dict
                 pass
 
-    return af_vcf_dict
+    return af_merged_dict
 
 
-def combine_indels(vcf_dictionary):
+def ref_based_dict(vcf_dictionary):
     """Combine insertion and deletion pñositons in the VCF dictionary.
 
     Parameters
@@ -1011,8 +1011,8 @@ def main(args=None):
         if value["REF_POS"] == last_ref_pos:
             last_ref_allele = value["REF"]
             break
-    af_vcf_dict = stats_vcf(alignment_dict, alleles_dict, last_ref_pos, last_ref_allele)
-    combined_vcf_dict = combine_indels(af_vcf_dict)
+    af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict, last_ref_pos, last_ref_allele)
+    combined_vcf_dict = ref_based_dict(af_merged_dict)
     create_vcf(combined_vcf_dict, output_vcf, alignment)
 
 
