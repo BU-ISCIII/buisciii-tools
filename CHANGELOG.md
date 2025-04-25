@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Added enhancements
 
 - Implemented multi-attachment support in Bioinfo-doc email sending workflow [#488](https://github.com/BU-ISCIII/buisciii-tools/pull/488)
+- Added kmerfinder to snippy template [#498](https://github.com/BU-ISCIII/buisciii-tools/pull/498)
 
 #### Fixes
 
