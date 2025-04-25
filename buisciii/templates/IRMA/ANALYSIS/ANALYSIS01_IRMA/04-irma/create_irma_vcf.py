@@ -233,7 +233,36 @@ def align2dict(alignment_file):
         for sequence in SeqIO.parse(alignment, "fasta"):
             sequences_dict[sequence.id] = str(sequence.seq)
     frag_name = list(sequences_dict.keys())[0].split("_")[-1]
-    sample_id, sample_seq = list(sequences_dict.items())[0]
+    # Check the number of sequences in alignment. Only two sequences should be in the aligment
+    if len(sequences_dict) == 0:
+        print(
+            "\033[91mERROR: No sequences in alignment for \033[1;91m"
+            + sample
+            + "\033[0m"
+        )
+        print("Please review this sample")
+        sys.exit()
+    elif len(sequences_dict) == 1:
+        print(
+            "\033[91mERROR: Only one sequence in alignment for \033[1;91m"
+            + sample
+            + "\033[0m"
+        )
+        print(list(sequences_dict.keys())[0])
+        print("Please review this sample")
+        sys.exit()
+    elif len(sequences_dict) == 2:
+        pass
+    else:
+        print(
+            "\033[91mERROR: More than two sequences in alignment \033[1;91m"
+            + sample
+            + "\033[0m"
+        )
+        print(list(sequences_dict.keys()))
+        print("Please review this sample")
+        sys.exit()
+
     ref_id, ref_seq = list(sequences_dict.items())[1]
     sample_position = 0
     ref_position = 0
