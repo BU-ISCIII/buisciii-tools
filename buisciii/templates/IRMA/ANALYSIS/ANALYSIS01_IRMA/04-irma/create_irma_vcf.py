@@ -141,87 +141,10 @@ def align2dict(alignment_file):
         Dictionary containing alignment information with alignment positions as keys.
         E.g.:
         {
-            "10": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 1,
-                "SAMPLE_POS": [
-                    8,
-                    9
-                ],
-                "REF": "A",
-                "ALT": "AAA",
-                "TYPE": "INS"
-            },
-            "11": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 2,
-                "SAMPLE_POS": [
-                    11
-                ],
-                "REF": "A",
-                "ALT": "A",
-                "TYPE": "REF"
-            },
-            "7542": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7542
-                ],
-                "REF": "T",
-                "ALT": "TT",
-                "TYPE": "INS"
-            },
-            "7543": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7543
-                ],
-                "REF": "T",
-                "ALT": "TC",
-                "TYPE": "INS"
-            },
-            "7544": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 7531,
-                "SAMPLE_POS": [
-                    7544
-                ],
-                "REF": "C",
-                "ALT": "CA",
-                "TYPE": "INS"
-            },
-            "10081": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10068,
-                "SAMPLE_POS": [
-                    10079
-                ],
-                "REF": "AA",
-                "ALT": "A",
-                "TYPE": "DEL"
-            },
-            "10082": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10069,
-                "SAMPLE_POS": [
-                    10079
-                ],
-                "REF": "-C",
-                "ALT": "-",
-                "TYPE": "DEL"
-            },
-            "10083": {
-                "CHROM": "EPI_ISL_18668201",
-                "REF_POS": 10070,
-                "SAMPLE_POS": [
-                    10079
-                ],
-                "REF": "-T",
-                "ALT": "-",
-                "TYPE": "DEL"
-            }
+            "1": {'CHROM': 'NC_007372.1', 'REF_POS': 1, 'SAMPLE_POS': [0], 'REF': 'A', 'ALT': '-'}, # Deletions
+            "46": {'CHROM': 'NC_007372.1', 'REF_POS': 46, 'SAMPLE_POS': [22], 'REF': 'C', 'ALT': 'T'}, #SNP
+            "56": {'CHROM': 'NC_007372.1', 'REF_POS': 52, 'SAMPLE_POS': [29], 'REF': '-', 'ALT': 'T'}, #Insertion middle/end
+            # Insertion begining
         }
     frag_name
         Fragment name
@@ -229,6 +152,7 @@ def align2dict(alignment_file):
     """
     sequences_dict = {}
     frag_name = ""
+    sample = os.path.basename(alignment_file).split("_ref.fasta")[0]
     with open(alignment_file, "r") as alignment:
         for sequence in SeqIO.parse(alignment, "fasta"):
             sequences_dict[sequence.id] = str(sequence.seq)
@@ -263,80 +187,57 @@ def align2dict(alignment_file):
         print("Please review this sample")
         sys.exit()
 
+    _, sample_seq = list(sequences_dict.items())[0]
     ref_id, ref_seq = list(sequences_dict.items())[1]
+
+    # initialize positions, dictionaries and counters
     sample_position = 0
     ref_position = 0
     align_dict = {}
     CHROM = ref_id
     ALT = ""
     SAMPLE_POS = []
+
     for i, (sample_base, ref_base) in enumerate(zip(sample_seq, ref_seq)):
         align_position = i + 1
+        # Ns and gaps aligned together are not considered though are not included in the dict
         if sample_base != "-":
             sample_position += 1
         if ref_base != "-":
             ref_position += 1
+
+        ## Insertions in the sample respect to the reference
         if ref_base == "-" and sample_base != "N":
-            if ref_position == 0:
-                ALT += sample_base
-                SAMPLE_POS.append(sample_position)
-            else:
-                content_dict = {
-                    "CHROM": CHROM,
-                    "REF_POS": ref_position,
-                    "SAMPLE_POS": [sample_position],
-                    "REF": sample_seq[i - 1],
-                    "ALT": sample_seq[i - 1] + sample_base,
-                    "TYPE": "INS",
-                }
-                align_dict[align_position] = content_dict
-        elif ref_position == 1 and len(SAMPLE_POS) > 1:
-            content_dict = {
-                "CHROM": CHROM,
-                "REF_POS": ref_position,
-                "SAMPLE_POS": SAMPLE_POS,
-                "REF": ref_base,
-                "ALT": ALT + sample_base,
-                "TYPE": "INS",
-            }
-            align_dict[align_position] = content_dict
-        elif sample_base == "-" and ref_base != "N":
-            if sample_position == 0:
-                content_dict = {
-                    "CHROM": CHROM,
-                    "REF_POS": ref_position,
-                    "SAMPLE_POS": [sample_position],
-                    "REF": ref_base + ref_seq[i + 1],
-                    "ALT": ref_seq[i + 1],
-                    "TYPE": "DEL",
-                }
-                align_dict[align_position] = content_dict
-            else:
-                content_dict = {
-                    "CHROM": CHROM,
-                    "REF_POS": ref_position - 1,
-                    "SAMPLE_POS": [sample_position],
-                    "REF": sample_seq[i - 1] + ref_base,
-                    "ALT": sample_seq[i - 1],
-                    "TYPE": "DEL",
-                }
-                align_dict[align_position] = content_dict
-        elif (
-            ref_base != sample_base
-            and ref_base != "N"
-            and ref_base != "-"
-            and sample_base != "N"
-            and sample_base != "-"
-        ):
             content_dict = {
                 "CHROM": CHROM,
                 "REF_POS": ref_position,
                 "SAMPLE_POS": [sample_position],
                 "REF": ref_base,
                 "ALT": sample_base,
-                "TYPE": "SNP",
             }
             align_dict[align_position] = content_dict
+        # Delettions in the sample respect to the reference
+        elif sample_base == "-" and ref_base != "N":
+            content_dict = {
+                "CHROM": CHROM,
+                "REF_POS": ref_position,
+                "SAMPLE_POS": [sample_position],
+                "REF": ref_base,
+                "ALT": sample_base,
+            }
+            align_dict[align_position] = content_dict
+
+        # Low coverage region in the sample
+        elif sample_base == "N" and ref_base != "-":
+            content_dict = {
+                "CHROM": CHROM,
+                "REF_POS": ref_position,
+                "SAMPLE_POS": [sample_position],
+                "REF": ref_base,
+                "ALT": sample_base,
+            }
+            align_dict[align_position] = content_dict
+
         elif (
             ref_base != "N"
             and ref_base != "-"
@@ -349,9 +250,9 @@ def align2dict(alignment_file):
                 "SAMPLE_POS": [sample_position],
                 "REF": ref_base,
                 "ALT": sample_base,
-                "TYPE": "REF",
             }
             align_dict[align_position] = content_dict
+
     return align_dict, frag_name
 
 
