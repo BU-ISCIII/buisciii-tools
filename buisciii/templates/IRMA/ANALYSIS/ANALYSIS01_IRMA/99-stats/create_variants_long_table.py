@@ -28,7 +28,6 @@
 import os
 import numpy as np
 import re
-import csv
 import glob
 import pandas as pd
 import argparse
@@ -43,6 +42,7 @@ with open(samples_type_file, "r") as f:
         if len(parts) >= 2:
             sample, subtype = parts[0], parts[1]  # remove underscores if desired
             sample_to_subtype[sample] = subtype
+
 
 # Function to process all .vcf files found in the provided folder as argument.
 def parse_vcf(vcf_file, sample_to_subtype):
@@ -151,7 +151,7 @@ def snpsift_to_table(snpsift_file):
             else:
                 table.iloc[i, j] = str(table.iloc[i, j]).split(",")[0]
 
-    ## Amino acid substitution
+    # Amino acid substitution
     aa = []
     for index, item in table["HGVS_P"].items():
         hgvs_p = three_letter_aa_to_one(str(item))
@@ -164,7 +164,6 @@ def snpsift_to_table(snpsift_file):
 # Function to process VCF and SnpSift files and merge data into a single CSV file.
 def process_folder(folder, output_file):
     vcf_records = []
-    snpsift_records = []
 
     # Process VCF files and collect records
     for vcf_file in glob.glob(os.path.join(folder, "**", "*.vcf"), recursive=True):
