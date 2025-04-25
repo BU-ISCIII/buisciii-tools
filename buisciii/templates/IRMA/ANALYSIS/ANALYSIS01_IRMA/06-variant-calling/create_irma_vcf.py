@@ -38,7 +38,6 @@ def parse_args(args=None):
         "--min_freq",
         type=float,
         default=0.25,
-        required=False,
         help="Minimum Allele Frequency for a variant to be included in the .vcf file, when that position has a dpeth>= total_depth. Default 0.25. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
     parser.add_argument(
@@ -46,7 +45,6 @@ def parse_args(args=None):
         "--total_depth",
         type=int,
         default=10,
-        required=False,
         help="Minimum position depth for a variant to be included in the .vcf file when Alle Frequency >= min_freq. Default 10. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
     parser.add_argument(
@@ -54,7 +52,6 @@ def parse_args(args=None):
         "--alt_depth",
         type=int,
         default=150,
-        required=False,
         help="Minimum depth for a variant to be included in the .vcf file. Default 150X. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
 
