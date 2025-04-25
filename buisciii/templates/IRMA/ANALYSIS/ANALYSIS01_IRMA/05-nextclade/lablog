@@ -1,0 +1,48 @@
+#!/bin/bash
+
+mkdir logs
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+if test -f nextclade_combined.csv; then rm nextclade_combined.csv; fi
+if test -d A_H1; then rm -rf A_H1; fi
+if test -d A_H3; then rm -rf A_H3; fi
+if test -d B; then rm -rf B; fi
+
+# Auxiliary file in which a nextclade dataset is associated with a specific flu subtype.
+AUX_FILE="equivalences.txt"
+
+echo "
+  while read -r nextclade_dataset subtype_folder; do
+      folder_path=\"../04-irma/\$subtype_folder\"
+      if [ -d \"\$folder_path\" ]; then
+          if [[ \"\$subtype_folder\" == \"A_H1\" || \"\$subtype_folder\" == \"A_H3\" ]]; then
+              input_file=\"\$folder_path/A_HA.txt\"
+          elif [[ \"\$subtype_folder\" == \"B\" ]]; then
+              input_file=\"\$folder_path/B_HA.txt\"
+          else
+              echo \"Unknown folder: \$subtype_folder\"
+              continue
+          fi
+
+          if [ ! -f \"\$input_file\" ]; then
+              echo \"Error: Input file \$input_file not found in \$folder_path!\"
+              continue
+          fi
+
+          # Run nextclade for all sequences from A_HA.txt or B_HA.txt, in order to determine their clade.
+          echo \"Running nextclade for \$subtype_folder with file \$input_file...\"
+          srun --chdir ${scratch_dir} --output logs/NEXTCLADE_RUN_\$(basename \$input_file)%j.log --job-name NEXTCLADE_RUN_\$(basename \$input_file) --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/nextclade\:3.9.1--h9ee0642_0 nextclade run \"\$input_file\" -d \"\$nextclade_dataset\" -O \"./\$subtype_folder/\" -v &
+      else
+          echo \"Warning: Folder \$folder_path does not exist, skipping...\"
+      fi
+  done < "$AUX_FILE"
+" > _01_run_nextclade.sh
+
+# Combine all results into one single file.
+echo "
+  echo \"Concatenating nextclade.csv files...\"
+  first_file=\$(find . -type f -name \"nextclade.csv\" | head -n 1)
+  head -n 1 \"\$first_file\" > nextclade_combined.csv
+  find . -type f -name \"nextclade.csv\" -exec awk 'NR>1' {} >> nextclade_combined.csv \;
+  echo \"Results concatenated into nextclade_combined.csv\"
+" > _02_merge_results.sh
