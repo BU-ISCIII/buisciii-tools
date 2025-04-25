@@ -1,0 +1,152 @@
+#!/bin/bash
+
+mkdir -p logs
+mkdir -p concatenated_sequences
+mkdir -p annotated_vcfs
+mkdir -p vcf_files
+
+ln -s ../04-irma/create_irma_vcf.py .
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+# Create a file with these columns: sample_id, flu_type, fragment_id, fasta_ref
+if [ -f sample_type_ref.txt ]; then
+  rm sample_type_ref.txt
+fi
+
+# Create a file with the sample_id, the flu_type, the fragment_id and the fasta_ref
+# The flu_type (p.e A_H1_N1) is the subtype of the sample, the fragment_id (pe. HA) is the fragment of the sample and the fasta_ref (pe. NC_007370.1) is the reference of the fragment
+cat ../samples_id.txt | xargs -I % bash -c '
+    sample="%"
+    subtype=$(grep "$sample" ../04-irma/irma_stats_flu.txt | cut -f 5)
+    if [ -z "$subtype" ]; then
+      echo "No subtype found for sample $sample. Skipping..."
+    else
+      grep "$subtype" flu_type_refs.txt | cut -f 2,3 | while IFS=$'\''\t'\'' read -r fragment ref; do
+        echo -e "$sample\t$subtype\t$fragment\t$ref" >> sample_type_ref.txt
+      done
+    fi
+'
+
+# Create script to concatenate each sample fragment with its proper reference
+cat ./sample_type_ref.txt | xargs -I % echo '
+  ref=$(echo "%" | awk '\''{print $4}'\'')
+  sample_id=$(echo "%" | awk '\''{print $1}'\'')
+  header_id=$(echo "%" | awk '\''{print $1}'\'' | sed "s/-/\//g")
+  fragment=$(echo "%" | awk '\''{print $3}'\'')
+
+  # Create output directory
+  mkdir -p concatenated_sequences/${sample_id}
+
+  # Extract the target sequence from the multifasta file
+  awk -v id="${header_id}_${fragment}" "BEGIN{RS=\">\"; ORS=\"\"} \$0 ~ id {print \">\"\$0}" \
+    ../04-irma/all_samples_completo.txt > concatenated_sequences/${sample_id}/${sample_id}_${fragment}_ref.fasta
+  # Activate the conda environment
+  eval "$(micromamba shell hook --shell bash)"
+  micromamba activate refgenie_v0.12.1
+  # Get the reference path from refgenie
+  ref_path=$(refgenie seek orthomyxoviridae/fasta:${ref} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+
+  # Append the corresponding reference sequence
+  cat ${ref_path} >> concatenated_sequences/${sample_id}/${sample_id}_${fragment}_ref.fasta
+  echo -e "-----finished $sample_id, fragment $fragment-----"
+' > _00_concat_seq4align.sh
+
+# Create script to run the concatenation. Run all in one process, as 1000s of processes could be run at once otherwise with potential overload issues
+echo "srun --partition short_idx --chdir ${scratch_dir} --mem 3500M --output logs/CONCATENATE_SEQ-%j.log bash _00_concat_seq4align.sh &" > _00_run_concat_seq4align.sh
+
+# Create script to run the alignment. _01_align.sh will be created and then run by the _01_run_align.sh script, to make sure that _00_concat_seq4align.sh is finished before creating _01_align.sh
+echo "find concatenated_sequences -name '*.fasta' | xargs -I {} echo \"singularity exec -B ${scratch_dir} /data/ucct/bi/pipelines/singularity-images/mafft:7.525--h031d066_1 mafft --anysymbol --auto {}  > \\\$(dirname {})/\\\$(basename {}).aligned.fasta\" > _01_align.sh" > _01_run_align.sh
+echo "srun --partition short_idx --chdir ${scratch_dir} --mem 3500M --output logs/ALIGN-%j.log bash _01_align.sh &" >> _01_run_align.sh
+
+# Create script to generate vcf files
+cat ./sample_type_ref.txt | xargs -I {} echo "
+  sample_id=\$(echo '{}' | awk '{print \$1}')
+  fragment=\$(echo '{}' | awk '{print \$3}')
+  input_file=\$(find ../04-irma/\${sample_id}/tables/ -type f | grep -E \"\${fragment}(_[HN][0-9])?-allAlleles\.txt$\")
+  mkdir -p vcf_files/\${sample_id}
+  echo -e \"-----Starting \$sample_id \${fragment}-----\"
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate biopython_v1.84
+  if [ -z \"\$input_file\" ]; then
+    echo \"No allAlleles file found in IRMA results for \${sample_id} and \${fragment}. Skipping...\"
+  else
+    python create_irma_vcf.py \
+      -a concatenated_sequences/\${sample_id}/\${sample_id}_\${fragment}_ref.fasta.aligned.fasta \
+      -i "\$input_file" \
+      -o vcf_files/\${sample_id}/\${sample_id}_\${fragment}.vcf \
+      -f 0.25 -d 10
+  fi
+  echo -e \"-----Finished \$sample_id and \${fragment}-----\"
+" > _02_create_vcf.sh
+
+echo "srun --partition short_idx --chdir ${scratch_dir} --time 01:30:00 --mem 3500M --output logs/VCF-%j.log bash _02_create_vcf.sh &" > _02_run_create_vcf.sh
+
+# Create script to annotate vcf files via snpEff
+cat ./sample_type_ref.txt | xargs -I {} echo "
+  sample_id=\$(echo '{}' | awk '{print \$1}')
+  ref=\$(echo '{}' | awk '{print \$4}')
+  fragment=\$(echo '{}' | awk '{print \$3}')
+  mkdir -p annotated_vcfs/\${sample_id}
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate refgenie_v0.12.1
+  dataDir=$(refgenie seek snpeff/flu_surveillance_db -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+  echo -e \"-----Annotating \$sample_id \${fragment} vcf file-----\"
+  singularity exec -B /data/ucct/bi /data/ucct/bi/pipelines/singularity-images/snpeff:5.2--hdfd78af_1.1 snpEff \
+  -v \
+  -dataDir "\$dataDir" \
+  -c genome.config \
+  "\$ref" \
+  vcf_files/\${sample_id}/\${sample_id}_\${fragment}.vcf > annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpeff.vcf
+  echo -e \"-----Finished annotating \$sample_id \${fragment} vcf file-----\"
+" > _03_snpeff.sh
+
+echo "srun --partition short_idx --chdir ${scratch_dir} --time 01:30:00 --mem 3500M --output logs/SNPEFF-%j.log bash _03_snpeff.sh &" >> _03_run_snpeff.sh
+
+# Create script to filter annotation results via snpSift
+cat ./sample_type_ref.txt | xargs -I {} echo "
+  sample_id=\$(echo '{}' | awk '{print \$1}')
+  ref=\$(echo '{}' | awk '{print \$4}')
+  fragment=\$(echo '{}' | awk '{print \$3}')
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate refgenie_v0.12.1
+  dataDir=$(refgenie seek snpeff/flu_surveillance_db -c /data/ucct/bi/references/refgenie/genome_config.yaml)
+  echo -e \"-----Extracting relevant fields for \$sample_id \${fragment} vcf file-----\"
+  singularity exec -B /data/ucct/bi /data/ucct/bi/pipelines/singularity-images/snpsift\:5.2--hdfd78af_0 SnpSift \
+  extractFields \
+  -s "," \
+  -e "." \
+  annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpeff.vcf \
+  CHROM \
+  POS \
+  REF \
+  ALT \
+  \"ANN[*].GENE\" \
+  \"ANN[*].GENEID\" \
+  \"ANN[*].IMPACT\" \
+  \"ANN[*].EFFECT\" \
+  \"ANN[*].FEATURE\" \
+  \"ANN[*].FEATUREID\" \
+  \"ANN[*].BIOTYPE\" \
+  \"ANN[*].RANK\" \
+  \"ANN[*].HGVS_C\" \
+  \"ANN[*].HGVS_P\" \
+  \"ANN[*].CDNA_POS\" \
+  \"ANN[*].CDNA_LEN\" \
+  \"ANN[*].CDS_POS\" \
+  \"ANN[*].CDS_LEN\" \
+  \"ANN[*].AA_POS\" \
+  \"ANN[*].AA_LEN\" \
+  \"ANN[*].DISTANCE\" \
+  \"EFF[*].EFFECT\" \
+  \"EFF[*].FUNCLASS\" \
+  \"EFF[*].CODON\" \
+  \"EFF[*].AA\" \
+  \"EFF[*].AA_LEN\" > annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpsift.txt
+  echo -e \"-----Finished extracting fields for \$sample_id \${fragment} vcf file-----\"
+" > _04_snpsift.sh
+
+echo "srun --partition short_idx --chdir ${scratch_dir} --time 01:30:00 --mem 3500M --output logs/SNPSIFT-%j.log bash _04_snpsift.sh &" > _04_run_snpsift.sh
