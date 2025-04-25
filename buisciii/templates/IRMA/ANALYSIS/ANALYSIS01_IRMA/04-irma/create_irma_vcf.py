@@ -137,7 +137,7 @@ def align2dict(alignment_file):
 
     Returns
     -------
-    vcf_dict
+    align_dict
         Dictionary containing alignment information with alignment positions as keys.
         E.g.:
         {
@@ -237,7 +237,7 @@ def align2dict(alignment_file):
     ref_id, ref_seq = list(sequences_dict.items())[1]
     sample_position = 0
     ref_position = 0
-    vcf_dict = {}
+    align_dict = {}
     CHROM = ref_id
     ALT = ""
     SAMPLE_POS = []
@@ -260,7 +260,7 @@ def align2dict(alignment_file):
                     "ALT": sample_seq[i - 1] + sample_base,
                     "TYPE": "INS",
                 }
-                vcf_dict[align_position] = content_dict
+                align_dict[align_position] = content_dict
         elif ref_position == 1 and len(SAMPLE_POS) > 1:
             content_dict = {
                 "CHROM": CHROM,
@@ -270,7 +270,7 @@ def align2dict(alignment_file):
                 "ALT": ALT + sample_base,
                 "TYPE": "INS",
             }
-            vcf_dict[align_position] = content_dict
+            align_dict[align_position] = content_dict
         elif sample_base == "-" and ref_base != "N":
             if sample_position == 0:
                 content_dict = {
@@ -281,7 +281,7 @@ def align2dict(alignment_file):
                     "ALT": ref_seq[i + 1],
                     "TYPE": "DEL",
                 }
-                vcf_dict[align_position] = content_dict
+                align_dict[align_position] = content_dict
             else:
                 content_dict = {
                     "CHROM": CHROM,
@@ -291,7 +291,7 @@ def align2dict(alignment_file):
                     "ALT": sample_seq[i - 1],
                     "TYPE": "DEL",
                 }
-                vcf_dict[align_position] = content_dict
+                align_dict[align_position] = content_dict
         elif (
             ref_base != sample_base
             and ref_base != "N"
@@ -307,7 +307,7 @@ def align2dict(alignment_file):
                 "ALT": sample_base,
                 "TYPE": "SNP",
             }
-            vcf_dict[align_position] = content_dict
+            align_dict[align_position] = content_dict
         elif (
             ref_base != "N"
             and ref_base != "-"
@@ -322,8 +322,8 @@ def align2dict(alignment_file):
                 "ALT": sample_base,
                 "TYPE": "REF",
             }
-            vcf_dict[align_position] = content_dict
-    return vcf_dict, frag_name
+            align_dict[align_position] = content_dict
+    return align_dict, frag_name
 
 
 def merge_allele_aligment(vcf_dictionary, alleles_dictionary):
