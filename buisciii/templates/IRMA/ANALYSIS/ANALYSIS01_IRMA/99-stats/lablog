@@ -92,7 +92,7 @@ echo "
 
     declare -A variants
     variants_consensus=()
-    vcf_path=\"${scratch_dir}/../06-variant-calling/vcf_files_prueba_vmlopez/\${in}/\${in}_*.vcf\"
+    vcf_path=\"${scratch_dir}/../06-variant-calling/vcf_files/\${in}/\${in}_*.vcf\"
 
     if ls \$vcf_path 1> /dev/null 2>&1; then
       for file in \$vcf_path; do
