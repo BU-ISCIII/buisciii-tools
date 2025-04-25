@@ -57,6 +57,7 @@ def parse_args(args=None):
 
     return parser.parse_args(args)
 
+
 def calc_mean(values, cast=float, precision=2):
     """Calculate lists means
 
@@ -64,7 +65,7 @@ def calc_mean(values, cast=float, precision=2):
     ----------
     values : list
         List of values to calculate mean.
-    cast : 
+    cast :
         Type of number (float, int)
     precusion: int
         Number of decimals in the results.
@@ -84,12 +85,14 @@ def calc_mean(values, cast=float, precision=2):
         number = str(round(mean_val, precision))
     return number
 
+
 def exit_with_error(msg, sample, details=None):
     print(f"\033[91mERROR: {msg} for \033[1;91m{sample}\033[0m")
     if details:
         print(details)
     print("Please review this sample")
     sys.exit()
+
 
 def alleles_to_dict(alleles_file):
     """Convert IRMA's allAlleles file to dictionary.
@@ -194,9 +197,13 @@ def align2dict(alignment_file):
     if len(sequences_dict) == 0:
         exit_with_error("No sequences in alignment", sample)
     elif len(sequences_dict) == 1:
-        exit_with_error("Only one sequence in alignment", sample, list(sequences_dict.keys())[0])
+        exit_with_error(
+            "Only one sequence in alignment", sample, list(sequences_dict.keys())[0]
+        )
     elif len(sequences_dict) > 2:
-        exit_with_error("More than two sequences in alignment", sample, list(sequences_dict.keys()))
+        exit_with_error(
+            "More than two sequences in alignment", sample, list(sequences_dict.keys())
+        )
 
     _, sample_seq = list(sequences_dict.items())[0]
     ref_id, ref_seq = list(sequences_dict.items())[1]
@@ -218,10 +225,18 @@ def align2dict(alignment_file):
             ref_position += 1
 
         condition = (
-            (ref_base == "-" and sample_base != "N") ## Insertions in the sample respect to the reference
-            or (sample_base == "-" and ref_base != "N") # Delettions in the sample respect to the reference
-            or (sample_base == "N" and ref_base != "-") # Low coverage region in the sample
-            or (ref_base not in {"N", "-"} and sample_base not in {"N", "-"}) # Do not consider Ns aligned with gaps.
+            (
+                ref_base == "-" and sample_base != "N"
+            )  ## Insertions in the sample respect to the reference
+            or (
+                sample_base == "-" and ref_base != "N"
+            )  # Delettions in the sample respect to the reference
+            or (
+                sample_base == "N" and ref_base != "-"
+            )  # Low coverage region in the sample
+            or (
+                ref_base not in {"N", "-"} and sample_base not in {"N", "-"}
+            )  # Do not consider Ns aligned with gaps.
         )
 
         if condition:
@@ -361,23 +376,28 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
                 "DP": ["NA"],
                 "TOTAL_DP": ["NA"],
                 "AF": ["NA"],
-                "QUAL": ["NA"]
+                "QUAL": ["NA"],
             }
         else:
             # For non deletion positions MUST exist in the AllAlleles file, find all the data available for that sample's position
             sample_positions = set(pos_values["SAMPLE_POS"])
             matching = (
-                v for v in alleles_dict.values()
+                v
+                for v in alleles_dict.values()
                 if int(v["Position"]) in sample_positions
             )
             for val in matching:
                 # Define the type of allele
                 allele_type = (
-                    "REF" if val["Allele"] == pos_values["REF"] else
-                    "INS" if pos_values["REF"] == "-" else
-                    "DEL" if val["Allele"] == "-" else
-                    "low_cov" if pos_values["ALT"] == "N" else
-                    "SNP"
+                    "REF"
+                    if val["Allele"] == pos_values["REF"]
+                    else "INS"
+                    if pos_values["REF"] == "-"
+                    else "DEL"
+                    if val["Allele"] == "-"
+                    else "low_cov"
+                    if pos_values["ALT"] == "N"
+                    else "SNP"
                 )
 
                 # create the data for those positons
@@ -1136,9 +1156,7 @@ def main(args=None):
     alleles_frag = next(iter(alleles_dict.values()))["Reference_Name"].split("_")[1]
 
     # Convert alignment to dictionary
-    alignment_dict, align_frag = align2dict(
-        alignment
-    )
+    alignment_dict, align_frag = align2dict(alignment)
 
     if alleles_frag != align_frag:
         print(
@@ -1153,9 +1171,7 @@ def main(args=None):
             print("Exiting.")
             exit()
     # Merge info from allAlleles and alignment
-    af_merged_dict = merge_allele_aligment(
-        alignment_dict, alleles_dict
-    )
+    af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
 
     # Convert merged info into reference based position format prior to vcf, merge INDELS and filter based on thresholds
     combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp, total_dp)
