@@ -1,5 +1,5 @@
 # =============================================================
-# INTRODUCTION 
+# INTRODUCTION
 
 # This script is conceived to create a table of all the reported variants for a set of flu samples.
 # It takes into consideration the flu subtype and the segment of its genome when displaying the variants detected.
@@ -47,7 +47,7 @@ with open(samples_type_file, "r") as f:
 # Function to process all .vcf files found in the provided folder as argument.
 def parse_vcf(vcf_file, sample_to_subtype):
     records = []
-    sample_name = re.sub(r'-(H\d+)-', '-', os.path.basename(os.path.dirname(vcf_file)))
+    sample_name = re.sub(r"-(H\d+)-", "-", os.path.basename(os.path.dirname(vcf_file)))
     flu_subtype = sample_to_subtype.get(sample_name, "UNKNOWN")
 
     with open(vcf_file, "r") as f:
@@ -55,10 +55,14 @@ def parse_vcf(vcf_file, sample_to_subtype):
             if line.startswith("#"):
                 continue
             fields = line.strip().split("\t")
-            chrom, pos, _, ref, alt, _, filter_, info, format_, sample_data = fields[:10]
+            chrom, pos, _, ref, alt, _, filter_, info, format_, sample_data = fields[
+                :10
+            ]
 
             # Extract DP from INFO field
-            dp = next((x.split("=")[1] for x in info.split(";") if x.startswith("DP=")), "0")
+            dp = next(
+                (x.split("=")[1] for x in info.split(";") if x.startswith("DP=")), "0"
+            )
 
             # Extract ALT_DP and AF from sample data
             sample_fields = sample_data.split(":")
@@ -71,9 +75,24 @@ def parse_vcf(vcf_file, sample_to_subtype):
                 ref_dp = 0
             af = sample_fields[-1] if sample_fields else "0"
 
-            records.append([sample_name, flu_subtype, chrom, pos, ref, alt, filter_, dp, ref_dp, alt_dp, af])
+            records.append(
+                [
+                    sample_name,
+                    flu_subtype,
+                    chrom,
+                    pos,
+                    ref,
+                    alt,
+                    filter_,
+                    dp,
+                    ref_dp,
+                    alt_dp,
+                    af,
+                ]
+            )
 
     return records
+
 
 # Function to report the aminoacids from the HGVS_P column.
 def three_letter_aa_to_one(hgvs_three):
@@ -113,6 +132,7 @@ def three_letter_aa_to_one(hgvs_three):
 
     return hgvs_one
 
+
 # Function to read info from the snpsift output file and return the revelant data into a table.
 def snpsift_to_table(snpsift_file):
     table = pd.read_table(snpsift_file, sep="\t", header="infer")
@@ -120,7 +140,9 @@ def snpsift_to_table(snpsift_file):
     old_colnames = list(table.columns)
     new_colnames = [x.replace("ANN[*].", "") for x in old_colnames]
     table.rename(columns=dict(zip(old_colnames, new_colnames)), inplace=True)
-    table = table.loc[:, ["CHROM", "POS", "REF", "ALT", "GENE", "EFFECT", "HGVS_C", "HGVS_P"]]
+    table = table.loc[
+        :, ["CHROM", "POS", "REF", "ALT", "GENE", "EFFECT", "HGVS_C", "HGVS_P"]
+    ]
 
     for i in range(len(table)):
         for j in range(3, 8):
@@ -137,6 +159,7 @@ def snpsift_to_table(snpsift_file):
     table["HGVS_P_1LETTER"] = pd.Series(aa)
 
     return table
+
 
 # Function to process VCF and SnpSift files and merge data into a single CSV file.
 def process_folder(folder, output_file):
@@ -155,19 +178,42 @@ def process_folder(folder, output_file):
         snpsift_tables.append(table)
 
     # Merge VCF data into a DataFrame
-    vcf_df = pd.DataFrame(vcf_records, columns=["SAMPLE", "FLU_SUBTYPE", "CHROM", "POS", "REF", "ALT", "FILTER", "DP", "REF_DP", "ALT_DP", "AF"])
+    vcf_df = pd.DataFrame(
+        vcf_records,
+        columns=[
+            "SAMPLE",
+            "FLU_SUBTYPE",
+            "CHROM",
+            "POS",
+            "REF",
+            "ALT",
+            "FILTER",
+            "DP",
+            "REF_DP",
+            "ALT_DP",
+            "AF",
+        ],
+    )
     vcf_df["POS"] = vcf_df["POS"].astype("int64")
 
     # Add clade information
-    clade_path = os.path.abspath(os.path.join("..", "05-nextclade", "nextclade_combined.csv"))
+    clade_path = os.path.abspath(
+        os.path.join("..", "05-nextclade", "nextclade_combined.csv")
+    )
 
     if os.path.exists(clade_path):
         clade_df = pd.read_csv(clade_path, sep=";", header=0)
-        clade_df["SAMPLE_ID"] = clade_df.iloc[:,1].str.replace("_HA", "", regex=False).str.replace("/", "-")
-        clade_dict = dict(zip(clade_df["SAMPLE_ID"], clade_df.iloc[:,2]))
+        clade_df["SAMPLE_ID"] = (
+            clade_df.iloc[:, 1]
+            .str.replace("_HA", "", regex=False)
+            .str.replace("/", "-")
+        )
+        clade_dict = dict(zip(clade_df["SAMPLE_ID"], clade_df.iloc[:, 2]))
         vcf_df["CLADE"] = vcf_df["SAMPLE"].map(clade_dict).fillna("NA")
     else:
-        print(f"Warning: Clade file not found at {clade_path}. 'CLADE' column will be NA.")
+        print(
+            f"Warning: Clade file not found at {clade_path}. 'CLADE' column will be NA."
+        )
         vcf_df["CLADE"] = "NA"
 
     # Combine all SnpSift tables into one DataFrame
@@ -175,12 +221,17 @@ def process_folder(folder, output_file):
     snpsift_df["POS"] = snpsift_df["POS"].astype("int64")
 
     # Merge VCF and SnpSift data on CHROM and POS
-    merged_df = pd.merge(vcf_df, snpsift_df, on=["CHROM", "POS", "REF", "ALT"], how="left").drop_duplicates()
+    merged_df = pd.merge(
+        vcf_df, snpsift_df, on=["CHROM", "POS", "REF", "ALT"], how="left"
+    ).drop_duplicates()
 
-   # Add CALLER column
+    # Add CALLER column
     merged_df["CALLER"] = "IRMA"
 
-    columns = [col for col in merged_df.columns if col not in ["CALLER", "CLADE"]] + ["CALLER", "CLADE"]
+    columns = [col for col in merged_df.columns if col not in ["CALLER", "CLADE"]] + [
+        "CALLER",
+        "CLADE",
+    ]
     merged_df = merged_df[columns]
 
     # Save the merged table to a CSV file
@@ -188,10 +239,19 @@ def process_folder(folder, output_file):
 
     print(f"CSV file created: {output_file}")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process VCF and SnpSift files from a folder and merge them into one CSV.")
-    parser.add_argument("folder", help="Path to the folder containing VCF and SnpSift .txt files.")
-    parser.add_argument("--output", default="variants_long_table.csv", help="Output CSV file for merged data.")
+    parser = argparse.ArgumentParser(
+        description="Process VCF and SnpSift files from a folder and merge them into one CSV."
+    )
+    parser.add_argument(
+        "folder", help="Path to the folder containing VCF and SnpSift .txt files."
+    )
+    parser.add_argument(
+        "--output",
+        default="variants_long_table.csv",
+        help="Output CSV file for merged data.",
+    )
     args = parser.parse_args()
 
     process_folder(args.folder, args.output)
