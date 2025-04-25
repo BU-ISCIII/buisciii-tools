@@ -234,11 +234,11 @@ def align2dict(alignment_file):
             # Low coverage region in the sample
             or (
                 sample_base == "N" and ref_base != "-"
-            ) 
+            )
             # Do not consider Ns aligned with gaps.
             or (
                 ref_base not in {"N", "-"} and sample_base not in {"N", "-"}
-            )  
+            )
         )
 
         if condition:
@@ -398,8 +398,8 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
                         if pos_values["REF"] == "-"
                         else (
                             "DEL"
-                        if val["Allele"] == "-"
-                        else "low_cov" if pos_values["ALT"] == "N" else "SNP"
+                            if val["Allele"] == "-"
+                            else "low_cov" if pos_values["ALT"] == "N" else "SNP"
                         )
                     )
                 )
