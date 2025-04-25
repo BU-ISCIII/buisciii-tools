@@ -1008,6 +1008,24 @@ def main(args=None):
     alt_dp = args.alt_depth
     total_dp = args.total_depth
 
+    if not os.path.exists(alignment):
+        print(
+            "\033[91mERROR: Alignment file does not exist: \033[1;91m"
+            + alignment
+            + "\033[0m"
+        )
+        print("Please review this sample")
+        sys.exit()
+
+    if not os.path.exists(all_alleles):
+        print(
+            "\033[91mERROR: Alleles file does not exist: \033[1;91m"
+            + all_alleles
+            + "\033[0m"
+        )
+        print("Please review this sample")
+        sys.exit()
+
     # Start analysis
     alleles_dict = alleles_to_dict(all_alleles)
     alignment_dict = align2dict(alignment)
