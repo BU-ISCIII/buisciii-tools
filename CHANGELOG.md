@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added `sort -u` to wgs_metrics_all.txt file generation command in 99-stats lablog (snippy template) [#494](https://github.com/BU-ISCIII/buisciii-tools/pull/494)
 - Avoided error messages when running 99-stats lablog several times (snippy template) [#495](https://github.com/BU-ISCIII/buisciii-tools/pull/495)
 - Added Nextclade, variant calling and stats extraction scripts into the IRMA template [#499](https://github.com/BU-ISCIII/buisciii-tools/pull/499).
+- Added flu_type to summary_stats (IRMA template) [#501](https://github.com/BU-ISCIII/buisciii-tools/pull/501).
 
 ### Modules
 
