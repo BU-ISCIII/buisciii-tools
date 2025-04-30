@@ -4,28 +4,6 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.9dev] - 2025-MM-DD : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.8dev
-
-### Credits
-
-- [Jaime Ozáez](https://github.com/jaimeozaez)
-
-### Template fixes and updates
-
-- Modified artic bed version in lablog_viralrecon for SARS-CoV-2 analysis [#505](https://github.com/BU-ISCIII/buisciii-tools/pull/505)
-
-### Modules
-
-#### Added enhancements
-
-#### Fixes
-
-#### Changed
-
-#### Removed
-
-### Requirements
-
 ## [2.2.8] - 2025-04-29 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.8
 
 ### Credits
@@ -47,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added Nextclade, variant calling and stats extraction scripts into the IRMA template [#499](https://github.com/BU-ISCIII/buisciii-tools/pull/499).
 - Added flu_type to summary_stats (IRMA template) [#501](https://github.com/BU-ISCIII/buisciii-tools/pull/501).
 - Fixed errors in IRMA template and fixed errors in irma2vcf script [#500](https://github.com/BU-ISCIII/buisciii-tools/pull/500)
+- Modified artic bed version in lablog_viralrecon for SARS-CoV-2 analysis [#505](https://github.com/BU-ISCIII/buisciii-tools/pull/505)
 
 ### Modules
 
