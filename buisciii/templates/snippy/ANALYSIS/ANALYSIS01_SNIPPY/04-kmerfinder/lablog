@@ -1,0 +1,39 @@
+# module load singularity
+
+# This scritp should only be executed in case no assembly pipeline has been previously performed
+
+mkdir -p logs
+scratch_dir=$(echo $(pwd) | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
+
+# Running kmerfinder
+cat ../samples_id.txt | xargs -I @@ echo "\
+mkdir @@
+srun --chdir ${scratch_dir} \\
+     --mem 10G \\
+     --time 1:00:00 \\
+     --job-name KMERFINDER.@@ \\
+     --output logs/KMERFINDER.@@.%j.log \\
+     --partition short_idx \\
+     --cpus-per-task 5 \\
+     singularity exec -B ${scratch_dir}/../../../ -B /data/ucct/bi/references/kmerfinder/latest/bacteria/ \\
+     /data/ucct/bi/pipelines/singularity-images/depot.galaxyproject.org-singularity-kmerfinder-3.0.2--hdfd78af_0.img \\
+     kmerfinder.py \\
+         --infile ${scratch_dir}/../02-preprocessing/@@/@@_R1_filtered.fastq.gz \\
+                  ${scratch_dir}/../02-preprocessing/@@/@@_R2_filtered.fastq.gz \\
+         --output_folder ./@@ \\
+         --db_path \"/data/ucct/bi/references/kmerfinder/latest/bacteria/bacteria.ATG\" \\
+         --tax \"/data/ucct/bi/references/kmerfinder/latest/bacteria/bacteria.tax\" \\
+         --extended_output \\
+&" > _01_kmerfinder.sh
+
+# Creating summary report in csv format gathering all sample results
+echo "mkdir reports" > _02_kmerfinder_summary.sh
+
+cat ../samples_id.txt | xargs -I @@ echo "\
+mv @@/data.json @@/@@_data.json
+mv @@/results.txt @@/@@_results.txt
+ln -s ../@@/@@_results.txt reports/" >> _02_kmerfinder_summary.sh
+
+echo "eval \"\$(micromamba shell hook --shell bash)\"; micromamba activate outbreakinfo" >> _02_kmerfinder_summary.sh
+echo "python3 /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.4.0/2_4_0/bin/kmerfinder_summary.py --path reports/ --output_bn kmerfinder.bn --output_csv kmerfinder_summary.csv" >> _02_kmerfinder_summary.sh
+echo "rm -rf reports" >> _02_kmerfinder_summary.sh

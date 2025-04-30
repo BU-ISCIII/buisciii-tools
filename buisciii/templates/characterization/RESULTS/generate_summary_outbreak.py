@@ -795,37 +795,28 @@ def add_mlva_results(ws, mlva_headers, mlva_dict):
 
 
 def main():
-    """
-    Main function to process genomic data and populate an Excel report.
-
-    Reads multiple data sources related to sample sequencing, including MLST,
-    KmerFinder, mapping statistics, variant analysis, QUAST assembly stats,
-    virulence factors, resistance genes, AMRFinder results, and plasmid data.
-    Fills an Excel template with this information.
-    """
-
-    # Read sample information
     samples = read_samples(samples_file)
 
-    # Read genomic analysis results
-    mlst_dict, mlst_header = read_ariba_mlst(tsv_file)
-    kmerfinder_dict = read_kmerfinder(csv_file)
-    mapping_dict = read_mapping_stats(mapping_file)
-    wgs_metrics_dict = read_wgs_metrics(wgs_metrics_file)
-    variants_dict = read_variants_stats(variants_stats_file)
-    quast_dict = read_quast_report(quast_report_file)
-    quast_per_reference_dict = read_quast_per_reference(quast_dir)
-    virulence_dict = read_virulence_stats(virulence_file)
-    resistance_dic = read_card_stats(card_file)
-    amrfinder_dict = read_amrfinder_results(amrfinder_dir)
-    amr_resistance_data = read_amrfinderplus_resistance(amrfinder_dir)
-    plasmid_data = read_plasmid_data(plasmid_file)
-    mlva_headers, mlva_dict = read_mlva_results(mlva_file)
+    mlst_dict, mlst_header = read_ariba_mlst(tsv_file) if tsv_file else ({}, "")
+    kmerfinder_dict = read_kmerfinder(csv_file) if csv_file else {}
+    mapping_dict = read_mapping_stats(mapping_file) if mapping_file else {}
+    wgs_metrics_dict = read_wgs_metrics(wgs_metrics_file) if wgs_metrics_file else {}
+    variants_dict = (
+        read_variants_stats(variants_stats_file) if variants_stats_file else {}
+    )
+    quast_dict = read_quast_report(quast_report_file) if quast_report_file else {}
+    quast_per_reference_dict = read_quast_per_reference(quast_dir) if quast_dir else {}
+    virulence_dict = read_virulence_stats(virulence_file) if virulence_file else {}
+    resistance_dic = read_card_stats(card_file) if card_file else {}
+    amrfinder_dict = read_amrfinder_results(amrfinder_dir) if amrfinder_dir else {}
+    amr_resistance_data = (
+        read_amrfinderplus_resistance(amrfinder_dir) if amrfinder_dir else {}
+    )
+    plasmid_data = read_plasmid_data(plasmid_file) if plasmid_file else pd.DataFrame()
+    mlva_headers, mlva_dict = read_mlva_results(mlva_file) if mlva_file else ([], {})
 
-    # Load the Excel template
     wb = load_workbook(xlsx_template)
 
-    # Get worksheet references
     ws_summary = wb["summary"]
     ws_plasmids = wb["plasmids"]
     ws_virulence = wb["virulence"]
@@ -840,16 +831,16 @@ def main():
     add_variants_stats(ws_summary, samples, variants_dict)
     add_quast_stats(ws_summary, samples, quast_dict)
     add_quast_per_reference(ws_summary, samples, quast_per_reference_dict)
-
     add_virulence_stats(ws_virulence, samples, virulence_dict)
-
     add_resistance_stats(ws_resistance, samples, resistance_dic)
     add_amrfinder_results(ws_resistance, samples, amrfinder_dict)
-
     add_amrfinderplus_resistance(ws_amrfinder_resistance, samples, amr_resistance_data)
 
-    add_plasmid_data(ws_plasmids, plasmid_data)
-    add_mlva_results(ws_mlva, mlva_headers, mlva_dict)
+    if not plasmid_data.empty:
+        add_plasmid_data(ws_plasmids, plasmid_data)
+
+    if mlva_headers and mlva_dict:
+        add_mlva_results(ws_mlva, mlva_headers, mlva_dict)
 
     output_xlsx = "summary_outbreak_filled.xlsx"
     wb.save(output_xlsx)

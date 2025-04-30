@@ -1,0 +1,57 @@
+# micromamba activate snippy_v4.6.0
+
+## We are using micrommaba because snippy perl script is manually modified.
+## Now mincov is only used for low coverage masking, and freebayes is run with min-coverage 0, same as bcftools filter. This way all variants are called, but are then filtered in the masking.
+# This analysis prevents from calling REF in positions of samples that have limit depth, so freebayes does not call the variant due to depth threshold, but it's not mask either because of different depth calculation between freebayes and samtools.
+# SNIPPY ISSUE: https://github.com/tseemann/snippy/issues/268#issuecomment-2804520905
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
+
+mkdir logs
+
+# BLOCK 1: CREATION OF INPUT.TAB AND COMMANDS.OUT
+
+## When creating input.tab, run the following line if you want to use .fastq.gz files for your analysis. If not, comment it.
+cat ../samples_id.txt | while read in; do echo -e "${in}\t${scratch_dir}/../02-preprocessing/${in}/${in}_R1_filtered.fastq.gz\t${scratch_dir}/../02-preprocessing/${in}/${in}_R2_filtered.fastq.gz"; done >> input.tab
+
+## If you are going to include .fasta files in the analysis, run the following line. Run the previous line as well if you also have .fastq.gz files for your analysis.
+## Bear in mind this line considers the .fasta files are inside a certain folder from REFERENCES! Change this line accordingly.
+## ls ../../../REFERENCES/*/*.fasta | cut -d '/' -f6 | sed 's/.fasta//g' | while read in; do paste <(echo ${in}) <(echo ${scratch_dir}/../../../REFERENCES/*/${in}.fasta); done >> input.tab
+
+ls ../../../REFERENCES/*.fna | xargs -I %%  snippy-multi ${scratch_dir}/input.tab --mincov 10 --mapqual 10 --basequal 5 --minqual 30 --ref %% --cpus 5 > commands.out
+
+# BLOCK 2: CREATION OF _00_snippy.sh
+
+head -n -1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" | awk '{print $0" &"}' > _00_snippy.sh
+
+# BLOCK 3: CREATION OF _01_snippy_core.sh
+
+## A) BY DEFAULT: snippy-core will run without masking any positions.
+tail -n 1 commands.out | sed -e "s@^@srun --chdir ${scratch_dir} --output logs/SNIPPY_CORE.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 @" | awk '{print $0" &"}' > _01_snippy_core.sh
+
+## B) If you want to mask complex variants, uncomment these lines:
+#echo "grep \"complex\" ./*/snps.vcf | cut -f 1,2,4,5 | cut -d \":\" -f 2 | sort -u | awk '{pos1=\$2; len_ref=length(\$3); printf \"%s\t%s\t%s\n\", \$1, pos1-1, pos1+len_ref+1}' | grep -v \"^#\" > mask_complex_variants.bed" > _01_snippy_core.sh
+## ls ${scratch_dir}/../../../REFERENCES/*.fna | xargs -I %% echo "snippy-core --debug --mask ./mask_complex_variants.bed --mask-char 'N' --ref '%%' $(cat ../samples_id.txt | xargs)" >> _01_snippy_core.sh
+
+## C) If you want to mask low-coverage variants, uncomment these lines:
+#echo "awk -F'\t' '/^NZ_/ {split(\$9, format, \":\"); split(\$10, values, \":\"); for (i in format) if (format[i] == \"DP\" && values[i] < 10) print \$1, \$2 - 1, \$2}' OFS='\t' ./*/snps.vcf > mask_low_coverage_variants.bed" >> _01_snippy_core.sh
+#echo "cat mask_complex_variants.bed mask_low_coverage_variants.bed > mask_complex_low.bed" >> _01_snippy_core.sh
+#ls ../../../REFERENCES/*.fna | xargs -I %% echo "srun --chdir ${scratch_dir} --output logs/SNIPPY.%j.log --job-name SNIPPY --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 snippy-core --debug --mask ./mask_complex_low.bed --mask-char 'N' --ref '%%' $(cat ../samples_id.txt | xargs) &" >> _01_snippy_core.sh
+
+# BLOCK 4: CREATION OF _02_phylo_aln.sh
+
+echo "srun --chdir ${scratch_dir} --output logs/SNIP-SITES.%j.log --job-name SNIP-SITES --cpus-per-task 5 --mem 49152 --partition short_idx --time 02:00:00 snp-sites -b -c -o phylo.aln core.full.aln &" > _02_phylo_aln.sh
+
+## Run this line if you want to know the size of phylo.aln
+## awk 'BEGIN{FS="[> ]"} /^>/{val=$2;next}  {print val,length($0)}' phylo.aln
+
+## Run this line to compare samples in pairs (CHANGE THIS LINE ACCORDING TO YOUR NEEDS, THIS IS JUST AN EXAMPLE!)
+#€ awk '$4 != $5 || $4 != $6 || $5 != $6' core.tab > differences.txt
+
+# BLOCK 5: CREATION OF _03_gubbins.sh to run GUBBINS (in order to filter recombinant sites):
+
+echo "snippy-clean_full_aln core.full.aln > clean.full.aln" > _03_gubbins.sh
+echo "singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/gubbins:3.3.5--py39pl5321he4a0461_0 run_gubbins.py --threads 20 -p gubbins clean.full.aln" >> _03_gubbins.sh
+echo "snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln" >> _03_gubbins.sh
+
+## Run gubbins
+echo "srun --chdir ${scratch_dir} --output logs/GUBBINS.%j.log --job-name GUBBINS --cpus-per-task 20 --mem 49152 --partition short_idx --time 02:00:00 bash _03_gubbins.sh &" > _03_run_gubbins.sh

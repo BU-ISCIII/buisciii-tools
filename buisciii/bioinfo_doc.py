@@ -699,7 +699,7 @@ class BioinfoDoc:
         email_html = template.render(email_data)
         return email_html
 
-    def send_email(self, html_text, results_pdf_file):
+    def send_email(self, html_text, results_pdf_file, attachment_files=None):
         email_host = self.conf["email_host"]
         email_port = self.conf["email_port"]
         email_host_user = self.conf["email_host_user"]
@@ -754,6 +754,35 @@ class BioinfoDoc:
             filename=str(os.path.basename(results_pdf_file)),
         )
         msg.attach(attach)
+
+        if buisciii.utils.prompt_yn_question(
+            "Do you want to attach additional files?", dflt=False
+        ):
+            stderr.print("[cyan] Provide additional files separated by semicolons (;)")
+            extra_files_input = buisciii.utils.ask_for_some_text(
+                msg="Attachment paths:"
+            )
+            attachment_files = [
+                os.path.expanduser(p.strip())
+                for p in extra_files_input.split(";")
+                if p.strip()
+            ]
+
+            for file_path in attachment_files:
+                if file_path and os.path.isfile(file_path):
+                    with open(file_path, "rb") as f:
+                        part = MIMEApplication(f.read(), _subtype="octet-stream")
+                    part.add_header(
+                        "Content-Disposition",
+                        "attachment",
+                        filename=os.path.basename(file_path),
+                    )
+                    msg.attach(part)
+                else:
+                    stderr.print(
+                        f"[yellow] Attachment not found or invalid: {file_path}"
+                    )
+
         server.sendmail(
             email_host_user,
             rcpt,

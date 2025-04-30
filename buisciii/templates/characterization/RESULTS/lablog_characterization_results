@@ -18,7 +18,7 @@ cd ..
 cd emmtyper
 ln -s ../../../../ANALYSIS/*CHARACTERIZATION/*emmtyper/01-typing/results_emmtyper.out .
 
-cd ../../
+cd ../../../
 
 eval "$(micromamba shell hook --shell=bash)"
 micromamba activate outbreakinfo

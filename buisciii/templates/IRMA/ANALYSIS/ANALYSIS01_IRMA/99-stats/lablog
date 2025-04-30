@@ -1,0 +1,202 @@
+#!/bin/bash
+
+mkdir -p logs
+ln -s ../06-variant-calling/sample_type_ref.txt .
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+# Given the sample_type_ref.txt file from 06-variant-calling, generate a .fa file containing all consensus sequences for each sample
+mkdir -p consensus_files
+cat ./sample_type_ref.txt | xargs -I % echo '
+  ref=$(echo "%" | awk '\''{print $4}'\'')
+  sample_id=$(echo "%" | awk '\''{print $1}'\'')
+  header_id=$(echo "%" | awk '\''{print $1}'\'' | sed "s/-/\//g")
+  fragment=$(echo "%" | awk '\''{print $3}'\'')
+  
+  # Extract the target sequence from the multifasta file
+  awk -v id="${header_id}_${fragment}" "BEGIN{RS=\">\"; ORS=\"\"} \$0 ~ id {print \">\"\$0}" \
+    ../04-irma/all_samples_completo.txt >> consensus_files/${sample_id}.consensus.fa
+' > _01_create_consensus_files.sh
+
+# Create a table of all the reported variants for a set of samples.
+echo "
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate biopython_v1.84
+  echo -e \"-----Generating variants_long_table.csv-----\"
+  python3 create_variants_long_table.py ../06-variant-calling/annotated_vcfs
+" > _02_create_variants_long_table.sh
+
+# Create a .tab file containing the percentage of Ns for each sample and each fragment.
+echo "
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate biopython_v1.84
+  echo -e \"-----Generating %Ns.tab-----\"
+  python3 percentajeNs.py consensus_files %Ns.tab
+  echo -e \"-----%Ns.tab correctly generated-----\"
+" > _03_run_percentage_Ns.sh
+
+# Create a table indicating the number of unambiguous bases and the total number of Ns.
+echo "
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate biopython_v1.84
+  echo -e \"-----Generating qc_metrics.tsv-----\"
+  # Define the input directory and the output file
+  input_fasta_dir=$(echo ./consensus_files)
+  output_file="qc_metrics.tsv"
+
+  # Create output file with headers
+  echo -e \"Sample\tTotal_Unambiguous_Bases\tTotal_Ns_count\" > \"\$output_file\"
+
+  # Process each consensus FASTA file
+  for fasta_file in \"\$input_fasta_dir\"/*.consensus.fa; do
+    sample_name=\$(basename \"\$fasta_file\" .consensus.fa)
+
+    # Get full consensus sequence
+    full_sequence=\$(grep -v '^>' \"\$fasta_file\" | tr -d '\\n')
+
+    # Count unambiguous bases (A, T, C, G, N included)
+    total_unambiguous_count=\$(echo \"\$full_sequence\" | grep -o '[ATCGN]' | wc -l)
+
+    # Count Ns
+    total_ns_count=\$(echo \"\$full_sequence\" | grep -o 'N' | wc -l)
+
+    # Write to output
+    echo -e \"\$sample_name\t\$total_unambiguous_count\t\$total_ns_count\" >> \"\$output_file\"
+  done
+
+  echo \"QC metrics file created: \$output_file\"
+" > _04_get_qc_metrics.sh
+
+# Create a table with relevant statistics.
+echo "
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate refgenie_v0.12.1
+  HEADER=\"sample\tflu_type\tflu_subtype\tclade\ttotalreads\tqc_filtered_reads\treads_host\t%readshost\treads_virus\t%readsvirus\tunmapped_reads\t%unmappedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\t%Ns10x\tVariantsinconsensusx10\tMissenseVariants\tTotal_Unambiguous_Bases\tTotal_Ns_count\tread_length\tanalysis_date\tcov_HA\tcov_MP\tcov_NA\tcov_NP\tcov_NS\tcov_PA\tcov_PB1\tcov_PB2\t10xcov_HA(%)\t10xcov_MP(%)\t10xcov_NA(%)\t10xcov_NP(%)\t10xcov_NS(%)\t10xcov_PA(%)\t10xcov_PB1(%)\t10xcov_PB2(%)\tperNs_HA\tperNs_MP\tperNs_NA\tperNs_NP\tperNs_NS\tperNs_PA\tperNs_PB1\tperNs_PB2\tvariants_HA\tvariants_MP\tvariants_NA\tvariants_NP\tvariants_NS\tvariants_PA\tvariants_PB1\tvariants_PB2\"
+  echo -e \${HEADER} > summary_stats_\$(date \"+%Y%m%d\").tab
+
+  cat ../samples_id.txt | while read in; do
+
+    echo -e \"-----Adding statistics for \$in in summary_stats_\$(date \"+%Y%m%d\").tab-----\"
+    declare -A gene_coverage
+    coverage_medians=()
+    for file in ${scratch_dir}/../04-irma/\${in}/tables/*-coverage.txt; do
+      fragment=\$(basename \$file | cut -d \"_\" -f 2 | cut -d \"-\" -f 1)
+      cov_median=\$(awk 'NR>1 {print \$3}' \"\$file\" | sort -n | awk '{a[NR]=\$1} END {print (NR%2==1)? a[(NR+1)/2] : (a[NR/2] + a[NR/2+1]) / 2}')
+      gene_coverage[\"\$fragment\"]=\"\$cov_median\"
+      coverage_medians+=(\"\$cov_median\")
+    done
+
+    declare -A variants
+    variants_consensus=()
+    vcf_path=\"${scratch_dir}/../06-variant-calling/vcf_files/\${in}/\${in}_*.vcf\"
+
+    if ls \$vcf_path 1> /dev/null 2>&1; then
+      for file in \$vcf_path; do
+        fragment=\$(basename \$file | cut -d \"_\" -f 2 | cut -d \".\" -f 1)
+        variant=\$(grep -v \"^#\" \"\$file\" | grep -c \"consensus\")
+        variants[\"\$fragment\"]=\"\$variant\"
+        variants_consensus+=(\"\$variant\")
+      done
+    else
+      echo \"-----No VCF file found for \${in} and \${fragment}.-----\"
+    fi
+
+    declare -A coverages_10x
+    pc10x=()
+    for file in ${scratch_dir}/../04-irma/\${in}/tables/*-coverage.txt; do
+      fragment=\$(basename \$file | cut -d \"_\" -f 2 | cut -d \"-\" -f 1)
+      ref=\$(awk -v sample=\"\$in\" -v frag=\"\$fragment\" '\$1 == sample && \$3 == frag {print \$4; exit}' sample_type_ref.txt)
+      if [ -z \"\$ref\" ]; then
+        echo \"WARNING: No reference found for sample=\$in and fragment=\$fragment\"
+        continue
+      fi
+      genome_size=\$(cat \$(refgenie seek orthomyxoviridae/fasta:\${ref} -c /data/ucct/bi/references/refgenie/genome_config.yaml) | grep -v \"^>\" | tr -d \"\n\" | wc -m)
+      cov10xpositions=\$(tail -n +2 \"\$file\" | awk '\$3 >= 10 {count++} END {if (count > 0) {print count} else {print 0}}')
+      per_cov10x=\$(awk \"BEGIN {printf \\\"%.2f\\\\n\\\", (\${cov10xpositions} / \${genome_size}) * 100}\")
+      coverages_10x[\"\$fragment\"]=\"\$per_cov10x\"
+      pc10x+=(\"\$per_cov10x\")
+    done
+
+    declare -A per_Ns
+    formatted_sample_name=\$(echo \"\$in\" | sed 's/-/\\//g')
+    ns_values=()
+    while IFS=\$'\\t' read -r sample ns_value; do
+      if [[ \"\$sample\" == \"\$formatted_sample_name\"* ]]; then
+        fragment=\"\${sample##*_}\"
+        ns_values+=(\"\$ns_value\")
+        per_Ns[\"\$fragment\"]=\"\$ns_value\"
+      fi
+    done < \"%Ns.tab\"
+
+    if [ \${#ns_values[@]} -gt 0 ]; then
+      total_ns=0
+      for ns in \"\${ns_values[@]}\"; do
+        total_ns=\$(echo \"\$total_ns + \$ns\" | bc)
+      done
+      pc_Ns=\$(printf \"%.2f\" \"\$(echo \"\$total_ns / \${#ns_values[@]}\" | bc -l)\")
+    else
+      pc_Ns=\"NA\"
+    fi
+
+    analysis_date=\$(date \"+%Y%m%d\")
+    flu_type=\$(awk -F '\t' -v sample=\"\$in\" '\$1 == sample {print \$5; exit}' ../04-irma/irma_stats_flu.txt | cut -d \"_\" -f 1)
+    flu_subtype=\$(awk -F '\t' -v sample=\"\$in\" '\$1 == sample {split(\$5, parts, \"_\"); if (length(parts) >= 3) print parts[2] parts[3]; exit}' ../04-irma/irma_stats_flu.txt)
+    coverage_depth=\$(printf \"%s\\n\" \"\${coverage_medians[@]}\" | sort -n | awk '{a[NR]=\$1} END {print (NR%2==1)? a[(NR+1)/2] : (a[NR/2] + a[NR/2+1]) / 2}')
+    variants_in_consensus=\$(printf \"%s\\n\" \"\${variants_consensus[@]}\" | awk '{sum+=\$1} END{print sum}')
+    variants_with_effect=\$(awk -F, -v sample=\"\$in\" '\$1 == sample && \$13 == \"missense_variant\" {count++} END {print count+0}' variants_long_table.csv)
+    pc_genome_greater_10x=\$(printf \"%s\\n\" \"\${pc10x[@]}\" | sort -n | awk '{sum+=\$1} END {printf \"%.2f\", (NR ? sum/NR : 0)}')
+    total_reads=\$(grep \"\\\"total_reads\\\"\" ../02-preprocessing/\${in}/\${in}_fastp.json | head -n1 | cut -d \":\" -f2 | sed \"s/,//g\")
+    reads_hostR1=\$(cat ../../*_TAXPROFILER/kraken2/*/\${in}_*.kraken2.report.txt | grep \"Homo sapiens\" | awk '{print \$2}')
+    reads_host_x2=\$((reads_hostR1 * 2))
+    pc_reads_host=\$(awk -v v1=\$total_reads -v v2=\$reads_host_x2 'BEGIN {printf \"%.2f\", (v2*100)/v1}')
+    reads_virus=\$(awk -F\"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' ../04-irma/irma_stats_flu.txt)
+    pc_reads_virus=\$(awk -v v1=\$reads_virus -v v2=\$total_reads 'BEGIN {if (v2 > 0) printf \"%.2f\", (v1 / v2) * 100; else print \"NA\"}')
+    unmapped_reads=\$((total_reads - (reads_host_x2+reads_virus)))
+    pc_unmapped=\$(awk -v v1=\$total_reads -v v2=\$unmapped_reads  'BEGIN {printf \"%.2f\", (v2/v1)*100}')
+    qc_filtered=\$(grep \"\\\"total_reads\\\"\" ../02-preprocessing/\${in}/\${in}_fastp.json | head -n2 | tail -n1 | cut -d \":\" -f2 | sed \"s/,//g\")
+    read_length=\$(unzip -p ../03-procQC/\${in}/\${in}_R1_filtered_fastqc.zip */fastqc_data.txt | grep \"Sequence length\" | cut -d \"-\" -f2)
+    number_unambiguous_bases=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$2}' qc_metrics.tsv)
+    number_Ns=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' qc_metrics.tsv)
+    clade=\$(awk -F \";\" -v sample=\"\$(echo \$in | sed \"s/-/\\//g\")_HA\" '\$2 == sample {print \$3}' ../05-nextclade/nextclade_combined.csv)
+    cov_HA=\${gene_coverage[HA]}
+    cov_MP=\${gene_coverage[MP]}
+    cov_NA=\${gene_coverage[NA]}
+    cov_NP=\${gene_coverage[NP]}
+    cov_NS=\${gene_coverage[NS]}
+    cov_PA=\${gene_coverage[PA]}
+    cov_PB1=\${gene_coverage[PB1]}
+    cov_PB2=\${gene_coverage[PB2]}
+    cov10x_HA=\${coverages_10x[HA]}
+    cov10x_MP=\${coverages_10x[MP]}
+    cov10x_NA=\${coverages_10x[NA]}
+    cov10x_NP=\${coverages_10x[NP]}
+    cov10x_NS=\${coverages_10x[NS]}
+    cov10x_PA=\${coverages_10x[PA]}
+    cov10x_PB1=\${coverages_10x[PB1]}
+    cov10x_PB2=\${coverages_10x[PB2]}
+    perNs_HA=\${per_Ns[HA]}
+    perNs_MP=\${per_Ns[MP]}
+    perNs_NA=\${per_Ns[NA]}
+    perNs_NP=\${per_Ns[NP]}
+    perNs_NS=\${per_Ns[NS]}
+    perNs_PA=\${per_Ns[PA]}
+    perNs_PB1=\${per_Ns[PB1]}
+    perNs_PB2=\${per_Ns[PB2]}
+    variants_HA=\${variants[HA]}
+    variants_MP=\${variants[MP]}
+    variants_NA=\${variants[NA]}
+    variants_NP=\${variants[NP]}
+    variants_NS=\${variants[NS]}
+    variants_PA=\${variants[PA]}
+    variants_PB1=\${variants[PB1]}
+    variants_PB2=\${variants[PB2]}
+
+    echo -e \"\${in}\t\$flu_type\t\$flu_subtype\t\$clade\t\$total_reads\t\$qc_filtered\t\$reads_host_x2\t\$pc_reads_host\t\$reads_virus\t\$pc_reads_virus\t\$unmapped_reads\t\$pc_unmapped\t\$coverage_depth\t\$pc_genome_greater_10x\t\$pc_Ns\t\$variants_in_consensus\t\$variants_with_effect\t\$number_unambiguous_bases\t\$number_Ns\t\$read_length\t\$analysis_date\t\$cov_HA\t\$cov_MP\t\$cov_NA\t\$cov_NP\t\$cov_NS\t\$cov_PA\t\$cov_PB1\t\$cov_PB2\t\$cov10x_HA\t\$cov10x_MP\t\$cov10x_NA\t\$cov10x_NP\t\$cov10x_NS\t\$cov10x_PA\t\$cov10x_PB1\t\$cov10x_PB2\t\$perNs_HA\t\$perNs_MP\t\$perNs_NA\t\$perNs_NP\t\$perNs_NS\t\$perNs_PA\t\$perNs_PB1\t\$perNs_PB2\t\$variants_HA\t\$variants_MP\t\$variants_NA\t\$variants_NP\t\$variants_NS\t\$variants_PA\t\$variants_PB1\t\$variants_PB2\" >> summary_stats_\$(date \"+%Y%m%d\").tab
+    echo -e \"-----Statistics for \$in correctly added into summary_stats_\$(date \"+%Y%m%d\").tab-----\n\"
+    unset gene_coverage coverages_10x per_Ns variants
+  done
+" > _05_create_mapping_stats.sh

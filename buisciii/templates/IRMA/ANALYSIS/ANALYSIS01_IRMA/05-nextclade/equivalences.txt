@@ -1,0 +1,3 @@
+flu_h1n1pdm_ha	A_H1
+flu_h3n2_ha	A_H3
+flu_vic_ha	B

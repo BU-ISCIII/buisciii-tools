@@ -579,7 +579,7 @@ else
         update_nextclade
         update_pangolin
 
-        echo "primer_bed: '/data/ucct/bi/references/refgenie/alias/coronaviridae/primer_schemes/NC_045512.2/artic_v4-1_ncov-2019-primer.scheme.bed'" >> $PARAMS_FILE
+        echo "primer_bed: '/data/ucct/bi/references/refgenie/alias/coronaviridae/primer_schemes/NC_045512.2/nCoV-2019.artic.V5-3-2.scheme.bed'" >> $PARAMS_FILE
 
     elif [ "$virus_tag" == "rsv" ]; then       
         # Update Nextclade
@@ -603,7 +603,7 @@ do
     cp create_summary_report.sh ${FOLDER_NAME}/
     cp deduplicate_long_table.sh ${FOLDER_NAME}/
     cp percentajeNs.py ${FOLDER_NAME}/
-    cp remove_columns_mapping_table.sh ${FOLDER_NAME}/
+    cp remove_columns_mapping_table_RELECOV.sh ${FOLDER_NAME}/
     grep -i ${in} samples_ref.txt | cut -f1,2 > ${FOLDER_NAME}/samples_ref.txt
     if [ $(cut -f2 ${FOLDER_NAME}/samples_ref.txt | sort -u | wc -l) -gt 1 ]; then cp _00_autorun.sh ${FOLDER_NAME}/; fi
     echo "ln -s ../00-reads ." > ${FOLDER_NAME}/lablog
