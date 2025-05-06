@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.9] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.9dev
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Updated create_summary_report.sh to properly handle single end reads [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.8] - 2025-04-29 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.8
 
 ### Credits
