@@ -6,7 +6,7 @@ USER=$(pwd | cut -d '/' -f7 | cut -d '_' -f4)
 HOST=$(pwd | cut -d '/' -f9 | cut -d '_' -f4 | tr '[:upper:]' '[:lower:]' | sed 's/.*/\u&/')
 
 # Define header for output file
-HEADER="run\tuser\thost\tVirussequence\tsample\ttotalreads\treadshostR1\treadshost\t%readshost\treadsvirus\t%readsvirus\tunmappedreads\t%unmapedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\tVariantsinconsensusx10\tMissenseVariants\t%Ns10x\tLineage\tread_length\tanalysis_date"
+HEADER="run\tuser\thost\tVirussequence\tsample\ttotalreads\treadshostR1\treadshost\t%readshost\treadsvirus\t%readsvirus\tunmappedreads\t%unmappedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\tVariantsinconsensusx10\tMissenseVariants\t%Ns10x\tLineage\tread_length\tanalysis_date"
 
 # Print header to output file
 echo -e $HEADER > mapping_illumina_$(date '+%Y%m%d').tab
@@ -21,7 +21,15 @@ do
     total_reads=$(grep 'total_reads' ${arr[1]}*/fastp/${arr[0]}.fastp.json | head -n2 | tail -n1 | cut -d ':' -f2 | sed 's/,//g')
 
     reads_hostR1=$(cat ${arr[1]}*/kraken2/${arr[0]}.kraken2.report.txt | grep -v 'unclassified' | cut -f3 | awk '{s+=$1}END{print s}')
-    reads_host_x2=$(echo $((reads_hostR1 * 2)) )
+
+    if [ -f "../../RAW/${arr[0]}_R2.fastq.gz" ]; then
+        # Paired-end reads
+        reads_host_x2=$(echo $((reads_hostR1 * 2)) )
+    else
+        # Single-end reads
+        reads_host_x2=$reads_hostR1
+    fi
+
     perc_host=$(echo $(awk -v v1=$total_reads -v v2=$reads_host_x2 'BEGIN {print (v2*100)/v1}') )
 
     reads_virus=$(cat ${arr[1]}*/variants/bowtie2/samtools_stats/${arr[0]}.sorted.bam.flagstat | grep '+ 0 mapped' | cut -d ' ' -f1)
