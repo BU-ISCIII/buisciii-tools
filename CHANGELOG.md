@@ -10,11 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Victor Lopez](https://github.com/victor5lm)
 - [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Juan Ledesma](https://github.com/juanledesma78)
 
 ### Template fixes and updates
 
 - Updated create_summary_report.sh to properly handle single end reads [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
 - Fix relative path handling in snpeff/snpsift annotation [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+- Added sed to lablog_bam2fq so that _R1.bam is removed and the variable sample is created properly for those sample ids having several underscores (i.e. EPI_ISL_666)[#490](https://github.com/BU-ISCIII/buisciii-tools/pull/490)
 
 ### Modules
 
@@ -50,6 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added flu_type to summary_stats (IRMA template) [#501](https://github.com/BU-ISCIII/buisciii-tools/pull/501).
 - Fixed errors in IRMA template and fixed errors in irma2vcf script [#500](https://github.com/BU-ISCIII/buisciii-tools/pull/500)
 - Modified artic bed version in lablog_viralrecon for SARS-CoV-2 analysis [#505](https://github.com/BU-ISCIII/buisciii-tools/pull/505)
+
 
 ### Modules
 
