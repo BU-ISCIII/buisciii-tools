@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
 
 ### Template fixes and updates
 
 - Updated create_summary_report.sh to properly handle single end reads [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+- Fix relative path handling in snpeff/snpsift annotation [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
 
 ### Modules
 
