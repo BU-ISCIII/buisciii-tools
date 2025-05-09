@@ -19,9 +19,9 @@ echo "
     [\"nf-core/taxprofiler\"]=\$dehosting_method_software_version
     [\"fastp\"]=\$preprocessing_software_version
     [\"nextclade\"]=\$clade_assignment_software_version
-    ["mafft"]=\$mafft_version
-    ["snpEff"]=\$snpeff_version
-    ["snpSift"]=\$snpsift_version)
+    [\"mafft\"]=\$mafft_version
+    [\"snpEff\"]=\$snpeff_version
+    [\"snpSift\"]=\$snpsift_version)
 
     for tool in \"\${!software[@]}\"; do
         echo -e \"\${tool}\t\${software[\$tool]}\" >> versions.csv
