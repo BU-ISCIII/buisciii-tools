@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Create a table with software versions.
+echo "
+    HEADER=\"software_name,software_version\"
+    echo -e \${HEADER} > versions.csv
+
+    IRMA_version=\$(/data/ucct/bi/pipelines/flu-amd/flu-amd-1.2.0/IRMA | grep -o \"v[0-9]\+\.[0-9]\+\.[0-9]\+\" | head -n 1)
+    dehosting_method_software_version=\$(cat ../*_ANALYSIS02_TAXPROFILER/pipeline_info/nf_core_pipeline_software_mqc_versions.yml | grep \"nf-core/taxprofiler:\" | awk '{print \$NF}')
+    preprocessing_software_version=\$(find 02-preprocessing/ -type f -name \"*_fastp.html\" | shuf -n 1 | xargs grep -oP 'fastp version:</td><td[^>]*>\K[0-9.]+' | sed 's/^/v/')
+    clade_assignment_software_version=\$(find ./05-nextclade/ -type f -name \"nextclade.json\" | shuf -n 1 | xargs grep -o '\"nextcladeAlgoVersion\": *\"[^\"]*\"' | awk -F'\"' '{print \"v\"\$4}')
+    mafft_version=\$(find 06-variant-calling/logs/ -type f -name \"ALIGN-*\" | shuf -n 1 | xargs grep -o \"Version [0-9.]\+\" | head -n 1 | cut -d \" \" -f 2 | sed \"s/^/v/g\")
+    snpeff_version=\$(find 06-variant-calling/logs/ -type f -name \"SNPEFF-*\" | shuf -n 1 | xargs grep -o -m 1 \"SnpEff version SnpEff [0-9.]\+\" | head -n 1 | cut -d \" \" -f 4 | sed \"s/^/v/g\")
+    snpsift_version=\$snpeff_version
+
+    declare -A software
+    software=(
+    [\"IRMA (Iterative Refinement Meta-Assembler)\"]=\$IRMA_version
+    [\"nf-core/taxprofiler\"]=\$dehosting_method_software_version
+    [\"fastp\"]=\$preprocessing_software_version
+    [\"nextclade\"]=\$clade_assignment_software_version
+    [\"mafft\"]=\$mafft_version
+    [\"snpEff\"]=\$snpeff_version
+    [\"snpSift\"]=\$snpsift_version)
+
+    for tool in \"\${!software[@]}\"; do
+        echo -e \"\${tool}\t\${software[\$tool]}\" >> versions.csv
+    done
+
+    # Convert tabs to commas for proper CSV format
+    sed -i 's/\t/,/g' versions.csv
+
+" > get_versions_table.sh
