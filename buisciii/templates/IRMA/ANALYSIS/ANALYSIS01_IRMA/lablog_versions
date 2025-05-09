@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create a table with relevant statistics.
+# Create a table with software versions.
 echo "
     HEADER=\"software_name,software_version\"
     echo -e \${HEADER} > versions.csv
