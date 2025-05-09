@@ -31,7 +31,7 @@ echo "
 
           # Run nextclade for all sequences from A_HA.txt or B_HA.txt, in order to determine their clade.
           echo \"Running nextclade for \$subtype_folder with file \$input_file...\"
-          srun --chdir ${scratch_dir} --output logs/NEXTCLADE_RUN_\$(basename \$input_file)%j.log --job-name NEXTCLADE_RUN_\$(basename \$input_file) --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/nextclade\:3.9.1--h9ee0642_0 nextclade run \"\$input_file\" -d \"\$nextclade_dataset\" -O \"./\$subtype_folder/\" -v &
+          srun --chdir ${scratch_dir} --output logs/NEXTCLADE_RUN_\${subtype_folder}_%j.log --job-name NEXTCLADE_RUN_\${subtype_folder} --partition short_idx --time 2:00:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/nextclade\:3.9.1--h9ee0642_0 nextclade run \"\$input_file\" -d \"\$nextclade_dataset\" -O \"./\$subtype_folder/\" --verbosity info &
       else
           echo \"Warning: Folder \$folder_path does not exist, skipping...\"
       fi
