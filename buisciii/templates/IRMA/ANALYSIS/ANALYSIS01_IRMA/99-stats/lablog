@@ -72,6 +72,20 @@ echo "
 
 # Create a table with relevant statistics.
 echo "
+  # Check if Taxprofiler results are available
+  echo \"Has Taxprofiler been executed and are the results available?\"
+  echo \"1) Yes\"
+  echo \"2) No\"
+  read -p \"Select an option [1/2]: \" answer
+
+  if [[ \"\$answer\" == \"2\" ]]; then
+    echo \"Please execute Taxprofiler before running this script.\"
+    exit 1
+  elif [[ \"\$answer\" != \"1\" ]]; then
+    echo \"Invalid option. Please run the script again and select 1 or 2.\"
+    exit 1
+  fi
+  
   # Activate the conda environment
   eval \"\$(micromamba shell hook --shell bash)\"
   micromamba activate refgenie_v0.12.1
