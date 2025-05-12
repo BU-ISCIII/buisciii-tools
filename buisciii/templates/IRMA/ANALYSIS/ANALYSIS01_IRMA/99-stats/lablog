@@ -76,7 +76,7 @@ echo "
   TAXPROFILER_DIR=$(find ../../ -type d -name '*_TAXPROFILER' | head -n 1)
 
   if [[ -z "$TAXPROFILER_DIR" ]] || ! compgen -G "$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt" > /dev/null; then
-      echo "ERROR: Taxprofiler results not found. Please execute Taxprofiler before running this script."
+      echo "ERROR: Taxprofiler results not found "(*.kraken2.report.txt)". Please execute Taxprofiler before running this script."
       exit 1
   fi
   
