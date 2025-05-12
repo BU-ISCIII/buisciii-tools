@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated create_summary_report.sh to properly handle single end reads [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
 - Fix relative path handling in snpeff/snpsift annotation [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
 - Added sed to lablog_bam2fq so that _R1.bam is removed and the variable sample is created properly for those sample ids having several underscores (i.e. EPI_ISL_666)[#490](https://github.com/BU-ISCIII/buisciii-tools/pull/490)
+- Update IRMA 99-stats lablog to request taxprofiler results before proceeding [#515](https://github.com/BU-ISCIII/buisciii-tools/pull/515).
 
 ### Modules
 
