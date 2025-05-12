@@ -6,7 +6,7 @@ USER=$(pwd | cut -d '/' -f7 | cut -d '_' -f4)
 HOST=$(pwd | cut -d '/' -f9 | cut -d '_' -f4 | tr '[:upper:]' '[:lower:]' | sed 's/.*/\u&/')
 
 # Define header for output file
-HEADER="run\tuser\thost\tVirussequence\tsample\ttotalreads\treadshostR1\treadshost\t%readshost\treadsvirus\t%readsvirus\tunmappedreads\t%unmappedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\tVariantsinconsensusx10\tMissenseVariants\t%Ns10x\tLineage\tread_length\tanalysis_date"
+HEADER="run\tuser\thost\tVirussequence\tsample\ttotalreads\treadshostR1\treadshost\t%readshost\treadsvirus\t%readsvirus\tunmappedreads\t%unmappedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\tVariantsinconsensusx10\tMissenseVariants\t%Ns10x\tLineage\tclade_assignment\tclade_assignment_software_database_version\tclade_assignment_date\tread_length\tanalysis_date"
 
 # Print header to output file
 echo -e $HEADER > mapping_illumina_$(date '+%Y%m%d').tab
@@ -54,6 +54,26 @@ do
 
     analysis_date=$(date '+%Y%m%d')
 
+    clade=$(tail -n +2 */variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
+    clade_assignment_date=$analysis_date
+    clade_assignment_software_database_version=$(cat *_viralrecon.log | grep 'nextclade_dataset_tag' | awk -F ': ' '{print $2}')
+    lineage_analysis_date=$analysis_date
+    lineage_algorithm_software_version=$(cat /data/ucct/bi/references/pangolin/$lineage_analysis_date/*_pangolin.log | grep -oP 'pangolin-data updated to \K[^ ]+')
+
+    # Updating the pangolin csv files
+    temp_file="${arr[0]}_tmp.csv"
+    touch $temp_file
+
+    # Read and update the CSV
+    {
+    IFS= read -r header
+    echo "${header},lineage_assignment_date,lineage_assignment_database_version"
+    IFS= read -r row
+    echo "${row},$lineage_analysis_date,$lineage_algorithm_software_version"
+    } < ./*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv > $temp_file
+
+    mv $temp_file ./*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv
+
     # Introduce data row into output file
-    echo -e "${RUN}\t${USER}\t${HOST}\t${arr[1]}\t${arr[0]}\t$total_reads\t$reads_hostR1\t$reads_host_x2\t$perc_host\t$reads_virus\t$reads_virus_perc\t$unmapped_reads\t$perc_unmapped\t$medianDPcov\t$cov10x\t$vars_in_cons10x\t$missense\t$ns_10x_perc\t$lineage\t$read_length\t$analysis_date" >> mapping_illumina_$(date '+%Y%m%d').tab
+    echo -e "${RUN}\t${USER}\t${HOST}\t${arr[1]}\t${arr[0]}\t$total_reads\t$reads_hostR1\t$reads_host_x2\t$perc_host\t$reads_virus\t$reads_virus_perc\t$unmapped_reads\t$perc_unmapped\t$medianDPcov\t$cov10x\t$vars_in_cons10x\t$missense\t$ns_10x_perc\t$lineage\t$clade\t$clade_assignment_software_database_version\t$clade_assignment_date\t$read_length\t$analysis_date" >> mapping_illumina_$(date '+%Y%m%d').tab
 done
