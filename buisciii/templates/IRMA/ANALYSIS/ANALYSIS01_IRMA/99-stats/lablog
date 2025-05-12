@@ -72,18 +72,12 @@ echo "
 
 # Create a table with relevant statistics.
 echo "
-  # Check if Taxprofiler results are available
-  echo \"Has Taxprofiler been executed and are the results available?\"
-  echo \"1) Yes\"
-  echo \"2) No\"
-  read -p \"Select an option [1/2]: \" answer
+  # Verify that Taxprofiler results exist before proceeding
+  TAXPROFILER_DIR=$(find ../../ -type d -name '*_TAXPROFILER' | head -n 1)
 
-  if [[ \"\$answer\" == \"2\" ]]; then
-    echo \"Please execute Taxprofiler before running this script.\"
-    exit 1
-  elif [[ \"\$answer\" != \"1\" ]]; then
-    echo \"Invalid option. Please run the script again and select 1 or 2.\"
-    exit 1
+  if [[ -z "$TAXPROFILER_DIR" ]] || ! compgen -G "$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt" > /dev/null; then
+      echo "ERROR: Taxprofiler results not found. Please execute Taxprofiler before running this script."
+      exit 1
   fi
   
   # Activate the conda environment
