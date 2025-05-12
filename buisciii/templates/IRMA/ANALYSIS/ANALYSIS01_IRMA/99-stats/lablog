@@ -72,7 +72,7 @@ echo "
 
 # Create a table with relevant statistics.
 echo "
-    # Verify that Taxprofiler results exist before proceeding
+  # Verify that Taxprofiler results exist before proceeding
   TAXPROFILER_DIR=\$(find ../../ -type d -name '*_TAXPROFILER' | head -n 1)
 
   if [[ -z \"\$TAXPROFILER_DIR\" ]] || ! compgen -G \"\$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt\" > /dev/null; then
