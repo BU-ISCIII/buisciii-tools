@@ -72,11 +72,11 @@ echo "
 
 # Create a table with relevant statistics.
 echo "
-  # Verify that Taxprofiler results exist before proceeding
-  TAXPROFILER_DIR=$(find ../../ -type d -name '*_TAXPROFILER' | head -n 1)
+    # Verify that Taxprofiler results exist before proceeding
+  TAXPROFILER_DIR=\$(find ../../ -type d -name '*_TAXPROFILER' | head -n 1)
 
-  if [[ -z "$TAXPROFILER_DIR" ]] || ! compgen -G "$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt" > /dev/null; then
-      echo "ERROR: Taxprofiler results not found "(*.kraken2.report.txt)". Please execute Taxprofiler before running this script."
+  if [[ -z \"\$TAXPROFILER_DIR\" ]] || ! compgen -G \"\$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt\" > /dev/null; then
+      echo \"ERROR: Taxprofiler results not found in path: \$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt. Please execute Taxprofiler before running this script.\"
       exit 1
   fi
   
