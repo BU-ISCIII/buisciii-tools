@@ -79,7 +79,7 @@ echo "
       echo \"ERROR: Taxprofiler results not found in path: \$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt. Please execute Taxprofiler before running this script.\"
       exit 1
   fi
-  
+
   # Activate the conda environment
   eval \"\$(micromamba shell hook --shell bash)\"
   micromamba activate refgenie_v0.12.1
@@ -170,7 +170,7 @@ echo "
     number_unambiguous_bases=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$2}' qc_metrics.tsv)
     number_Ns=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' qc_metrics.tsv)
     clade=\$(awk -F \";\" -v sample=\"\$(echo \$in | sed \"s/-/\\//g\")_HA\" '\$2 == sample {print \$3}' ../05-nextclade/nextclade_combined.csv)
-    clade_assignment_date=\$(cat ../05-nextclade/\${flu_type}*/nextclade.json | awk -F'\"' '/createdAt/ {print \$4}' | cut -d 'T' -f 1 | tr -d '-')
+    clade_assignment_date=\$(cat ../05-nextclade/\${flu_type}*/nextclade.json | awk -F'\"' '/createdAt/ {print \$4}' | cut -d 'T' -f 1 | tr -d '-' | head -n 1)
     clade_assignment_software_database_version=\$(cat ../05-nextclade/logs/NEXTCLADE_RUN_\${flu_type}_\$(echo \${flu_subtype} | cut -d \"N\" -f 1)_*.log | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}Z' | head -n 1)
     cov_HA=\${gene_coverage[HA]}
     cov_MP=\${gene_coverage[MP]}
