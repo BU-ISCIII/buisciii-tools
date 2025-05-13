@@ -157,7 +157,7 @@ echo "
     variants_in_consensus=\$(printf \"%s\\n\" \"\${variants_consensus[@]}\" | awk '{sum+=\$1} END{print sum}')
     variants_with_effect=\$(awk -F, -v sample=\"\$in\" '\$1 == sample && \$13 == \"missense_variant\" {count++} END {print count+0}' variants_long_table.csv)
     pc_genome_greater_10x=\$(printf \"%s\\n\" \"\${pc10x[@]}\" | sort -n | awk '{sum+=\$1} END {printf \"%.2f\", (NR ? sum/NR : 0)}')
-    virus_sequence=\$(awk -v sample=\"\${in}\" '\$1 == sample {ref = ref ? ref \",\" \$4 : \$4} END {if (ref) print ref}' sample_type_ref.txt)
+    virus_sequence=\$(awk -v sample=\"\${in}\" '\$1 == sample {ref = ref ? ref \",\" \$4 : \$4} END {if (ref) print ref}' ../06-variant-calling/sample_type_ref.txt)
     total_reads=\$(grep \"\\\"total_reads\\\"\" ../02-preprocessing/\${in}/\${in}_fastp.json | head -n1 | cut -d \":\" -f2 | sed \"s/,//g\")
     reads_hostR1=\$(cat ../../*_TAXPROFILER/kraken2/*/\${in}_*.kraken2.report.txt | grep \"Homo sapiens\" | awk '{print \$2}')
     reads_host_x2=\$((reads_hostR1 * 2))
