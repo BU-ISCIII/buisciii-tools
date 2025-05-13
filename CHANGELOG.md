@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update IRMA 99-stats lablog to raise Error if taxprofiler results are missing [#515](https://github.com/BU-ISCIII/buisciii-tools/pull/515).
 - Added a new lablog to create a .csv file for software versions in IRMA's template [#514](https://github.com/BU-ISCIII/buisciii-tools/pull/514/files).
 - Fixed wrong variable definition in IRMA's 99-stats lablog and added Nextclade's info into viralrecon's create_summary_report.sh script to be added into the mapping_illumina report [#518](https://github.com/BU-ISCIII/buisciii-tools/pull/518).
+- Added virus_sequence variable into IRMA's 99-stats lablog for the creation of the summary stats report [#519](https://github.com/BU-ISCIII/buisciii-tools/pull/519).
 
 ### Modules
 
