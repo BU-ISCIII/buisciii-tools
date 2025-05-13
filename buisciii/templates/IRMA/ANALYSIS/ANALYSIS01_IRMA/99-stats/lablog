@@ -171,7 +171,7 @@ echo "
     number_Ns=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' qc_metrics.tsv)
     clade=\$(awk -F \";\" -v sample=\"\$(echo \$in | sed \"s/-/\\//g\")_HA\" '\$2 == sample {print \$3}' ../05-nextclade/nextclade_combined.csv)
     clade_assignment_date=\$(cat ../05-nextclade/\${flu_type}*/nextclade.json | awk -F'\"' '/createdAt/ {print \$4}' | cut -d 'T' -f 1 | tr -d '-' | head -n 1)
-    clade_assignment_software_database_version=\$(cat ../05-nextclade/logs/NEXTCLADE_RUN_\${flu_type}_\$(echo \${flu_subtype} | cut -d \"N\" -f 1)_*.log | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}Z' | head -n 1)
+    clade_assignment_software_database_version=\$(cat ../05-nextclade/logs/NEXTCLADE_RUN_\${flu_type}_\$(echo \${flu_subtype} | cut -d \"N\" -f 1)*.log | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}Z' | head -n 1)
     cov_HA=\${gene_coverage[HA]}
     cov_MP=\${gene_coverage[MP]}
     cov_NA=\${gene_coverage[NA]}
@@ -209,4 +209,7 @@ echo "
     echo -e \"-----Statistics for \$in correctly added into summary_stats_\$(date \"+%Y%m%d\").tab-----\n\"
     unset gene_coverage coverages_10x per_Ns variants
   done
-" > _05_create_mapping_stats.sh
+" > _05_create_summary_stats.sh
+
+# Run _05_create_summary_stats.sh
+echo "srun --partition middle_idx --chdir ${scratch_dir} --output logs/SUMMARY_STATS.%j.log --job-name SUMMARY_STATS --time 01:00:00 bash ${scratch_dir}/_05_create_summary_stats.sh &" > _05_run_create_summary_stats.sh
