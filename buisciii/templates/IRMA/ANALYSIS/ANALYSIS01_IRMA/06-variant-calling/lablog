@@ -94,12 +94,12 @@ cat ./sample_type_ref.txt | xargs -I {} echo "
   micromamba activate refgenie_v0.12.1
   dataDir=$(refgenie seek snpeff/flu_surveillance_db -c /data/ucct/bi/references/refgenie/genome_config.yaml)
   echo -e \"-----Annotating \$sample_id \${fragment} vcf file-----\"
-  singularity exec -B /data/ucct/bi /data/ucct/bi/pipelines/singularity-images/snpeff:5.2--hdfd78af_1.1 snpEff \
+  singularity exec -B /data/ucct/bi -B ${scratch_dir} /data/ucct/bi/pipelines/singularity-images/snpeff:5.2--hdfd78af_1.1 snpEff \
   -v \
   -dataDir "\$dataDir" \
   -c genome.config \
   "\$ref" \
-  vcf_files/\${sample_id}/\${sample_id}_\${fragment}.vcf > annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpeff.vcf
+  ${scratch_dir}/vcf_files/\${sample_id}/\${sample_id}_\${fragment}.vcf > annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpeff.vcf
   echo -e \"-----Finished annotating \$sample_id \${fragment} vcf file-----\"
 " > _03_snpeff.sh
 
@@ -115,11 +115,11 @@ cat ./sample_type_ref.txt | xargs -I {} echo "
   micromamba activate refgenie_v0.12.1
   dataDir=$(refgenie seek snpeff/flu_surveillance_db -c /data/ucct/bi/references/refgenie/genome_config.yaml)
   echo -e \"-----Extracting relevant fields for \$sample_id \${fragment} vcf file-----\"
-  singularity exec -B /data/ucct/bi /data/ucct/bi/pipelines/singularity-images/snpsift\:5.2--hdfd78af_0 SnpSift \
+  singularity exec -B /data/ucct/bi -B ${scratch_dir} /data/ucct/bi/pipelines/singularity-images/snpsift\:5.2--hdfd78af_0 SnpSift \
   extractFields \
   -s "," \
   -e "." \
-  annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpeff.vcf \
+  ${scratch_dir}/annotated_vcfs/\${sample_id}/\${sample_id}_\${fragment}.snpeff.vcf \
   CHROM \
   POS \
   REF \

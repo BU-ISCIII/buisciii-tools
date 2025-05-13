@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.9] - 2025-05-13 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.9
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
+- [Juan Ledesma](https://github.com/juanledesma78)
+
+### Template fixes and updates
+
+- Updated create_summary_report.sh to properly handle single end reads [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+- Fix relative path handling in snpeff/snpsift annotation [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+- Added sed to lablog_bam2fq so that _R1.bam is removed and the variable sample is created properly for those sample ids having several underscores (i.e. EPI_ISL_666)[#490](https://github.com/BU-ISCIII/buisciii-tools/pull/490)
+- Update IRMA 99-stats lablog to raise Error if taxprofiler results are missing [#515](https://github.com/BU-ISCIII/buisciii-tools/pull/515).
+- Added a new lablog to create a .csv file for software versions in IRMA's template [#514](https://github.com/BU-ISCIII/buisciii-tools/pull/514/files).
+- Fixed wrong variable definition in IRMA's 99-stats lablog and added Nextclade's info into viralrecon's create_summary_report.sh script to be added into the mapping_illumina report [#518](https://github.com/BU-ISCIII/buisciii-tools/pull/518).
+- Added virus_sequence variable into IRMA's 99-stats lablog for the creation of the summary stats report [#519](https://github.com/BU-ISCIII/buisciii-tools/pull/519).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.8] - 2025-04-29 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.8
 
 ### Credits
@@ -26,6 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added flu_type to summary_stats (IRMA template) [#501](https://github.com/BU-ISCIII/buisciii-tools/pull/501).
 - Fixed errors in IRMA template and fixed errors in irma2vcf script [#500](https://github.com/BU-ISCIII/buisciii-tools/pull/500)
 - Modified artic bed version in lablog_viralrecon for SARS-CoV-2 analysis [#505](https://github.com/BU-ISCIII/buisciii-tools/pull/505)
+
 
 ### Modules
 

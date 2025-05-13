@@ -72,10 +72,18 @@ echo "
 
 # Create a table with relevant statistics.
 echo "
+  # Verify that Taxprofiler results exist before proceeding
+  TAXPROFILER_DIR=\$(find ../../ -type d -name '*_TAXPROFILER' | head -n 1)
+
+  if [[ -z \"\$TAXPROFILER_DIR\" ]] || ! compgen -G \"\$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt\" > /dev/null; then
+      echo \"ERROR: Taxprofiler results not found in path: \$TAXPROFILER_DIR/kraken2/*/*.kraken2.report.txt. Please execute Taxprofiler before running this script.\"
+      exit 1
+  fi
+
   # Activate the conda environment
   eval \"\$(micromamba shell hook --shell bash)\"
   micromamba activate refgenie_v0.12.1
-  HEADER=\"sample\tflu_type\tflu_subtype\tclade\ttotalreads\tqc_filtered_reads\treads_host\t%readshost\treads_virus\t%readsvirus\tunmapped_reads\t%unmappedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\t%Ns10x\tVariantsinconsensusx10\tMissenseVariants\tTotal_Unambiguous_Bases\tTotal_Ns_count\tread_length\tanalysis_date\tcov_HA\tcov_MP\tcov_NA\tcov_NP\tcov_NS\tcov_PA\tcov_PB1\tcov_PB2\t10xcov_HA(%)\t10xcov_MP(%)\t10xcov_NA(%)\t10xcov_NP(%)\t10xcov_NS(%)\t10xcov_PA(%)\t10xcov_PB1(%)\t10xcov_PB2(%)\tperNs_HA\tperNs_MP\tperNs_NA\tperNs_NP\tperNs_NS\tperNs_PA\tperNs_PB1\tperNs_PB2\tvariants_HA\tvariants_MP\tvariants_NA\tvariants_NP\tvariants_NS\tvariants_PA\tvariants_PB1\tvariants_PB2\"
+  HEADER=\"sample\tVirussequence\tflu_type\tflu_subtype\tclade\tclade_assignment_date\tclade_assignment_software_database_version\ttotalreads\tqc_filtered_reads\treads_host\t%readshost\treads_virus\t%readsvirus\tunmapped_reads\t%unmappedreads\tmedianDPcoveragevirus\tCoverage>10x(%)\t%Ns10x\tVariantsinconsensusx10\tMissenseVariants\tTotal_Unambiguous_Bases\tTotal_Ns_count\tread_length\tanalysis_date\tcov_HA\tcov_MP\tcov_NA\tcov_NP\tcov_NS\tcov_PA\tcov_PB1\tcov_PB2\t10xcov_HA(%)\t10xcov_MP(%)\t10xcov_NA(%)\t10xcov_NP(%)\t10xcov_NS(%)\t10xcov_PA(%)\t10xcov_PB1(%)\t10xcov_PB2(%)\tperNs_HA\tperNs_MP\tperNs_NA\tperNs_NP\tperNs_NS\tperNs_PA\tperNs_PB1\tperNs_PB2\tvariants_HA\tvariants_MP\tvariants_NA\tvariants_NP\tvariants_NS\tvariants_PA\tvariants_PB1\tvariants_PB2\"
   echo -e \${HEADER} > summary_stats_\$(date \"+%Y%m%d\").tab
 
   cat ../samples_id.txt | while read in; do
@@ -149,6 +157,7 @@ echo "
     variants_in_consensus=\$(printf \"%s\\n\" \"\${variants_consensus[@]}\" | awk '{sum+=\$1} END{print sum}')
     variants_with_effect=\$(awk -F, -v sample=\"\$in\" '\$1 == sample && \$13 == \"missense_variant\" {count++} END {print count+0}' variants_long_table.csv)
     pc_genome_greater_10x=\$(printf \"%s\\n\" \"\${pc10x[@]}\" | sort -n | awk '{sum+=\$1} END {printf \"%.2f\", (NR ? sum/NR : 0)}')
+    virus_sequence=\$(awk -v sample=\"\${in}\" '\$1 == sample {ref = ref ? ref \",\" \$4 : \$4} END {if (ref) print ref}' ../06-variant-calling/sample_type_ref.txt)
     total_reads=\$(grep \"\\\"total_reads\\\"\" ../02-preprocessing/\${in}/\${in}_fastp.json | head -n1 | cut -d \":\" -f2 | sed \"s/,//g\")
     reads_hostR1=\$(cat ../../*_TAXPROFILER/kraken2/*/\${in}_*.kraken2.report.txt | grep \"Homo sapiens\" | awk '{print \$2}')
     reads_host_x2=\$((reads_hostR1 * 2))
@@ -162,6 +171,8 @@ echo "
     number_unambiguous_bases=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$2}' qc_metrics.tsv)
     number_Ns=\$(awk -F \"\t\" -v id=\"\$in\" '\$1 == id {print \$3}' qc_metrics.tsv)
     clade=\$(awk -F \";\" -v sample=\"\$(echo \$in | sed \"s/-/\\//g\")_HA\" '\$2 == sample {print \$3}' ../05-nextclade/nextclade_combined.csv)
+    clade_assignment_date=\$(cat ../05-nextclade/\${flu_type}*/nextclade.json | awk -F'\"' '/createdAt/ {print \$4}' | cut -d 'T' -f 1 | tr -d '-' | head -n 1)
+    clade_assignment_software_database_version=\$(cat ../05-nextclade/logs/NEXTCLADE_RUN_\${flu_type}_\$(echo \${flu_subtype} | cut -d \"N\" -f 1)*.log | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}Z' | head -n 1)
     cov_HA=\${gene_coverage[HA]}
     cov_MP=\${gene_coverage[MP]}
     cov_NA=\${gene_coverage[NA]}
@@ -195,8 +206,11 @@ echo "
     variants_PB1=\${variants[PB1]}
     variants_PB2=\${variants[PB2]}
 
-    echo -e \"\${in}\t\$flu_type\t\$flu_subtype\t\$clade\t\$total_reads\t\$qc_filtered\t\$reads_host_x2\t\$pc_reads_host\t\$reads_virus\t\$pc_reads_virus\t\$unmapped_reads\t\$pc_unmapped\t\$coverage_depth\t\$pc_genome_greater_10x\t\$pc_Ns\t\$variants_in_consensus\t\$variants_with_effect\t\$number_unambiguous_bases\t\$number_Ns\t\$read_length\t\$analysis_date\t\$cov_HA\t\$cov_MP\t\$cov_NA\t\$cov_NP\t\$cov_NS\t\$cov_PA\t\$cov_PB1\t\$cov_PB2\t\$cov10x_HA\t\$cov10x_MP\t\$cov10x_NA\t\$cov10x_NP\t\$cov10x_NS\t\$cov10x_PA\t\$cov10x_PB1\t\$cov10x_PB2\t\$perNs_HA\t\$perNs_MP\t\$perNs_NA\t\$perNs_NP\t\$perNs_NS\t\$perNs_PA\t\$perNs_PB1\t\$perNs_PB2\t\$variants_HA\t\$variants_MP\t\$variants_NA\t\$variants_NP\t\$variants_NS\t\$variants_PA\t\$variants_PB1\t\$variants_PB2\" >> summary_stats_\$(date \"+%Y%m%d\").tab
+    echo -e \"\${in}\t\$virus_sequence\t\$flu_type\t\$flu_subtype\t\$clade\t\$clade_assignment_date\t\$clade_assignment_software_database_version\t\$total_reads\t\$qc_filtered\t\$reads_host_x2\t\$pc_reads_host\t\$reads_virus\t\$pc_reads_virus\t\$unmapped_reads\t\$pc_unmapped\t\$coverage_depth\t\$pc_genome_greater_10x\t\$pc_Ns\t\$variants_in_consensus\t\$variants_with_effect\t\$number_unambiguous_bases\t\$number_Ns\t\$read_length\t\$analysis_date\t\$cov_HA\t\$cov_MP\t\$cov_NA\t\$cov_NP\t\$cov_NS\t\$cov_PA\t\$cov_PB1\t\$cov_PB2\t\$cov10x_HA\t\$cov10x_MP\t\$cov10x_NA\t\$cov10x_NP\t\$cov10x_NS\t\$cov10x_PA\t\$cov10x_PB1\t\$cov10x_PB2\t\$perNs_HA\t\$perNs_MP\t\$perNs_NA\t\$perNs_NP\t\$perNs_NS\t\$perNs_PA\t\$perNs_PB1\t\$perNs_PB2\t\$variants_HA\t\$variants_MP\t\$variants_NA\t\$variants_NP\t\$variants_NS\t\$variants_PA\t\$variants_PB1\t\$variants_PB2\" >> summary_stats_\$(date \"+%Y%m%d\").tab
     echo -e \"-----Statistics for \$in correctly added into summary_stats_\$(date \"+%Y%m%d\").tab-----\n\"
     unset gene_coverage coverages_10x per_Ns variants
   done
-" > _05_create_mapping_stats.sh
+" > _05_create_summary_stats.sh
+
+# Run _05_create_summary_stats.sh
+echo "srun --partition middle_idx --chdir ${scratch_dir} --output logs/SUMMARY_STATS.%j.log --job-name SUMMARY_STATS --time 01:00:00 bash ${scratch_dir}/_05_create_summary_stats.sh &" > _05_run_create_summary_stats.sh
