@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.10dev] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.10dev
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Redefine the analysis date and lineage analysis date variables in create_summary_report.sh from viralrecon's template [#522](https://github.com/BU-ISCIII/buisciii-tools/issues/522).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.9] - 2025-05-13 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.9
 
 ### Credits
