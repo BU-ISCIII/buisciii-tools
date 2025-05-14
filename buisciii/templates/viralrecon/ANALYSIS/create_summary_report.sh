@@ -57,7 +57,7 @@ do
     clade=$(tail -n +2 */variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
     clade_assignment_date=$analysis_date
     clade_assignment_software_database_version=$(cat *_viralrecon.log | grep 'nextclade_dataset_tag' | awk -F ': ' '{print $2}')
-    lineage_analysis_date=$(cat $(ls -t ../../DOC/*viralrecon.config | head -n 1) | grep -A1 "pangolin" | grep datadir | sed -E 's/.*\/([0-9]{8})\/.*/\1/')
+    lineage_analysis_date=$(cat $(ls -t ../../DOC/*viralrecon.config | head -n 1) | grep -A1 "pangolin" | grep "datadir" | sed -E 's/.*\/([0-9]{8})\/.*/\1/')
     lineage_assignment_database_version=$(cat /data/ucct/bi/references/pangolin/$lineage_analysis_date/*_pangolin.log | grep -oP 'pangolin-data updated to \K[^ ]+')
 
     # Update the .csv pangolin files 
