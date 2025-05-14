@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Template fixes and updates
 
-- Redefine the analysis date and lineage analysis date variables in create_summary_report.sh from viralrecon's template [#522](https://github.com/BU-ISCIII/buisciii-tools/issues/522).
+- Redefinition of analysis_date and lineage_analysis_date based on mapping folder and DOC config in viralrecon's template [#522](https://github.com/BU-ISCIII/buisciii-tools/issues/522).
 
 ### Modules
 
