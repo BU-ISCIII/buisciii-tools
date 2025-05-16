@@ -40,9 +40,9 @@ echo "
 
 # Combine all results into one single file.
 echo "
-  echo \"Concatenating nextclade.csv files...\"
-  first_file=\$(find . -type f -name \"nextclade.csv\" | head -n 1)
-  head -n 1 \"\$first_file\" > nextclade_combined.csv
-  find . -type f -name \"nextclade.csv\" -exec awk 'NR>1' {} >> nextclade_combined.csv \;
-  echo \"Results concatenated into nextclade_combined.csv\"
-" > _02_merge_results.sh
+  # Activate the conda environment
+  eval \"\$(micromamba shell hook --shell bash)\"
+  micromamba activate biopython_v1.84
+  echo -e \"-----Generating nextclade_combined.csv-----\"
+  python3 merge_results.py
+" > _02_run_merge_results.sh
