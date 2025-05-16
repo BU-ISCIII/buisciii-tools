@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Template fixes and updates
 
 - Redefinition of analysis_date and lineage_analysis_date based on mapping folder and DOC config in viralrecon's template [#523](https://github.com/BU-ISCIII/buisciii-tools/pull/523).
-- Fix analysis_date format in create_summary_report.sh [#525](https://github.com/BU-ISCIII/buisciii-tools/pull/525).
+- Fix analysis_date and lineage_assignment_date format in create_summary_report.sh [#525](https://github.com/BU-ISCIII/buisciii-tools/pull/525).
 
 ### Modules
 
