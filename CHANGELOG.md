@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Redefinition of analysis_date and lineage_analysis_date based on mapping folder and DOC config in viralrecon's template [#523](https://github.com/BU-ISCIII/buisciii-tools/pull/523).
 - Fix analysis_date and lineage_assignment_date format in create_summary_report.sh [#525](https://github.com/BU-ISCIII/buisciii-tools/pull/525).
-- Created a new script to correctly merge all nextclade results into one .csv file in IRMA's template [#526](https://github.com/BU-ISCIII/buisciii-tools/pull/526).
+- Created a new script to correctly merge all nextclade results into one .csv file in IRMA's template, apart from updating lablog_irma_results with new symlinks to relevant files [#526](https://github.com/BU-ISCIII/buisciii-tools/pull/526).
 
 ### Modules
 
