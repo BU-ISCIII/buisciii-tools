@@ -33,7 +33,7 @@ do
     perc_host=$(echo $(awk -v v1=$total_reads -v v2=$reads_host_x2 'BEGIN {print (v2*100)/v1}') )
 
     reads_virus=$(cat ${arr[1]}*/variants/bowtie2/samtools_stats/${arr[0]}.sorted.bam.flagstat | grep '+ 0 mapped' | cut -d ' ' -f1)
-    
+
     unmapped_reads=$(echo $((total_reads - (reads_host_x2+reads_virus))) )
     perc_unmapped=$(echo $(awk -v v1=$total_reads -v v2=$unmapped_reads  'BEGIN {print (v2/v1)*100}') )
 
@@ -52,27 +52,30 @@ do
 
     read_length=$(cat ${arr[1]}*/multiqc/multiqc_data/multiqc_fastqc.yaml | grep -A5 -E "'?${arr[0]}+(_1)?'?:$" | grep "Sequence length:" | tr "-" " " | rev | cut -d " " -f1 | rev)
 
-    analysis_date=$(ls -d *_mapping | grep -oP '\d{8}' | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
+    analysis_date=$(date '+%Y%m%d')
 
-    clade=$(tail -n +2 */variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
+    clade=$(tail -n +2 ${arr[1]}*/variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
     clade_assignment_date=$analysis_date
-    clade_assignment_software_database_version=$(cat *_viralrecon.log | grep 'nextclade_dataset_tag' | awk -F ': ' '{print $2}')
-    lineage_assignment_date_raw=$(cat $(ls -t ../../DOC/*viralrecon.config | head -n 1) | grep -A1 "pangolin" | grep "datadir" | sed -E 's/.*\/([0-9]{8})\/.*/\1/')
-    lineage_assignment_date=$(echo $lineage_assignment_date_raw | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
-    lineage_assignment_database_version=$(cat /data/ucct/bi/references/pangolin/$lineage_assignment_date_raw/*_pangolin.log | grep -oP 'pangolin-data updated to \K[^ ]+')
+    clade_assignment_software_database_version=$(cat *_viralrecon.log | grep 'nextclade_dataset_tag' | awk -F ': ' '{print $2}' | head -n 1)
+    lineage_analysis_date=$analysis_date
+    lineage_algorithm_software_version=$(cat /data/ucct/bi/references/pangolin/$lineage_analysis_date/*_pangolin.log | grep -oP 'pangolin-data updated to \K[^ ]+')
 
-    # Update the .csv pangolin files 
-    temp_file="${arr[0]}_tmp.csv"
-    touch $temp_file
+    # Only update pangolin CSV if the folder exists
+    pangolin_dir=$(echo "${arr[1]}"*/variants/ivar/consensus/bcftools/pangolin)
+    if [[ -d "${pangolin_dir}" && -f "$pangolin_dir/${arr[0]}.pangolin.csv" ]]; then
+        # Update the .csv pangolin files
+        temp_file="${arr[0]}_tmp.csv"
+        touch $temp_file
 
-    {
-    IFS= read -r header
-    echo "${header},lineage_assignment_date,lineage_assignment_database_version"
-    IFS= read -r row
-    echo "${row},$lineage_assignment_date,$lineage_assignment_database_version"
-    } < ./*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv > $temp_file
+        {
+        IFS= read -r header
+        echo "${header},lineage_assignment_date,lineage_assignment_database_version"
+        IFS= read -r row
+        echo "${row},$lineage_assignment_date,$lineage_assignment_database_version"
+        } < ./${arr[1]}*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv > $temp_file
 
-    mv $temp_file ./*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv
+        mv $temp_file ./${arr[1]}*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv
+    fi
 
     # Introduce data row into output file
     echo -e "${RUN}\t${USER}\t${HOST}\t${arr[1]}\t${arr[0]}\t$total_reads\t$reads_hostR1\t$reads_host_x2\t$perc_host\t$reads_virus\t$reads_virus_perc\t$unmapped_reads\t$perc_unmapped\t$medianDPcov\t$cov10x\t$vars_in_cons10x\t$missense\t$ns_10x_perc\t$lineage\t$clade\t$clade_assignment_software_database_version\t$clade_assignment_date\t$read_length\t$analysis_date" >> mapping_illumina_$(date '+%Y%m%d').tab
