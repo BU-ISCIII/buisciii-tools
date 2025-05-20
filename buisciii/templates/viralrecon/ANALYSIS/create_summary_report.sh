@@ -52,13 +52,14 @@ do
 
     read_length=$(cat ${arr[1]}*/multiqc/multiqc_data/multiqc_fastqc.yaml | grep -A5 -E "'?${arr[0]}+(_1)?'?:$" | grep "Sequence length:" | tr "-" " " | rev | cut -d " " -f1 | rev)
 
-    analysis_date=$(date '+%Y%m%d')
+    analysis_date=$(ls -d *_mapping | grep -oP '\d{8}' | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
 
-    clade=$(tail -n +2 ${arr[1]}*/variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
+    clade=$(tail -n +2 */variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
     clade_assignment_date=$analysis_date
-    clade_assignment_software_database_version=$(cat *_viralrecon.log | grep 'nextclade_dataset_tag' | awk -F ': ' '{print $2}' | head -n 1)
-    lineage_analysis_date=$analysis_date
-    lineage_algorithm_software_version=$(cat /data/ucct/bi/references/pangolin/$lineage_analysis_date/*_pangolin.log | grep -oP 'pangolin-data updated to \K[^ ]+')
+    clade_assignment_software_database_version=$(cat *_viralrecon.log | grep 'nextclade_dataset_tag' | awk -F ': ' '{print $2}')
+    lineage_assignment_date_raw=$(cat $(ls -t ../../DOC/*viralrecon.config | head -n 1) | grep -A1 "pangolin" | grep "datadir" | sed -E 's/.*\/([0-9]{8})\/.*/\1/')
+    lineage_assignment_date=$(echo $lineage_assignment_date_raw | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
+    lineage_assignment_database_version=$(cat /data/ucct/bi/references/pangolin/$lineage_assignment_date_raw/*_pangolin.log | grep -oP 'pangolin-data updated to \K[^ ]+')
 
     # Only update pangolin CSV if the folder exists
     pangolin_dir=$(echo "${arr[1]}"*/variants/ivar/consensus/bcftools/pangolin)
