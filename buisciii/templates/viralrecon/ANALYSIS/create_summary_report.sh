@@ -63,19 +63,24 @@ do
 
     # Only update pangolin CSV if the folder exists
     pangolin_dir=$(echo "${arr[1]}"*/variants/ivar/consensus/bcftools/pangolin)
-    if [[ -d "${pangolin_dir}" && -f "$pangolin_dir/${arr[0]}.pangolin.csv" ]]; then
-        # Update the .csv pangolin files
-        temp_file="${arr[0]}_tmp.csv"
-        touch $temp_file
+    pangolin_file=$(echo "$pangolin_dir/${arr[0]}.pangolin.csv")
+    if [[ -f "$pangolin_file" ]]; then
+        header_line=$(head -n 1 "$pangolin_file")
 
-        {
-        IFS= read -r header
-        echo "${header},lineage_assignment_date,lineage_assignment_database_version"
-        IFS= read -r row
-        echo "${row},$lineage_assignment_date,$lineage_assignment_database_version"
-        } < ./${arr[1]}*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv > $temp_file
+        if ! echo "$header_line" | grep -q "lineage_assignment_date,lineage_assignment_database_version"; then
+            # Update the .csv pangolin files if the lineage columns are missing
+            temp_file="${arr[0]}_tmp.csv"
+            touch $temp_file
 
-        mv $temp_file ./${arr[1]}*/variants/ivar/consensus/bcftools/pangolin/${arr[0]}.pangolin.csv
+            {
+                IFS= read -r header
+                echo "${header},lineage_assignment_date,lineage_assignment_database_version"
+                IFS= read -r row
+                echo "${row},$lineage_assignment_date,$lineage_assignment_database_version"
+            } < $pangolin_file > $temp_file
+
+            mv $temp_file $pangolin_file
+        fi
     fi
 
     # Introduce data row into output file
