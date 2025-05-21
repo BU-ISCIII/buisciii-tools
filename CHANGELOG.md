@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.10] - 2025-05-21 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.10
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
+
+### Template fixes and updates
+
+- Redefinition of analysis_date and lineage_analysis_date based on mapping folder and DOC config in viralrecon's template [#523](https://github.com/BU-ISCIII/buisciii-tools/pull/523).
+- Fix analysis_date and lineage_assignment_date format in create_summary_report.sh [#525](https://github.com/BU-ISCIII/buisciii-tools/pull/525).
+- Created a new script to correctly merge all nextclade results into one .csv file in IRMA's template, apart from updating lablog_irma_results with new symlinks to relevant files [#526](https://github.com/BU-ISCIII/buisciii-tools/pull/526).
+- Adapted create_summary_report.sh to handle multiple references and add lineage columns to pangolin .csv only if they do not exist yet [#530](https://github.com/BU-ISCIII/buisciii-tools/pull/530).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.9] - 2025-05-13 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.9
 
 ### Credits

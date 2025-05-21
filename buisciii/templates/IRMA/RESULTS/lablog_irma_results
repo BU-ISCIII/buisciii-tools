@@ -16,6 +16,8 @@ while true; do
         ln -s ../../ANALYSIS/*_IRMA/04-irma/A_H* .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/B .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/C .
+        ln -s ../../ANALYSIS/*_IRMA/99-stats/summary_stats_*.tab summary_stats.tab
+        ln -s ../../ANALYSIS/*_IRMA/99-stats/variants_long_table.csv .
         tail -n +2 ../../ANALYSIS/*_IRMA/04-irma/irma_stats_flu.txt | cut -f5 | sort | uniq -c > flu_type_summary.txt
         break
     elif [ "$ORGANISM" == "2" ]; then
