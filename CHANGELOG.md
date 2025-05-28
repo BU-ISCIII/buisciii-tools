@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.11] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.11dev
+
+### Credits
+
+- [Juan Ledesma](https://github.com/juanledesma78)
+
+### Template fixes and updates
+
+- Added micromamba environment PikaVirus_dev_2.6 to file hpc_slurm_pikavirus.config [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.10] - 2025-05-21 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.10
 
 ### Credits
