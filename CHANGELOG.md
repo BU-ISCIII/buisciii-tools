@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Template fixes and updates
 
-- Added micromamba environment PikaVirus_dev_2.6 to file hpc_slurm_pikavirus.config [#509](https://github.com/BU-ISCIII/buisciii-tools/pull/509).
+- Added micromamba environment PikaVirus_dev_2.6 to file hpc_slurm_pikavirus.config [#535](https://github.com/BU-ISCIII/buisciii-tools/pull/535).
 
 ### Modules
 
