@@ -52,7 +52,7 @@ do
 
     read_length=$(cat ${arr[1]}*/multiqc/multiqc_data/multiqc_fastqc.yaml | grep -A5 -E "'?${arr[0]}+(_1)?'?:$" | grep "Sequence length:" | tr "-" " " | rev | cut -d " " -f1 | rev)
 
-    analysis_date=$(ls -d *_mapping | grep -oP '\d{8}' | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
+    analysis_date=$(ls -d *_mapping | sed -n 's/.*_\([0-9]\{8\}\)_viralrecon_mapping$/\1/p' | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/' | sort -u)
 
     clade=$(tail -n +2 ${arr[1]}*/variants/ivar/consensus/bcftools/nextclade/${arr[0]}.csv | cut -d ";" -f 3)
     clade_assignment_date=$analysis_date
