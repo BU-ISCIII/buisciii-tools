@@ -9,13 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Juan Ledesma](https://github.com/juanledesma78)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Template fixes and updates
 
 - Added micromamba environment PikaVirus_dev_2.6 to file hpc_slurm_pikavirus.config [#535](https://github.com/BU-ISCIII/buisciii-tools/pull/535).
-- Changed analysis_date in create_summary_report.sh to take properly dates from RSV services when using viralrecon [#540](https://github.com/BU-ISCIII/buisciii-tools/pull/540)
+- Changed analysis_date in create_summary_report.sh to take properly dates from RSV services when using viralrecon [#540](https://github.com/BU-ISCIII/buisciii-tools/pull/540).
 
 ### Modules
+
+- Fixed clean module to handle subpaths stated in services.json [#543](https://github.com/BU-ISCIII/buisciii-tools/pull/543).
 
 #### Added enhancements
 
