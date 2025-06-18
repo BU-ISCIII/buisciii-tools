@@ -237,7 +237,9 @@ class CleanUp:
 
         # Check found list without duplicates
         if not sorted(list(dict.fromkeys(found))) == sorted(to_find):
-            stderr.print("[orange]WARNING: Some files/dirs to delete/rename were not found")
+            stderr.print(
+                "[orange]WARNING: Some files/dirs to delete/rename were not found"
+            )
             for item in to_find:
                 if item not in found:
                     stderr.print(f"[orange] {item}")
