@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Juan Ledesma](https://github.com/juanledesma78)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
 
 ### Template fixes and updates
 
@@ -25,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Fixes
 
 #### Changed
+
+- Modified bu-isciii > buisciii for all commands in README text [#548](https://github.com/BU-ISCIII/buisciii-tools/pull/548).
 
 #### Removed
 
