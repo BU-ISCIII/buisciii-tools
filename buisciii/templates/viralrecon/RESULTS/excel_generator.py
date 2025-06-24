@@ -105,7 +105,7 @@ def excel_generator(csv_files: List[str]):
         elif "illumina" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
             table["analysis_date"] = pd.to_datetime(
-                table["analysis_date"].astype(str), format="%Y%m%d"
+                table["analysis_date"].astype(str), format="%Y-%m-%d"
             )
         elif "assembly" in str(file) or ".tsv" in str(file) or ".tab" in str(file):
             table = pd.read_csv(file, sep="\t", header=0)
