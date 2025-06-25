@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed analysis_date in create_summary_report.sh to take properly dates from RSV services when using viralrecon [#540](https://github.com/BU-ISCIII/buisciii-tools/pull/540).
 - Fixed date formats for IRMA's template and excel_generator.py [#549](https://github.com/BU-ISCIII/buisciii-tools/pull/549).
 - Fixed the way whether samples are paired or single-end is detected [#550](https://github.com/BU-ISCIII/buisciii-tools/pull/550).
+- Removed pseudo_aligner parameter from RNASeq's lablog and added all missing symlinks in its RESULTS's lablog [#552](https://github.com/BU-ISCIII/buisciii-tools/pull/552).
 
 ### Modules
 
