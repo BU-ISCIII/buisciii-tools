@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Added enhancements
 
+- Added new script to download multiple SRA entries in fastq format when necessary [#551](https://github.com/BU-ISCIII/buisciii-tools/pull/551).
+
 #### Fixes
 
 #### Changed
