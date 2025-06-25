@@ -16,4 +16,7 @@ ln -s ../../ANALYSIS/*_DIFFERENTIAL_EXPRESSION/[0-9]*_* .
 
 # Links to counts files
 ln -s ../../ANALYSIS/*_RNASEQ/*_rnaseq/star_salmon/salmon.merged.gene_counts.tsv .
+ln -s ../../ANALYSIS/*_RNASEQ/*_rnaseq/star_salmon/salmon.merged.gene_tpm.tsv .
+ln -s ../../ANALYSIS/*_RNASEQ/*_rnaseq/star_salmon/salmon.merged.transcript_counts.tsv .
+ln -s ../../ANALYSIS/*_RNASEQ/*_rnaseq/star_salmon/salmon.merged.transcript_tpm.tsv .
 ln -s ../../ANALYSIS/*_RNASEQ/02-differential_expression/99-stats/normalized_expression.csv .
