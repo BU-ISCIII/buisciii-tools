@@ -22,7 +22,7 @@ do
 
     reads_hostR1=$(cat ${arr[1]}*/kraken2/${arr[0]}.kraken2.report.txt | grep -v 'unclassified' | cut -f3 | awk '{s+=$1}END{print s}')
 
-    if [ -f "../../RAW/${arr[0]}_R2.fastq.gz" ]; then
+    if [ -f "00-reads/${arr[0]}_R2.fastq.gz" ]; then
         # Paired-end reads
         reads_host_x2=$(echo $((reads_hostR1 * 2)) )
     else
