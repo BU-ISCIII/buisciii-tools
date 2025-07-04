@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed date formats for IRMA's template and excel_generator.py [#549](https://github.com/BU-ISCIII/buisciii-tools/pull/549).
 - Fixed the way whether samples are paired or single-end is detected [#550](https://github.com/BU-ISCIII/buisciii-tools/pull/550).
 - Removed pseudo_aligner parameter from RNASeq's lablog and added all missing symlinks in its RESULTS's lablog [#552](https://github.com/BU-ISCIII/buisciii-tools/pull/552).
+- Updated scratch.py and __main__.py to properly handle custom paths and temporary directories [#555](https://github.com/BU-ISCIII/buisciii-tools/pull/555).
 
 ### Modules
 
