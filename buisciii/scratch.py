@@ -113,11 +113,11 @@ class Scratch:
             try:
                 if protocol == "rsync":
                     rsync_command = sysrsync.get_rsync_command(
-                            source=self.full_path,
-                            destination=self.tmp_dir,
-                            options=self.conf["options"],
-                            exclusions=self.conf["exclusions"],
-                            sync_source_contents=False,
+                        source=self.full_path,
+                        destination=self.tmp_dir,
+                        options=self.conf["options"],
+                        exclusions=self.conf["exclusions"],
+                        sync_source_contents=False,
                     )
                     exit_code = self.srun_command(self.srun_settings, rsync_command)
 
