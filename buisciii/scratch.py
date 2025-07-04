@@ -82,7 +82,7 @@ class Scratch:
             )
             sys.exit()
         elif path is not None and ask_path is False:
-            self.path = path
+            self.full_path = path
         elif path is not None and ask_path is not False:
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
@@ -95,8 +95,8 @@ class Scratch:
                 self.resolution_info,
                 "non_archived_path",
             )
+            self.full_path = os.path.join(self.path, self.service_folder)
 
-        self.full_path = os.path.join(self.path, self.service_folder)
         self.out_file = os.path.join(self.full_path, "DOC", "service_info.txt")
 
     def srun_command(self, srun_settings, command):
@@ -113,11 +113,11 @@ class Scratch:
             try:
                 if protocol == "rsync":
                     rsync_command = sysrsync.get_rsync_command(
-                        source=self.full_path,
-                        destination=self.conf["scratch_path"] + "/",
-                        options=self.conf["options"],
-                        exclusions=self.conf["exclusions"],
-                        sync_source_contents=False,
+                            source=self.full_path,
+                            destination=self.tmp_dir,
+                            options=self.conf["options"],
+                            exclusions=self.conf["exclusions"],
+                            sync_source_contents=False,
                     )
                     exit_code = self.srun_command(self.srun_settings, rsync_command)
 
@@ -169,15 +169,15 @@ class Scratch:
             f = open(self.out_file, "r")
             for line in f:
                 if re.search("Origin service directory:", line):
-                    dest_folder = "".join(line.split()[3])
-                    dest_dir = os.path.normpath("/".join(dest_folder.split("/")[:-1]))
+                    dest_folder = os.path.normpath("".join(line.split()[3]))
+                    dest_dir = os.path.dirname(dest_folder)
             stderr.print("[blue]to %s" % dest_folder)
             if self.service_folder in dest_folder:
                 try:
                     if self.conf["protocol"] == "rsync":
                         # scratch_tmp cannot be used due to permission issues
                         scratch_bi_path = "".join(
-                            [self.conf["scratch_path"], self.service_folder]
+                            [self.tmp_dir, self.service_folder]
                         )
                         rsync_command = sysrsync.get_rsync_command(
                             source=scratch_bi_path,
