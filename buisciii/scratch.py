@@ -176,9 +176,7 @@ class Scratch:
                 try:
                     if self.conf["protocol"] == "rsync":
                         # scratch_tmp cannot be used due to permission issues
-                        scratch_bi_path = "".join(
-                            [self.tmp_dir, self.service_folder]
-                        )
+                        scratch_bi_path = "".join([self.tmp_dir, self.service_folder])
                         rsync_command = sysrsync.get_rsync_command(
                             source=scratch_bi_path,
                             destination=dest_dir,
