@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the way whether samples are paired or single-end is detected [#550](https://github.com/BU-ISCIII/buisciii-tools/pull/550).
 - Removed pseudo_aligner parameter from RNASeq's lablog and added all missing symlinks in its RESULTS's lablog [#552](https://github.com/BU-ISCIII/buisciii-tools/pull/552).
 - Updated scratch.py and __main__.py to properly handle custom paths and temporary directories [#555](https://github.com/BU-ISCIII/buisciii-tools/pull/555).
+- Updated create_summary_report.sh to transform negative values into 0 [#556](https://github.com/BU-ISCIII/buisciii-tools/pull/556).
 
 ### Modules
 
