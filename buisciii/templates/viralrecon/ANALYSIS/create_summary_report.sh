@@ -34,8 +34,15 @@ do
 
     reads_virus=$(cat ${arr[1]}*/variants/bowtie2/samtools_stats/${arr[0]}.sorted.bam.flagstat | grep '+ 0 mapped' | cut -d ' ' -f1)
 
-    unmapped_reads=$(echo $((total_reads - (reads_host_x2+reads_virus))) )
-    perc_unmapped=$(echo $(awk -v v1=$total_reads -v v2=$unmapped_reads  'BEGIN {print (v2/v1)*100}') )
+    unmapped_reads=$((total_reads - (reads_host_x2 + reads_virus)))
+    if ((unmapped_reads < 0)); then
+        unmapped_reads=0
+    fi
+
+    perc_unmapped=$(awk -v v1=$total_reads -v v2=$unmapped_reads 'BEGIN {
+        if (v1 == 0 || v2 < 0) print 0;
+        else print (v2/v1)*100
+    }')
 
     ns_10x_perc=$(cat %Ns.tab | grep -w ${arr[0]} | grep ${arr[1]} | cut -f2)
 
