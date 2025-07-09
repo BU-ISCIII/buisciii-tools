@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Modules
 
 - Fixed clean module to handle subpaths stated in services.json [#543](https://github.com/BU-ISCIII/buisciii-tools/pull/543).
+- Fixed bioinfo_doc module to be able to indicate type (service_info or delivery) via CLI [#558](https://github.com/BU-ISCIII/buisciii-tools/pull/558).
 
 #### Added enhancements
 
