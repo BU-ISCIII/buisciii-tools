@@ -31,7 +31,7 @@ if (ncol(samples_ref) == 2) {
 
 # Fastq path
 
-fastq_names <- list.files("../../RAW/")
+fastq_names <- list.files("../../RAW/", pattern = "\\.fastq\\.gz$")
 path_run <- Sys.readlink(paste0("../../RAW/", fastq_names[1]))
 
 # columnas
@@ -78,31 +78,32 @@ for (i in 1:nrow(samples_ref)) {
     
     # Contigs
     assembly_workdir <- paste(workdir, "/assembly", sep = "")
-    quast_report_path <- paste("/",list.files(pattern = "transposed_report.tsv", recursive = TRUE, path = assembly_workdir), sep = "")
-    table_quast <- read.delim(paste0(assembly_workdir, quast_report_path), skip = 0, header = T, sep = "\t")
+    quast_report_path <- list.files(pattern = "transposed_report.tsv", recursive = TRUE, path = assembly_workdir)
+
+    if (length(quast_report_path) > 0) {
+        table_quast <- read.delim(paste0(assembly_workdir, "/", quast_report_path[1]), skip = 0, header = T, sep = "\t")
+    } else {
+        table_quast <- NULL
+    }
 
     # no quast error
-    if (exists("table_quast") == FALSE) {
+    if (is.null(table_quast)) {
         value_contigs <- NA
         value_lcontig <- NA
         value_genomef <- NA
     } else {
-
         sample_data <- subset(table_quast, Assembly == paste(name_id, "scaffolds", sep = "."))
         value_contigs <- as.numeric(sample_data$X..contigs)
         value_lcontig <- as.numeric(sample_data$Largest.contig)
         value_genomef <- as.numeric(as.character(sample_data$Genome.fraction....))
-        
-        # empty values
+
         # empty values
         if (length(value_contigs) == 0) {
             value_contigs <- NA
         }
-
         if (length(value_lcontig) == 0) {
             value_lcontig <- NA
         }
-
         if (length(value_genomef) == 0) {
             value_genomef <- NA
         }
