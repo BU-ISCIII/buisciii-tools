@@ -51,11 +51,14 @@ class BioinfoDoc:
         conf=None,
         email_psswd=None,
     ):
-        if type is None:
-            self.type = buisciii.utils.prompt_selection(
+        self.type = (
+            type
+            if type is not None
+            else buisciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
                 choices=["service_info", "delivery"],
             )
+        )
         self.conf = conf.get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
