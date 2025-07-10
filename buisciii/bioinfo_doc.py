@@ -52,7 +52,7 @@ class BioinfoDoc:
         email_psswd=None,
     ):
         # Type validation
-        valid_types=["service_info", "delivery"]
+        valid_types = ["service_info", "delivery"]
         if type is None:
             self.type = buisciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
