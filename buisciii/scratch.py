@@ -70,7 +70,9 @@ class Scratch:
             "resolution_full_number"
         ]
         if self.tmp_dir.startswith("/scratch/bi"):
-            tmp_dir = self.tmp_dir.replace("/scratch/bi", "/data/ucct/bi/scratch_tmp/bi", 1)
+            tmp_dir = self.tmp_dir.replace(
+                "/scratch/bi", "/data/ucct/bi/scratch_tmp/bi", 1
+            )
         else:
             tmp_dir = self.tmp_dir
         self.scratch_tmp_path = os.path.join(tmp_dir, self.service_folder)
