@@ -69,7 +69,11 @@ class Scratch:
         self.service_folder = self.resolution_info["resolutions"][0][
             "resolution_full_number"
         ]
-        self.scratch_tmp_path = os.path.join(self.tmp_dir, self.service_folder)
+        if self.tmp_dir.startswith("/scratch/bi"):
+            tmp_dir = self.tmp_dir.replace("/scratch/bi", "/data/ucct/bi/scratch_tmp/bi", 1)
+        else:
+            tmp_dir = self.tmp_dir
+        self.scratch_tmp_path = os.path.join(tmp_dir, self.service_folder)
         # params like --chdir, --partition and --time
         srun_params = self.conf["srun_settings"].items()
         self.srun_settings = [arg for param in srun_params for arg in param]
