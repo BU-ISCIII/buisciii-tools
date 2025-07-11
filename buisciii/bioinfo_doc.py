@@ -51,11 +51,19 @@ class BioinfoDoc:
         conf=None,
         email_psswd=None,
     ):
+        # Type validation
+        valid_types = ["service_info", "delivery"]
         if type is None:
             self.type = buisciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
-                choices=["service_info", "delivery"],
+                choices=valid_types,
             )
+        else:
+            if type not in valid_types:
+                raise ValueError(
+                    f"Invalid type: '{type}'. It must be one of the following: {', '.join(valid_types)}."
+                )
+            self.type = type
         self.conf = conf.get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
