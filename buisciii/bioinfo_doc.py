@@ -670,15 +670,21 @@ class BioinfoDoc:
                                     f"Provided file doesn't exist. Attempts left: {i}"
                                 )
                             else:
-                                stderr.print(f"File selected: {email_data['email_notes']}")
+                                stderr.print(
+                                    f"File selected: {email_data['email_notes']}"
+                                )
                                 break
                         else:
                             stderr.print(
                                 "No more attempts. Email notes will be given by prompt"
                             )
-                            email_data["email_notes"] = buisciii.utils.ask_for_some_text(
+                            email_data[
+                                "email_notes"
+                            ] = buisciii.utils.ask_for_some_text(
                                 msg="Write email notes"
-                            ).replace("\n", "<br />")
+                            ).replace(
+                                "\n", "<br />"
+                            )
                     else:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                             msg="Write email notes"
