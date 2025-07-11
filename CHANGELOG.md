@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed clean module to handle subpaths stated in services.json [#543](https://github.com/BU-ISCIII/buisciii-tools/pull/543).
 - Fixed bioinfo_doc module to be able to indicate type (service_info or delivery) via CLI [#558](https://github.com/BU-ISCIII/buisciii-tools/pull/558).
+- Fixed the bioinfo_doc module to properly ask for email text notes and the scratch module to use proper scratch_tmp_path [#559](https://github.com/BU-ISCIII/buisciii-tools/pull/559).
 
 #### Added enhancements
 
