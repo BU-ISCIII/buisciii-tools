@@ -678,9 +678,11 @@ class BioinfoDoc:
                             stderr.print(
                                 "No more attempts. Email notes will be given by prompt"
                             )
-                            email_data["email_notes"] = buisciii.utils.ask_for_some_text(
-                                msg="Write email notes"
-                            ).replace("\n", "<br />")
+                            email_data["email_notes"] = (
+                                buisciii.utils.ask_for_some_text(
+                                    msg="Write email notes"
+                                ).replace("\n", "<br />")
+                            )
                     else:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                             msg="Write email notes"
