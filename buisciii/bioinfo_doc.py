@@ -675,20 +675,10 @@ class BioinfoDoc:
                                 )
                                 break
                         else:
-                            stderr.print(
-                                "No more attempts. Email notes will be given by prompt"
-                            )
-                            email_data[
-                                "email_notes"
-                            ] = buisciii.utils.ask_for_some_text(
-                                msg="Write email notes"
-                            ).replace(
-                                "\n", "<br />"
-                            )
+                            stderr.print("No more attempts. Email notes will be given by prompt")
+                            email_data["email_notes"] = buisciii.utils.ask_for_some_text(msg="Write email notes").replace("\n", "<br />")
                     else:
-                        email_data["email_notes"] = buisciii.utils.ask_for_some_text(
-                            msg="Write email notes"
-                        ).replace("\n", "<br />")
+                        email_data["email_notes"] = buisciii.utils.ask_for_some_text(msg="Write email notes").replace("\n", "<br />")
             else:
                 if buisciii.utils.prompt_yn_question(
                     msg="Do you wish to provide a text file for email notes?",
