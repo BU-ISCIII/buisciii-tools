@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.11] - 2025-07-11 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.11
+
+### Credits
+
+- [Juan Ledesma](https://github.com/juanledesma78)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Jaime Ozáez](https://github.com/jaimeozaez)
+
+### Template fixes and updates
+
+- Added micromamba environment PikaVirus_dev_2.6 to file hpc_slurm_pikavirus.config [#535](https://github.com/BU-ISCIII/buisciii-tools/pull/535).
+- Changed analysis_date in create_summary_report.sh to take properly dates from RSV services when using viralrecon [#540](https://github.com/BU-ISCIII/buisciii-tools/pull/540).
+- Fixed date formats for IRMA's template and excel_generator.py [#549](https://github.com/BU-ISCIII/buisciii-tools/pull/549).
+- Fixed the way whether samples are paired or single-end is detected [#550](https://github.com/BU-ISCIII/buisciii-tools/pull/550).
+- Removed pseudo_aligner parameter from RNASeq's lablog and added all missing symlinks in its RESULTS's lablog [#552](https://github.com/BU-ISCIII/buisciii-tools/pull/552).
+- Updated scratch.py and __main__.py to properly handle custom paths and temporary directories [#555](https://github.com/BU-ISCIII/buisciii-tools/pull/555).
+- Updated create_summary_report.sh to transform negative values into 0 [#556](https://github.com/BU-ISCIII/buisciii-tools/pull/556).
+- Updated the assembly stats script to handle files in RAW properly and when quast results are not available for any sample [#557](https://github.com/BU-ISCIII/buisciii-tools/pull/557).
+
+### Modules
+
+- Fixed clean module to handle subpaths stated in services.json [#543](https://github.com/BU-ISCIII/buisciii-tools/pull/543).
+- Fixed bioinfo_doc module to be able to indicate type (service_info or delivery) via CLI [#558](https://github.com/BU-ISCIII/buisciii-tools/pull/558).
+- Fixed the bioinfo_doc module to properly ask for email text notes and the scratch module to use proper scratch_tmp_path [#559](https://github.com/BU-ISCIII/buisciii-tools/pull/559).
+
+#### Added enhancements
+
+- Added new script to download multiple SRA entries in fastq format when necessary [#551](https://github.com/BU-ISCIII/buisciii-tools/pull/551).
+
+#### Fixes
+
+#### Changed
+
+- Modified bu-isciii > buisciii for all commands in README text [#548](https://github.com/BU-ISCIII/buisciii-tools/pull/548).
+
+#### Removed
+
+### Requirements
+
 ## [2.2.10] - 2025-05-21 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.10
 
 ### Credits

@@ -69,13 +69,13 @@ pip install .
 Run bu-isciii tools:
 
 ```bash
-bu-isciii --help
+buisciii --help
 ```
 
 Outputs the following:
 
 ```bash
-Usage: bu-isciii [OPTIONS] COMMAND [ARGS]...
+Usage: buisciii [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --version                  Show the version and exit.
@@ -110,7 +110,7 @@ bu-isciii list
 Help:
 
 ```bash
-Usage: bu-isciii list [OPTIONS] <service>
+Usage: buisciii list [OPTIONS] <service>
 
   List available bu-isciii services.
 
@@ -163,13 +163,13 @@ Output:
 Example of usage:
 
 ```bash
-bu-isciii new-service <resolution_id>
+buisciii new-service <resolution_id>
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii new-service [OPTIONS] <resolution id>
+Usage: buisciii new-service [OPTIONS] <resolution id>
 
   Create new service, it will create folder and copy template depending on
   selected service.
@@ -186,13 +186,13 @@ Options:
 Example of usage:
 
 ```bash
-bu-isciii scratch --direction service_to_scratch <resolution_id>
+buisciii scratch --direction service_to_scratch <resolution_id>
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii scratch [OPTIONS] <resolution id>
+Usage: buisciii scratch [OPTIONS] <resolution id>
 
   Copy service folder to scratch directory for execution.
 
@@ -217,13 +217,13 @@ Options:
 Example of usage:
 
 ```bash
-bu-isciii finish <resolution_id>
+buisciii finish <resolution_id>
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii finish [OPTIONS] <resolution id>
+Usage: buisciii finish [OPTIONS] <resolution id>
 
   Service cleaning, remove big files, rename folders before copy and copy
   resolution FOLDER to sftp.
@@ -246,13 +246,13 @@ Finish module performs de following modules at onin this order, at once:
 Example of usage:
 
 ```bash
-bu-isciii clean <resolution_id>
+buisciii clean <resolution_id>
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii clean [OPTIONS] <resolution id>
+Usage: buisciii clean [OPTIONS] <resolution id>
 
   Service cleaning. It will either remove big files, rename folders before
   copy, revert this renaming, show removable files or show folders for no
@@ -278,7 +278,7 @@ Options:
 ##### scratch back
 
 ```bash
-bu-isciii scratch --direction scratch_to_service <resolution_id>
+buisciii scratch --direction scratch_to_service <resolution_id>
 ```
 
 ##### copy_sftp
@@ -286,13 +286,13 @@ bu-isciii scratch --direction scratch_to_service <resolution_id>
 Example of usage:
 
 ```bash
-bu-isciii copy-sftp <resolution_id>
+buisciii copy-sftp <resolution_id>
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii copy-sftp [OPTIONS] <resolution id>
+Usage: buisciii copy-sftp [OPTIONS] <resolution id>
 
   Copy resolution FOLDER to sftp, change status of resolution in iskylims and
   generate md, pdf, html.
@@ -311,13 +311,13 @@ Options:
 Example of usage:
 
 ```bash
-bu-isciii bioinfo-doc <resolution_id>
+buisciii bioinfo-doc <resolution_id>
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii bioinfo-doc [OPTIONS] <resolution id>
+Usage: buisciii bioinfo-doc [OPTIONS] <resolution id>
 
   Create the folder documentation structure in bioinfo_doc server
 
@@ -342,13 +342,13 @@ Options:
 Example of usage:
 
 ```bash
-bu-isciii archive --date_from 2022-01-01 --date_until 2023-01-01
+buisciii archive --date_from 2022-01-01 --date_until 2023-01-01
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii archive [OPTIONS]
+Usage: buisciii archive [OPTIONS]
 
   Archive services or retrieve services from archive
 
@@ -375,13 +375,13 @@ Options:
 Example of usage:
 
 ```bash
-bu-isciii autoclean-sftp
+buisciii autoclean-sftp
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii autoclean-sftp [OPTIONS]
+Usage: buisciii autoclean-sftp [OPTIONS]
 
   Clean old sftp services
 
@@ -397,13 +397,13 @@ Options:
 Example of usage:
 
 ```bash
-bu-isciii fix-permissions -d /data/bi
+buisciii fix-permissions -d /data/bi
 ```
 
 Help:
 
 ```bash
-Usage: bu-isciii fix-permissions [OPTIONS]
+Usage: buisciii fix-permissions [OPTIONS]
 
   Fix permissions
 

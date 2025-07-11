@@ -214,32 +214,37 @@ class CleanUp:
         """
         self.check_path_exists()
         pathlist = []
-        # key: root, values: [[files inside], [dirs inside]]
         found = []
-        # TODO: This has to be revisite if it takes to long.
-        # I've tried to continue if found, but I guess there could be several work folders in the project.. Let's see how it goes
-        for root, dirs, files in os.walk(self.full_path):
-            for item_to_be_found in to_find:
-                if os.path.basename(root) == item_to_be_found:
-                    pathlist.append(root)
-                    found.append(item_to_be_found)
-                for file in files:
-                    path = os.path.join(root, file)
-                    if file == item_to_be_found:
-                        pathlist.append(path)
-                        found.append(item_to_be_found)
+
+        for item_to_find in to_find:
+            # If there are subpaths in to_find, split them into different components (e.g., ["virus_coverage", "plots"], from virus_coverage/plots)
+            path_parts = item_to_find.split(os.sep)
+            target_name = path_parts[-1]
+            parent_dirs = path_parts[:-1]
+
+            for root, dirs, files in os.walk(self.full_path):
+                if root.endswith(os.sep.join(parent_dirs)):
+                    # Check for matching directories, if any
+                    if target_name in dirs:
+                        full_path = os.path.join(root, target_name)
+                        pathlist.append(full_path)
+                        found.append(item_to_find)
+                    # Check for matching files, if any
+                    if target_name in files:
+                        full_path = os.path.join(root, target_name)
+                        pathlist.append(full_path)
+                        found.append(item_to_find)
 
         # Check found list without duplicates
-        if not list(dict.fromkeys(found)).sort() == to_find.sort():
+        if not sorted(list(dict.fromkeys(found))) == sorted(to_find):
             stderr.print(
-                "[orange]WARNING:Some files/dir to delete/rename have not been found"
+                "[orange]WARNING: Some files/dirs to delete/rename were not found"
             )
             for item in to_find:
                 if item not in found:
-                    stderr.print("[orange] %s" % item)
-            return pathlist
-        else:
-            return pathlist
+                    stderr.print(f"[orange] {item}")
+
+        return pathlist
 
     def find_work(self):
         """

@@ -57,7 +57,7 @@ def run_buisciii():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "2.2.10"
+    __version__ = "2.2.11"
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
@@ -252,7 +252,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
     "-t",
     "--tmp_dir",
     type=click.Path(),
-    default="/data/ucct/bi/scratch_tmp/bi/",
+    default="/scratch/bi/",
     help="Directory to which the files will be transfered for execution. Default: /data/ucct/bi/scratch_tmp/bi/",
 )
 @click.option(
@@ -411,7 +411,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
     "-t",
     "--tmp_dir",
     type=click.Path(),
-    default="/data/ucct/bi/scratch_tmp/bi/",
+    default="/scratch/bi/",
     help="Absolute path to the scratch directory containing the service.",
 )
 @click.pass_context

@@ -51,11 +51,19 @@ class BioinfoDoc:
         conf=None,
         email_psswd=None,
     ):
+        # Type validation
+        valid_types = ["service_info", "delivery"]
         if type is None:
             self.type = buisciii.utils.prompt_selection(
                 msg="Select the documentation type you want to create",
-                choices=["service_info", "delivery"],
+                choices=valid_types,
             )
+        else:
+            if type not in valid_types:
+                raise ValueError(
+                    f"Invalid type: '{type}'. It must be one of the following: {', '.join(valid_types)}."
+                )
+            self.type = type
         self.conf = conf.get_configuration("bioinfo_doc")
         if path is None:
             if ask_path:
@@ -647,9 +655,38 @@ class BioinfoDoc:
                         "\n", "<br />"
                     )
                 else:
-                    email_data["email_notes"] = buisciii.utils.ask_for_some_text(
-                        msg="Write email notes"
-                    ).replace("\n", "<br />")
+                    if buisciii.utils.prompt_yn_question(
+                        msg="Do you wish to provide a text file for email notes?",
+                        dflt=False,
+                    ):
+                        for i in range(3, -1, -1):
+                            email_data["email_notes"] = buisciii.utils.prompt_path(
+                                msg="Write the path to the file with RAW text as email notes"
+                            )
+                            if not os.path.isfile(
+                                os.path.expanduser(email_data["email_notes"])
+                            ):
+                                stderr.print(
+                                    f"Provided file doesn't exist. Attempts left: {i}"
+                                )
+                            else:
+                                stderr.print(
+                                    f"File selected: {email_data['email_notes']}"
+                                )
+                                break
+                        else:
+                            stderr.print(
+                                "No more attempts. Email notes will be given by prompt"
+                            )
+                            email_data["email_notes"] = (
+                                buisciii.utils.ask_for_some_text(
+                                    msg="Write email notes"
+                                ).replace("\n", "<br />")
+                            )
+                    else:
+                        email_data["email_notes"] = buisciii.utils.ask_for_some_text(
+                            msg="Write email notes"
+                        ).replace("\n", "<br />")
             else:
                 if buisciii.utils.prompt_yn_question(
                     msg="Do you wish to provide a text file for email notes?",

@@ -56,7 +56,6 @@
             "'service_info.txt'",
             "'work'"
         ],
-        "scratch_path": "/scratch/bi/",
         "srun_settings": {
             "--partition": "middle_idx",
             "--time": "24:00:00",
