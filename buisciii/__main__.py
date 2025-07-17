@@ -419,7 +419,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
-    
+
     clean_tmp_dir = tmp_dir
     if tmp_dir == "/scratch/bi/":
         clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
