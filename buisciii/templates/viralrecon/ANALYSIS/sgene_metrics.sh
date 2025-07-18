@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# Activate the micromamba environment
+eval "$(micromamba shell hook --shell bash)"
+micromamba activate outbreakinfo
+
+# Ensure required tools are available
+for tool in blastn samtools bcftools; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "Error: $tool is not available. Make sure you have activated the corresponding micromamba environment. Aborting." >&2
+    exit 1
+  fi
+done
+
+# Initialize warning counter
+warning_count=0
+
 # Define directories for variant analysis
 input_fasta_dir=$(echo ./*_viralrecon_mapping/variants/ivar/consensus/bcftools)
 input_bam_dir=$(echo ./*_viralrecon_mapping/variants/bowtie2)
@@ -24,14 +39,16 @@ for fasta_file in $input_fasta_dir/*.consensus.fa; do
   
   ref_genome=${ref_map["$sample_name"]}
   if [ -z "$ref_genome" ]; then
-    echo "Warning: No reference found for sample $sample_name" >&2
+    echo "Warning: No reference found for sample $sample_name!" >&2
+    ((warning_count++))
     continue
   fi
 
   # Run BLASTn to get S-gene coordinates in the consensus sequence
   blast_output=$(blastn -query "$SGENE_OUTPUT" -subject "$fasta_file" -outfmt "6 sstart send" | sort -k2,2nr | head -1)
   if [ -z "$blast_output" ]; then
-    echo "Error: No BLAST hit found for sample $sample_name" >&2
+    echo "Warning: No BLAST hit found for sample $sample_name!" >&2
+    ((warning_count++))
     continue
   fi
 
@@ -68,11 +85,15 @@ for fasta_file in $input_fasta_dir/*.consensus.fa; do
   coverage_percentage=$(printf "%.2f" "$coverage_percentage")
 
   # Count S-Gene Frameshifts
-  vcf_file="$input_vcf_dir/consensus/${sample_name}.vcf.gz"
+  vcf_file="$input_vcf_dir/consensus/bcftools/${sample_name}.vcf.gz"
   indels=$(bcftools view -r "$sample_name:$s_gene_start-$s_gene_end" -i 'TYPE="indel"' "$vcf_file" 2>/dev/null | wc -l)
 
   # Save results to output file
   echo -e "$sample_name\t$ambiguous_percentage\t$coverage_percentage\t$indels\t$total_unambiguous_count\t$total_ns_count" >> $output_file
 done
 
-echo "Process completed. File generated: $output_file"
+if [[ "$warning_count" -eq 0 ]]; then
+  echo "✅ Process completed successfully. File generated: $output_file"
+else
+  echo "⚠️ Process completed with $warning_count warning(s). Check logs above. File generated: $output_file"
+fi
