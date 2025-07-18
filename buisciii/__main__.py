@@ -57,7 +57,7 @@ def run_buisciii():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "2.2.11"
+    __version__ = "2.2.12"
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
