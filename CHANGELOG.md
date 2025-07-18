@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.12] - 2025-07-18 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.12
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Fixed IRMA's 99-stats lablog to take host reads from samtools stats instead of kraken [#564](https://github.com/BU-ISCIII/buisciii-tools/pull/564).
+- Fixed sgene_metrics.sh to handle warnings properly [#565](https://github.com/BU-ISCIII/buisciii-tools/pull/565).
+
+### Modules
+
+- Fixed finish module so that the clean module is run correctly [#564](https://github.com/BU-ISCIII/buisciii-tools/pull/564).
+- Fixed bioinfo_doc module so that a text file can properly be used for email notes [#564](https://github.com/BU-ISCIII/buisciii-tools/pull/564).
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.11] - 2025-07-11 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.11
 
 ### Credits

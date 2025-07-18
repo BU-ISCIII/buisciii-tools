@@ -57,7 +57,7 @@ def run_buisciii():
     )
 
     # stderr.print("[green]                                          `._,._,'\n", highlight=False)
-    __version__ = "2.2.11"
+    __version__ = "2.2.12"
     stderr.print(
         "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
     )
@@ -419,10 +419,15 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
     """
-    print("Starting cleaning scratch directory: " + tmp_dir)
+
+    clean_tmp_dir = tmp_dir
+    if tmp_dir == "/scratch/bi/":
+        clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
+
+    print("Starting cleaning scratch directory: " + clean_tmp_dir)
     clean_scratch = buisciii.clean.CleanUp(
         resolution,
-        tmp_dir,
+        clean_tmp_dir,
         ask_path,
         "clean",
         ctx.obj["api_user"],

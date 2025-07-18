@@ -256,7 +256,7 @@ class BioinfoDoc:
         if os.path.exists(self.service_folder):
             log.info("Already creted the service folder for %s", self.service_folder)
             stderr.print(
-                "[green] Skiping folder creation for service "
+                "[green] Skipping folder creation for service "
                 + self.service_folder
                 + ". Trying with subfolders"
             )
@@ -267,7 +267,7 @@ class BioinfoDoc:
                         self.service_folder,
                     )
                     stderr.print(
-                        "[green] Skiping folder creation for service "
+                        "[green] Skipping folder creation for service "
                         + self.service_folder
                         + "/"
                         + folder
@@ -547,7 +547,7 @@ class BioinfoDoc:
             "images",
         )
         if not os.path.exists(file_path):
-            stderr.print("[green] Coping images folder temporarylly to " + file_path)
+            stderr.print("[green] Copying images folder temporarily to " + file_path)
             images_folder = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "assets/reports/md/images"
             )
@@ -678,11 +678,13 @@ class BioinfoDoc:
                             stderr.print(
                                 "No more attempts. Email notes will be given by prompt"
                             )
-                            email_data["email_notes"] = (
-                                buisciii.utils.ask_for_some_text(
-                                    msg="Write email notes"
-                                ).replace("\n", "<br />")
-                            )
+                            email_data["email_notes"] = None
+                    else:
+                        email_data["email_notes"] = None
+
+                    if email_data["email_notes"]:
+                        with open(os.path.expanduser(email_data["email_notes"])) as f:
+                            email_data["email_notes"] = f.read().replace("\n", "<br />")
                     else:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                             msg="Write email notes"
