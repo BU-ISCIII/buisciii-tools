@@ -11,7 +11,6 @@ import os
 
 
 def check_arg(args=None):
-
     """
         Description:
         Function collect arguments from command line using argparse
@@ -57,7 +56,6 @@ def check_arg(args=None):
 
 
 def ariba_dictionary_card(file_csv):
-
     """
     Description:
         Function to extract the relevant part of out.summarycard.csv file
@@ -97,7 +95,6 @@ def ariba_dictionary_card(file_csv):
 
 
 def ariba_dictionary_vfdb(file_csv):
-
     """
     Description:
         Function to extract the relevant part of out.summaryvfdb_full.csv file
@@ -132,7 +129,6 @@ def ariba_dictionary_vfdb(file_csv):
 
 
 def ariba_dictionary_megares(file_csv):
-
     """
     Description:
         Function to extract the relevant part of out.summarymegares.csv file
@@ -170,7 +166,6 @@ def ariba_dictionary_megares(file_csv):
 
 
 def ariba_dictionary_srst2(file_csv):
-
     """
     Description:
         Function to extract the relevant part of out.summarysrst2_argannot.csv file
@@ -208,7 +203,6 @@ def ariba_dictionary_srst2(file_csv):
 
 
 def ariba_dictionary_plasmidfinder(file_csv):
-
     """
     Description:
         Function to extract the relevant part of out.summaryplasmidfinder_full.csv file
@@ -242,7 +236,6 @@ def ariba_dictionary_plasmidfinder(file_csv):
 
 
 def ariba_dictionary_pubmlst(file_csv):
-
     """
     Description:
         Function to extract the relevant part of out.summarypubmlst_full.csv file
@@ -276,7 +269,6 @@ def ariba_dictionary_pubmlst(file_csv):
 
 
 def dictionary2csv(dictionary, csv_file):
-
     """
     Description:
         Function to create a csv from a dictionary
@@ -295,7 +287,6 @@ def dictionary2csv(dictionary, csv_file):
 
 
 def dictionary2bn(dictionary, binary_file):
-
     """
     Description:
         Function to create a binary file from a dictionary
