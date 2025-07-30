@@ -311,6 +311,7 @@ def dictionary2bn(dictionary, binary_file):
 
     return
 
+
 # MAIN SCRIPT
 
 
