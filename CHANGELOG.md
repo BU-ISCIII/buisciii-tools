@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.13dev] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.13dev
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Updated sftp_user.json [#568](https://github.com/BU-ISCIII/buisciii-tools/pull/568).
+- Fixed the parse_ariba.py script and stored in the 99-stats folder from the CHARACTERIZATION template [#568](https://github.com/BU-ISCIII/buisciii-tools/pull/568).
+
+### Modules
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.12] - 2025-07-18 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.12
 
 ### Credits
