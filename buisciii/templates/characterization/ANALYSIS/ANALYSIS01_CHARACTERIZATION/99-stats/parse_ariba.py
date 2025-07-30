@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import argparse
 import sys
 import re
@@ -8,10 +7,7 @@ import csv
 import pickle
 import os
 
-
-#################
-### FUNCTIONS ###
-#################
+# FUNCTIONS
 
 
 def check_arg(args=None):
@@ -60,11 +56,6 @@ def check_arg(args=None):
     return parser.parse_args()
 
 
-#################
-### FUNCTIONS ###
-#################
-
-
 def ariba_dictionary_card(file_csv):
 
     """
@@ -105,11 +96,6 @@ def ariba_dictionary_card(file_csv):
     return genes_list
 
 
-#################
-### FUNCTIONS ###
-#################
-
-
 def ariba_dictionary_vfdb(file_csv):
 
     """
@@ -143,11 +129,6 @@ def ariba_dictionary_vfdb(file_csv):
                 genes_list[sample].update(virulence_genes_vfdb=len(genes))
 
     return genes_list
-
-
-#################
-### FUNCTIONS ###
-#################
 
 
 def ariba_dictionary_megares(file_csv):
@@ -186,11 +167,6 @@ def ariba_dictionary_megares(file_csv):
                 genes_list[sample].update(resistance_megares=gene_resis)
 
     return genes_list
-
-
-#################
-### FUNCTIONS ###
-#################
 
 
 def ariba_dictionary_srst2(file_csv):
@@ -299,11 +275,6 @@ def ariba_dictionary_pubmlst(file_csv):
     return plasmids_list
 
 
-#################
-### FUNCTIONS ###
-#################
-
-
 def dictionary2csv(dictionary, csv_file):
 
     """
@@ -323,11 +294,6 @@ def dictionary2csv(dictionary, csv_file):
             write.writerow([a] + [b.get(i, "") for i in header])
 
 
-#################
-### FUNCTIONS ###
-#################
-
-
 def dictionary2bn(dictionary, binary_file):
 
     """
@@ -345,10 +311,7 @@ def dictionary2bn(dictionary, binary_file):
 
     return
 
-
-###################
-### MAIN SCRIPT ###
-###################
+# MAIN SCRIPT
 
 
 if __name__ == "__main__":
