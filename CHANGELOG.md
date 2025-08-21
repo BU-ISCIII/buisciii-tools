@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Updated sftp_user.json [#568](https://github.com/BU-ISCIII/buisciii-tools/pull/568).
 - Fixed the parse_ariba.py script and stored in the 99-stats folder from the CHARACTERIZATION template [#568](https://github.com/BU-ISCIII/buisciii-tools/pull/568).
+- Updated IRMA template to comply with new sample id format in relecov analysis [578](https://github.com/BU-ISCIII/buisciii-tools/pull/578)
 
 ### Modules
 
