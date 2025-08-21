@@ -163,11 +163,13 @@ def snpsift_to_table(snpsift_file):
 
     return table
 
+
 def map_clade(sample, clade_dict):
     for key in clade_dict:
         if sample in key:
             return clade_dict[key]
     return "NA"
+
 
 # Function to process VCF and SnpSift files and merge data into a single CSV file.
 def process_folder(folder, output_file):
