@@ -64,6 +64,8 @@ def parse_vcf(vcf_file, sample_to_subtype):
                 (x.split("=")[1] for x in info.split(";") if x.startswith("DP=")), "0"
             )
 
+            allele_type = "consensus" if "consensus" in info else "minor"
+
             # Extract ALT_DP and AF from sample data
             sample_fields = sample_data.split(":")
             alt_dp = sample_fields[1] if len(sample_fields) > 1 else "0"
@@ -84,6 +86,7 @@ def parse_vcf(vcf_file, sample_to_subtype):
                     ref,
                     alt,
                     filter_,
+                    allele_type,
                     dp,
                     ref_dp,
                     alt_dp,
@@ -160,6 +163,11 @@ def snpsift_to_table(snpsift_file):
 
     return table
 
+def map_clade(sample, clade_dict):
+    for key in clade_dict:
+        if sample in key:
+            return clade_dict[key]
+    return "NA"
 
 # Function to process VCF and SnpSift files and merge data into a single CSV file.
 def process_folder(folder, output_file):
@@ -187,6 +195,7 @@ def process_folder(folder, output_file):
             "REF",
             "ALT",
             "FILTER",
+            "ALLELE_TYPE",
             "DP",
             "REF_DP",
             "ALT_DP",
@@ -208,7 +217,7 @@ def process_folder(folder, output_file):
             .str.replace("/", "-")
         )
         clade_dict = dict(zip(clade_df["SAMPLE_ID"], clade_df.iloc[:, 2]))
-        vcf_df["CLADE"] = vcf_df["SAMPLE"].map(clade_dict).fillna("NA")
+        vcf_df["CLADE"] = vcf_df["SAMPLE"].apply(lambda x: map_clade(x, clade_dict))
     else:
         print(
             f"Warning: Clade file not found at {clade_path}. 'CLADE' column will be NA."

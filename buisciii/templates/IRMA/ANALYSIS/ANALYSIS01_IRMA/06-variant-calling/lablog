@@ -16,14 +16,22 @@ fi
 
 # Create a file with the sample_id, the flu_type, the fragment_id and the fasta_ref
 # The flu_type (p.e A_H1_N1) is the subtype of the sample, the fragment_id (pe. HA) is the fragment of the sample and the fasta_ref (pe. NC_007370.1) is the reference of the fragment
-cat ../samples_id.txt | xargs -I % bash -c '
-    sample="%"
+cat ../samples_id.txt | xargs -I @@ bash -c '
+    sample="@@"
     subtype=$(grep "$sample" ../04-irma/irma_stats_flu.txt | cut -f 5)
     if [ -z "$subtype" ]; then
       echo "No subtype found for sample $sample. Skipping..."
     else
       grep "$subtype" flu_type_refs.txt | cut -f 2,3 | while IFS=$'\''\t'\'' read -r fragment ref; do
-        echo -e "$sample\t$subtype\t$fragment\t$ref" >> sample_type_ref.txt
+      	if grep -qP ".*${sample}.*${fragment}" ../04-irma/all_samples_completo.txt; then
+      		# for relecov
+      		header_id="$(grep -P ".*${sample}.*${fragment}" ../04-irma/all_samples_completo.txt | sed "s/>//g")"
+      		header_id=${header_id%_*}
+      	else
+      		# for routine samples
+      		header_id=$(echo $sample | sed "s/-/\//g")
+      	fi
+        echo -e "$sample\t$subtype\t$fragment\t$ref\t$header_id" >> sample_type_ref.txt
       done
     fi
 '
@@ -32,7 +40,7 @@ cat ../samples_id.txt | xargs -I % bash -c '
 cat ./sample_type_ref.txt | xargs -I % echo '
   ref=$(echo "%" | awk '\''{print $4}'\'')
   sample_id=$(echo "%" | awk '\''{print $1}'\'')
-  header_id=$(echo "%" | awk '\''{print $1}'\'' | sed "s/-/\//g")
+  header_id=$(echo "%" | awk '\''{print $5}'\'')
   fragment=$(echo "%" | awk '\''{print $3}'\'')
 
   # Create output directory
