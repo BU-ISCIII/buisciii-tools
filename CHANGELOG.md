@@ -9,12 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
+- [Alejandro Bernabeu](https://github.com/Aberdur)
 
 ### Template fixes and updates
 
 - Updated sftp_user.json [#568](https://github.com/BU-ISCIII/buisciii-tools/pull/568).
 - Fixed the parse_ariba.py script and stored in the 99-stats folder from the CHARACTERIZATION template [#568](https://github.com/BU-ISCIII/buisciii-tools/pull/568).
 - Updated IRMA template to comply with new sample id format in relecov analysis [578](https://github.com/BU-ISCIII/buisciii-tools/pull/578)
+- Fix pkg_resources installation error and pin bacass version in Assembly template [579](https://github.com/BU-ISCIII/buisciii-tools/pull/579)
 
 ### Modules
 
