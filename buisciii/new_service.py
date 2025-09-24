@@ -97,14 +97,16 @@ class NewService:
             samples_by_project[sample["project_name"]].append(sample)
 
         for project_name, samples in samples_by_project.items():
-            md5_file_path = f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
+            md5_file_path = (
+                f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
+            )
             if not os.path.exists(md5_file_path):
                 stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
                 sys.exit(1)
 
-            sample_names_pattern = "|".join([
-                re.escape(s['sample_name']) + ".*\\.fastq\\.gz" for s in samples
-            ])
+            sample_names_pattern = "|".join(
+                [re.escape(s["sample_name"]) + ".*\\.fastq\\.gz" for s in samples]
+            )
 
             stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
 
@@ -115,11 +117,13 @@ class NewService:
                     shell=True,
                     check=True,
                     cwd=os.path.dirname(md5_file_path),
-                    executable="/bin/bash"
+                    executable="/bin/bash",
                 )
                 stderr.print("[green]MD5 check passed!")
             except subprocess.CalledProcessError as e:
-                stderr.print(f"[red]ERROR: MD5 check failed for project {project_name}: {e}")
+                stderr.print(
+                    f"[red]ERROR: MD5 check failed for project {project_name}: {e}"
+                )
                 sys.exit(1)
 
     def create_folder(self):
