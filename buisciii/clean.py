@@ -135,14 +135,15 @@ class CleanUp:
 
     def get_clean_items(self, services_ids, type="files"):
         """
-        Get delete files list from service conf with viralrecon protocol-aware filtering.
+        Description:
+            Get delete files list from service conf
 
-        Args:
-            services_ids (list): List of service IDs to process.
-            type (str): One of the following: "files", "folders" or "no_copy".
-        
-        Returns:
-            list: Items to clean, or empty string if none
+        Usage:
+            object.get_delete_files(services_ids, type = "files")
+
+        Params:
+            services_ids [list]: list with services ids selected.
+            type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
         service_conf = buisciii.service_json.ServiceJson()
         clean_items_list = []
