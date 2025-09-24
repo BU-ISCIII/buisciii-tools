@@ -5,6 +5,7 @@ import sys
 import os
 import logging
 import shutil
+import glob
 from rich.console import Console
 
 # Local imports
@@ -109,50 +110,79 @@ class CleanUp:
             )
         else:
             self.option = option
+        
+
+    def detect_protocol(self):
+        """
+        Detect analysis protocol from params.yml files.
+    
+        Searches for the most recent *params.yml in DOC/ directory and extracts the protocol (amplicon/metagenomics)
+        
+        """
+        try:
+            params_files = glob.glob(os.path.join(self.full_path, "DOC", "*params.yml"))
+                
+            # Get most recent params file
+            params_file = max(params_files, key=os.path.getmtime)
+            
+            with open(params_file) as f:
+                for line in f:
+                    if line.startswith("protocol:"):
+                        return line.split(":")[1].strip().strip("'\"")
+                        
+        except Exception as e:
+            stderr.print(f"[yellow]WARNING: Protocol detection failed: {str(e)}")
 
     def get_clean_items(self, services_ids, type="files"):
         """
-        Description:
-            Get delete files list from service conf
+        Get delete files list from service conf with viralrecon protocol-aware filtering.
 
-        Usage:
-            object.get_delete_files(services_ids, type = "files")
-
-        Params:
-            services_ids [list]: list with services ids selected.
-            type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
+        Args:
+            services_ids (list): List of service IDs to process.
+            type (str): One of the following: "files", "folders" or "no_copy".
+        
+        Returns:
+            list: Items to clean, or empty string if none
         """
         service_conf = buisciii.service_json.ServiceJson()
         clean_items_list = []
+        
         for service in services_ids:
             try:
                 items = service_conf.get_find_deep(service, type)
                 if items is None:
-                    stderr.print(
-                        "[red]ERROR: Service type %s not found in services json file for service %s."
-                        % (type, service)
-                    )
+                    stderr.print(f"[red]ERROR: Service type {type} not found for service {service}.")
                     sys.exit()
+
+                # Specific handling for viralrecon, since some files should not be deleted based on the protocol.
+                if service == "viralrecon" and type == "files":
+                    protocol = self.detect_protocol()
+                    
+                    for item in items:
+                        if "sorted.bam" in item:
+                            if protocol == "amplicon":
+                                clean_items_list.append(item)
+                        elif item not in clean_items_list:
+                            clean_items_list.append(item)
                 else:
                     for item in items:
                         if item not in clean_items_list:
                             clean_items_list.append(item)
+                            
             except KeyError as e:
-                stderr.print(
-                    "[red]ERROR: Service id %s not found in services json file."
-                    % service
-                )
-                stderr.print("traceback error %s" % e)
+                stderr.print(f"[red]ERROR: Service id {service} not found.")
+                stderr.print(f"traceback error {e}")
                 sys.exit()
+        
         if len(clean_items_list) == 0:
             clean_items_list = ""
-        return clean_items_list
+        return clean_items_list    
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
         if not os.path.exists(self.full_path):
             stderr.print(
-                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.."
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exist. Exiting.."
                 % self.full_path
             )
             sys.exit()
