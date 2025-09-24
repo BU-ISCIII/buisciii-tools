@@ -110,26 +110,25 @@ class CleanUp:
             )
         else:
             self.option = option
-        
 
     def detect_protocol(self):
         """
         Detect analysis protocol from params.yml files.
-    
+
         Searches for the most recent *params.yml in DOC/ directory and extracts the protocol (amplicon/metagenomics)
-        
+
         """
         try:
             params_files = glob.glob(os.path.join(self.full_path, "DOC", "*params.yml"))
-                
+
             # Get most recent params file
             params_file = max(params_files, key=os.path.getmtime)
-            
+
             with open(params_file) as f:
                 for line in f:
                     if line.startswith("protocol:"):
                         return line.split(":")[1].strip().strip("'\"")
-                        
+
         except Exception as e:
             stderr.print(f"[yellow]WARNING: Protocol detection failed: {str(e)}")
 
@@ -147,18 +146,20 @@ class CleanUp:
         """
         service_conf = buisciii.service_json.ServiceJson()
         clean_items_list = []
-        
+
         for service in services_ids:
             try:
                 items = service_conf.get_find_deep(service, type)
                 if items is None:
-                    stderr.print(f"[red]ERROR: Service type {type} not found for service {service}.")
+                    stderr.print(
+                        f"[red]ERROR: Service type {type} not found for service {service}."
+                    )
                     sys.exit()
 
                 # Specific handling for viralrecon, since some files should not be deleted based on the protocol.
                 if service == "viralrecon" and type == "files":
                     protocol = self.detect_protocol()
-                    
+
                     for item in items:
                         if "sorted.bam" in item:
                             if protocol == "amplicon":
@@ -169,15 +170,15 @@ class CleanUp:
                     for item in items:
                         if item not in clean_items_list:
                             clean_items_list.append(item)
-                            
+
             except KeyError as e:
                 stderr.print(f"[red]ERROR: Service id {service} not found.")
                 stderr.print(f"traceback error {e}")
                 sys.exit()
-        
+
         if len(clean_items_list) == 0:
             clean_items_list = ""
-        return clean_items_list    
+        return clean_items_list
 
     def check_path_exists(self):
         # if the folder path is not found, then bye
