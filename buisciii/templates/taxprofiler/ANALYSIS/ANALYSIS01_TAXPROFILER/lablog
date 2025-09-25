@@ -67,7 +67,7 @@ cat <<EOF > taxprofiler.sbatch
 # module load Nextflow/24.04.2 singularity
 export NXF_OPTS="-Xms500M -Xmx6G"
 
-nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.2.1 \\
+nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.2.4 \\
     -profile singularity \\
     -c ../../DOC/taxprofiler.config \\
     --input samplesheet.csv \\
