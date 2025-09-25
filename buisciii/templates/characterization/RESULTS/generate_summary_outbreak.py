@@ -270,7 +270,7 @@ def read_card_stats(card_file):
 
         # Process the resistance gene list, removing unnecessary characters
         card_genes = (
-            row["resistance_genes_car"].strip("[]").replace("'", "").split(", ")
+            row["resistance_genes_card"].strip("[]").replace("'", "").split(", ")
         )
         card_genes_cleaned = [gene.replace(".match", "") for gene in card_genes]
         card_list = ", ".join(card_genes_cleaned)
