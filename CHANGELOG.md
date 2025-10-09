@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed snippy folder in iqtree's lablog [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
 
 ### Modules
 
