@@ -1,4 +1,4 @@
-DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega"
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
 
 mkdir $DELIVERY_FOLDER
 
@@ -7,3 +7,6 @@ cd $DELIVERY_FOLDER
 
 # Links to reports
 ln -s ../../ANALYSIS/*RBPANEL/99-stats/multiqc_report.html .
+ln -s ../../ANALYSIS/*RBPANEL/99-stats/hsMetrics_all.out .
+ln -s ../../ANALYSIS/*RBPANEL/07-annotation/*_all_annotated.tab .
+ln -s ../../ANALYSIS/*RBPANEL/07-annotation/*_rb1_annotated.tab .
