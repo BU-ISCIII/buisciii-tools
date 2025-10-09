@@ -1,30 +1,8 @@
 # module load singularity
 
+ln -s ../samples_id.txt .
 mkdir logs
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
-echo "Use bash lablog ../samples_id.txt"
-
-samples_file=$1
-cat <<EOF > samtools_mpileup.sbatch
-#!/bin/sh
-#SBATCH --ntasks 1
-#SBATCH --cpus-per-task 4
-#SBATCH --mem 16384
-#SBATCH --time 8:00:00
-#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
-#SBATCH --partition middle_idx
-#SBATCH --output logs/samtools_mpileup_%A_%a.log
-#SBATCH --chdir $scratch_dir
-
-SAMPLE_LIST=(\$(<$samples_file))
-SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
-
-mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/samtools:1.16.1--h6899075_1 samtools mpileup -A -d 20000 -Q 0 -f /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ${scratch_dir}/../04-mapping/\${SAMPLE}/\${SAMPLE}_sorted.bam > \${SAMPLE}/\${SAMPLE}.pileup
-
-EOF
-
-echo "sbatch samtools_mpileup.sbatch" > _01_samtools_mpileup.sh
-echo "Done"
+cat samples_id.txt | while read in; do mkdir ${in}; echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir ${scratch_dir} --time 10:00:00 --output logs/SAMTOOLS_MPILEUP.${in}.%j.log singularity exec -B ${scratch_dir}/../../../ -B /data/ucct/bi/references/ /data/ucct/bi/pipelines/singularity-images/samtools:1.22.1--h96c455f_0 samtools mpileup -A -d 20000 -Q 0 -f /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta ${scratch_dir}/../04-mapping/${in}/${in}_sorted.bam -o ${in}/${in}.pileup &"; done >> _01_samtools_mpileup.sh
