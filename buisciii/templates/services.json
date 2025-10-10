@@ -16,22 +16,22 @@
         "delivery_md": "assets/reports/md/assembly.md",
         "results_md": "assets/reports/results/assembly.md"
     },
-    "mtbseq": {
-        "label": "Bacteria: In-depth analysis of Mycobacterium species genomes (e.g. M. tuberculosis. M. bovis)",
-        "template": "mtbseq",
+    "tbprofiler": {
+        "label": "Bacteria: In-depth analysis of Mycobacterium species genomes using TBProfiler",
+        "template": "tbprofiler",
         "order": 1,
         "begin": "base",
         "end": "",
-        "url": "https://github.com/ngs-fzb/MTBseq_source",
-        "description": "Mycobacterium tuberculosis mapping, variant calling and detection of resistance using MTBseq",
+        "url": "https://github.com/jodyphelan/TBProfiler",
+        "description": "Mycobacterium tuberculosis variant calling and resistance prediction using TBProfiler",
         "clean": {
           "folders":["01-preprocessing", "Bam", "Mpileup"],
           "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
-        "delivery_md": "",
-        "results_md": ""
+        "delivery_md": "assets/reports/md/tbprofiler_delivery.md",
+        "results_md": "assets/reports/results/tbprofiler_results.md"
     },
     "pikavirus": {
       "label": "Viral: Detection and characterization of viral genomes within metagenomic data",
