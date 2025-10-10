@@ -126,12 +126,9 @@ Output:
 ┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │    assembly_annotation │ Nextflow assembly pipeline to assemble    │ https://github.com/Daniel-VM/bacass/...    │
 │                        │ bacterial genomes                         │                                            │
-│        mtbseq_assembly │ Mycobacterium tuberculosis mapping,       │ https://github.com/ngs-fzb/MTBseq_source   │
-│                        │ variant calling and detection of          │                                            │
-│                        │ resistance using MTBseq                   │                                            │
-│                 mtbseq │ Mycobacterium tuberculosis mapping,       │ https://github.com/ngs-fzb/MTBseq_source   │
-│                        │ variant calling and detection of          │                                            │
-│                        │ resistance using MTBseq                   │                                            │
+│             tbprofiler │ Mycobacterium tuberculosis variant        │ https://github.com/jodyphelan/TBProfiler   │
+│                        │ calling and resistance prediction using   │                                            │
+│                        │ TBProfiler                                │                                            │
 │              pikavirus │ PikaVirus, a mapping-based tool for       │ https://github.com/BU-ISCIII/PikaVirus     │
 │                        │ metagenome analysis of virus.             │                                            │
 │     plasmidid_assembly │ Plasmid identification tool based on      │ https://github.com/BU-ISCIII/plasmidID     │
@@ -150,11 +147,6 @@ Output:
 │       seek_and_destroy │ Simple pipeline for basic quality         │ https://github.com/GuilleGorines/Seek-Des… │
 │                        │ control, host removal and exploratory     │                                            │
 │                        │ analysis of samples.                      │                                            │
-│ ariba_characterization │                                           │                                            │
-│                mag_met │ 1- Bioinformatics best-practise analysis  │ https://github.com/nf-core/mag or          │
-│                        │ for taxonomic classification and          │ https://github.com/nf-core/taxprofiler     │
-│                        │ profiling; 2- Bioinformatics best-practise│                                            │
-│                        │ analysis pipeline for assembly, binning   │                                            │
 └────────────────────────┴───────────────────────────────────────────┴────────────────────────────────────────────┘
 ```
 
