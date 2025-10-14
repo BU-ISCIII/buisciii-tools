@@ -2,6 +2,7 @@
 
 # Generic imports
 import sys
+import re
 import os
 import logging
 import glob
@@ -9,6 +10,7 @@ import json
 import shutil
 import rich
 import subprocess
+from collections import defaultdict
 
 # Local imports
 import buisciii
@@ -90,38 +92,39 @@ class NewService:
         self.full_path = os.path.join(self.path, self.service_folder)
 
     def check_md5(self):
-        # Path to the .md5 file
-        project_name = self.service_samples[0]["project_name"]
-        md5_file_path = (
-            f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
-        )
-        if not os.path.exists(md5_file_path):
-            stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
-            sys.exit(1)
+        samples_by_project = defaultdict(list)
+        for sample in self.service_samples:
+            samples_by_project[sample["project_name"]].append(sample)
 
-        original_dir = os.getcwd()
-        md5_dir = os.path.dirname(md5_file_path)
-        os.chdir(md5_dir)
+        for project_name, samples in samples_by_project.items():
+            md5_file_path = (
+                f'{self.conf["fastq_repo"]}/{project_name}/md5sum_{project_name}.md5'
+            )
+            if not os.path.exists(md5_file_path):
+                stderr.print(f"[red]ERROR: .md5 file not found at {md5_file_path}")
+                sys.exit(1)
 
-        # Regex pattern to match sample names in .fastq.gz files
-        sample_names_pattern = "|".join(
-            [
-                f"{sample['sample_name']}.*\\.fastq\\.gz"
-                for sample in self.service_samples
-            ]
-        )
+            sample_names_pattern = "|".join(
+                [re.escape(s["sample_name"]) + ".*\\.fastq\\.gz" for s in samples]
+            )
 
-        # md5sum command
-        stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
-        try:
-            cmd = f"grep -E '{sample_names_pattern}' {md5_file_path} | md5sum -c"
-            subprocess.run(cmd, shell=True, check=True, executable="/bin/bash")
-            stderr.print("[green]MD5 check passed!")
-        except subprocess.CalledProcessError as e:
-            stderr.print(f"[red]ERROR: MD5 check failed: {e.stderr}")
-            sys.exit(1)
-        finally:
-            os.chdir(original_dir)
+            stderr.print(f"[blue]Checking MD5 integrity for {md5_file_path}")
+
+            try:
+                cmd = f"grep -E '{sample_names_pattern}' {md5_file_path} | md5sum -c -"
+                subprocess.run(
+                    cmd,
+                    shell=True,
+                    check=True,
+                    cwd=os.path.dirname(md5_file_path),
+                    executable="/bin/bash",
+                )
+                stderr.print("[green]MD5 check passed!")
+            except subprocess.CalledProcessError as e:
+                stderr.print(
+                    f"[red]ERROR: MD5 check failed for project {project_name}: {e}"
+                )
+                sys.exit(1)
 
     def create_folder(self):
         if not self.no_create_folder:

@@ -2,7 +2,7 @@
 
 ################################################
 ################################################
-## LOAD LIBRARIES                             ##
+##              LOAD LIBRARIES                ##
 ################################################
 ################################################
 
@@ -31,7 +31,7 @@ library(data.table)
 
 ################################################
 ################################################
-## PARSE COMMAND-LINE PARAMETERS              ##
+##       PARSE COMMAND-LINE PARAMETERS        ##
 ################################################
 ################################################
 cat(cyan$bgRed$bold("########################\nStarting diferential expression pipeline\n###############################\n"))
@@ -151,15 +151,15 @@ if (opt$quality_plots) {
 
 ################################################
 ################################################
-## FUNCTIONS                                  ##
+##                 FUNCTIONS                  ##
 ################################################
 ################################################
 
 ################################################
-## LOAD DATA                                  ##
+##                 LOAD DATA                  ##
 ################################################
 
-####LOAD CLINICAL DATA FILE#########################
+#########################LOAD CLINICAL DATA FILE#########################
 load_sample_data <- function(clinical_data, group) {
   samples <- read.table(clinical_data, header = T)
   compare_col <- which(colnames(samples) %in% group)
@@ -175,20 +175,20 @@ load_sample_data <- function(clinical_data, group) {
   return(samples)
 }
 
-####LOAD EXPRESSION DATA FILE#########################
+#########################LOAD EXPRESSION DATA FILE#########################
 
-####TRANSCRIPTS FISHPOND#########################
+#########################TRANSCRIPTS FISHPOND#########################
 
 load_transcript_data_fishpond <- function(coldata_table, compare_char1, compare_char2){
   #####Load quantification data####
   tximeta_data<- tximeta(coldata_table)
   scaled_inferential_replicates <- scaleInfReps(tximeta_data)
 
-  #####Select data to compare
+  #####Select data to compare#####
   scaled_inferential_replicates_selected <- scaled_inferential_replicates[,scaled_inferential_replicates$condition %in% c(compare_char1,compare_char2)]
   scaled_inferential_replicates_selected$condition <- factor(scaled_inferential_replicates_selected$condition, levels=c(compare_char1,compare_char2))
 
-  ####Filter expression minimum 1 count and 1 sample
+  ####Filter expression minimum 1 count and 1 sample####
   scaled_inferential_replicates_selected <- labelKeep(scaled_inferential_replicates_selected, minCount = 1, minN = 1)
   scaled_inferential_replicates_selected <- scaled_inferential_replicates_selected[mcols(scaled_inferential_replicates_selected)$keep,]
   return(scaled_inferential_replicates_selected)
@@ -224,10 +224,10 @@ deduplicate_expression <- function(counts_dups){
 }
 
 ################################################
-## DESEQ2                                     ##
+##                   DESEQ2                   ##
 ################################################
 
-####DIFFERENTIAL EXPRESSION#########################
+#########################DIFFERENTIAL EXPRESSION#########################
 
 deseq2_analysis <- function(txi_data, samples, compare_char1, compare_char2){
   if (opt$batch_effect) {
@@ -286,7 +286,7 @@ deseq2_analysis <- function(txi_data, samples, compare_char1, compare_char2){
   return(list(dds_matrix = dds, results =res))
 }
 
-####NORMALIZATION#########################
+#########################NORMALIZATION#########################
 
 normalized_counts <- function(dds_table){
 
@@ -321,7 +321,7 @@ normalized_counts <- function(dds_table){
 }
 
 
-####SUBSETTING#########################
+#########################SUBSETTING#########################
 
 subset_samples <- function(samples_data, compare_char1, compare_char2, norm_data){
   row_1 <- which(samples_data$condition %in% compare_char1)
@@ -337,7 +337,7 @@ subset_samples <- function(samples_data, compare_char1, compare_char2, norm_data
 }
 
 
-####DE PLOTS#########################
+#########################DE PLOTS#########################
 
 differential_plots <- function(res_de, de_results, ntd_subset, dds_subset){
   #MA-plotThe  MA-plot  shows  the  log2  fold  changes  from  the  treatment  over  the  meanof  normalized  counts.
@@ -476,7 +476,7 @@ quality_plots <- function(data_subset){
 }
 
 ################################################
-## fishpond                                   ##
+##                 FISHPOND                   ##
 ################################################
 
 fishpond_plots <- function(swish_data, expr){
@@ -536,7 +536,7 @@ fishpond_plots <- function(swish_data, expr){
 }
 
 ################################################
-## WARNINGS                                   ##
+##                   WARNINGS                 ##
 ################################################
 
 test_data <- function(samples_data, txi_data){
@@ -550,20 +550,20 @@ test_data <- function(samples_data, txi_data){
 
 ##############################################################################################################################################
 ##############################################################################################################################################
-##################################################### MAIN                                  ##################################################
+#####################################################                 MAIN                 ##################################################
 ##############################################################################################################################################
 ##############################################################################################################################################
 
 
 ################################################
 ################################################
-## LOAD DATA                                  ##
+##                 LOAD DATA                  ##
 ################################################
 ################################################
 
-cat(blue("########################\nStarting with loading data\n###############################\n"))
+cat(blue("########################\nStarting loading data\n###############################\n"))
 
-####LOAD TRANSCRIPT RELATION DATA FILE #########################
+#### LOAD TRANSCRIPT RELATION DATA FILE #########################
 if (opt$differential_expression != "DEM") {
   tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "tx2gene.tsv"), header = F)
   colnames(tx2gene) <- c("TXNAME", "GENEID", "gene_name")
@@ -573,10 +573,10 @@ if (opt$differential_expression != "DEM") {
   }
 }
 
-####LOAD CLINICAL DATA FILE #########################
+#### LOAD CLINICAL DATA FILE #########################
 samples_clin_data <- load_sample_data(clinical_data = opt$sample_data, group = opt$group_col)
 
-####LOAD ESPRESSION DATA #########################
+#### LOAD ESPRESSION DATA #########################
 if (opt$differential_expression == "DEM") {
   expression_matrix <- NULL
   csv_list <- list.files(path = opt$rnaseq_dir, pattern = "miRNAs_expressed_all_samples*", full.names = TRUE)
@@ -600,13 +600,13 @@ if (opt$differential_expression == "DEM") {
   coldata <- data.frame(files, samples_clin_data, stringsAsFactors=FALSE)
   
   if (!all(file.exists(coldata$files))) {
-    cat(red("############WARNING############\nNo todos los ficheros existen\n###############################\n"))
+    cat(red("############WARNING############\nNot all files exist!\n###############################\n"))
   }
 }
 
 ################################################
 ################################################
-## DIFFERENTIAL EXPRESSION                    ##
+##          DIFFERENTIAL EXPRESSION           ##
 ################################################
 ################################################
 
@@ -614,7 +614,7 @@ if (opt$differential_expression == "DEM") {
 if ( opt$deseq2 ) {
   ################################################
   ################################################
-  ## DIFFERENTIAL EXPRESSION DESEQ2             ##
+  ##       DIFFERENTIAL EXPRESSION DESEQ2       ##
   ################################################
   ################################################
 
@@ -692,13 +692,13 @@ if ( opt$deseq2 ) {
     #write.xlsx(x = norm_name_table, file = "normalized_expression.xlsx", sheetName = "Norm_exp", col.names = TRUE, row.names = FALSE, append = FALSE, showNA = TRUE, password = NULL)
   }
 
-  cat(blue("########################\nStarting with data subsettion\n###############################\n"))
+  cat(blue("########################\nStarting with data subsetting\n###############################\n"))
   subset_data <- subset_samples(samples_data = samples_clin_data, compare_char1 = opt$treatment, compare_char2 = opt$control, norm_data = norm_count)
 
   differential_plots(res_de = deseq2_results$results, de_results = DE_results, ntd_subset = subset_data$subset_ntd, dds_subset = subset_data$subset_dds)
 
   if (opt$quality_plots) {
-    cat(blue("########################\nStarting with Quality plots\n###############################\n"))
+    cat(blue("########################\nStarting with Quality Plots\n###############################\n"))
     dir.create("Quality_plots",showWarnings = FALSE)
     dir.create("Quality_plots/DESeq2",showWarnings = FALSE)
     quality_plots(data_subset = subset_data)
@@ -709,11 +709,11 @@ if ( opt$deseq2 ) {
 if (opt$differential_expression == "DET" && opt$fishpond) {
   ################################################
   ################################################
-  ## DIFFERENTIAL EXPRESSION FISHPOND           ##
+  ##      DIFFERENTIAL EXPRESSION FISHPOND      ##
   ################################################
   ################################################
 
-  cat(blue("########################\nStarting with fishpond\n###############################\n"))
+  cat(blue("########################\nStarting with Fishpond\n###############################\n"))
   dir.create("Differential_expression",showWarnings = FALSE)
   dir.create("Differential_expression/fishpond", showWarnings = FALSE)
 
@@ -722,12 +722,14 @@ if (opt$differential_expression == "DET" && opt$fishpond) {
   set.seed(1)
   swish_data <- swish(fishpond_input_data, x="condition", nperms=64)
 
-  #############Significant info##############
-  cat(green("###############################\nSignifican transcripts\n###############################\n"))
-  cat(green("###############################\nUp genes\n###############################\n"))
-  print(table(mcols(swish_data)$pvalue <= .05, mcols(swish_data)$log2FC >= 2))
-  cat(green("###############################\nDown genes\n###############################\n"))
-  print(table(mcols(swish_data)$pvalue <= .05, mcols(swish_data)$log2FC <= -2))
+  #############SIGNIFICANT INFO##############
+  cat(green("###############################\nSignificant transcripts\n###############################\n"))
+  up_genes   <- sum(mcols(swish_data)$qvalue <= 0.05 & mcols(swish_data)$log2FC >= 2, na.rm = TRUE)
+  down_genes <- sum(mcols(swish_data)$qvalue <= 0.05 & mcols(swish_data)$log2FC <= -2, na.rm = TRUE)
+  cat(green("###############################\n"))
+  cat(green("Number of transcripts with qvalue < 0.05 and log2FC >= |2| according to Fishpond:\n"))
+  cat(green(paste0("WT vs KO: ", up_genes, "Up / ", down_genes, "Down\n")))
+  cat(green("###############################\n"))
 
   #############DE TABLE##############
   DE_matrix <- mcols(swish_data)[,c("log2FC","stat","pvalue","qvalue")]
@@ -744,9 +746,10 @@ if (opt$differential_expression == "DET" && opt$fishpond) {
   fishpond_plots(swish_data = swish_data, expr = expr)
 }
 save.image()
-cat(blue("########################\nNumber of genes with padj < 0.05 and log2FC >= |2|:\n"))
-cat(blue(nrow(DE_results_merged_sig)))
-cat(blue("\n###############################\n"))
+if (opt$differential_expression == "DEG") {
+  cat(blue("########################\nNumber of genes with padj < 0.05 and log2FC >= |2|:\n"))
+  cat(blue(nrow(DE_results_merged_sig)))
+  cat(blue("\n########################\n"))
+}
 
-cat(green("########################\nPipeline completed succesfully\n###############################\n"))
-
+cat(green("########################\nPipeline completed successfully\n########################\n"))
