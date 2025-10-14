@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0dev] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.0dev
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Updated taxprofiler version in lablog [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Fixed snippy folder in iqtree's lablog [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
+
+### Modules
+
+- Fixed new-service to properly check MD5 files when samples do not belong to the same run [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
+- Fixed clean module to remove .sorted.bam files only when the protocol is AMPLICONS in viralrecon services [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.2.13] - 2025-09-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.13
 
 ### Credits
