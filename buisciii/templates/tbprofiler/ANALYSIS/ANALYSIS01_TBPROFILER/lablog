@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# module load singularity
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+mkdir logs
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+cat samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir ${scratch_dir} --time 10:00:00 --output logs/TBPROFILER.${in}.%j.log singularity exec -B ${scratch_dir}/../../ -B /srv/fastq_repo/ /data/ucct/bi/pipelines/singularity-images/tb-profiler:6.5.0--pyhdfd78af_0 tb-profiler profile -1 00-reads/${in}_R1.fastq.gz -2 00-reads/${in}_R2.fastq.gz -p ${in} --csv --spoligotype -t 4 &"; done >> _01_tbprofiler.sh
+
+echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir ${scratch_dir} --time 01:00:00 --output logs/TBCOLLATE.%j.log singularity exec -B ${scratch_dir} /data/ucct/bi/pipelines/singularity-images/tb-profiler:6.5.0--pyhdfd78af_0 tb-profiler collate -d ${scratch_dir}/results &" > _02_tbcollate.sh

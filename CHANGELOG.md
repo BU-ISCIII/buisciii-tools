@@ -4,11 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [2.3.0dev] - 2025-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.0dev
 
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
+- [Pau Pascual](https://github.com/PauPascualMas)
 - [Magdalena Matito](https://github.com/magdasmat)
 
 ### Template fixes and updates
@@ -18,7 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
-- Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
+- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/issues/585)
+- Added new authors contact in pyproject.toml [#601](https://github.com/BU-ISCIII/buisciii-tools/issues/601)
+  - Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
 - Replace MTBseq with TBProfiler in README.md [#597](https://github.com/BU-ISCIII/buisciii-tools/pull/597).
 - Replace MTBseq with TBProfiler in templates/services.json [#598](https://github.com/BU-ISCIII/buisciii-tools/pull/598).
 - Updated emmtyper's lablog [#603](https://github.com/BU-ISCIII/buisciii-tools/pull/603).
@@ -36,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Changed
 
 #### Removed
-
+- Removed MTBseq template and its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/issues/585)
 ### Requirements
 
 ## [2.2.13] - 2025-09-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.13
