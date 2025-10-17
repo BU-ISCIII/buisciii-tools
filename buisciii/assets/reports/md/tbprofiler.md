@@ -1,10 +1,10 @@
 # TBProfiler
 
-<img src="images/tb-profiler-logo-rectangle.png" alt="TBProfiler" width="300"/>)
+<img src="images/tb-profiler-logo-rectangle.png" alt="TBProfiler" width="300"/>
 
 
 ## Introduction
-[**TBProfiler**](https://github.com/jodyphelan/TBProfiler) is a computational pipeline designed for the analysis of **Mycobacterium tuberculosis (MTB) whole genome sequencing (WGS) data**. The pipeline aligns reads to the H37Rv reference using [bowtie2](https://github.com/BenLangmead/bowtie2), [BWA](https://github.com/lh3/bwa) or [minimap2](https://github.com/lh3/minimap2) and then calls variants using [bcftools](https://github.com/samtools/bcftools). These variants are then compared to a [drug-resistance database](https://github.com/jodyphelan/tbdb) and annotated using [SnpEff](https://pcingola.github.io/SnpEff/). We also predict the number of reads supporting drug resistance variants as an insight into hetero-resistance. The collated data can be graphically viewed on top of a phylogenetic tree using [iTOL](https://github.com/iBiology/iTOL). Config files can be generated and uploaded to iTOL to visualise drug resistance types, lineage and individual drug resistance predictions.
+[**TBProfiler**](https://github.com/jodyphelan/TBProfiler) is a computational pipeline designed for the analysis of **Mycobacterium tuberculosis (MTB) whole genome sequencing (WGS) data**. The pipeline aligns reads to the H37Rv reference using [bowtie2](https://github.com/BenLangmead/bowtie2), [BWA](https://github.com/lh3/bwa) or [minimap2](https://github.com/lh3/minimap2) and then calls variants using [bcftools](https://github.com/samtools/bcftools). These variants are then compared to a [drug-resistance database](https://github.com/jodyphelan/tbdb) and annotated using [SnpEff](https://pcingola.github.io/SnpEff/). It also predicts the number of reads supporting drug resistance variants as an insight into hetero-resistance. The collated data can be graphically viewed on top of a phylogenetic tree using [iTOL](https://github.com/iBiology/iTOL). Config files can be generated and uploaded to iTOL to visualise drug resistance types, lineage and individual drug resistance predictions.
 
 It provides:
 
@@ -39,7 +39,7 @@ The TBProfiler pipeline typically consists of the following steps:
 
 `_01_tbprofiler.sh`: script that runs whole pipeline for each sample.
 
-`_02_tbcollate.sh`: script that automatically creates a number of colled result files from all the individual result files in the result directory.
+`_02_tbcollate.sh`: script that automatically creates a number of collated result files from all the individual result files in the result directory.
 
 ## Input Files
 
@@ -83,7 +83,7 @@ vcf/
 └── SAMPLE2.targets.vcf.gz
 ```
 
--**logs/**
+- **logs/**
 Logs for `_01_tbprofiler.sh` and `_02_tbcollate.sh`:
 ```bash
 logs/
