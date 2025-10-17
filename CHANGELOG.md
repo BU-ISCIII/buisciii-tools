@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
+<<<<<<< HEAD
 - Refactor MTBseq template for TBProfiler pipleine with its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/issues/585)
 - Added new authors contact in pyproject.toml [#601](https://github.com/BU-ISCIII/buisciii-tools/issues/601)
   - Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
@@ -28,6 +29,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated emmtyper's lablog [#603](https://github.com/BU-ISCIII/buisciii-tools/pull/603).
 - Updated bacass version in assembly's template [#604](https://github.com/BU-ISCIII/buisciii-tools/pull/604).
 - Updated sftp_user.json to add bdandres to LabInmunology [#605](https://github.com/BU-ISCIII/buisciii-tools/pull/605). 
+=======
+- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
+- Added new authors contact in pyproject.toml [#601](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
+- Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file (PR pending)
+
+>>>>>>> c8a4947 (Add TB-Profiler markdown reports for md and results)
 ### Modules
 
 - Fixed new-service to properly check MD5 files when samples do not belong to the same run [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
@@ -40,6 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Changed
 
 #### Removed
+
 - Removed MTBseq template and its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/issues/585)
 ### Requirements
 
