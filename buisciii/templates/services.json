@@ -25,8 +25,8 @@
         "url": "https://github.com/jodyphelan/TBProfiler",
         "description": "Mycobacterium tuberculosis variant calling and resistance prediction using TBProfiler",
         "clean": {
-          "folders":["01-preprocessing", "Bam", "Mpileup"],
-          "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
+          "folders":[],
+          "files":[]
         },
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
