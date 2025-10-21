@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Replace MTBseq with TBProfiler in README.md [#597](https://github.com/BU-ISCIII/buisciii-tools/pull/597).
 - Replace MTBseq with TBProfiler in templates/services.json [#598](https://github.com/BU-ISCIII/buisciii-tools/pull/598).
 - Updated emmtyper's lablog [#603](https://github.com/BU-ISCIII/buisciii-tools/pull/603).
+- Updated bacass version in assembly's template [#604](https://github.com/BU-ISCIII/buisciii-tools/pull/604).
 
 ### Modules
 
