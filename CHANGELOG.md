@@ -18,9 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
-- Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595)
-- Replace MTBseq with TBProfiler in README.md [#597](https://github.com/BU-ISCIII/buisciii-tools/pull/597)
-- Replace MTBseq with TBProfiler in templates/services.json [#598](https://github.com/BU-ISCIII/buisciii-tools/pull/598)
+- Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
+- Replace MTBseq with TBProfiler in README.md [#597](https://github.com/BU-ISCIII/buisciii-tools/pull/597).
+- Replace MTBseq with TBProfiler in templates/services.json [#598](https://github.com/BU-ISCIII/buisciii-tools/pull/598).
+- Updated emmtyper's lablog [#603](https://github.com/BU-ISCIII/buisciii-tools/pull/603).
 
 ### Modules
 
