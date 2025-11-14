@@ -20,27 +20,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
 - Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
-<<<<<<< HEAD
-<<<<<<< HEAD
-- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/issues/585)
-- Added new authors contact in pyproject.toml [#601](https://github.com/BU-ISCIII/buisciii-tools/issues/601)
-  - Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
+- Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
 - Replace MTBseq with TBProfiler in README.md [#597](https://github.com/BU-ISCIII/buisciii-tools/pull/597).
 - Replace MTBseq with TBProfiler in templates/services.json [#598](https://github.com/BU-ISCIII/buisciii-tools/pull/598).
 - Updated emmtyper's lablog [#603](https://github.com/BU-ISCIII/buisciii-tools/pull/603).
 - Updated bacass version in assembly's template [#604](https://github.com/BU-ISCIII/buisciii-tools/pull/604).
 - Updated sftp_user.json to add bdandres to LabInmunology [#605](https://github.com/BU-ISCIII/buisciii-tools/pull/605). 
-=======
-- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
-- Added new authors contact in pyproject.toml [#601](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
-- Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file (PR pending)
-=======
-- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#599](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
-- Added new authors contact in pyproject.toml [#599](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
-- Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file [#599](https://github.com/BU-ISCIII/buisciii-tools/pull/599)
->>>>>>> c2b2a5f (Add TB-Profiler markdown reports for md and results)
+- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
+- Added new authors contact in pyproject.toml [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
+- Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
 
->>>>>>> c8a4947 (Add TB-Profiler markdown reports for md and results)
 ### Modules
 
 - Fixed new-service to properly check MD5 files when samples do not belong to the same run [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
@@ -54,7 +43,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Removed
 
-- Removed MTBseq template and its lablogs [#585](https://github.com/BU-ISCIII/buisciii-tools/issues/585)
 ### Requirements
 
 ## [2.2.13] - 2025-09-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.13

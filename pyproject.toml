@@ -20,9 +20,9 @@ authors = [
     {name = "Juan Ledesma", email = "juan.ledesma@isciii.es"},
     {name = "Sergio Olmos", email = "sergio.olmos@externos.isciii.es"},
     {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
-    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"}
-    {name = "Magdalena Matito", email = "mmatito@externos.isciii.es"}
-    {name = "Pau Pascual", email = "ppascual@externos.isciii.es}
+    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"},
+    {name = "Magdalena Matito", email = "mmatito@externos.isciii.es"},
+    {name = "Pau Pascual", email = "ppascual@externos.isciii.es"}
 ]
 
 maintainers = [
@@ -38,9 +38,9 @@ maintainers = [
     {name = "Juan Ledesma", email = "juan.ledesma@isciii.es"},
     {name = "Sergio Olmos", email = "sergio.olmos@externos.isciii.es"},
     {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
-    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"}
-    {name = "Magdalena Matito", email = "mmatito@externos.isciii.es"}
-    {name = "Pau Pascual", email = "ppascual@externos.isciii.es}
+    {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"},
+    {name = "Magdalena Matito", email = "mmatito@externos.isciii.es"},
+    {name = "Pau Pascual", email = "ppascual@externos.isciii.es"}
 ]
 
 description = "Tools for managing and resolution of buisciii services."
