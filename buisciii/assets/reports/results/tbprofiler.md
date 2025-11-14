@@ -49,6 +49,4 @@ This document provides a summary and commentary on the typical outputs generated
   * *Rv0678_p.Gln22Pro*: Specific protein change in the Rv0678 gene.  
   * *EBG00000313339_n.2042C>T*: Specific nucleotide variant in the EBG00000313339 gene (n. = genomic/nucleotide position; e.g., C>T at position 2042).  
 
-  > Cells in the matrix contain 1 if the sample has that specific mutation and 0 if it does not.
-
 ---
