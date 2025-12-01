@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Victor Lopez](https://github.com/victor5lm)
 - [Pau Pascual](https://github.com/PauPascualMas)
 - [Magdalena Matito](https://github.com/magdasmat)
+- [Juan Ledesma](https://github.com/juanledesma78)
 
 ### Template fixes and updates
 
@@ -29,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Refactor MTBseq template for TBProfiler pipleine with its lablogs [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
 - Added new authors contact in pyproject.toml [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
 - Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
+- Added new BLAST database created in July 2025 [#608](https://github.com/BU-ISCIII/buisciii-tools/pull/608)
 
 ### Modules
 
