@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added new authors contact in pyproject.toml [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
 - Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
 - Added new BLAST database created in July 2025 [#608](https://github.com/BU-ISCIII/buisciii-tools/pull/608)
+- Added hgil and Labviruspapiloma to sft_user.json [#609](https://github.com/BU-ISCIII/buisciii-tools/pull/609)
 
 ### Modules
 
