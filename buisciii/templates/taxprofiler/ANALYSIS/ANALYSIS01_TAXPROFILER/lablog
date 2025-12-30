@@ -79,6 +79,7 @@ nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler-1.2
     --shortread_qc_tool fastp \\
     --perform_shortread_hostremoval true \\
     --hostremoval_reference /data/ucct/bi/references/eukaria/homo_sapiens/hg38/NCBI/genome/GCF_000001405.40_GRCh38.p14/GCF_000001405.40_GRCh38.p14_genomic.fna.gz \\
+    --shortread_hostremoval_index /data/ucct/bi/references/eukaria/homo_sapiens/hg38/NCBI/genome/GCF_000001405.40_GRCh38.p14/bowtie2_index/ \\
     --run_kraken2 true \\
     --run_bracken true \\
     --run_centrifuge false \\
