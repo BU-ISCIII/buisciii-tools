@@ -360,6 +360,16 @@ check_references() {
     if [ -z "$REF_GFF" ]; then
         log_message "File ${ref}.gff is not yet downloaded."
         if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
+        if [[ $environment != *"refgenie"* ]]; then
+            eval "$(micromamba shell hook --shell bash)"
+            micromamba activate refgenie_v0.12.1
+            environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
+            if [[ $environment == *"refgenie"* ]]; then
+                log_message "$environment environment succesfully activated!" green
+            else
+                log_message "Refgenie environment was NOT DETECTED. Please ensure manually that all references were downloaded!" blk_red
+            fi
+        fi
         if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exist
             log_message "Creating new directory: /data/ucct/bi/references/refgenie/alias/${family}/ and saving file ${ref}.gff in /data/ucct/bi/references/refgenie/alias/${family}/gff/${ref}."
             digest=$(openssl rand -hex 24)
