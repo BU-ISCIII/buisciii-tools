@@ -49,6 +49,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Requirements
 
+- Updated GitHub action: `python_lint` now uses Python 3.10 [#615](https://github.com/BU-ISCIII/buisciii-tools/pull/615)
+
 ## [2.2.13] - 2025-09-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.13
 
 ### Credits
