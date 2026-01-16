@@ -303,6 +303,12 @@ check_references() {
         # Activate the micromamba environment (YOU MIGHT HAVE TO DO THIS MANUALLY)
         eval "$(micromamba shell hook --shell bash)"
         micromamba activate refgenie_v0.12.1
+        environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
+        if [[ $environment == *"refgenie"* ]]; then
+            log_message "$environment environment succesfully activated!" green
+        else
+            log_message "Refgenie environment was NOT DETECTED. Please ensure manually that all references were downloaded!" blk_red
+        fi
         if [ ! -e "/data/ucct/bi/references/refgenie/alias/${family}" ]; then # Check if directory doesn't exists
             log_message "Creating new directory: /data/ucct/bi/references/refgenie/alias/${family}/ and saving file ${ref}.fasta in /data/ucct/bi/references/refgenie/alias/${family}/fasta/${ref}."
             digest=$(openssl rand -hex 24)
