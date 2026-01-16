@@ -300,7 +300,7 @@ check_references() {
             log_message "SAMtools module not loaded. Exiting..." blk_red
             exit 1
         fi
-        # Activate the micromamba environment (YOU MIGHT HAVE TO DO THIS MANUALLY)
+        # Activate the micromamba environment
         eval "$(micromamba shell hook --shell bash)"
         micromamba activate refgenie_v0.12.1
         environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
