@@ -84,7 +84,9 @@ Options:
   -u, --api_user TEXT        User for the API logging
   -p, --api_password TEXT    Password for the API logging
   -c, --cred_file TEXT       Config file with API logging credentials
-  --help                     Show this message and exit
+  -D, --debug                Show the full traceback on error for debugging purposes.
+  -d, --dev                  Develop settings
+  --help                     Show this message and exit.
 
 Commands:
   list         List available bu-isciii services.
@@ -121,33 +123,29 @@ Options:
 Output:
 
 ```bash
-┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃           Service name ┃ Description                               ┃ Github                                     ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    assembly_annotation │ Nextflow assembly pipeline to assemble    │ https://github.com/Daniel-VM/bacass/...    │
-│                        │ bacterial genomes                         │                                            │
-│             tbprofiler │ Mycobacterium tuberculosis variant        │ https://github.com/jodyphelan/TBProfiler   │
-│                        │ calling and resistance prediction using   │                                            │
-│                        │ TBProfiler                                │                                            │
-│              pikavirus │ PikaVirus, a mapping-based tool for       │ https://github.com/BU-ISCIII/PikaVirus     │
-│                        │ metagenome analysis of virus.             │                                            │
-│     plasmidid_assembly │ Plasmid identification tool based on      │ https://github.com/BU-ISCIII/plasmidID     │
-│                        │ mapping and assisted by assembly          │                                            │
-│         wgmlst_taranis │ Multilocus sequence typing (MLST) using   │ https://github.com/BU-ISCIII/taranis       │
-│                        │ Taranis                                   │                                            │
-│       wgmlst_chewbbaca │ Multilocus sequence typing (MLST) using   │ https://github.com/B-UMMI/chewBBACA        │
-│                        │ chewBBACA                                 │                                            │
-│             viralrecon │ Viral genome reconstruction analysis for  │ https://github.com/BU-ISCIII/viralrecon    │
-│                        │ SARS-COV-2 data                           │                                            │
-│                 rnaseq │ RNA-seq analysis                          │ https://github.com/nf-core/rnaseq          │
-│          lowfreq_panel │ Low frequency variant calling from        │                                            │
-│                        │ enrichment panel.                         │                                            │
-│                 snippy │ Rapid haploid variant calling and core    │ https://github.com/tseemann/snippy         │
-│                        │ genome alignment                          │                                            │
-│       seek_and_destroy │ Simple pipeline for basic quality         │ https://github.com/GuilleGorines/Seek-Des… │
-│                        │ control, host removal and exploratory     │                                            │
-│                        │ analysis of samples.                      │                                            │
-└────────────────────────┴───────────────────────────────────────────┴────────────────────────────────────────────┘
+┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃        Service name ┃ Description                                                                                                              ┃ Github                                        ┃
+┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│                IRMA │ Influenza fragment reconstruction and variant detection                                                                  │ https://github.com/CDCgov/irma                │
+│ assembly_annotation │ nf-core/bacass:  Simple bacterial assembly and annotation pipeline                                                       │ https://github.com/nf-core/bacass/tree/2.4.0  │
+│            blast_nt │ Alignment of de novo assembly contigs to database                                                                        │ -                                             │
+│    characterization │ Multi-Locus Sequence Typing (MLST), analysis of virulence factors, antimicrobial resistance and plasmid characterization │ -                                             │
+│             exomeeb │ Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)  │ -                                             │
+│           exometrio │ Human: Exome sequencing for variant calling, annotation and inheritance filtering                                        │ -                                             │
+│  freebayes_outbreak │ Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)                               │ -                                             │
+│       lowfreq_panel │ Low frequency variant calling from enrichment panel                                                                      │ -                                             │
+│           pikavirus │ PikaVirus, a mapping-based tool for metagenome analysis of virus                                                         │ https://github.com/BU-ISCIII/PikaVirus        │
+│  plasmidid_assembly │ Plasmid identification tool based on mapping and assisted by assembly                                                    │ https://github.com/BU-ISCIII/plasmidID        │
+│              rnaseq │ RNA-Seq analysis                                                                                                         │ https://github.com/nf-core/rnaseq             │
+│    seek_and_destroy │ Simple pipeline for basic quality control, host removal and exploratory analysis of samples                              │ https://github.com/GuilleGorines/Seek-Destroy │
+│              snippy │ Rapid haploid variant calling and core genome alignment                                                                  │ https://github.com/tseemann/snippy            │
+│         taxprofiler │ Highly parallelised multi-taxonomic profiling of shotgun short- and long-read metagenomic data                           │ https://github.com/nf-core/taxprofiler        │
+│          tbprofiler │ Mycobacterium tuberculosis variant calling and resistance prediction using TBProfiler                                    │ https://github.com/jodyphelan/TBProfiler      │
+│          viralrecon │ Viral genome reconstruction analysis for SARS-COV-2 data                                                                 │ https://github.com/BU-ISCIII/viralrecon       │
+│    wgmlst_chewbbaca │ Multilocus sequence typing (MLST) using chewBBACA                                                                        │ https://github.com/B-UMMI/chewBBACA           │
+│      wgmlst_taranis │ Multilocus sequence typing (MLST) using Taranis                                                                          │ https://github.com/BU-ISCIII/taranis          │
+│             wgstrio │ Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering                            │ -                                             │
+└─────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴───────────────────────────────────────────────┘
 ```
 
 #### new-service
