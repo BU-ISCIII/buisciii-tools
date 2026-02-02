@@ -34,13 +34,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added hgil and Labviruspapiloma to sft_user.json [#609](https://github.com/BU-ISCIII/buisciii-tools/pull/609)
 - Updated taxprofiler's lablog so that Bowtie2 uses an already built index [#612](https://github.com/BU-ISCIII/buisciii-tools/pull/612).
 - Updated viralrecon's lablog to avoid exiting when the refgenie env is not loaded, even when it actually is [#613](https://github.com/BU-ISCIII/buisciii-tools/pull/613).
+- Completed service info in services.json [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
 
 ### Modules
 
 - Fixed new-service to properly check MD5 files when samples do not belong to the same run [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
-- Fixed clean module to remove .sorted.bam files only when the protocol is AMPLICONS in viralrecon services [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
 
 #### Added enhancements
+
+- Implemented logging and error handling in buisciii-tools [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
 
 #### Fixes
 
