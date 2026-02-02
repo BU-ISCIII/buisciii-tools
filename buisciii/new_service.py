@@ -193,7 +193,7 @@ class NewService:
         for service_id in services_ids:
             try:
                 service_template = services_json.get_find(service_id, "template")
-            except KeyError as e:
+            except KeyError:
                 message = f"ERROR: Service ID {service_id} not found in the services.json file!"
                 stderr.print(f"[red]{message}")
                 log.error(message)

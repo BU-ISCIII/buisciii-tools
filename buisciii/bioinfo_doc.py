@@ -206,7 +206,7 @@ class BioinfoDoc:
         self.all_services = None
         try:
             self.config_pdfkit = pdfkit.configuration()
-        except OSError as e:
+        except OSError:
             stderr.print(
                 "[red]wkhtmlpdf executable was not found. Install it using conda environment."
             )
@@ -380,11 +380,11 @@ class BioinfoDoc:
         # delivery_dict = {
         # "resolution_number": "SRVSGAFI005.1",
         # "pipelines_in_delivery": ["viralrecon"],
-        # "delivery_notes" : delivery_notes,
-        # "execution_start_date" : "YYYY-MM-DD",
-        # "execution_end_date" : "YYYY-MM-DD",
-        # "permanent_used_space" : "",
-        # "temporary_used_space" : ""
+        # "delivery_notes": delivery_notes,
+        # "execution_start_date": "YYYY-MM-DD",
+        # "execution_end_date": "YYYY-MM-DD",
+        # "permanent_used_space": "",
+        # "temporary_used_space": ""
         # }
 
         self.rest_api.post_request("create-delivery", json.dumps(delivery_dict))
@@ -553,7 +553,7 @@ class BioinfoDoc:
                 html_file, output_path=pdf_file, configuration=self.config_pdfkit
             )
             log.info(f"PDF file created successfully: {pdf_file}")
-        except OSError as e:
+        except OSError:
             stderr.print("[red]Unable to convert to PDF!")
             log.error("Unable to convert to PDF")
             raise
@@ -650,7 +650,7 @@ class BioinfoDoc:
             )
             log.info(f"Merged PDF saved to: {delivery_pdf_file}")
 
-        except OSError as e:
+        except OSError:
             stderr.print("[red]ERROR: Merging PDFs failed.")
             log.error("ERROR: Merging PDFs failed.")
             raise
@@ -690,8 +690,8 @@ class BioinfoDoc:
 
             md_type [str]:
                 Type of markdown being processed. Can be:
-                    - "service" : service description markdown
-                    - "results" : results markdown
+                    - "service": service description markdown
+                    - "results": results markdown
         """
         stderr.print(
             "Creating service results markdown file for " + self.service_folder + " !"
@@ -782,11 +782,11 @@ class BioinfoDoc:
                 f"Successfully created tree file from '{sftp_path}' in '{tree_file_path}'"
             )
 
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             stderr.print("[red]ERROR: Failed to create tree from SFTP")
             log.error("ERROR: Failed to create tree from SFTP")
             raise
-        except IOError as e:
+        except IOError:
             stderr.print("[red]ERROR: Failed to create tree file")
             log.error("ERROR: Failed to create tree file")
             raise
@@ -815,7 +815,7 @@ class BioinfoDoc:
                     ):
                         for i in range(3, -1, -1):
                             email_data["email_notes"] = buisciii.utils.prompt_path(
-                                msg="Write the path to the file with RAW text as email notes"
+                                msg="Write the path to the file with RAW text mail notes"
                             )
                             if not os.path.isfile(
                                 os.path.expanduser(email_data["email_notes"])
@@ -858,7 +858,7 @@ class BioinfoDoc:
                 ):
                     for i in range(3, -1, -1):
                         email_data["email_notes"] = buisciii.utils.prompt_path(
-                            msg="Write the path to the file with RAW text as email notes"
+                            msg="Write the path to the file with RAW text mail notes"
                         )
                         if not os.path.isfile(
                             os.path.expanduser(email_data["email_notes"])
@@ -938,7 +938,7 @@ class BioinfoDoc:
                 server.starttls(context=context)
             server.ehlo()
             server.login(user=email_host_user, password=email_host_password)
-        except Exception as e:
+        except Exception:
             stderr.print("[red]Unable to send e-mail: " + str(e))
             log.error("ERROR: Unable to send e-mail!")
             raise
