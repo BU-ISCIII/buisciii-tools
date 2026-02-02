@@ -16,7 +16,7 @@ class ConfigJson:
     def get_configuration(self, topic):
         """
         Description:
-            Obtain the topic configuration from json data
+            Obtain the topic configuration from JSON data.
         """
         if topic in self.topic_config:
             return self.json_data[topic]
@@ -25,7 +25,7 @@ class ConfigJson:
     def get_find(self, topic, found):
         """
         Description:
-            Obtain from topic any forward items from json data
+            Obtain from topic any forward items from JSON data.
         """
         if found in self.json_data[topic]:
             return self.json_data[topic][found]
