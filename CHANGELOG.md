@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Added enhancements
 
 - Implemented logging and error handling in buisciii-tools [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
+- Replaced pkg_resources by importlib.metadata due to pkg_resources being deprecated [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
 
 #### Fixes
 
