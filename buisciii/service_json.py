@@ -16,21 +16,21 @@ class ServiceJson:
     def get_json_data(self):
         """
         Description:
-            Get the dictionary json data
+            Get the dictionary JSON data.
         """
         return self.json_data
 
     def get_service_list(self):
         """
         Description:
-            Get the service list
+            Get the service list.
         """
         return self.service_list
 
     def get_service_configuration(self, service):
         """
         Description:
-            Obtain the service configuration from json data
+            Obtain the service configuration from JSON data.
         """
         if service in self.service_list:
             return self.json_data[service]
@@ -39,7 +39,7 @@ class ServiceJson:
     def get_find(self, service, found):
         """
         Description:
-            Obtain from service any forward items from json data
+            Obtain from service any forward items from JSON data.
         """
         if found in self.json_data[service]:
             return self.json_data[service][found]
@@ -51,6 +51,10 @@ class ServiceJson:
             return None
 
     def get_find_aux(self, service, found):
+        """
+        Description:
+            Recursively search for a key in a nested dictionary or list.
+        """
         if isinstance(service, dict):
             if found in service:
                 return service[found]
@@ -66,6 +70,10 @@ class ServiceJson:
         return None
 
     def get_find_deep(self, service, found):
+        """
+        Description:
+            Perform a deep search for a key.
+        """
         if service in self.service_list:
             serv_dict = self.json_data[service]
             call_aux = self.get_find_aux(serv_dict, found)
@@ -74,6 +82,11 @@ class ServiceJson:
             return "service not found"
 
     def my_recursivity(self, service, found_item):
+        """
+        Description:
+            Recursively search for a key in the service's JSON configuration.
+        """
+
         def recursive(my_dict, found_item):
             if isinstance(my_dict, dict):
                 for key, values in my_dict.items():
@@ -90,6 +103,10 @@ class ServiceJson:
         return False
 
     def get_list_of_delivery_doc(self):
+        """
+        Description:
+            Return a dictionary mapping each service to its corresponding delivery PDF file.
+        """
         docs = {}
         for service in self.service_list:
             docs[service] = self.json_data[service]["delivery_pdf"]
