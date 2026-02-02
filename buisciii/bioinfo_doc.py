@@ -850,7 +850,7 @@ class BioinfoDoc:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                             msg="Write email notes"
                         ).replace("\n", "<br />")
-                        log.info(f"Email notes: {email_data["email_notes"]}")
+                        log.info(f'Email notes: {email_data["email_notes"]}')
             else:
                 if buisciii.utils.prompt_yn_question(
                     msg="Do you wish to provide a text file for email notes?",
@@ -891,7 +891,7 @@ class BioinfoDoc:
                     email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                         msg="Write email notes"
                     ).replace("\n", "<br />")
-                    log.info(f"Email notes: {email_data["email_notes"]}")
+                    log.info(f'Email notes: {email_data["email_notes"]}')
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
