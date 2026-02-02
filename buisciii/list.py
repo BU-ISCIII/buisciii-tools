@@ -23,8 +23,7 @@ stderr = Console(
 
 def generate_table(service_list, data_dictionary):
     """
-    Given a list of services,
-    generate a rich table with it
+    Given a list of services, generate a rich table with related information.
     """
 
     table = rich.table.Table()
@@ -50,8 +49,7 @@ class ListServices:
 
     def print_table(self, service=None):
         """
-        Print table for service
-        names and description
+        Print table for service names and description.
         """
 
         if service:
