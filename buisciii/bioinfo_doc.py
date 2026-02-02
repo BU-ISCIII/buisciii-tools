@@ -546,7 +546,7 @@ class BioinfoDoc:
             html_file [str]:
                 Path to the HTML file to be converted into PDF.
         """
-        log.info(f"Converting HTML to PDF...")
+        log.info("Converting HTML to PDF...")
         pdf_file = html_file.replace(".html", ".pdf")
         try:
             pdfkit.from_file(
@@ -938,7 +938,7 @@ class BioinfoDoc:
                 server.starttls(context=context)
             server.ehlo()
             server.login(user=email_host_user, password=email_host_password)
-        except Exception:
+        except Exception as e:
             stderr.print("[red]Unable to send e-mail: " + str(e))
             log.error("ERROR: Unable to send e-mail!")
             raise
