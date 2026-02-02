@@ -40,7 +40,7 @@
       "begin": "base",
       "end": "taxprofiler",
       "url": "https://github.com/BU-ISCIII/PikaVirus",
-      "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus.",
+      "description": "PikaVirus, a mapping-based tool for metagenome analysis of virus",
       "clean": {
         "folders":["virus_coverage/plots"],
         "files":[]
@@ -127,7 +127,7 @@
         "order": 1,
         "begin": "",
         "end": "taxprofiler",
-        "description": "RNA-seq analysis",
+        "description": "RNA-Seq analysis",
         "clean": {
           "folders":[],
           "files":["star_salmon/sample_name.Aligned.out.bam", "star_salmon/sample_name.Aligned.toTranscriptome.out.bam"]
@@ -140,11 +140,11 @@
     "lowfreq_panel": {
         "label": "Low-frequency variants detection and annotation for whole genome or sequencing panel (e.g. retinoblastoma gene panel)",
         "template": "lowfreq_panel",
-        "url": "",
+        "url": "-",
         "order": 1,
         "begin": "",
         "end": "",
-        "description": "Low frequency variant calling from enrichment panel.",
+        "description": "Low frequency variant calling from enrichment panel",
         "clean": {
           "folders":["02-preprocessing", "05-samtools"],
           "files":[]
@@ -178,7 +178,7 @@
       "begin": "base",
       "end": "",
       "url": "https://github.com/GuilleGorines/Seek-Destroy",
-      "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples.",
+      "description": "Simple pipeline for basic quality control, host removal and exploratory analysis of samples",
       "clean": {
         "folders":[],
         "files":[]
@@ -190,11 +190,11 @@
     "characterization": {
       "label": "Bacteria: Multi-Locus Sequence Typing (MLST), analysis of virulence factors, antimicrobial resistance, and plasmids characterization",
       "template": "characterization",
-      "url": "",
+      "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
-      "description": "",
+      "description": "Multi-Locus Sequence Typing (MLST), analysis of virulence factors, antimicrobial resistance and plasmid characterization",
       "clean": {
         "folders":["01-preprocessing"],
         "files":[]
@@ -224,11 +224,11 @@
     "exometrio": {
       "label": "Human: Exome sequencing for variant calling, annotation and inheritance filtering (e.g. Exome sequencing of a human trio (two parents and one child))",
       "template": "exometrio",
-      "url": "",
+      "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
-      "description": "",
+      "description": "Human: Exome sequencing for variant calling, annotation and inheritance filtering",
       "clean": {
         "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates", "03-annotation/vep", "03-annotation/exomiser"],
         "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
@@ -241,11 +241,11 @@
     "exomeeb": {
       "label": "Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)",
       "template": "exomeeb",
-      "url": "",
+      "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
-      "description": "",
+      "description": "Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing"],
         "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
@@ -256,13 +256,13 @@
       "results_md": "assets/reports/results/exomeeb.md"
     },
     "wgstrio": {
-      "label": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering (e.g.WGS of a human trio )",
+      "label": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering (e.g. WGS of a human trio)",
       "template": "wgstrio",
-      "url": "",
+      "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
-      "description": "",
+      "description": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
         "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
@@ -275,11 +275,11 @@
     "freebayes_outbreak": {
       "label": "Eukaria (non-human): Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)",
       "template": "freebayes_outbreak",
-      "url": "",
+      "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
-      "description": "",
+      "description": "Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)",
       "clean": {
         "folders":["02-preprocessing"],
         "files":[]
@@ -292,11 +292,11 @@
     "IRMA": {
       "label": "Viral Flu: Influenza fragment reconstruction and variant detection",
       "template": "IRMA",
-      "url": "",
+      "url": "https://github.com/CDCgov/irma",
       "order": 1,
       "begin": "",
       "end": "taxprofiler",
-      "description": "",
+      "description": "Influenza fragment reconstruction and variant detection",
       "clean": {
         "folders":["02-preprocessing", "intermediate"],
         "files":["sample_name/RSV_AD.bam", "sample_name/RSV_BD.bam"]
@@ -309,11 +309,11 @@
     "blast_nt": {
       "label": "Alignment of de novo assembly contigs to database",
       "template": "blast_nt",
-      "url": "",
+      "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
-      "description": "",
+      "description": "Alignment of de novo assembly contigs to database",
       "clean": {
         "folders":[],
         "files":[]
