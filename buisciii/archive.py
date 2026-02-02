@@ -638,7 +638,7 @@ class Archive:
                 )
                 continue
 
-            (origin, destiny) = (
+            origin, destiny = (
                 (
                     self.services[service]["non_archived_path"],
                     self.services[service]["archived_path"],
