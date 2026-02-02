@@ -146,7 +146,7 @@ class CleanUp:
                     for item in items:
                         if item not in clean_items_list:
                             clean_items_list.append(item)
-            except KeyError as e:
+            except KeyError:
                 stderr.print(
                     "[red]ERROR: Service ID %s not found in the services.json file."
                     % service
@@ -335,7 +335,7 @@ class CleanUp:
                     os.replace(directory_to_rename, newpath)
                     if verbose:
                         print(f"Renamed {directory_to_rename} to {newpath}.")
-                except PermissionError as e:
+                except PermissionError:
                     stderr.print(
                         f"[red]Error moving {directory_to_rename} to {newpath}!"
                     )

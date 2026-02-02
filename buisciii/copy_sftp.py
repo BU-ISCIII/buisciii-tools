@@ -122,7 +122,7 @@ class CopySftp:
                 item = service_conf.get_find_deep(service, type)
                 if item not in last_folders_list:
                     last_folders_list.append(item)
-            except KeyError as e:
+            except KeyError:
                 stderr.print(
                     "[red]ERROR: Service ID %s not found in the services.json file."
                     % service
@@ -181,7 +181,7 @@ class CopySftp:
                     )
                     log.error("This protocol is not allowed at the moment!")
                     sys.exit()
-            except RsyncError as e:
+            except RsyncError:
                 stderr.print(
                     "[yellow]Data copied to the SFTP with errors.",
                     highlight=False,

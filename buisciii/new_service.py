@@ -134,7 +134,7 @@ class NewService:
                 stderr.print(f"[green]{message}")
                 log.info(message)
 
-            except subprocess.CalledProcessError as e:
+            except subprocess.CalledProcessError:
                 message = f"ERROR: MD5 check failed for project {project_name}"
                 stderr.print(f"[red]{message}")
                 log.error(message)
@@ -173,7 +173,7 @@ class NewService:
                     log.info(message)
             return True
         else:
-            stderr.print(f"[yellow]Assuming folder already exists! Moving forward!")
+            stderr.print("[yellow]Assuming folder already exists! Moving forward!")
             log.info("Assuming folder already exists! Moving forward!")
             return False
 
@@ -213,7 +213,7 @@ class NewService:
                 stderr.print(
                     f"[green]Successfully copied the template '{service_template}' to the directory '{self.full_path}'!"
                 )
-            except OSError as e:
+            except OSError:
                 message = "ERROR: Copying template failed!"
                 stderr.print(f"[red]{message}")
                 log.error(message)
@@ -283,7 +283,7 @@ class NewService:
                         file,
                         os.path.join(self.full_path, "RAW", os.path.basename(file)),
                     )
-                except OSError as e:
+                except OSError:
                     message = f"ERROR: Symbolic links creation failed for file {file}"
                     stderr.print(f"[red]{message}")
                     log.error(message)
@@ -304,8 +304,8 @@ class NewService:
                 f.write(json_samples)
             stderr.print(f"Created samples JSON file: {json_samples_file}")
             log.info(f"Created samples JSON file: {json_samples_file}")
-        except Exception as e:
-            message = f"Error creating samples JSON file"
+        except Exception:
+            message = "Error creating samples JSON file"
             log.error(message)
             stderr.print(f"[red]{message}")
             raise
@@ -340,9 +340,9 @@ class NewService:
                     log.info(
                         f"Updated service state to 'in_progress' for {self.resolution_id}"
                     )
-                except Exception as e:
-                    stderr.print(f"[yellow]Could not update service state")
-                    log.warning(f"Could not update service state")
+                except Exception:
+                    stderr.print("[yellow]Could not update service state")
+                    log.warning("Could not update service state")
                     raise
 
         else:
@@ -375,9 +375,9 @@ class NewService:
                         log.info(
                             f"Updated service state to 'in_progress' for {self.resolution_id}"
                         )
-                    except Exception as e:
-                        stderr.print(f"[yellow]Could not update service state")
-                        log.warning(f"Could not update service state")
+                    except Exception:
+                        stderr.print("[yellow]Could not update service state")
+                        log.warning("Could not update service state")
                         raise
             else:
                 message = "Directory not created. Bye!"

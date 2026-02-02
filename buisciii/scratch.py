@@ -161,7 +161,7 @@ class Scratch:
                     stderr.print(
                         f"[red]An error ocurred while copying '{self.full_path}'!"
                     )
-            except Exception as e:
+            except Exception:
                 log.error(f"ERROR: Copy of the directory {self.full_path} failed!")
                 stderr.print(
                     f"[red]ERROR: Copy of the directory {self.full_path} failed!"
@@ -227,7 +227,7 @@ class Scratch:
                         log.error("This protocol is not allowed at the moment!")
                         stderr.print("[red]This protocol is not allowed at the moment!")
                         sys.exit()
-                except Exception as e:
+                except Exception:
                     log.error(
                         f"ERROR: Copy of directory {self.scratch_tmp_path} failed!"
                     )
