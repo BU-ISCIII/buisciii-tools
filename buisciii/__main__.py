@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-# import sys
+
 import logging
 import os
+from datetime import datetime
+import sys
 
 import click
 import rich.console
@@ -23,6 +25,14 @@ import buisciii.autoclean_sftp
 
 log = logging.getLogger()
 
+# Set up rich stderr console
+stderr = rich.console.Console(
+    stderr=True,
+    style="dim",
+    highlight=False,
+    force_terminal=buisciii.utils.rich_force_colors(),
+)
+
 
 def run_buisciii():
     # Set up rich stderr console
@@ -34,35 +44,33 @@ def run_buisciii():
     rich.traceback.install(console=stderr, width=200, word_wrap=True, extra_lines=1)
 
     # Print nf-core header
-    # stderr.print("\n[green]{},--.[grey39]/[green],-.".format(" " * 42), highlight=False)
     stderr.print(
-        "[blue]                 ___              ___    ___   ___  ___   ___   ____   ",
+        r"[blue]                 ___              ___    ___   ___  ___   ___   ____   ",
         highlight=False,
     )
     stderr.print(
-        "[blue]   \    |-[grey39]-|  [blue]  |   \   |   |      |    |     |      |     |      |    ",
+        r"[blue]   \    |-[grey39]-|  [blue]  |   \   |   |      |    |     |      |     |      |    ",
         highlight=False,
     )
     stderr.print(
-        "[blue]    \   \  [grey39]/ [blue]   |__ /   |   | ___  |    |__   |      |     |      |    ",
+        r"[blue]    \   \  [grey39]/ [blue]   |__ /   |   | ___  |    |__   |      |     |      |    ",
         highlight=False,
     )
     stderr.print(
-        "[blue]    /  [grey39] / [blue] \    |   \   |   |      |       |  |      |     |      |    ",
+        r"[blue]    /  [grey39] / [blue] \    |   \   |   |      |       |  |      |     |      |    ",
         highlight=False,
     )
     stderr.print(
-        "[blue]   /   [grey39] |-[blue]-|    |__ /   |___|     _|__  ___|  |___  _|_   _|_    _|_   ",
+        r"[blue]   /   [grey39] |-[blue]-|    |__ /   |___|     _|__  ___|  |___  _|_   _|_    _|_   ",
         highlight=False,
     )
 
-    # stderr.print("[green]                                          `._,._,'\n", highlight=False)
     __version__ = "2.2.13"
     stderr.print(
-        "[grey39]    BU-ISCIII-tools version {}".format(__version__), highlight=False
+        "[grey39]    BUISCIII-tools version {}".format(__version__), highlight=False
     )
 
-    # Lanch the click cli
+    # Launch the click cli
     buisciii_cli()
 
 
@@ -88,7 +96,8 @@ class CustomHelpOrder(click.Group):
         )
 
     def command(self, *args, **kwargs):
-        """Behaves the same as `click.Group.command()` except capture
+        """
+        Behaves the same as `click.Group.command()` except capture
         a priority for listing command names in help.
         """
         help_priority = kwargs.pop("help_priority", 1000)
@@ -100,6 +109,108 @@ class CustomHelpOrder(click.Group):
             return cmd
 
         return decorator
+
+
+def setup_automatic_logging(service_path, resolution_id, command_name):
+    """
+    Configure automatic logging for a service execution.
+
+    This function creates and configures a log file associated with a specific
+    service execution. The log file is generally stored inside the `DOC`
+    directory of the service.
+
+    Parameters
+    ----------
+    service_path : str
+        Path to the root directory of the service where the log file will be
+        created.
+    resolution_id : str
+        Unique identifier of the resolution.
+    command_name : str
+        Name of the module being executed.
+
+    Returns
+    -------
+    log_filepath : str or None
+        Full path to the created log file if logging was successfully configured.
+        Returns None if the service path does not exist, required parameters are
+        missing, or an error occurs during logging setup.
+    """
+
+    try:
+        # Path verification
+        if command_name == "new_service" and not os.path.exists(service_path):
+            stderr.print(f"[red]Service path does not exist: {service_path}!")
+            sys.exit(1)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        if command_name == "archive":
+            archive_logs_dir = f"/data/ucct/bi/logs/archive/{datetime.now().year}"
+            if not os.path.exists(archive_logs_dir):
+                try:
+                    os.makedirs(archive_logs_dir, exist_ok=True)
+                except Exception as e:
+                    print(f"Could not create archive directory: {e}")
+                    import tempfile
+
+                    archive_logs_dir = tempfile.gettempdir()
+            log_filename = f"{command_name}_{timestamp}.log"
+            log_filepath = os.path.join(archive_logs_dir, log_filename)
+
+        elif command_name == "autoclean-sftp" and service_path is None:
+            logs_base_dir = "/data/ucct/bi/logs"
+            service_path = os.path.join(
+                logs_base_dir, command_name, str(datetime.now().year)
+            )
+
+            # Create the log path if it does not exist
+            if not os.path.exists(service_path):
+                try:
+                    os.makedirs(service_path, exist_ok=True)
+                except Exception as e:
+                    print(f"Could not create autoclean_sftp directory: {e}")
+                    import tempfile
+
+                    service_path = tempfile.gettempdir()
+            log_filename = f"{command_name}_{timestamp}.log"
+            log_filepath = os.path.join(service_path, log_filename)
+
+        else:
+            if command_name == "bioinfo-doc":
+                doc_path = service_path
+            else:
+                doc_path = os.path.join(service_path, "DOC")
+
+            # If DOC does not exist, it is created
+            if not os.path.exists(doc_path) and command_name != "archive":
+                try:
+                    os.makedirs(doc_path, exist_ok=True)
+                except Exception as e:
+                    print(f"Could not create DOC directory: {e}")
+                    # If this is not posible, the service folder is used
+                    doc_path = service_path
+
+            log_filename = f"{resolution_id}_{command_name}_{timestamp}.log"
+            log_filepath = os.path.join(doc_path, log_filename)
+
+        log_fh = logging.FileHandler(log_filepath, encoding="utf-8")
+        log_fh.setLevel(logging.INFO)
+        log_fh.setFormatter(
+            logging.Formatter(
+                "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
+            )
+        )
+
+        logging.getLogger().addHandler(log_fh)
+
+        print(f"Log will be saved to: {log_filepath}")
+
+        return log_filepath
+
+    except Exception as e:
+        print(f"Error setting up automatic logging: {e}")
+        return None
 
 
 @click.group(cls=CustomHelpOrder)
@@ -135,23 +246,41 @@ class CustomHelpOrder(click.Group):
     required=False,
     default=None,
 )
+@click.option(
+    "-D",
+    "--debug",
+    is_flag=True,
+    default=False,
+    help="Show the full traceback on error for debugging purposes.",
+)
 @click.option("-d", "--dev", help="Develop settings", is_flag=True, default=False)
 @click.pass_context
-def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev):
+def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev, debug):
+    if debug:
+        log.setLevel(logging.DEBUG)
+
     # Set the base logger to output DEBUG
     log.setLevel(logging.INFO)
-    # Initialize context
+
     ctx.obj = {}
-    # Set up logs to a file if we asked for one
+
+    # If -l was specified, save log in the indicated file
+    ctx.obj["manual_log_file"] = log_file
+
+    # Manual logging if -l was specified
     if log_file:
-        log_fh = logging.FileHandler(log_file, encoding="utf-8")
-        log_fh.setLevel(logging.INFO)
-        log_fh.setFormatter(
-            logging.Formatter(
-                "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
+        try:
+            log_fh = logging.FileHandler(log_file, encoding="utf-8")
+            log_fh.setLevel(logging.INFO)
+            log_fh.setFormatter(
+                logging.Formatter(
+                    "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
+                )
             )
-        )
-        log.addHandler(log_fh)
+            log.addHandler(log_fh)
+            print(f"Manual log will be saved to: {log_file}")
+        except Exception as e:
+            print(f"Warning: Could not setup manual logging: {e}")
 
     if dev:
         conf = buisciii.config_json.ConfigJson(
@@ -162,8 +291,9 @@ def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev)
     else:
         conf = buisciii.config_json.ConfigJson()
 
-    ctx.obj = buisciii.utils.get_yaml_config(conf, cred_file)
     ctx.obj["conf"] = conf
+    ctx.obj.update(buisciii.utils.get_yaml_config(conf, cred_file))
+    ctx.obj["debug"] = debug
 
     if buisciii.utils.validate_api_credentials(ctx.obj):
         print("API credentials successfully extracted from yaml config file")
@@ -184,7 +314,7 @@ def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev)
 @click.pass_context
 def list(ctx, service):
     """
-    List available bu-isciii services.
+    List all available buisciii services.
     """
     service_list = buisciii.list.ListServices()
     service_list.print_table(service)
@@ -217,18 +347,40 @@ def list(ctx, service):
 @click.pass_context
 def new_service(ctx, resolution, path, no_create_folder, ask_path):
     """
-    Create new service, it will create folder and copy template depending on selected service.
+    Create new service: this will create the service folder and copy templates depending on selected service/s.
     """
-    new_ser = buisciii.new_service.NewService(
-        resolution,
-        path,
-        no_create_folder,
-        ask_path,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    new_ser.create_new_service()
+    if resolution is None:
+        resolution = buisciii.utils.prompt_resolution_id()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        new_ser = buisciii.new_service.NewService(
+            resolution,
+            path,
+            no_create_folder,
+            ask_path,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+            setup_logging_cb=(
+                None
+                if ctx.obj.get("manual_log_file")
+                else lambda service_path: setup_automatic_logging(
+                    service_path, resolution, "new_service"
+                )
+            ),
+        )
+
+        new_ser.create_new_service()
+
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # COPY SERVICE FOLDER TO SCRATCHS TMP
@@ -271,17 +423,35 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
     """
     Copy service folder to scratch directory for execution.
     """
-    scratch_copy = buisciii.scratch.Scratch(
-        resolution,
-        path,
-        tmp_dir,
-        direction,
-        ask_path,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    scratch_copy.handle_scratch()
+    if resolution is None:
+        resolution = buisciii.utils.prompt_resolution_id()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        scratch_copy = buisciii.scratch.Scratch(
+            resolution,
+            path,
+            tmp_dir,
+            direction,
+            ask_path,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+
+        # Automatic logging
+        if resolution and not ctx.obj.get("manual_log_file"):
+            setup_automatic_logging(scratch_copy.full_path, resolution, "scratch")
+
+        scratch_copy.handle_scratch()
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # CLEAN SERVICE
@@ -327,19 +497,37 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
 @click.pass_context
 def clean(ctx, resolution, path, ask_path, option):
     """
-    Service cleaning. It will either remove big files, rename folders before copy, revert this renaming,
+    Service cleaning. This will either remove big files, rename folders before copy, revert this renaming,
     show removable files or show folders for no copy.
     """
-    clean = buisciii.clean.CleanUp(
-        resolution,
-        path,
-        ask_path,
-        option,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    clean.handle_clean()
+    if resolution is None:
+        resolution = buisciii.utils.prompt_resolution_id()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        clean_obj = buisciii.clean.CleanUp(
+            resolution,
+            path,
+            ask_path,
+            option,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+
+        # Automatic logging
+        if resolution and not ctx.obj.get("manual_log_file"):
+            setup_automatic_logging(clean_obj.full_path, resolution, "clean")
+
+        clean_obj.handle_clean()
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # COPY RESULTS FOLDER TO SFTP
@@ -369,18 +557,36 @@ def clean(ctx, resolution, path, ask_path, option):
 @click.pass_context
 def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
     """
-    Copy resolution FOLDER to sftp, change status of resolution in iskylims and generate md, pdf, html.
+    Copy resolution folder to SFTP, change status of the resolution in iSkyLIMS and generate md, pdf & html files.
     """
-    new_del = buisciii.copy_sftp.CopySftp(
-        resolution,
-        path,
-        ask_path,
-        sftp_folder,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    new_del.copy_sftp()
+    if resolution is None:
+        resolution = buisciii.utils.prompt_resolution_id()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        new_del = buisciii.copy_sftp.CopySftp(
+            resolution,
+            path,
+            ask_path,
+            sftp_folder,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+
+        # Automatic logging
+        if resolution and not ctx.obj.get("manual_log_file"):
+            setup_automatic_logging(new_del.full_path, resolution, "copy_sftp")
+
+        new_del.copy_sftp()
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # CLEAN SCRATCH, COPY TO SERVICE, RENAME SERVICE AND COPY RESULTS FOLDER TO SFTP
@@ -417,12 +623,36 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
 @click.pass_context
 def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
-    Service cleaning, remove big files, rename folders before copy and copy resolution FOLDER to sftp.
+    Service cleaning, big files removal, folders renaming before copy and resolution folder copying to the SFTP.
     """
+    if resolution is None:
+        resolution = buisciii.utils.prompt_resolution_id()
 
     clean_tmp_dir = tmp_dir
     if tmp_dir == "/scratch/bi/":
         clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
+
+    conf = buisciii.config_json.ConfigJson()
+    conf_api = conf.get_configuration("xtutatis_api_settings")
+    rest_api = buisciii.drylab_api.RestServiceApi(
+        conf_api["server"],
+        conf_api["api_url"],
+        ctx.obj["api_user"],
+        ctx.obj["api_password"],
+    )
+    resolution_info = rest_api.get_request(
+        request_info="service-data", safe=True, resolution=resolution
+    )
+    service_folder = resolution_info["resolutions"][0]["resolution_full_number"]
+    service_path = os.path.join(
+        buisciii.utils.get_service_paths(
+            conf, "services_and_colaborations", resolution_info, "non_archived_path"
+        ),
+        service_folder,
+    )
+
+    if not ctx.obj.get("manual_log_file"):
+        setup_automatic_logging(service_path, resolution, "finish")
 
     print("Starting cleaning scratch directory: " + clean_tmp_dir)
     clean_scratch = buisciii.clean.CleanUp(
@@ -469,8 +699,9 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
         ctx.obj["conf"],
     )
     copy_sftp.copy_sftp()
-    print("Service correctly in SFTP folder")
-    print("Remember to generate delivery docs after setting delivery in iSkyLIMS.")
+
+    print("Service correctly stored in the SFTP folder")
+    print("Remember to generate delivery docs after setting delivery in iSkyLIMS!")
 
 
 # CREATE DOCS IN BIOINFO_DOC
@@ -539,21 +770,45 @@ def bioinfo_doc(
     """
     Create the folder documentation structure in bioinfo_doc server
     """
-    email_pass = email_psswd if email_psswd else ctx.obj.get("email_password")
-    new_doc = buisciii.bioinfo_doc.BioinfoDoc(
-        type,
-        resolution,
-        path,
-        ask_path,
-        sftp_folder,
-        report_md,
-        results_md,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-        email_pass,
-    )
-    new_doc.create_documentation()
+    if resolution is None:
+        resolution = buisciii.utils.prompt_resolution_id()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        email_pass = email_psswd if email_psswd else ctx.obj.get("email_password")
+        new_doc = buisciii.bioinfo_doc.BioinfoDoc(
+            type,
+            resolution,
+            path,
+            ask_path,
+            sftp_folder,
+            report_md,
+            results_md,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+            email_pass,
+        )
+
+        if resolution and not ctx.obj.get("manual_log_file"):
+            logs_directory = os.path.join(
+                new_doc.path,
+                new_doc.conf["services_path"],
+                datetime.strftime(new_doc.resolution_datetime, "%Y"),
+                "logs",
+            )
+            setup_automatic_logging(logs_directory, resolution, "bioinfo-doc")
+
+        new_doc.create_documentation()
+
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # ARCHIVE SERVICES
@@ -613,20 +868,37 @@ def archive(
     """
     Archive services or retrieve services from archive
     """
-    archive_ser = buisciii.archive.Archive(
-        service_id,
-        service_file,
-        ser_type,
-        option,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-        skip_prompts,
-        date_from,
-        date_until,
-        output_name,
-    )
-    archive_ser.handle_archive()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        # Automatic logging
+        if not ctx.obj.get("manual_log_file"):
+            setup_automatic_logging(None, None, "archive")
+
+        archive_ser = buisciii.archive.Archive(
+            service_id,
+            service_file,
+            ser_type,
+            option,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+            skip_prompts,
+            date_from,
+            date_until,
+            output_name,
+        )
+
+        archive_ser.handle_archive()
+
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # CLEAN OLD SFTP SERVICES
@@ -648,10 +920,27 @@ def archive(
 @click.pass_context
 def autoclean_sftp(ctx, sftp_folder, days):
     """Clean old sftp services"""
-    sftp_clean = buisciii.autoclean_sftp.AutoremoveSftpService(
-        sftp_folder, days, ctx.obj["conf"]
-    )
-    sftp_clean.handle_autoclean_sftp()
+
+    debug = ctx.obj.get("debug", False)
+    try:
+        sftp_clean = buisciii.autoclean_sftp.AutoremoveSftpService(
+            sftp_folder, days, ctx.obj["conf"]
+        )
+
+        # Automatic logging
+        if not ctx.obj.get("manual_log_file"):
+            setup_automatic_logging(None, None, "autoclean-sftp")
+
+        sftp_clean.handle_autoclean_sftp()
+
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # FIX PERMISSIONS
@@ -670,6 +959,7 @@ def fix_permissions(ctx, input_directory):
     """
     Fix permissions
     """
+    debug = ctx.obj.get("debug", False)
     conf = buisciii.config_json.ConfigJson()
     permissions = conf.get_configuration("global").get("permissions")
     stderr = rich.console.Console(
@@ -680,8 +970,17 @@ def fix_permissions(ctx, input_directory):
         if not os.path.isdir(directory):
             stderr.print(f"[red]Invalid input directory: {directory}")
             continue
-        buisciii.utils.remake_permissions(directory, permissions)
-        stderr.print(f"[green]Correct permissions were applied to {directory}")
+        try:
+            buisciii.utils.remake_permissions(directory, permissions)
+            stderr.print(f"[green]Correct permissions were applied to {directory}")
+        except Exception as e:
+            if debug:
+                log.exception(f"EXCEPTION FOUND: {e}")
+                raise
+            else:
+                log.exception(f"EXCEPTION FOUND: {e}")
+                stderr.print(f"EXCEPTION FOUND: {e}")
+                sys.exit(1)
 
 
 if __name__ == "__main__":
