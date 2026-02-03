@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated taxprofiler's lablog so that Bowtie2 uses an already built index [#612](https://github.com/BU-ISCIII/buisciii-tools/pull/612).
 - Updated viralrecon's lablog to avoid exiting when the refgenie env is not loaded, even when it actually is [#613](https://github.com/BU-ISCIII/buisciii-tools/pull/613).
 - Completed service info in services.json [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
+- Updated sftp_user.json to add lorena.pozo to labantibiotics [#620](https://github.com/BU-ISCIII/buisciii-tools/pull/620). 
 
 ### Modules
 
