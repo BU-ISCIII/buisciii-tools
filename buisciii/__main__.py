@@ -5,6 +5,7 @@ import logging
 import os
 from datetime import datetime
 import sys
+import tempfile
 
 import click
 import rich.console
@@ -113,28 +114,27 @@ class CustomHelpOrder(click.Group):
 
 def setup_automatic_logging(service_path, resolution_id, command_name):
     """
-    Configure automatic logging for a service execution.
+    Description:
+        Configure automatic logging for a service execution.
 
-    This function creates and configures a log file associated with a specific
-    service execution. The log file is generally stored inside the `DOC`
-    directory of the service.
+        This function creates and configures a log file associated with a specific
+        service execution. The log file is generally stored inside the `DOC`
+        directory of the service.
 
-    Parameters
-    ----------
-    service_path : str
-        Path to the root directory of the service where the log file will be
-        created.
-    resolution_id : str
-        Unique identifier of the resolution.
-    command_name : str
-        Name of the module being executed.
+    Params:
+        service_path : str
+            Path to the root directory of the service where the log file will be
+            created.
+        resolution_id : str
+            Unique identifier of the resolution.
+        command_name : str
+            Name of the module being executed.
 
-    Returns
-    -------
-    log_filepath : str or None
-        Full path to the created log file if logging was successfully configured.
-        Returns None if the service path does not exist, required parameters are
-        missing, or an error occurs during logging setup.
+    Returns:
+        log_filepath : str or None
+            Full path to the created log file if logging was successfully configured.
+            Returns None if the service path does not exist, required parameters are
+            missing, or an error occurs during logging setup.
     """
 
     try:
@@ -152,8 +152,6 @@ def setup_automatic_logging(service_path, resolution_id, command_name):
                     os.makedirs(archive_logs_dir, exist_ok=True)
                 except Exception as e:
                     print(f"Could not create archive directory: {e}")
-                    import tempfile
-
                     archive_logs_dir = tempfile.gettempdir()
             log_filename = f"{command_name}_{timestamp}.log"
             log_filepath = os.path.join(archive_logs_dir, log_filename)
@@ -163,15 +161,11 @@ def setup_automatic_logging(service_path, resolution_id, command_name):
             service_path = os.path.join(
                 logs_base_dir, command_name, str(datetime.now().year)
             )
-
-            # Create the log path if it does not exist
             if not os.path.exists(service_path):
                 try:
                     os.makedirs(service_path, exist_ok=True)
                 except Exception as e:
-                    print(f"Could not create autoclean_sftp directory: {e}")
-                    import tempfile
-
+                    print(f"Could not create autoclean-sftp directory: {e}")
                     service_path = tempfile.gettempdir()
             log_filename = f"{command_name}_{timestamp}.log"
             log_filepath = os.path.join(service_path, log_filename)
