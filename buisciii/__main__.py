@@ -112,7 +112,7 @@ class CustomHelpOrder(click.Group):
         return decorator
 
 
-def setup_automatic_logging(service_path, resolution_id, command_name):
+def setup_automatic_logging(service_path, resolution_id, command_name, conf):
     """
     Description:
         Configure automatic logging for a service execution.
@@ -144,9 +144,10 @@ def setup_automatic_logging(service_path, resolution_id, command_name):
             sys.exit(1)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        data_path = conf.get_configuration("global").get("data_path")
 
         if command_name == "archive":
-            archive_logs_dir = f"/data/ucct/bi/logs/archive/{datetime.now().year}"
+            archive_logs_dir = f"{data_path}/logs/archive/{datetime.now().year}"
             if not os.path.exists(archive_logs_dir):
                 try:
                     os.makedirs(archive_logs_dir, exist_ok=True)
@@ -157,7 +158,7 @@ def setup_automatic_logging(service_path, resolution_id, command_name):
             log_filepath = os.path.join(archive_logs_dir, log_filename)
 
         elif command_name == "autoclean-sftp" and service_path is None:
-            logs_base_dir = "/data/ucct/bi/logs"
+            logs_base_dir = f"{data_path}/logs"
             service_path = os.path.join(
                 logs_base_dir, command_name, str(datetime.now().year)
             )
@@ -189,14 +190,13 @@ def setup_automatic_logging(service_path, resolution_id, command_name):
             log_filepath = os.path.join(doc_path, log_filename)
 
         log_fh = logging.FileHandler(log_filepath, encoding="utf-8")
-        log_fh.setLevel(logging.INFO)
         log_fh.setFormatter(
             logging.Formatter(
                 "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
             )
         )
 
-        logging.getLogger().addHandler(log_fh)
+        log.addHandler(log_fh)
 
         print(f"Log will be saved to: {log_filepath}")
 
@@ -251,30 +251,16 @@ def setup_automatic_logging(service_path, resolution_id, command_name):
 @click.pass_context
 def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev, debug):
     if debug:
+        # Set the base logger to output everything
         log.setLevel(logging.DEBUG)
-
-    # Set the base logger to output DEBUG
-    log.setLevel(logging.INFO)
+    else:
+        # Set the base logger to hide DEBUG messages
+        log.setLevel(logging.INFO)
 
     ctx.obj = {}
 
     # If -l was specified, save log in the indicated file
     ctx.obj["manual_log_file"] = log_file
-
-    # Manual logging if -l was specified
-    if log_file:
-        try:
-            log_fh = logging.FileHandler(log_file, encoding="utf-8")
-            log_fh.setLevel(logging.INFO)
-            log_fh.setFormatter(
-                logging.Formatter(
-                    "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
-                )
-            )
-            log.addHandler(log_fh)
-            print(f"Manual log will be saved to: {log_file}")
-        except Exception as e:
-            print(f"Warning: Could not setup manual logging: {e}")
 
     if dev:
         conf = buisciii.config_json.ConfigJson(
@@ -288,6 +274,20 @@ def buisciii_cli(ctx, verbose, log_file, api_user, api_password, cred_file, dev,
     ctx.obj["conf"] = conf
     ctx.obj.update(buisciii.utils.get_yaml_config(conf, cred_file))
     ctx.obj["debug"] = debug
+
+    # Manual logging if -l was specified
+    if log_file:
+        try:
+            log_fh = logging.FileHandler(log_file, encoding="utf-8")
+            log_fh.setFormatter(
+                logging.Formatter(
+                    "[%(asctime)s] %(name)-20s [%(levelname)-7s]  %(message)s"
+                )
+            )
+            log.addHandler(log_fh)
+            print(f"Manual log will be saved to: {log_file}")
+        except Exception as e:
+            print(f"Warning: Could not setup manual logging: {e}")
 
     if buisciii.utils.validate_api_credentials(ctx.obj):
         print("API credentials successfully extracted from yaml config file")
@@ -360,7 +360,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
                 None
                 if ctx.obj.get("manual_log_file")
                 else lambda service_path: setup_automatic_logging(
-                    service_path, resolution, "new_service"
+                    service_path, resolution, "new_service", ctx.obj["conf"] 
                 )
             ),
         )
@@ -435,7 +435,7 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
 
         # Automatic logging
         if resolution and not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(scratch_copy.full_path, resolution, "scratch")
+            setup_automatic_logging(scratch_copy.full_path, resolution, "scratch", ctx.obj["conf"])
 
         scratch_copy.handle_scratch()
     except Exception as e:
@@ -511,7 +511,7 @@ def clean(ctx, resolution, path, ask_path, option):
 
         # Automatic logging
         if resolution and not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(clean_obj.full_path, resolution, "clean")
+            setup_automatic_logging(clean_obj.full_path, resolution, "clean", ctx.obj["conf"])
 
         clean_obj.handle_clean()
     except Exception as e:
@@ -570,7 +570,7 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
 
         # Automatic logging
         if resolution and not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(new_del.full_path, resolution, "copy_sftp")
+            setup_automatic_logging(new_del.full_path, resolution, "copy_sftp", ctx.obj["conf"])
 
         new_del.copy_sftp()
     except Exception as e:
@@ -626,7 +626,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     if tmp_dir == "/scratch/bi/":
         clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
 
-    conf = buisciii.config_json.ConfigJson()
+
     conf_api = conf.get_configuration("xtutatis_api_settings")
     rest_api = buisciii.drylab_api.RestServiceApi(
         conf_api["server"],
@@ -646,7 +646,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     )
 
     if not ctx.obj.get("manual_log_file"):
-        setup_automatic_logging(service_path, resolution, "finish")
+        setup_automatic_logging(service_path, resolution, "finish", ctx.obj["conf"])
 
     print("Starting cleaning scratch directory: " + clean_tmp_dir)
     clean_scratch = buisciii.clean.CleanUp(
@@ -791,7 +791,7 @@ def bioinfo_doc(
                 datetime.strftime(new_doc.resolution_datetime, "%Y"),
                 "logs",
             )
-            setup_automatic_logging(logs_directory, resolution, "bioinfo-doc")
+            setup_automatic_logging(logs_directory, resolution, "bioinfo-doc", ctx.obj["conf"])
 
         new_doc.create_documentation()
 
@@ -867,7 +867,7 @@ def archive(
     try:
         # Automatic logging
         if not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(None, None, "archive")
+            setup_automatic_logging(None, None, "archive", ctx.obj["conf"])
 
         archive_ser = buisciii.archive.Archive(
             service_id,
@@ -923,7 +923,7 @@ def autoclean_sftp(ctx, sftp_folder, days):
 
         # Automatic logging
         if not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(None, None, "autoclean-sftp")
+            setup_automatic_logging(None, None, "autoclean-sftp", ctx.obj["conf"])
 
         sftp_clean.handle_autoclean_sftp()
 
