@@ -435,7 +435,9 @@ def scratch(ctx, resolution, path, tmp_dir, direction, ask_path):
 
         # Automatic logging
         if resolution and not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(scratch_copy.full_path, resolution, "scratch", ctx.obj["conf"])
+            setup_automatic_logging(
+                scratch_copy.full_path, resolution, "scratch", ctx.obj["conf"]
+            )
 
         scratch_copy.handle_scratch()
     except Exception as e:
@@ -511,7 +513,9 @@ def clean(ctx, resolution, path, ask_path, option):
 
         # Automatic logging
         if resolution and not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(clean_obj.full_path, resolution, "clean", ctx.obj["conf"])
+            setup_automatic_logging(
+                clean_obj.full_path, resolution, "clean", ctx.obj["conf"]
+            )
 
         clean_obj.handle_clean()
     except Exception as e:
@@ -570,7 +574,9 @@ def copy_sftp(ctx, resolution, path, ask_path, sftp_folder):
 
         # Automatic logging
         if resolution and not ctx.obj.get("manual_log_file"):
-            setup_automatic_logging(new_del.full_path, resolution, "copy_sftp", ctx.obj["conf"])
+            setup_automatic_logging(
+                new_del.full_path, resolution, "copy_sftp", ctx.obj["conf"]
+            )
 
         new_del.copy_sftp()
     except Exception as e:
@@ -791,7 +797,9 @@ def bioinfo_doc(
                 datetime.strftime(new_doc.resolution_datetime, "%Y"),
                 "logs",
             )
-            setup_automatic_logging(logs_directory, resolution, "bioinfo-doc", ctx.obj["conf"])
+            setup_automatic_logging(
+                logs_directory, resolution, "bioinfo-doc", ctx.obj["conf"]
+            )
 
         new_doc.create_documentation()
 

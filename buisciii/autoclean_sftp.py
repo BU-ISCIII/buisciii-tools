@@ -111,9 +111,7 @@ class AutoremoveSftpService:
         """
         if not os.path.exists(self.path):
             stderr.print(
-                "[red]ERROR: The path: "
-                + self.path
-                + "does not exist. Exiting..."
+                "[red]ERROR: The path: " + self.path + "does not exist. Exiting..."
             )
             log.error(f"ERROR: The path {self.path} does not exist. Exiting...")
             raise ValueError(f"The path {self.path} does not exist!")

@@ -186,7 +186,9 @@ class BioinfoDoc:
             log.error(
                 f"Unable to fetch information for resolution {self.resolution_id}!"
             )
-            raise ValueError(f"Unable to fetch information for resolution {self.resolution_id}!")
+            raise ValueError(
+                f"Unable to fetch information for resolution {self.resolution_id}!"
+            )
         self.service_name = self.resolution_info["resolutions"][0][
             "resolution_full_number"
         ]
@@ -587,7 +589,9 @@ class BioinfoDoc:
                 "ERROR: Unable to generate files because an invalid option %s was specified",
                 type,
             )
-            raise ValueError(f"ERROR: Unable to generate files because an invalid option {type} was specified")
+            raise ValueError(
+                f"ERROR: Unable to generate files because an invalid option {type} was specified"
+            )
 
         mk_text, file_name = self.create_markdown(file_path)
         file_name_without_ext = file_name.replace(".md", "")

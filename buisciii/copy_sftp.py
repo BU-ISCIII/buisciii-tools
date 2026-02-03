@@ -81,7 +81,9 @@ class CopySftp:
             log.error(
                 "ERROR: Either give a path or make the terminal ask you for a path, not both."
             )
-            raise ValueError("Either give a path or make the terminal ask you for a path, not both.")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both."
+            )
         elif path is not None and ask_path is False:
             self.path = path
         elif path is not None and ask_path is not False:
@@ -91,7 +93,9 @@ class CopySftp:
             log.error(
                 "ERROR: Either give a path or make the terminal ask you a path, not both."
             )
-            raise ValueError("Either give a path or make the terminal ask you for a path, not both.")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both."
+            )
         else:
             self.path = buisciii.utils.get_service_paths(
                 conf,
@@ -179,7 +183,9 @@ class CopySftp:
                         highlight=False,
                     )
                     log.error("This protocol is not allowed at the moment!")
-                    raise NotImplementedError("This protocol is not allowed at the moment!")
+                    raise NotImplementedError(
+                        "This protocol is not allowed at the moment!"
+                    )
             except RsyncError:
                 stderr.print(
                     "[yellow]Data copied to the SFTP with errors.",
@@ -204,5 +210,7 @@ class CopySftp:
             log.error(
                 f"ERROR: Service number {self.service_folder} not in the source path {self.full_path}"
             )
-            raise ValueError(f"ERROR: Service number {self.service_folder} not in the source path {self.full_path}")
+            raise ValueError(
+                f"ERROR: Service number {self.service_folder} not in the source path {self.full_path}"
+            )
         return True

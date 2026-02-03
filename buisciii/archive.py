@@ -116,7 +116,9 @@ class Archive:
             log.warning(
                 f"Initial date was {('not' if date_from is None else '')} set, but final date was {('not' if date_until is None else '')}. Please provide both!"
             )
-            raise ValueError(f"Initial date was {('not' if date_from is None else '')} set, but final date was {('not' if date_until is None else '')}. Please provide both!")
+            raise ValueError(
+                f"Initial date was {('not' if date_from is None else '')} set, but final date was {('not' if date_until is None else '')}. Please provide both!"
+            )
 
         if (
             (

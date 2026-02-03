@@ -71,7 +71,9 @@ class CleanUp:
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you for a path, not both."
             )
-            raise ValueError("Either give a path or make the terminal ask you for a path, not both")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both"
+            )
         elif path is not None and ask_path is False:
             self.path = path
         elif path is not None and ask_path is not False:
@@ -81,7 +83,9 @@ class CleanUp:
             stderr.print(
                 "[red] ERROR: Either give a path or make the terminal ask you for a path, not both."
             )
-            raise ValueError("Either give a path or make the terminal ask you for a path, not both")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both"
+            )
         else:
             self.path = buisciii.utils.get_service_paths(
                 conf,

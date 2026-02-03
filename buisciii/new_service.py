@@ -78,14 +78,18 @@ class NewService:
             message = "ERROR: Either give a path or make the terminal ask you for a path, not both."
             stderr.print(f"[red]{message}")
             log.error(message)
-            raise ValueError("Either give a path or make the terminal ask you for a path, not both.")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both."
+            )
         elif path is not None and ask_path is False:
             self.path = path
         elif path is not None and ask_path is not False:
             message = "ERROR: Either give a path or make the terminal ask you for a path, not both."
             stderr.print(f"[red]{message}")
             log.error(message)
-            raise ValueError("Either give a path or make the terminal ask you for a path, not both.")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both."
+            )
         else:
             self.path = buisciii.utils.get_service_paths(
                 conf,
@@ -156,7 +160,9 @@ class NewService:
                 message = f"ERROR: the service folder already exists. Skipping folder creation '{self.full_path}' and exiting."
                 stderr.print(f"[red]{message}")
                 log.error(message)
-                raise FileExistsError(f"The service folder already exists. Skipping folder creation '{self.full_path}' and exiting.")
+                raise FileExistsError(
+                    f"The service folder already exists. Skipping folder creation '{self.full_path}' and exiting."
+                )
             else:
                 try:
                     os.mkdir(self.full_path)
