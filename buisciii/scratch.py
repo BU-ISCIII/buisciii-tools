@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-# Generic imports
-import sys
+# Generic imports 
 import os
 import logging
 import re
