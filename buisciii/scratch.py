@@ -87,14 +87,14 @@ class Scratch:
             message = "ERROR: Either give a path or make the terminal ask you for a path, not both."
             log.error(message)
             stderr.print(f"[red]{message}")
-            sys.exit()
+            raise ValueError("Either give a path or make the terminal ask you for a path, not both.")
         elif path is not None and ask_path is False:
             self.full_path = path
         elif path is not None and ask_path is not False:
             message = "ERROR: Either give a path or make the terminal ask you for a path, not both."
             log.error(message)
             stderr.print(f"[red]{message}")
-            sys.exit()
+            raise ValueError("Either give a path or make the terminal ask you for a path, not both.")
         else:
             self.path = buisciii.utils.get_service_paths(
                 conf,
@@ -142,7 +142,7 @@ class Scratch:
                 else:
                     log.error("This protocol is not allowed at the moment!")
                     stderr.print("[red]This protocol is not allowed at the moment!")
-                    sys.exit()
+                    raise NotImplementedError("This protocol is not allowed at the moment!")
                 if exit_code == 0:
                     f = open(self.out_file, "w")
                     f.write("Temporal directory: " + self.scratch_tmp_path + "\n")
@@ -226,7 +226,7 @@ class Scratch:
                     else:
                         log.error("This protocol is not allowed at the moment!")
                         stderr.print("[red]This protocol is not allowed at the moment!")
-                        sys.exit()
+                        raise NotImplementedError("This protocol is not allowed at the moment!")
                 except Exception:
                     log.error(
                         f"ERROR: Copy of directory {self.scratch_tmp_path} failed!"
