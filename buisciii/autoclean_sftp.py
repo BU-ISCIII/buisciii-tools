@@ -97,7 +97,7 @@ class AutoremoveSftpService:
             + self.path
         )
         log.info(
-            "Services older than"
+            "Services older than "
             + str(self.days.days)
             + " days will now be deleted from "
             + self.path
@@ -111,12 +111,12 @@ class AutoremoveSftpService:
         """
         if not os.path.exists(self.path):
             stderr.print(
-                "[red]ERROR: The path:"
+                "[red]ERROR: The path: "
                 + self.path
-                + "does not exist. Exiting..." % self.path
+                + "does not exist. Exiting..."
             )
             log.error(f"ERROR: The path {self.path} does not exist. Exiting...")
-            sys.exit()
+            raise ValueError(f"The path {self.path} does not exist!")
         else:
             return True
 
@@ -147,7 +147,7 @@ class AutoremoveSftpService:
         if len(self.sftp_services) == 0:
             stderr.print(f"[yellow]No services found in {self.path}! Exiting...")
             log.warning(f"No services found in {self.path}! Exiting...")
-            sys.exit()
+            raise ValueError(f"No services found in {self.path}! Exiting...")
 
     def mark_toDelete(self):
         """
