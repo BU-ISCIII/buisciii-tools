@@ -360,7 +360,7 @@ def new_service(ctx, resolution, path, no_create_folder, ask_path):
                 None
                 if ctx.obj.get("manual_log_file")
                 else lambda service_path: setup_automatic_logging(
-                    service_path, resolution, "new_service", ctx.obj["conf"] 
+                    service_path, resolution, "new_service", ctx.obj["conf"]
                 )
             ),
         )
@@ -626,7 +626,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     if tmp_dir == "/scratch/bi/":
         clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
 
-
+    conf = buisciii.config_json.ConfigJson()
     conf_api = conf.get_configuration("xtutatis_api_settings")
     rest_api = buisciii.drylab_api.RestServiceApi(
         conf_api["server"],
