@@ -78,7 +78,7 @@ class BioinfoDoc:
         if not os.path.exists(self.path):
             stderr.print(f"[red]Folder '{self.path}' does not exist!")
             log.error(f"ERROR: Folder '{self.path}' does not exist!")
-            sys.exit()
+            raise ValueError(f"ERROR: Folder '{self.path}' does not exist!")
         if resolution_id is None:
             self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
@@ -93,7 +93,7 @@ class BioinfoDoc:
         if self.resolution_info == 404:
             log.error("ERROR: Received Error 404 from iSkyLIMS API. Aborting...")
             stderr.print("[red]Received Error 404 from iSkyLIMS API. Aborting...")
-            sys.exit(1)
+            raise ValueError("Received Error 404 from iSkyLIMS API. Aborting...")
         if self.type == "delivery":
             if len(self.resolution_info["resolutions"][0]["delivery"]) > 0:
                 log.warning("Service delivery already exists.")
@@ -119,7 +119,7 @@ class BioinfoDoc:
                         "[red]ERROR: Markdown file " + report_md + " does not exist!"
                     )
                     log.error("ERROR: Markdown file " + report_md + " does not exist!")
-                    sys.exit(1)
+                    raise ValueError("Markdown file " + report_md + " does not exist!")
             else:
                 self.service_ids_requested_list = (
                     buisciii.utils.append_end_to_service_id_list(
@@ -152,7 +152,7 @@ class BioinfoDoc:
                         "[red]ERROR: Markdown file " + results_md + " does not exist."
                     )
                     log.error("ERROR: Markdown file " + results_md + " does not exist.")
-                    sys.exit(1)
+                    raise ValueError("Markdown file " + results_md + " does not exist!")
             else:
                 for service_id_requested in self.service_ids_requested_list:
                     if (
@@ -186,7 +186,7 @@ class BioinfoDoc:
             log.error(
                 f"Unable to fetch information for resolution {self.resolution_id}!"
             )
-            sys.exit(1)
+            raise ValueError(f"Unable to fetch information for resolution {self.resolution_id}!")
         self.service_name = self.resolution_info["resolutions"][0][
             "resolution_full_number"
         ]
@@ -587,7 +587,7 @@ class BioinfoDoc:
                 "ERROR: Unable to generate files because an invalid option %s was specified",
                 type,
             )
-            sys.exit(1)
+            raise ValueError(f"ERROR: Unable to generate files because an invalid option {type} was specified")
 
         mk_text, file_name = self.create_markdown(file_path)
         file_name_without_ext = file_name.replace(".md", "")
@@ -1071,4 +1071,4 @@ class BioinfoDoc:
         else:
             stderr.print("[red]Invalid option!")
             log.error("Unable to continue because of an invalid option %s", type)
-            sys.exit(1)
+            raise ValueError("Invalid option!")
