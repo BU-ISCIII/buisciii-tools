@@ -6,9 +6,9 @@ This markdown briefly describes the files found in `RESULTS/` folder for ExomeEB
 
 This file includes information regarding variant annotation, effect prediction and inheritance typing:
 
-![HTML Description 1](images/exomiser-html-description-1.png)
+![HTML Description 1](../md/images/exomiser-html-description-1.png)
 
-![HTML Description 2](images/exomiser-html-description-2.png)
+![HTML Description 2](../md/images/exomiser-html-description-2.png)
 
 ## picard_hsmetrics.csv
 
