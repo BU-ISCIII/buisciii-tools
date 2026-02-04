@@ -2,14 +2,6 @@
 
 These file briefly describes the files in `RESULTS/` folder from ExomeTrio and WGStrio services.
 
-## exomiser.html
-
-This file includes information regarding variant annotation, effect prediction and inheritance typing:
-
-![HTML Description 1](images/exomiser-html-description-1.png)
-
-![HTML Description 2](images/exomiser-html-description-2.png)
-
 ## picard_hsmetrics.csv
 
 This table includes mapping quality metrics from sarek's pipeline results, with the following columns:
