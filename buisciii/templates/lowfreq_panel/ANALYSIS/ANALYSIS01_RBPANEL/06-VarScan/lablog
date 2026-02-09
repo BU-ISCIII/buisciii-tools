@@ -1,31 +1,10 @@
 # module load singularity
 
+ln -s ../samples_id.txt .
 mkdir logs
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
-echo "Use bash lablog ../samples_id.txt"
-
-samples_file=$1
-cat <<EOF > varscan.sbatch
-#!/bin/sh
-#SBATCH --ntasks 1
-#SBATCH --cpus-per-task 4
-#SBATCH --mem 16384
-#SBATCH --time 8:00:00
-#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
-#SBATCH --partition middle_idx
-#SBATCH --output logs/varscan_%A_%a.log
-#SBATCH --chdir $scratch_dir
-
-SAMPLE_LIST=(\$(<$samples_file))
-SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
-
-mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/varscan:2.4.4--hdfd78af_1 varscan mpileup2cns ${scratch_dir}/../05-samtools/\${SAMPLE}/\${SAMPLE}.pileup --min-var-freq 0.05 --p-value 0.99 --variants --output-vcf 1 > \${SAMPLE}/\${SAMPLE}.vcf
-bgzip \${SAMPLE}/\${SAMPLE}.vcf
-tabix \${SAMPLE}/\${SAMPLE}.vcf.gz
-EOF
-
-echo "sbatch varscan.sbatch" > _01_varscan.sh
-echo "Done"
+cat samples_id.txt | while read in; do mkdir ${in}; echo "singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/varscan:2.4.6--hdfd78af_0 varscan mpileup2cns ${scratch_dir}/../05-samtools/${in}/${in}.pileup --min-var-freq 0.05 --p-value 0.99 --variants --output-vcf 1 > ${in}/${in}.vcf &"; done >> _00_varscan_mpileup2cns.sh
+echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir ${scratch_dir} --time 10:00:00 --output logs/VARSCAN.%j.log bash _00_varscan_mpileup2cns.sh &" > _01_run_varscan_mpileup2cns.sh
+cat samples_id.txt | while read in; do echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir ${scratch_dir} --time 10:00:00 --output logs/GZIP.${in}.%j.log gzip ${in}/${in}.vcf &"; done >> _02_gzip.sh

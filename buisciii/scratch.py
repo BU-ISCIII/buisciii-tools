@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # Generic imports
-import sys
 import os
 import logging
 import re
@@ -18,6 +17,7 @@ import buisciii.drylab_api
 import buisciii.config_json
 
 log = logging.getLogger(__name__)
+
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -57,7 +57,7 @@ class Scratch:
             self.direction = direction
         # Load conf
         conf_api = conf.get_configuration("xtutatis_api_settings")
-        # Obtain info from iskylims api
+        # Obtain info from iSkyLIMS API
         rest_api = buisciii.drylab_api.RestServiceApi(
             conf_api["server"], conf_api["api_url"], api_user, api_password
         )
@@ -83,17 +83,21 @@ class Scratch:
             stderr.print("Directory where service folder is located.")
             self.path = buisciii.utils.prompt_path(msg="Path")
         elif path == "-a":
-            stderr.print(
-                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            message = "ERROR: Either give a path or make the terminal ask you for a path, not both."
+            log.error(message)
+            stderr.print(f"[red]{message}")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both."
             )
-            sys.exit()
         elif path is not None and ask_path is False:
             self.full_path = path
         elif path is not None and ask_path is not False:
-            stderr.print(
-                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            message = "ERROR: Either give a path or make the terminal ask you for a path, not both."
+            log.error(message)
+            stderr.print(f"[red]{message}")
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both."
             )
-            sys.exit()
         else:
             self.path = buisciii.utils.get_service_paths(
                 conf,
@@ -106,14 +110,26 @@ class Scratch:
         self.out_file = os.path.join(self.full_path, "DOC", "service_info.txt")
 
     def srun_command(self, srun_settings, command):
+        """
+        Description:
+            Runs 'srun', returning the exit code of the command.
+        """
         command_list = [["srun"], srun_settings, command]
         srun_command = [arg for command in command_list for arg in command]
         exit_code = subprocess.call(srun_command)
         return exit_code
 
     def copy_scratch(self):
-        stderr.print("[blue]I will copy the service from %s" % self.full_path)
-        stderr.print("[blue]to %s" % self.scratch_tmp_path)
+        """
+        Description:
+            Copy the service folder from the main directory to the temporary scratch path.
+        """
+        log.info(
+            f"The service will be copied from '{self.full_path}' to '{self.scratch_tmp_path}'"
+        )
+        stderr.print(
+            f"[blue]The service will be copied from '{self.full_path}' to '{self.scratch_tmp_path}'"
+        )
         if self.service_folder in self.full_path:
             protocol = self.conf["protocol"]
             try:
@@ -126,51 +142,58 @@ class Scratch:
                         sync_source_contents=False,
                     )
                     exit_code = self.srun_command(self.srun_settings, rsync_command)
-
                 else:
-                    stderr.print(
-                        "[ref] This protocol is not allowed at the moment",
-                        highlight=False,
+                    log.error("This protocol is not allowed at the moment!")
+                    stderr.print("[red]This protocol is not allowed at the moment!")
+                    raise NotImplementedError(
+                        "This protocol is not allowed at the moment!"
                     )
-                    sys.exit()
                 if exit_code == 0:
-                    stderr.print(
-                        "[green] Data copied to the sftp folder successfully",
-                        highlight=False,
-                    )
                     f = open(self.out_file, "w")
                     f.write("Temporal directory: " + self.scratch_tmp_path + "\n")
                     f.write("Origin service directory: " + self.full_path + "\n")
                     f.close()
+                    log.info(
+                        f"Successfully copied the directory to '{self.scratch_tmp_path}'"
+                    )
                     stderr.print(
-                        "[green]Successfully copied the directory to %s"
-                        % self.scratch_tmp_path,
-                        highlight=False,
+                        f"[green]Successfully copied the directory to '{self.scratch_tmp_path}'"
                     )
                 else:
-                    stderr.print(f"[red]Errors while copying {self.full_path}")
-            except Exception as e:
-                stderr.print(e)
+                    log.error(
+                        f"ERROR: An error ocurred while copying '{self.full_path}'!"
+                    )
+                    stderr.print(
+                        f"[red]An error ocurred while copying '{self.full_path}'!"
+                    )
+            except Exception:
+                log.error(f"ERROR: Copy of the directory {self.full_path} failed!")
                 stderr.print(
-                    "[red]ERROR: Copy of the directory %s failed" % self.full_path,
-                    highlight=False,
+                    f"[red]ERROR: Copy of the directory {self.full_path} failed!"
                 )
-                sys.exit(1)
+                raise
         else:
             log.error(
-                f"Directory path not the same as service resolution. Skip folder copy '{self.full_path}'"
+                f"Directory path is not the same as the service resolution. Skipping folder copy for '{self.full_path}'!"
             )
             stderr.print(
                 "[red]ERROR: Directory "
                 + self.full_path
-                + " not the same as "
+                + " is not the same as "
                 + self.service_folder,
                 highlight=False,
             )
         return True
 
     def revert_copy_scratch(self):
-        stderr.print(f"[blue]I will copy back the service from {self.scratch_tmp_path}")
+        """
+        Description:
+            Copy the service folder back from scratch to the original service directory.
+        """
+        log.info(f"The service will be copied back from '{self.scratch_tmp_path}'")
+        stderr.print(
+            f"[blue]The service will be copied back from '{self.scratch_tmp_path}'"
+        )
         try:
             f = open(self.out_file, "r")
             for line in f:
@@ -181,7 +204,7 @@ class Scratch:
             if self.service_folder in dest_folder:
                 try:
                     if self.conf["protocol"] == "rsync":
-                        # scratch_tmp cannot be used due to permission issues
+                        # Bear in mind that scratch_tmp cannot be used due to permission issues!
                         scratch_bi_path = "".join([self.tmp_dir, self.service_folder])
                         rsync_command = sysrsync.get_rsync_command(
                             source=scratch_bi_path,
@@ -201,45 +224,48 @@ class Scratch:
                             self.full_path, permissions_config
                         )
 
+                        log.info(f"Successfully copied the directory to {dest_folder}")
                         stderr.print(
-                            "[green]Successfully copied the directory to %s"
-                            % dest_folder,
-                            highlight=False,
+                            f"[green]Successfully copied the directory to {dest_folder}"
                         )
                     else:
-                        stderr.print(
-                            "[ref] This protocol is not allowed at the moment",
-                            highlight=False,
+                        log.error("This protocol is not allowed at the moment!")
+                        stderr.print("[red]This protocol is not allowed at the moment!")
+                        raise NotImplementedError(
+                            "This protocol is not allowed at the moment!"
                         )
-                        sys.exit()
-                except Exception as e:
-                    stderr.print(e)
-                    stderr.print(
-                        "[red]ERROR: Copy of directory %s failed"
-                        % self.scratch_tmp_path,
-                        highlight=False,
+                except Exception:
+                    log.error(
+                        f"ERROR: Copy of directory {self.scratch_tmp_path} failed!"
                     )
-                    sys.exit(1)
+                    stderr.print(
+                        f"[red]ERROR: Copy of directory {self.scratch_tmp_path} failed!"
+                    )
+                    raise
             else:
                 log.error(
-                    f"Directory path not the same as service resolution. Skip folder copy '{dest_folder}'"
+                    f"Directory path is not the same as the service resolution. Skipping copy for folder '{dest_folder}'"
                 )
                 stderr.print(
                     "[red]ERROR: Directory "
                     + dest_folder
-                    + " not the same as "
+                    + " is not the same as "
                     + self.full_path,
                     highlight=False,
                 )
         except OSError:
-            stderr.print(
-                "[red]ERROR: %s does not exist" % self.out_file,
-                highlight=False,
-            )
+            log.error(f"ERROR: {self.out_file} does not exist!")
+            stderr.print(f"[red]ERROR: {self.out_file} does not exist!")
+            raise
         return True
 
     def remove_scratch(self):
-        stderr.print("[blue]I will remove the folder %s" % self.scratch_tmp_path)
+        """
+        Description:
+            Remove the temporary scratch folder associated with the service.
+        """
+        log.info(f"The folder {self.scratch_tmp_path} will now be removed")
+        stderr.print(f"[blue]The folder {self.scratch_tmp_path} will now be removed")
         try:
             f = open(self.out_file, "r")
             for line in f:
@@ -248,19 +274,16 @@ class Scratch:
             f.close()
 
         except OSError:
-            stderr.print(
-                "[red]ERROR: %s does not exist" % self.out_file,
-                highlight=False,
-            )
+            log.error(f"ERROR: {self.out_file} does not exist!")
+            stderr.print(f"[red]ERROR: {self.out_file} does not exist!")
+            raise
         if self.service_folder in scratch_folder:
             shutil.rmtree(scratch_folder)
-            stderr.print(
-                "[green]Successfully removed directory %s" % scratch_folder,
-                highlight=False,
-            )
+            log.info(f"Successfully removed directory {scratch_folder}")
+            stderr.print(f"[green]Successfully removed directory {scratch_folder}")
         else:
             log.error(
-                f"Directory path is not the same as service resolution. Skip folder copy '{scratch_folder}'"
+                f"Directory path is not the same as the service resolution. Skipping folder copy for '{scratch_folder}'"
             )
             stderr.print(
                 "[red]ERROR: Directory "
@@ -272,6 +295,10 @@ class Scratch:
         return True
 
     def handle_scratch(self):
+        """
+        Description:
+            Execute the scratch module based on the chosen direction.
+        """
         if self.direction == "service_to_scratch":
             self.copy_scratch()
         elif self.direction == "scratch_to_service":

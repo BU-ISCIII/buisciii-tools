@@ -1,37 +1,13 @@
 # module load singularity
-
-scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
-mkdir logs
-
-echo "Use bash lablog ../samples_id.txt"
-samples_file=$1
-cat <<EOF > bcftools_query.sbatch
-#!/bin/sh
-#SBATCH --ntasks 1
-#SBATCH --cpus-per-task 4
-#SBATCH --mem 16384
-#SBATCH --time 8:00:00
-#SBATCH --array 1-$(wc -l $samples_file | cut -d " " -f 1)
-#SBATCH --partition middle_idx
-#SBATCH --output logs/bcftools_query_%A_%a.log
-#SBATCH --chdir $scratch_dir
-
-SAMPLE_LIST=(\$(<$samples_file))
-SAMPLE=\${SAMPLE_LIST[\${SLURM_ARRAY_TASK_ID}-1]}
-
-mkdir \$SAMPLE
-singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1 bcftools query -H ${scratch_dir}/../06-VarScan/\${SAMPLE}/\${SAMPLE}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' > \${SAMPLE}/\${SAMPLE}.table
-EOF
-
-echo "sbatch bcftools_query.sbatch" > _01_bcftools_query.sh
-
-
 # module load Java/1.8.0_281 R/4.1.0-foss-2021a
-cat ../samples_id.txt | xargs -I @@ echo "mkdir @@;srun --chdir ${scratch_dir} --output logs/KGGSEQ.@@.%j.log --job-name KGGSEQ --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 java -jar -Xmx8g /data/ucct/bi/pipelines/kggseq/kggseqhg19/kggseq.jar --no-web --buildver hg19 --vcf-file ../06-VarScan/@@/@@.vcf.gz --db-gene refgene --db-score dbnsfp --genome-annot --db-filter ESP5400,dbsnp141,1kg201305 --rare-allele-freq 1 --mendel-causing-predict best --omim-annot --out @@/@@_annot.txt --no-qc &" > _02_kggseq.sh
-cat ../samples_id.txt | xargs -I % echo "gunzip %/%_annot.txt.flt.txt.gz" > _03_final_table.sh
-cat ../samples_id.txt | xargs -I % echo 'cp header %/%_header.table && tail -n +2 %/%.table >> %/%_header.table'  >> _03_final_table.sh
-cat ../samples_id.txt | xargs -I % echo "Rscript merge_parse.R %" >> _03_final_table.sh
 
-cat ../samples_id.txt | xargs -I % echo "grep -P '\"RB1\"' ./%_all_annotated.tab > %_rb1_annotated.tab" > _04_filter_final_table.sh
+mkdir logs
+ln -s ../samples_id.txt .
+scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 
-echo "Done"
+cat samples_id.txt | while read in; do mkdir ${in}; echo "srun --partition short_idx --cpus-per-task 10 --mem 35000M --chdir ${scratch_dir} --time 10:00:00 --output logs/BCFTOOLS_QUERY.${in}.%j.log singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/bcftools:1.22--h3a4d415_1.1 bcftools query -H ${scratch_dir}/../06-VarScan/${in}/${in}.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER[\t%GT\t%DP\t%RD\t%AD\t%FREQ\t%PVAL\t%RBQ\t%ABQ\t%RDF\t%RDR\t%ADF\t%ADR]\n' -o ${in}/${in}.table &"; done >> _01_bcftools_query.sh
+cat samples_id.txt | while read in; do echo "srun --chdir ${scratch_dir} --output logs/KGGSEQ.${in}.%j.log --job-name KGGSEQ --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 java -jar -Xmx8g /data/ucct/bi/pipelines/kggseq/kggseqhg19/kggseq.jar --no-web --buildver hg19 --vcf-file ${scratch_dir}/../06-VarScan/${in}/${in}.vcf.gz --db-gene refgene --db-score dbnsfp --genome-annot --db-filter ESP5400,dbsnp141,1kg201305 --rare-allele-freq 1 --mendel-causing-predict best --omim-annot --out ${in}/${in}_annot.txt --no-qc &"; done >> _02_kggseq.sh
+cat samples_id.txt | while read in; do echo "gunzip ${in}/${in}_annot.txt.flt.txt.gz"; done >> _03_final_table.sh
+cat samples_id.txt | while read in; do echo "cp header ${in}/${in}_header.table && tail -n +2 ${in}/${in}.table >> ${in}/${in}_header.table"; done >> _03_final_table.sh
+cat samples_id.txt | while read in; do echo "Rscript merge_parse.R ${in}"; done >> _03_final_table.sh
+cat samples_id.txt | while read in; do echo "head -n 1 ./${in}_all_annotated.tab > ${in}_rb1_annotated.tab && grep -P '\"RB1\"' ./${in}_all_annotated.tab | tail -n +2 >> ${in}_rb1_annotated.tab"; done > _04_filter_final_table.sh

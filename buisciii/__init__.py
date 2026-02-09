@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-"""Main buisciii package file."""
+"""Main BU-ISCIII package file"""
 
-import pkg_resources
+from importlib.metadata import version
 
-__version__ = pkg_resources.get_distribution("buisciii-tools").version
+__version__ = version("buisciii-tools")

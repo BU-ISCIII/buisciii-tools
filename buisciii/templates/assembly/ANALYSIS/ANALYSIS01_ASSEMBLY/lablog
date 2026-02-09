@@ -104,10 +104,10 @@ cat <<EOF > assembly.sbatch
 #SBATCH --output $(date '+%Y%m%d')_assembly01.log
 #SBATCH --chdir $scratch_dir
 
-# module load Nextflow/23.10.0 singularity
+# module load Nextflow/25.04.6 singularity
 export NXF_OPTS="-Xms500M -Xmx8G"
 
-nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.3.1/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.5.0/main.nf \\
         -c ../../DOC/hpc_slurm_assembly.config \\
         -profile singularity \\
         --input samplesheet.csv \\

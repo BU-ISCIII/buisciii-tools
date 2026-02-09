@@ -4,6 +4,62 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [2.3.0] - 2025-02-09 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.0
+
+### Credits
+
+- [Victor Lopez](https://github.com/victor5lm)
+- [Pau Pascual](https://github.com/PauPascualMas)
+- [Magdalena Matito](https://github.com/magdasmat)
+- [Juan Ledesma](https://github.com/juanledesma78)
+
+### Template fixes and updates
+
+- Updated taxprofiler version in lablog [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Fixed snippy folder in iqtree's lablog [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Fixed minor mistake in generate_summary_outbreak.py [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Enhanced differential_expression.R when reporting results [#584](https://github.com/BU-ISCIII/buisciii-tools/pull/584).
+- Updated the lowfreq_panel template [#586](https://github.com/BU-ISCIII/buisciii-tools/pull/586).
+- Updated sftp_user.json to add mcoiras [#595](https://github.com/BU-ISCIII/buisciii-tools/pull/595).
+- Replace MTBseq with TBProfiler in README.md [#597](https://github.com/BU-ISCIII/buisciii-tools/pull/597).
+- Replace MTBseq with TBProfiler in templates/services.json [#598](https://github.com/BU-ISCIII/buisciii-tools/pull/598).
+- Updated emmtyper's lablog [#603](https://github.com/BU-ISCIII/buisciii-tools/pull/603).
+- Updated bacass version in assembly's template [#604](https://github.com/BU-ISCIII/buisciii-tools/pull/604).
+- Updated sftp_user.json to add bdandres to LabInmunology [#605](https://github.com/BU-ISCIII/buisciii-tools/pull/605). 
+- Refactor MTBseq template for TBProfiler pipleine with its lablogs [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
+- Added new authors contact in pyproject.toml [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
+- Update tbprofiler assets/reports/md markdown file and tbprofiler assets/reports/results markdown file [#607](https://github.com/BU-ISCIII/buisciii-tools/pull/607)
+- Added new BLAST database created in July 2025 [#608](https://github.com/BU-ISCIII/buisciii-tools/pull/608)
+- Added hgil and Labviruspapiloma to sft_user.json [#609](https://github.com/BU-ISCIII/buisciii-tools/pull/609)
+- Updated taxprofiler's lablog so that Bowtie2 uses an already built index [#612](https://github.com/BU-ISCIII/buisciii-tools/pull/612).
+- Updated viralrecon's lablog to avoid exiting when the refgenie env is not loaded, even when it actually is [#613](https://github.com/BU-ISCIII/buisciii-tools/pull/613).
+- Completed service info in services.json [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
+- Updated sftp_user.json to add lorena.pozo to labantibiotics [#620](https://github.com/BU-ISCIII/buisciii-tools/pull/620).
+- Replaced conda by the corresponding micromamba's env in amrfinderplus's lablog [#621](https://github.com/BU-ISCIII/buisciii-tools/pull/621).
+- Removed exomiser.html part from trios' results md and fixed wrong image paths in exomeeb results md [#622](https://github.com/BU-ISCIII/buisciii-tools/pull/622).
+- Added new exometrio bed files [#624](https://github.com/BU-ISCIII/buisciii-tools/pull/624).
+- Fixed minor mistake in chewbbaca's lablog [#625](https://github.com/BU-ISCIII/buisciii-tools/pull/625).
+
+### Modules
+
+- Fixed new-service to properly check MD5 files when samples do not belong to the same run [#583](https://github.com/BU-ISCIII/buisciii-tools/pull/583).
+
+#### Added enhancements
+
+- Implemented logging and error handling in buisciii-tools [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
+- Replaced pkg_resources by importlib.metadata due to pkg_resources being deprecated [#619](https://github.com/BU-ISCIII/buisciii-tools/pull/619).
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+- Updated GitHub action: `python_lint` now uses Python 3.10 [#615](https://github.com/BU-ISCIII/buisciii-tools/pull/615)
+
 ## [2.2.13] - 2025-09-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.2.13
 
 ### Credits

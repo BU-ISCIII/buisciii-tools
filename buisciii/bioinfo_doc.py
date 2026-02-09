@@ -28,6 +28,7 @@ import buisciii.drylab_api
 import buisciii.service_json
 
 log = logging.getLogger(__name__)
+
 stderr = rich.console.Console(
     stderr=True,
     style="dim",
@@ -55,7 +56,7 @@ class BioinfoDoc:
         valid_types = ["service_info", "delivery"]
         if type is None:
             self.type = buisciii.utils.prompt_selection(
-                msg="Select the documentation type you want to create",
+                msg="Select the documentation type you want to create:",
                 choices=valid_types,
             )
         else:
@@ -75,8 +76,9 @@ class BioinfoDoc:
         else:
             self.path = path
         if not os.path.exists(self.path):
-            stderr.print("[red] Folder does not exist. " + self.path + "!")
-            sys.exit(1)
+            stderr.print(f"[red]Folder '{self.path}' does not exist!")
+            log.error(f"ERROR: Folder '{self.path}' does not exist!")
+            raise ValueError(f"ERROR: Folder '{self.path}' does not exist!")
         if resolution_id is None:
             self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
@@ -89,11 +91,12 @@ class BioinfoDoc:
             request_info="service-data", safe=True, resolution=self.resolution_id
         )
         if self.resolution_info == 404:
-            print("Received Error 404 from Iskylims API. Aborting")
-            sys.exit(1)
+            log.error("ERROR: Received Error 404 from iSkyLIMS API. Aborting...")
+            stderr.print("[red]Received Error 404 from iSkyLIMS API. Aborting...")
+            raise ValueError("Received Error 404 from iSkyLIMS API. Aborting...")
         if self.type == "delivery":
             if len(self.resolution_info["resolutions"][0]["delivery"]) > 0:
-                print("Service delivery already exist.")
+                log.warning("Service delivery already exists.")
                 if buisciii.utils.prompt_yn_question(
                     "Do you want to overwrite delivery info?", dflt=False
                 ):
@@ -113,9 +116,10 @@ class BioinfoDoc:
                     self.delivery_md_list.append(os.path.normpath(report_md))
                 else:
                     stderr.print(
-                        "[red] ERROR: Markdown file " + report_md + " does not exist."
+                        "[red]ERROR: Markdown file " + report_md + " does not exist!"
                     )
-                    sys.exit()
+                    log.error("ERROR: Markdown file " + report_md + " does not exist!")
+                    raise ValueError("Markdown file " + report_md + " does not exist!")
             else:
                 self.service_ids_requested_list = (
                     buisciii.utils.append_end_to_service_id_list(
@@ -145,9 +149,10 @@ class BioinfoDoc:
                     self.results_md_list.append(os.path.normpath(results_md))
                 else:
                     stderr.print(
-                        "[red] ERROR: Markdown file " + results_md + " does not exist."
+                        "[red]ERROR: Markdown file " + results_md + " does not exist."
                     )
-                    sys.exit()
+                    log.error("ERROR: Markdown file " + results_md + " does not exist.")
+                    raise ValueError("Markdown file " + results_md + " does not exist!")
             else:
                 for service_id_requested in self.service_ids_requested_list:
                     if (
@@ -174,11 +179,16 @@ class BioinfoDoc:
             self.sftp_folder = sftp_folder
         if not self.resolution_info:
             stderr.print(
-                "[red] Unable to fetch information for resolution "
+                "[red]Unable to fetch information for resolution "
                 + self.resolution_id
                 + "!"
             )
-            sys.exit(1)
+            log.error(
+                f"Unable to fetch information for resolution {self.resolution_id}!"
+            )
+            raise ValueError(
+                f"Unable to fetch information for resolution {self.resolution_id}!"
+            )
         self.service_name = self.resolution_info["resolutions"][0][
             "resolution_full_number"
         ]
@@ -198,12 +208,14 @@ class BioinfoDoc:
         self.all_services = None
         try:
             self.config_pdfkit = pdfkit.configuration()
-        except OSError as e:
+        except OSError:
             stderr.print(
-                "[red] wkhtmlpdf executable was not found. Install it using conda environment."
+                "[red]wkhtmlpdf executable was not found. Install it using conda environment."
             )
-            stderr.print(f"[red] Error: {e}")
-            sys.exit()
+            log.error(
+                "ERROR: wkhtmlpdf executable was not found. Install it using conda environment."
+            )
+            raise
 
         if self.type == "service_info":
             self.template_file = self.conf["service_info_template_path_file"]
@@ -228,7 +240,10 @@ class BioinfoDoc:
             self.all_services = service_list
 
     def load_versions(self):
-        """Load and parse the versions.yml file."""
+        """
+        Description:
+            Load and parse the versions.yml file.
+        """
         result = subprocess.run(
             f"find /data/ucct/bi/services_and_colaborations/*/*/{self.service_name} -name '*versions.yml'",
             stdout=subprocess.PIPE,
@@ -236,11 +251,12 @@ class BioinfoDoc:
             shell=True,
         )
         versions_files = result.stdout.strip().split("\n")
+        log.info(f"Loading versions for service: {self.service_name}...")
         if versions_files == [""]:
-            stderr.print(
-                f"[red] No versions.yml files found for the service {self.service_name}!"
+            log.warning(
+                f"No versions.yml files found for the service {self.service_name}"
             )
-            return "No software versions data available for this service"
+            return "No software versions data available for this service!"
         else:
             versions_data = {}
             loaded_contents = []
@@ -253,29 +269,33 @@ class BioinfoDoc:
             return versions_data
 
     def create_structure(self):
+        """
+        Description:
+            Create the directory structure required for service documentation.
+        """
         if os.path.exists(self.service_folder):
-            log.info("Already creted the service folder for %s", self.service_folder)
+            log.info("Already created the service folder for '%s'", self.service_folder)
             stderr.print(
-                "[green] Skipping folder creation for service "
+                "[green]Skipping folder creation for service "
                 + self.service_folder
-                + ". Trying with subfolders"
+                + ". Trying with subfolders."
             )
             for folder in self.conf["service_folder"]:
                 if os.path.exists(os.path.join(self.service_folder, folder)):
                     log.info(
-                        "Already creted the service subfolders for %s",
+                        "Already created the service subfolders for '%s'",
                         self.service_folder,
                     )
                     stderr.print(
-                        "[green] Skipping folder creation for service "
+                        "[green]Skipping folder creation for service "
                         + self.service_folder
                         + "/"
                         + folder
                     )
                 else:
-                    log.info("Creating service subfolder %s", folder)
+                    log.info("Creating service subfolder '%s'", folder)
                     stderr.print(
-                        "[blue] Creating the service subfolderfolder "
+                        "[blue]Creating the service subfolder "
                         + folder
                         + " for "
                         + self.service_folder
@@ -284,7 +304,8 @@ class BioinfoDoc:
                     os.makedirs(
                         os.path.join(self.service_folder, folder), exist_ok=True
                     )
-                    log.info("Service folders created")
+                    stderr.print("[green]Service subfolder created")
+                    log.info("Service subfolders created")
                 if self.type == "delivery":
                     file_path = os.path.join(
                         self.service_folder, self.service_result_folder
@@ -306,16 +327,21 @@ class BioinfoDoc:
                     )
 
         else:
-            log.info("Creating service folder for %s", self.service_folder)
+            log.info("Creating service folder for '%s'", self.service_folder)
             stderr.print(
-                "[blue] Creating the service folder for " + self.service_folder + "!"
+                "[blue]Creating the service folder for " + self.service_folder + "!"
             )
             for folder in self.conf["service_folder"]:
                 os.makedirs(os.path.join(self.service_folder, folder), exist_ok=True)
-            log.info("Service folders created")
+            stderr.print("[green]Service folders created!")
+            log.info("Service folders created!")
         return
 
     def post_delivery_info(self):
+        """
+        Description:
+            Register delivery notes in iSkyLIMS and update service state to 'delivered'.
+        """
         if buisciii.utils.prompt_yn_question(
             msg="Do you wish to provide a text file for delivery notes?", dflt=False
         ):
@@ -325,11 +351,16 @@ class BioinfoDoc:
                 )
                 if not os.path.isfile(os.path.expanduser(self.provided_txt)):
                     stderr.print(f"Provided file doesn't exist. Attempts left: {i}")
+                    log.warning(f"Provided file doesn't exist. Attempts left: {i}")
                 else:
                     stderr.print(f"File selected: {self.provided_txt}")
+                    log.info(f"File selected: {self.provided_txt}")
                     break
             else:
-                stderr.print("No more attempts. Delivery notes will be given by prompt")
+                stderr.print(
+                    "No more attempts. Delivery notes will be given by prompt..."
+                )
+                log.info("Delivery notes will be given by prompt...")
                 self.provided_txt = None
         else:
             self.provided_txt = None
@@ -341,6 +372,7 @@ class BioinfoDoc:
             self.delivery_notes = buisciii.utils.ask_for_some_text(
                 msg="Write some delivery notes:"
             )
+            log.info(f"Delivery notes: {self.delivery_notes}")
         delivery_dict = {
             "resolution_number": self.resolution_id,
             "delivery_notes": self.delivery_notes,
@@ -350,11 +382,11 @@ class BioinfoDoc:
         # delivery_dict = {
         # "resolution_number": "SRVSGAFI005.1",
         # "pipelines_in_delivery": ["viralrecon"],
-        # "delivery_notes" : delivery_notes,
-        # "execution_start_date" : "YYYY-MM-DD",
-        # "execution_end_date" : "YYYY-MM-DD",
-        # "permanent_used_space" : "",
-        # "temporary_used_space" : ""
+        # "delivery_notes": delivery_notes,
+        # "execution_start_date": "YYYY-MM-DD",
+        # "execution_end_date": "YYYY-MM-DD",
+        # "permanent_used_space": "",
+        # "temporary_used_space": ""
         # }
 
         self.rest_api.post_request("create-delivery", json.dumps(delivery_dict))
@@ -363,19 +395,31 @@ class BioinfoDoc:
         )
 
     def create_markdown(self, file_path):
-        """Create the markdown fetching the information from request api"""
+        """
+        Description:
+            Generate a markdown document using service data and jinja templates.
+
+        Usage:
+            object.create_markdown(file_path)
+
+        Params:
+            file_path [str]:
+                Directory path where the generated markdown file will be stored.
+        """
         log.info(
-            "starting proccess to create markdown for service %s", self.service_folder
+            "Starting process to create markdown for service '%s'", self.service_folder
         )
         stderr.print(
-            "[green] Creating service information markdown file for "
+            "[green]Creating service information markdown file for "
             + self.service_folder
             + " !"
         )
-        log.info("Start creating the markdown file")
+        log.info(f"Creating markdown at: '{file_path}'")
+        log.debug(f"Number of samples: {len(self.samples) if self.samples else 0}")
+        log.debug(f"Number of services requested: {len(self.services_requested)}")
 
         markdown_data = {}
-        # service related information
+        # Service related information
         markdown_data["service"] = self.resolution_info
         markdown_data["user_data"] = self.resolution_info["service_user_id"]
         markdown_data["software_versions"] = self.versions
@@ -419,15 +463,28 @@ class BioinfoDoc:
         file_name = os.path.join(file_path, f_name)
 
         # Delivery related information
-        pakage_path = os.path.dirname(os.path.realpath(__file__))
-        templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
+        package_path = os.path.dirname(os.path.realpath(__file__))
+        templateLoader = jinja2.FileSystemLoader(searchpath=package_path)
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template(self.template_file)
+
         # Create markdown
         mk_text = template.render(markdown_data)
+        log.info(f"Markdown file created: {file_name}")
         return str(mk_text), file_name
 
     def convert_markdown_to_html(self, mk_text):
+        """
+        Description:
+            Convert markdown content into HTML.
+
+        Usage:
+            object.convert_markdown_to_html(mk_text)
+
+        Params:
+            mk_text [str]:
+                Markdown text to be converted into HTML.
+        """
         html_text = markdown.markdown(
             mk_text,
             extensions=[
@@ -445,9 +502,23 @@ class BioinfoDoc:
                 "pymdownx.highlight": {"noclasses": True},
             },
         )
+        log.info("Converting markdown to HTML...")
         return html_text
 
     def wrap_html(self, html_text, file_name):
+        """
+        Description:
+            Wrap HTML content with a base template and CSS styling.
+
+        Usage:
+            object.wrap_html(html_text, file_name)
+
+        Params:
+            html_text [str]:
+                HTML content to be embedded into the base template.
+            file_name [str]:
+                Output file path without the `.html` extension.
+        """
         file_name += ".html"
         html_template_file = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
@@ -462,21 +533,48 @@ class BioinfoDoc:
         file_read = file_read.replace("{path_to_css}", css_path)
         with open(file_name, "w") as fh:
             fh.write(file_read)
+        log.info(f"Wrapping HTML with template, output: {file_name}")
         return file_name
 
     def convert_to_pdf(self, html_file):
+        """
+        Description:
+            Convert an HTML file into a PDF document.
+
+        Usage:
+            object.convert_to_pdf(html_file)
+
+        Params:
+            html_file [str]:
+                Path to the HTML file to be converted into PDF.
+        """
+        log.info("Converting HTML to PDF...")
         pdf_file = html_file.replace(".html", ".pdf")
         try:
             pdfkit.from_file(
                 html_file, output_path=pdf_file, configuration=self.config_pdfkit
             )
-        except OSError as e:
-            stderr.print("[red] Unable to convert to PDF")
-            stderr.print(f"[red] Error: {e}")
-            log.exception("Unable to create pdf.", exc_info=e)
+            log.info(f"PDF file created successfully: {pdf_file}")
+        except OSError:
+            stderr.print("[red]Unable to convert to PDF!")
+            log.error("Unable to convert to PDF")
+            raise
         return
 
     def generate_documentation_files(self, type):
+        """
+        Description:
+            Generate markdown, HTML and PDF files for documentation.
+
+        Usage:
+            object.generate_documentation_files(type)
+
+        Params:
+            type [str]:
+                Type of documentation to generate. Supported values:
+                - "service_info": service information documentation.
+                - "delivery": delivery documentation.
+        """
         if type == "service_info":
             file_path = os.path.join(self.service_folder, self.service_info_folder)
         elif self.type == "delivery":
@@ -486,9 +584,14 @@ class BioinfoDoc:
                 self.delivery_sub_folder,
             )
         else:
-            stderr.print("[red] invalid option")
-            log.error("Unable to generate files because invalid option %s", type)
-            sys.exit(1)
+            stderr.print("[red]Invalid option!")
+            log.error(
+                "ERROR: Unable to generate files because an invalid option %s was specified",
+                type,
+            )
+            raise ValueError(
+                f"ERROR: Unable to generate files because an invalid option {type} was specified"
+            )
 
         mk_text, file_name = self.create_markdown(file_path)
         file_name_without_ext = file_name.replace(".md", "")
@@ -499,6 +602,23 @@ class BioinfoDoc:
         return pdf_file
 
     def join_pdf_files(self, documentation_pdf, results_pdf, service_pdf):
+        """
+        Description:
+            Merge multiple PDF documents into a single delivery PDF.
+
+        Usage:
+            object.join_pdf_files(documentation_pdf, results_pdf, service_pdf)
+
+        Params:
+            documentation_pdf [str]:
+                Path to the main documentation PDF file.
+
+            results_pdf [str or None]:
+                Path to the results PDF file. If None, this file is skipped.
+
+            service_pdf [str or None]:
+                Path to the service PDF file. If None, this file is skipped.
+        """
         delivery_pdf_name = (
             self.resolution_number + "_" + self.delivery_sub_folder + ".pdf"
         )
@@ -509,6 +629,7 @@ class BioinfoDoc:
             delivery_pdf_name,
         )
         try:
+            log.info("Merging PDF files...")
             mergeFile = PyPDF2.PdfMerger()
             mergeFile.append(PyPDF2.PdfReader(documentation_pdf, "rb"))
             if results_pdf is not None:
@@ -517,7 +638,7 @@ class BioinfoDoc:
                 mergeFile.append(PyPDF2.PdfReader(service_pdf, "rb"))
             mergeFile.write(delivery_pdf_file)
             stderr.print(
-                "[green]Successfully merged the PDFs %s, %s and %s to the directory %s"
+                "[green]Successfully merged the PDFs %s, %s and %s to the directory '%s'"
                 % (
                     documentation_pdf,
                     results_pdf,
@@ -531,15 +652,20 @@ class BioinfoDoc:
                 ),
                 highlight=False,
             )
+            log.info(f"Merged PDF saved to: {delivery_pdf_file}")
 
-        except OSError as e:
+        except OSError:
             stderr.print("[red]ERROR: Merging PDFs failed.")
-            stderr.print("traceback error %s" % e)
-            sys.exit()
+            log.error("ERROR: Merging PDFs failed.")
+            raise
 
         return delivery_pdf_file
 
     def copy_images(self):
+        """
+        Description:
+            Copy report image assets into the delivery folder if not present.
+        """
         file_path = os.path.join(
             self.service_folder,
             self.service_result_folder,
@@ -547,18 +673,34 @@ class BioinfoDoc:
             "images",
         )
         if not os.path.exists(file_path):
-            stderr.print("[green] Copying images folder temporarily to " + file_path)
+            stderr.print("[green]Copying images folder temporarily to " + file_path)
+            log.info(f"Copying images folder temporarily to '{file_path}'...")
             images_folder = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), "assets/reports/md/images"
             )
             shutil.copytree(images_folder, file_path, dirs_exist_ok=False)
 
     def create_results_doc(self, md_list, md_type):
+        """
+        Description:
+            Generate PDF documentation from result or service markdown files.
+
+        Usage:
+            object.create_results_doc(md_list, md_type)
+
+        Params:
+            md_list [list of str]:
+                List of paths to markdown files to be included in the PDF.
+
+            md_type [str]:
+                Type of markdown being processed. Can be:
+                    - "service": service description markdown
+                    - "results": results markdown
+        """
         stderr.print(
-            "[green] Creating service results markdown file for "
-            + self.service_folder
-            + " !"
+            "Creating service results markdown file for " + self.service_folder + " !"
         )
+        log.info(f"Creating service results markdown file for '{self.service_folder}'")
         file_path = os.path.join(
             self.service_folder,
             self.service_result_folder,
@@ -568,7 +710,7 @@ class BioinfoDoc:
             mk_text = ""
         else:
             mk_text = (
-                "# Results\nHere we describe the content of the  `RESULTS` folder.\n"
+                "# Results\nHere we describe the content of the `RESULTS` folder.\n"
             )
         for results_md in md_list:
             results_md_path = os.path.join(
@@ -594,6 +736,10 @@ class BioinfoDoc:
         return pdf_file
 
     def clean_files(self):
+        """
+        Description:
+            Remove intermediate files from the delivery folder.
+        """
         file_path = os.path.join(
             self.service_folder,
             self.service_result_folder,
@@ -610,6 +756,10 @@ class BioinfoDoc:
                 shutil.rmtree(os.path.join(file_path, f), ignore_errors=True)
 
     def sftp_tree(self):
+        """
+        Description:
+            Generate and store a tree view of the service content on the SFTP.
+        """
         sftp_path = os.path.join(self.sftp_folder, self.service_name)
         try:
             tree_result = subprocess.run(
@@ -628,21 +778,29 @@ class BioinfoDoc:
             f.write(tree_result.stdout)
             f.close()
             stderr.print(
-                "[green]Successfully created tree file from %s in %s"
+                "[green]Successfully created tree file from '%s' in '%s'"
                 % (sftp_path, tree_file_path),
                 highlight=False,
             )
+            log.info(
+                f"Successfully created tree file from '{sftp_path}' in '{tree_file_path}'"
+            )
 
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             stderr.print("[red]ERROR: Failed to create tree from SFTP")
-            stderr.print("traceback error %s" % e)
-            sys.exit()
-        except IOError as e:
+            log.error("ERROR: Failed to create tree from SFTP")
+            raise
+        except IOError:
             stderr.print("[red]ERROR: Failed to create tree file")
-            stderr.print("traceback error %s" % e)
-            sys.exit()
+            log.error("ERROR: Failed to create tree file")
+            raise
 
     def email_creation(self):
+        """
+        Description:
+            Provide email notes and build the HTML content for the delivery notification email.
+        """
+        log.info("Creating email content...")
         email_data = {}
         if buisciii.utils.prompt_yn_question(
             "Do you want to add some delivery notes to the e-mail?", dflt=False
@@ -661,7 +819,7 @@ class BioinfoDoc:
                     ):
                         for i in range(3, -1, -1):
                             email_data["email_notes"] = buisciii.utils.prompt_path(
-                                msg="Write the path to the file with RAW text as email notes"
+                                msg="Write the path to the file with RAW text mail notes"
                             )
                             if not os.path.isfile(
                                 os.path.expanduser(email_data["email_notes"])
@@ -669,13 +827,20 @@ class BioinfoDoc:
                                 stderr.print(
                                     f"Provided file doesn't exist. Attempts left: {i}"
                                 )
+                                log.warning(
+                                    f"Provided file doesn't exist. Attempts left: {i}"
+                                )
                             else:
                                 stderr.print(
                                     f"File selected: {email_data['email_notes']}"
                                 )
+                                log.info(f"File selected: {email_data['email_notes']}")
                                 break
                         else:
                             stderr.print(
+                                "No more attempts. Email notes will be given by prompt"
+                            )
+                            log.info(
                                 "No more attempts. Email notes will be given by prompt"
                             )
                             email_data["email_notes"] = None
@@ -689,6 +854,7 @@ class BioinfoDoc:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                             msg="Write email notes"
                         ).replace("\n", "<br />")
+                        log.info(f'Email notes: {email_data["email_notes"]}')
             else:
                 if buisciii.utils.prompt_yn_question(
                     msg="Do you wish to provide a text file for email notes?",
@@ -696,7 +862,7 @@ class BioinfoDoc:
                 ):
                     for i in range(3, -1, -1):
                         email_data["email_notes"] = buisciii.utils.prompt_path(
-                            msg="Write the path to the file with RAW text as email notes"
+                            msg="Write the path to the file with RAW text mail notes"
                         )
                         if not os.path.isfile(
                             os.path.expanduser(email_data["email_notes"])
@@ -704,11 +870,18 @@ class BioinfoDoc:
                             stderr.print(
                                 f"Provided file doesn't exist. Attempts left: {i}"
                             )
+                            log.warning(
+                                f"Provided file doesn't exist. Attempts left: {i}"
+                            )
                         else:
                             stderr.print(f"File selected: {email_data['email_notes']}")
+                            log.info(f"File selected: {email_data['email_notes']}")
                             break
                     else:
                         stderr.print(
+                            "No more attempts. Email notes will be given by prompt"
+                        )
+                        log.info(
                             "No more attempts. Email notes will be given by prompt"
                         )
                         email_data["email_notes"] = None
@@ -722,6 +895,7 @@ class BioinfoDoc:
                     email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                         msg="Write email notes"
                     ).replace("\n", "<br />")
+                    log.info(f'Email notes: {email_data["email_notes"]}')
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
@@ -730,8 +904,8 @@ class BioinfoDoc:
         email_data["sftp_folder"] = self.sftp_data[1]
 
         email_template_file = "templates/email.j2"
-        pakage_path = os.path.dirname(os.path.realpath(__file__))
-        templateLoader = jinja2.FileSystemLoader(searchpath=pakage_path)
+        package_path = os.path.dirname(os.path.realpath(__file__))
+        templateLoader = jinja2.FileSystemLoader(searchpath=package_path)
         templateEnv = jinja2.Environment(loader=templateLoader)
         template = templateEnv.get_template(email_template_file)
 
@@ -739,6 +913,21 @@ class BioinfoDoc:
         return email_html
 
     def send_email(self, html_text, results_pdf_file, attachment_files=None):
+        """
+        Description:
+            Send the delivery email with PDF attachments.
+
+        Usage:
+            object.send_email(html_text, results_pdf_file, attachment_files=None)
+
+        Params:
+            html_text [str]:
+                HTML content used as the email body.
+            results_pdf_file [str]:
+                Path to the main results PDF file to be attached.
+            attachment_files [list, optional]:
+                List of additional file paths to attach to the email.
+        """
         email_host = self.conf["email_host"]
         email_port = self.conf["email_port"]
         email_host_user = self.conf["email_host_user"]
@@ -754,7 +943,9 @@ class BioinfoDoc:
             server.ehlo()
             server.login(user=email_host_user, password=email_host_password)
         except Exception as e:
-            stderr.print("[red] Unable to send e-mail: " + str(e))
+            stderr.print("[red]Unable to send e-mail: " + str(e))
+            log.error("ERROR: Unable to send e-mail!")
+            raise
         default_cc = "bioinformatica@isciii.es"
         msg = MIMEMultipart("alternative")
         msg["To"] = self.resolution_info["service_user_id"]["email"]
@@ -773,7 +964,7 @@ class BioinfoDoc:
             dflt=False,
         ):
             stderr.print(
-                "[red] Write emails to be added in semicolon separated format: icuesta@isciii.es;user2@isciii.es"
+                "[red]Write emails to be added in semicolon separated format: icuesta@isciii.es;user2@isciii.es"
             )
             cc_address = buisciii.utils.ask_for_some_text(msg="E-mails:")
         else:
@@ -797,7 +988,7 @@ class BioinfoDoc:
         if buisciii.utils.prompt_yn_question(
             "Do you want to attach additional files?", dflt=False
         ):
-            stderr.print("[cyan] Provide additional files separated by semicolons (;)")
+            stderr.print("[cyan]Provide additional files separated by semicolons (;)")
             extra_files_input = buisciii.utils.ask_for_some_text(
                 msg="Attachment paths:"
             )
@@ -819,8 +1010,9 @@ class BioinfoDoc:
                     msg.attach(part)
                 else:
                     stderr.print(
-                        f"[yellow] Attachment not found or invalid: {file_path}"
+                        f"[yellow]Attachment not found or invalid: '{file_path}'"
                     )
+                    log.warning(f"Attachment not found or invalid: '{file_path}'")
 
         server.sendmail(
             email_host_user,
@@ -828,9 +1020,14 @@ class BioinfoDoc:
             msg.as_string(),
         )
         server.quit()
-        stderr.print("[green] Mail sent correctly")
+        stderr.print("[green]Mail sent correctly!")
+        log.info("Mail sent correctly!")
 
     def create_documentation(self):
+        """
+        Description:
+            Execute the full documentation workflow.
+        """
         self.create_structure()
         if self.type == "service_info":
             self.generate_documentation_files("service_info")
@@ -842,24 +1039,28 @@ class BioinfoDoc:
                 result_pdf = self.create_results_doc(self.results_md_list, "results")
             else:
                 stderr.print("Results markdown does not exist.")
+                log.warning("Results markdown does not exist.")
                 if buisciii.utils.prompt_yn_question(
                     "Do you want to continue without it?", dflt=True
                 ):
                     result_pdf = None
                 else:
                     stderr.print("Bye.")
-                    sys.exit(1)
+                    log.info("Bye.")
+                    sys.exit()
             if self.delivery_md_list:
                 service_pdf = self.create_results_doc(self.delivery_md_list, "service")
             else:
                 stderr.print("Delivery markdown does not exist.")
+                log.warning("Delivery markdown does not exist.")
                 if buisciii.utils.prompt_yn_question(
                     "Do you want to continue without it?", dflt=True
                 ):
                     service_pdf = None
                 else:
                     stderr.print("Bye.")
-                    sys.exit(1)
+                    log.info("Bye.")
+                    sys.exit()
             results_pdf = self.join_pdf_files(doc_pdf, result_pdf, service_pdf)
             self.clean_files()
             self.sftp_tree()
@@ -872,6 +1073,6 @@ class BioinfoDoc:
                 print(email_html)
             return
         else:
-            stderr.print("[red] invalid option")
-            log.error("Unable to proceed because invalid option %s", type)
-            sys.exit(1)
+            stderr.print("[red]Invalid option!")
+            log.error("Unable to continue because of an invalid option %s", type)
+            raise ValueError("Invalid option!")

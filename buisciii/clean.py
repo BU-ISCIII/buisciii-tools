@@ -14,6 +14,7 @@ import buisciii.drylab_api
 import buisciii.service_json
 
 log = logging.getLogger(__name__)
+
 stderr = Console(
     stderr=True,
     style="dim",
@@ -33,14 +34,13 @@ class CleanUp:
         api_password=None,
         conf=None,
     ):
-        # access the api with the resolution name to obtain the data
-        # ask away if no input given
+        # Access the API with the resolution name to obtain the data
         if resolution_id is None:
             self.resolution_id = buisciii.utils.prompt_resolution_id()
         else:
             self.resolution_id = resolution_id
 
-        # Obtain info from iskylims api
+        # Obtain info from iSkyLIMS API
         self.conf = conf.get_configuration("cleanning")
         conf_api = conf.get_configuration("xtutatis_api_settings")
         rest_api = buisciii.drylab_api.RestServiceApi(
@@ -65,17 +65,27 @@ class CleanUp:
             )
             self.path = buisciii.utils.prompt_path(msg="Path")
         elif path == "-a":
-            stderr.print(
-                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            log.error(
+                "ERROR: Either give a path or make the terminal ask you for a path, not both"
             )
-            sys.exit()
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you for a path, not both."
+            )
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both"
+            )
         elif path is not None and ask_path is False:
             self.path = path
         elif path is not None and ask_path is not False:
-            stderr.print(
-                "[red] ERROR: Either give a path or make the terminal ask you a path, not both."
+            log.error(
+                "ERROR: Either give a path or make the terminal ask you for a path, not both"
             )
-            sys.exit()
+            stderr.print(
+                "[red] ERROR: Either give a path or make the terminal ask you for a path, not both."
+            )
+            raise ValueError(
+                "Either give a path or make the terminal ask you for a path, not both"
+            )
         else:
             self.path = buisciii.utils.get_service_paths(
                 conf,
@@ -113,13 +123,13 @@ class CleanUp:
     def get_clean_items(self, services_ids, type="files"):
         """
         Description:
-            Get delete files list from service conf
+            Get delete files list from service conf.
 
         Usage:
             object.get_delete_files(services_ids, type = "files")
 
         Params:
-            services_ids [list]: list with services ids selected.
+            services_ids [list]: list with services IDs selected.
             type [string]: one of these: "files", "folders" or "no_copy" for getting the param from service.json
         """
         service_conf = buisciii.service_json.ServiceJson()
@@ -129,38 +139,56 @@ class CleanUp:
                 items = service_conf.get_find_deep(service, type)
                 if items is None:
                     stderr.print(
-                        "[red]ERROR: Service type %s not found in services json file for service %s."
+                        "[red]ERROR: Service type %s not found in the services.json file for service %s."
                         % (type, service)
                     )
-                    sys.exit()
+                    log.error(
+                        f"ERROR: Service type {type} not found in the services.json file for service {service}!"
+                    )
+                    raise
                 else:
                     for item in items:
                         if item not in clean_items_list:
                             clean_items_list.append(item)
-            except KeyError as e:
+            except KeyError:
                 stderr.print(
-                    "[red]ERROR: Service id %s not found in services json file."
+                    "[red]ERROR: Service ID %s not found in the services.json file."
                     % service
                 )
-                stderr.print("traceback error %s" % e)
-                sys.exit()
+                log.error(
+                    f"ERROR: Service ID {service} not found in the services.json file."
+                )
+                raise
         if len(clean_items_list) == 0:
             clean_items_list = ""
         return clean_items_list
 
     def check_path_exists(self):
-        # if the folder path is not found, then bye
+        """
+        Description:
+            Checks if the folder path exists and, if not, exits.
+
+        Usage:
+            object.check_path_exists()
+
+        Params:
+
+        """
+        # If the folder path is not found, then bye!
         if not os.path.exists(self.full_path):
             stderr.print(
-                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exitst. Exiting.."
+                "[red] ERROR: It seems like finding the correct path is beneath me. I apologise. The path: %s does not exist. Exiting!"
                 % self.full_path
             )
-            sys.exit()
+            log.error(
+                f"ERROR: It seems like finding the correct path is beneath me. I apologise. The path: {self.full_path} does not exist. Exiting!"
+            )
+            raise
 
     def show_removable(self, to_stdout=True):
         """
         Description:
-            Print or return the list of objects that must be deleted in this service
+            Print or return the list of objects that must be deleted in this service.
 
         Usage:
             object.show_removable_dirs(to_stdout = [BOOL])
@@ -171,8 +199,10 @@ class CleanUp:
         if to_stdout:
             folders = ", ".join(self.delete_folders)
             stderr.print(f"The following folders will be purged: {folders}")
+            log.info(f"The following folders will be purged: {folders}")
             files = ", ".join(self.delete_files)
             stderr.print(f"The following files will be deleted: {files}")
+            log.info(f"The following files will be deleted: {files}")
             return
         else:
             return self.delete_folders + self.delete_files
@@ -180,7 +210,7 @@ class CleanUp:
     def show_nocopy(self, to_stdout=True):
         """
         Description:
-            Print or return the list of objects that must be renamed in this service
+            Print or return the list of objects that must be renamed in this service.
 
         Usage:
             object.show_nocopy(to_stdout = [BOOL])
@@ -191,6 +221,7 @@ class CleanUp:
         if to_stdout:
             no_copy = ", ".join(self.nocopy)
             stderr.print(f"The following files will be renamed with _NC: {no_copy}")
+            log.info(f"The following files will be renamed with _NC: {no_copy}")
             return
         else:
             return self.nocopy
@@ -202,8 +233,8 @@ class CleanUp:
                 -list with the elements (dirs and files) to be deleted
                 -list with the dirs to be renamed
 
-        If a list is given as arguments, the names included
-        (either files or directories) won't be included in the
+        If a list is given as argument, the names included
+        (either files or directories) won't be added into the
         dictionary.
 
         Usage:
@@ -237,19 +268,18 @@ class CleanUp:
 
         # Check found list without duplicates
         if not sorted(list(dict.fromkeys(found))) == sorted(to_find):
-            stderr.print(
-                "[orange]WARNING: Some files/dirs to delete/rename were not found"
-            )
             for item in to_find:
                 if item not in found:
-                    stderr.print(f"[orange] {item}")
-
+                    stderr.print(
+                        f"[yellow]WARNING: The following item was not found: {item}"
+                    )
+                    log.warning(f"WARNING: The following item was not found: {item}")
         return pathlist
 
     def find_work(self):
         """
         Description:
-            Parses the directory tree to find work folder
+            Parses the directory tree to find work folder.
 
         Usage:
             to_delete = object.find_work()
@@ -271,19 +301,23 @@ class CleanUp:
     def rename(self, to_find, add, verbose=True):
         """
         Description:
-            Rename the files and directories
+            Rename the files and directories.
 
         Usage:
+            rename(to_find=["dir1", "dir2"], add="_NC", verbose=True)
 
         Params:
-
+            to_find (list[str]): List of directory names to search for inside ``self.full_path``.
+            add (str): String to append to each matching directory name (e.g. "_NC").
+            verbose (bool, optional): If True, prints a message for each successfully renamed directory.
         """
-        # generate the list of items to add the "_NC" to
+        # Generate the list of items to add the "_NC" to
         elements = ", ".join(to_find)
-        # ask away if thats ok
         stderr.print(f"The following directories will be renamed: {elements}")
+        log.info(f"The following directories will be renamed: {elements}")
         if not buisciii.utils.prompt_yn_question("Is it okay?", dflt=True):
-            stderr.print("You are the boss here.")
+            stderr.print("No directories renamed!")
+            log.info("No directories renamed!")
             sys.exit()
 
         path_content = self.scan_dirs(to_find=to_find)
@@ -295,6 +329,9 @@ class CleanUp:
                     "[orange]WARNING: Directory %s already renamed to %s Omitting..."
                     % (directory_to_rename, renamed_directory)
                 )
+                log.warning(
+                    f"WARNING: Directory {directory_to_rename} already renamed to {renamed_directory}! Omitting..."
+                )
                 continue
             else:
                 newpath = directory_to_rename + add
@@ -302,15 +339,18 @@ class CleanUp:
                     os.replace(directory_to_rename, newpath)
                     if verbose:
                         print(f"Renamed {directory_to_rename} to {newpath}.")
-                except PermissionError as e:
-                    print(f"Error moving {directory_to_rename} to {newpath}: {e}")
-                    sys.exit()
+                except PermissionError:
+                    stderr.print(
+                        f"[red]Error moving {directory_to_rename} to {newpath}!"
+                    )
+                    log.info(f"Error moving {directory_to_rename} to {newpath}!")
+                    raise
         return
 
     def purge_files(self):
         """
         Description:
-            Remove the files that must be deleted for the delivery of the service
+            Remove the files that must be deleted before the service delivery.
 
         Usage:
             object.purge_files()
@@ -329,20 +369,21 @@ class CleanUp:
             for file in path_content:
                 os.remove(file)
                 stderr.print("[green]Successfully removed " + file)
+                log.info(f"Successfully removed {file}!")
         return
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
         Description:
-            Remove the files that must be deleted for the delivery of the service
-            Their contains, except for the lablog file, and the logs dir, will be
-            deleted
+            Remove the files that must be deleted for the delivery of the service.
+            Their content, except for the lablog file, as well as the logs dir, will be
+            deleted.
 
         Usage:
             object.purge_folders()
 
         Params:
-            sacredtexts [list]: names (str) of the files that shall not be deleted.
+            sacredtexts [list]: names (str) of the files that will not be deleted.
 
         """
         path_content = self.scan_dirs(to_find=self.delete_folders)
@@ -359,13 +400,14 @@ class CleanUp:
                         else:
                             os.remove(item_path)
                         if verbose:
-                            print(f"Removed {item}.")
+                            stderr.print("[green]Successfully removed " + item_path)
+                            log.info(f"Successfully removed {item_path}!")
         return
 
     def delete_work(self):
         """
         Description:
-            Removes full work folder
+            Removes the whole work folder.
 
         Usage:
             object.delete_work()
@@ -377,13 +419,17 @@ class CleanUp:
         if work_dir:
             for work_folder in work_dir:
                 shutil.rmtree(work_folder)
+                stderr.print("[green]Successfully removed " + work_folder)
+                log.info(f"Successfully removed {work_folder}!")
         else:
-            stderr.print("There is no work folder here")
+            stderr.print("There is no work folder!")
+            log.warning("There is no work folder!")
 
     def delete(self, verbose=True, sacredtexts=["lablog", "logs"], add="_DEL"):
         """
         Description:
             Remove both files and purge folders defined for the service, and rename to tag.
+
         Usage:
             object.delete()
 
@@ -395,35 +441,36 @@ class CleanUp:
 
         # Ask for confirmation
         if not buisciii.utils.prompt_yn_question("Is it okay?", dflt=True):
-            stderr.print("You got it.")
+            stderr.print("Nothing will be deleted!")
+            log.info("Nothing will be deleted!")
             sys.exit()
 
         # Purge folders
         if self.delete_folders != "":
             self.purge_folders(sacredtexts=sacredtexts, add=add, verbose=verbose)
         else:
-            stderr.print("No folders to remove")
+            stderr.print("There are no folders to delete!")
+            log.info("There are no folders to delete!")
+
         # Purge work
         self.delete_work()
         # Delete files
         if self.delete_files != "":
             self.purge_files()
         else:
-            stderr.print("No files to remove")
+            stderr.print("No files to remove!")
+            log.info("No files to remove!")
 
     def revert_renaming(self, verbose=True, terminations=["_DEL", "_NC"]):
         """
         Description:
-        Reverts the naming (adding of the _NC tag)
-
-        Usage:
-
-        Params:
+            Reverts the naming (adding of the _NC tag).
 
         """
         to_rename = self.scan_dirs(to_find=terminations)
         if not to_rename:
-            stderr.print("[orange] WARNING: I have nothing to revert renaming.")
+            stderr.print("[yellow] WARNING: I have nothing to revert renaming from!")
+            log.warning("WARNING: I have nothing to revert renaming from!")
             return
         for dir_to_rename in to_rename:
             # remove all the terminations
@@ -432,11 +479,13 @@ class CleanUp:
                     newname = dir_to_rename.replace(term, "")
                     os.replace(dir_to_rename, newname)
             if verbose:
-                print(f"Replaced {dir_to_rename} with {newname}.")
+                stderr.print(f"Replaced {dir_to_rename} with {newname}.")
+                log.info(f"Replaced {dir_to_rename} with {newname}.")
 
     def full_clean(self):
         """
-        Perform and handle the whole cleaning of the service
+        Description:
+            Perform and handle the whole cleaning of the service.
         """
 
         self.delete()
@@ -446,7 +495,8 @@ class CleanUp:
 
     def handle_clean(self):
         """
-        Handle clean class options
+        Description:
+            Handle clean class options.
         """
         if self.option == "show_removable":
             self.show_removable()

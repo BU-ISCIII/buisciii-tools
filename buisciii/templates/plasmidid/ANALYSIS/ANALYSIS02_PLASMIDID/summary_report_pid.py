@@ -6,7 +6,6 @@ import sys
 import logging
 import html
 
-
 # Third party imports
 import argparse
 import pandas as pd

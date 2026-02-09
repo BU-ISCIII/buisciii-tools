@@ -1,0 +1,7 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+
+mkdir -p $DELIVERY_FOLDER/tbprofiler
+
+cd $DELIVERY_FOLDER/tbprofiler
+
+ln -s ../../../ANALYSIS/*TBPROFILER/results/tbprofiler.* .
