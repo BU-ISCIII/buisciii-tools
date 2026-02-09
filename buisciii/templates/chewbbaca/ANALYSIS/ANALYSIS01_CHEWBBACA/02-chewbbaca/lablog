@@ -28,7 +28,7 @@ prompt_with_color() {
 }
 
 while true; do
-    read -p "Is your schema already prepared for ChewBBACA? (yes/no)" yesno
+    read -p "Is your schema already prepared for ChewBBACA? (y/n)" yesno
     case $yesno in
         [Yy]* ) 
             print_color "Indicate the path to the schema:" 'blue'
@@ -47,7 +47,7 @@ while true; do
             print_color "Using schema from path: $schema_path" 'green'
             echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-PREPARE-SCHEMA.%j.log --job-name CHEWBBACA-PREPARE-SCHEMA --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py PrepExternalSchema --schema-directory $schema_path --output-directory prep_schema &" > _01_prep_schema.sh
 
-            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-SCHEMA-EVALUATOR.%j.log --job-name CHEWBBACA-SCHEMA-EVALUATOR --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py SchemaEvaluator --schema-directory schema_path --output-directory analyze_schema &" > _02_analyze_schema.sh
+            echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-SCHEMA-EVALUATOR.%j.log --job-name CHEWBBACA-SCHEMA-EVALUATOR --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py SchemaEvaluator --schema-directory $schema_path --output-directory analyze_schema &" > _02_analyze_schema.sh
 
             echo "srun --chdir $scratch_dir --output logs/CHEWBBACA-ALLELECALL.%j.log --job-name CHEWBBACA-ALLELECALL --cpus-per-task 4 --mem 64G --partition middle_idx --time 12:00:00 singularity exec --bind ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/chewbbaca:3.3.3--pyhdfd78af_0 chewBBACA.py AlleleCall -i ../01-assemblies/ -g ./prep_schema/ -o ./allele_calling --cpu 4 &" > _03_allele_calling.sh
 
