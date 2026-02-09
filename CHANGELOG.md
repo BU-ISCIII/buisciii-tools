@@ -39,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Replaced conda by the corresponding micromamba's env in amrfinderplus's lablog [#621](https://github.com/BU-ISCIII/buisciii-tools/pull/621).
 - Removed exomiser.html part from trios' results md and fixed wrong image paths in exomeeb results md [#622](https://github.com/BU-ISCIII/buisciii-tools/pull/622).
 - Added new exometrio bed files [#624](https://github.com/BU-ISCIII/buisciii-tools/pull/624).
-- Fixed minor mistake in chewbbaca's lablog []().
+- Fixed minor mistake in chewbbaca's lablog [#625](https://github.com/BU-ISCIII/buisciii-tools/pull/625).
 
 ### Modules
 
