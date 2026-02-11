@@ -124,8 +124,30 @@ df_final[, columnas_ch] <- apply(df_final[, columnas_ch], 2, function(x) as.char
 columnas_nu <- as.vector(6:length(colnames(df_final)))
 df_final[, columnas_nu] <- apply(df_final[, columnas_nu], 2, function(x) as.numeric(as.character(x)))
 
+# group by sample
+df_grouped <- df_final %>%
+  group_by(sample) %>%
+  summarise(
+    run = first(run),
+    user = first(user),
+    host = first(host),
+
+    Virussequence = paste(unique(Virussequence), collapse = ","),
+
+    totalreads = first(totalreads),
+    readshostR1 = first(readshostR1),
+    readshost = first(readshost),
+    `%readshost` = first(`%readshost`),
+    `Non-host-reads` = first(`Non-host-reads`),
+    `%Non-host-reads` = first(`%Non-host-reads`),
+    Contigs = if (all(is.na(Contigs))) NA else max(Contigs, na.rm = TRUE),
+    Largest_contig = if (all(is.na(Largest_contig))) NA else max(Largest_contig, na.rm = TRUE),
+    `%Genome_fraction` = if (all(is.na(`%Genome_fraction`))) NA else max(`%Genome_fraction`, na.rm = TRUE),
+    .groups = "drop"
+  )
+
 # Write table csv
-write.table(df_final, "assembly_stats.csv", row.names = F, col.names = T, sep = "\t", quote = F)
+write.table(df_grouped, "assembly_stats.csv", row.names = F, col.names = T, sep = "\t", quote = F)
 
 # Write table xlsx
-write_xlsx(df_final, "assembly_stats.xlsx", format_headers = F)
+write_xlsx(df_grouped, "assembly_stats.xlsx", format_headers = F)

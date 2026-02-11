@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1dev] - 2026-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.0
+
+### Credits
+
+- [Pau Pascual](https://github.com/PauPascualMas)
+
+### Template fixes and updates
+
+- Modified `create_assembly_stats.R` to group by sample in viralrecon template [#631](https://github.com/BU-ISCIII/buisciii-tools/pull/631)
 
 ## [2.3.0] - 2025-02-09 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.0
 
