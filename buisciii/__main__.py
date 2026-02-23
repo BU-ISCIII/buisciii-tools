@@ -140,7 +140,9 @@ def setup_automatic_logging(service_path, resolution_id, command_name, conf):
     try:
         # Path verification
         if command_name == "new_service" and not os.path.exists(service_path):
-            stderr.print(f"[red]Service path does not exist: {service_path}! Please check the service folder was created correctly.")
+            stderr.print(
+                f"[red]Service path does not exist: {service_path}! Please check the service folder was created correctly."
+            )
             sys.exit(1)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -627,7 +629,7 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     if resolution is None:
         resolution = buisciii.utils.prompt_resolution_id()
-    
+
     debug = ctx.obj.get("debug", False)
     try:
         clean_tmp_dir = tmp_dir
@@ -667,7 +669,11 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
             ctx.obj["conf"],
         )
         clean_scratch.handle_clean()
-        print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
+        print(
+            "Starting copy from scratch directory: "
+            + tmp_dir
+            + " to service directory."
+        )
         copy_scratch2service = buisciii.scratch.Scratch(
             resolution,
             path,
