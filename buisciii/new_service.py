@@ -322,10 +322,10 @@ class NewService:
             Run the whole service creation workflow.
         """
         if len(self.service_samples) > 0:
-            if self.setup_logging_cb is not None:
-                self.setup_logging_cb(self.full_path)
             self.check_md5()
             self.create_folder()
+            if self.setup_logging_cb is not None:
+                self.setup_logging_cb(self.full_path)
             self.copy_template()
             self.create_samples_id()
             self.create_symbolic_links()
