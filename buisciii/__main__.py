@@ -140,7 +140,7 @@ def setup_automatic_logging(service_path, resolution_id, command_name, conf):
     try:
         # Path verification
         if command_name == "new_service" and not os.path.exists(service_path):
-            stderr.print(f"[red]Service path does not exist: {service_path}!")
+            stderr.print(f"[red]Service path does not exist: {service_path}! Please check the service folder was created correctly.")
             sys.exit(1)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -627,81 +627,91 @@ def finish(ctx, resolution, path, ask_path, sftp_folder, tmp_dir):
     """
     if resolution is None:
         resolution = buisciii.utils.prompt_resolution_id()
+    
+    debug = ctx.obj.get("debug", False)
+    try:
+        clean_tmp_dir = tmp_dir
+        if tmp_dir == "/scratch/bi/":
+            clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
 
-    clean_tmp_dir = tmp_dir
-    if tmp_dir == "/scratch/bi/":
-        clean_tmp_dir = "/data/ucct/bi/scratch_tmp/bi"
+        conf = buisciii.config_json.ConfigJson()
+        conf_api = conf.get_configuration("xtutatis_api_settings")
+        rest_api = buisciii.drylab_api.RestServiceApi(
+            conf_api["server"],
+            conf_api["api_url"],
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+        )
+        resolution_info = rest_api.get_request(
+            request_info="service-data", safe=True, resolution=resolution
+        )
+        service_folder = resolution_info["resolutions"][0]["resolution_full_number"]
+        service_path = os.path.join(
+            buisciii.utils.get_service_paths(
+                conf, "services_and_colaborations", resolution_info, "non_archived_path"
+            ),
+            service_folder,
+        )
 
-    conf = buisciii.config_json.ConfigJson()
-    conf_api = conf.get_configuration("xtutatis_api_settings")
-    rest_api = buisciii.drylab_api.RestServiceApi(
-        conf_api["server"],
-        conf_api["api_url"],
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-    )
-    resolution_info = rest_api.get_request(
-        request_info="service-data", safe=True, resolution=resolution
-    )
-    service_folder = resolution_info["resolutions"][0]["resolution_full_number"]
-    service_path = os.path.join(
-        buisciii.utils.get_service_paths(
-            conf, "services_and_colaborations", resolution_info, "non_archived_path"
-        ),
-        service_folder,
-    )
+        if not ctx.obj.get("manual_log_file"):
+            setup_automatic_logging(service_path, resolution, "finish", ctx.obj["conf"])
 
-    if not ctx.obj.get("manual_log_file"):
-        setup_automatic_logging(service_path, resolution, "finish", ctx.obj["conf"])
+        print("Starting cleaning scratch directory: " + clean_tmp_dir)
+        clean_scratch = buisciii.clean.CleanUp(
+            resolution,
+            clean_tmp_dir,
+            ask_path,
+            "clean",
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+        clean_scratch.handle_clean()
+        print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
+        copy_scratch2service = buisciii.scratch.Scratch(
+            resolution,
+            path,
+            tmp_dir,
+            "scratch_to_service",
+            ask_path,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+        copy_scratch2service.handle_scratch()
+        print("Starting renaming of the service directory.")
+        rename_databi = buisciii.clean.CleanUp(
+            resolution,
+            path,
+            ask_path,
+            "rename",
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+        rename_databi.handle_clean()
+        print("Starting copy of the service directory to the SFTP folder")
+        copy_sftp = buisciii.copy_sftp.CopySftp(
+            resolution,
+            path,
+            ask_path,
+            sftp_folder,
+            ctx.obj["api_user"],
+            ctx.obj["api_password"],
+            ctx.obj["conf"],
+        )
+        copy_sftp.copy_sftp()
 
-    print("Starting cleaning scratch directory: " + clean_tmp_dir)
-    clean_scratch = buisciii.clean.CleanUp(
-        resolution,
-        clean_tmp_dir,
-        ask_path,
-        "clean",
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    clean_scratch.handle_clean()
-    print("Starting copy from scratch directory: " + tmp_dir + " to service directory.")
-    copy_scratch2service = buisciii.scratch.Scratch(
-        resolution,
-        path,
-        tmp_dir,
-        "scratch_to_service",
-        ask_path,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    copy_scratch2service.handle_scratch()
-    print("Starting renaming of the service directory.")
-    rename_databi = buisciii.clean.CleanUp(
-        resolution,
-        path,
-        ask_path,
-        "rename",
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    rename_databi.handle_clean()
-    print("Starting copy of the service directory to the SFTP folder")
-    copy_sftp = buisciii.copy_sftp.CopySftp(
-        resolution,
-        path,
-        ask_path,
-        sftp_folder,
-        ctx.obj["api_user"],
-        ctx.obj["api_password"],
-        ctx.obj["conf"],
-    )
-    copy_sftp.copy_sftp()
-
-    print("Service correctly stored in the SFTP folder")
-    print("Remember to generate delivery docs after setting delivery in iSkyLIMS!")
+        print("Service correctly stored in the SFTP folder")
+        print("Remember to generate delivery docs after setting delivery in iSkyLIMS!")
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
 
 
 # CREATE DOCS IN BIOINFO_DOC
