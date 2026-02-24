@@ -4,4 +4,4 @@ mkdir -p $DELIVERY_FOLDER/tbprofiler
 
 cd $DELIVERY_FOLDER/tbprofiler
 
-ln -s ../../../ANALYSIS/*TBPROFILER/results/tbprofiler.* .
+ln -s ../../../ANALYSIS/*TBPROFILER/tbprofiler.* .
