@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "buisciii-tools"
-version = "2.3.0"
+version = "2.3.1"
 dynamic = ["dependencies"]
 
 authors = [
@@ -22,7 +22,8 @@ authors = [
     {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
     {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"},
     {name = "Magdalena Matito", email = "mmatito@externos.isciii.es"},
-    {name = "Pau Pascual", email = "ppascual@externos.isciii.es"}
+    {name = "Pau Pascual", email = "ppascual@externos.isciii.es"},
+    {name = "Enrique Sapena Ventura", email = "enrique.sapena@isciii.es"}
 ]
 
 maintainers = [
@@ -40,7 +41,8 @@ maintainers = [
     {name = "Alejandro Bernabeu", email = "abernabeu@isciii.es"},
     {name = "Alba Talavera", email = "alba.talavera@externos.isciii.es"},
     {name = "Magdalena Matito", email = "mmatito@externos.isciii.es"},
-    {name = "Pau Pascual", email = "ppascual@externos.isciii.es"}
+    {name = "Pau Pascual", email = "ppascual@externos.isciii.es"},
+    {name = "Enrique Sapena Ventura", email = "enrique.sapena@isciii.es"}
 ]
 
 description = "Tools for managing and resolution of buisciii services."
