@@ -10,13 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Pau Pascual](https://github.com/PauPascualMas)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Magdalena Matito](https://github.com/magdasmat)
 
 ### Template fixes and updates
 
 - Modified `create_assembly_stats.R` to group by sample in viralrecon template [#631](https://github.com/BU-ISCIII/buisciii-tools/pull/631).
 - Fixed error handling in finish module and automatic logging for new_service [#632](https://github.com/BU-ISCIII/buisciii-tools/pull/632).
 - Solved symlink path for TBProfiler results lablog [#634](https://github.com/BU-ISCIII/buisciii-tools/pull/634)
-
+- Fixed tbprofiler `delivery_md` and `results_md` paths in `buisciii/templates/services.json` [#640](https://github.com/BU-ISCIII/buisciii-tools/pull/640)
 
 ### Modules
 
