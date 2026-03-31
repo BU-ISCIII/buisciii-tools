@@ -22,7 +22,7 @@ cat ../samples_id.txt | xargs -I @@ bash -c '
     if [ -z "$subtype" ]; then
       echo "No subtype found for sample $sample. Skipping..."
     else
-      grep "$subtype" flu_type_refs.txt | cut -f 2,3 | while IFS=$'\''\t'\'' read -r fragment ref; do
+      grep "^$subtype" flu_type_refs.txt | cut -f 2,3 | while IFS=$'\''\t'\'' read -r fragment ref; do
       	if grep -qP ".*${sample}.*${fragment}" ../04-irma/all_samples_completo.txt; then
       		# for relecov
       		header_id="$(grep -P ".*${sample}.*${fragment}" ../04-irma/all_samples_completo.txt | sed "s/>//g")"
