@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed tbprofiler `delivery_md` and `results_md` paths in `buisciii/templates/services.json` [#640](https://github.com/BU-ISCIII/buisciii-tools/pull/640)
 - Fixed new taxprofiler pipeline yaml filename in versions lablog [#641](https://github.com/BU-ISCIII/buisciii-tools/pull/641)
 - Fixed grep subtype anchor in IRMA variant-calling lablog to correctly filter Influenza B references [#644](https://github.com/BU-ISCIII/buisciii-tools/pull/644).
-- Updated assembly's RESULTS lablog in accordance to nf-core/bacass' 2.5.0 version []().
+- Updated assembly's RESULTS lablog in accordance to nf-core/bacass' 2.5.0 version [#645](https://github.com/BU-ISCIII/buisciii-tools/pull/645).
 
 ### Modules
 
