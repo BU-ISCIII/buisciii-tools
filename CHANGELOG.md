@@ -4,18 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.2_dev] - XXXX-XX-XX:
+## [2.3.2] - 2026-03-31 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.2
 
 ### Credits
 
 - [Magdalena Matito](https://github.com/magdasmat)
 - [Pau Pascual](https://github.com/PauPascualMas)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Template fixes and updates
 
 - Fixed tbprofiler `delivery_md` and `results_md` paths in `buisciii/templates/services.json` [#640](https://github.com/BU-ISCIII/buisciii-tools/pull/640)
 - Fixed new taxprofiler pipeline yaml filename in versions lablog [#641](https://github.com/BU-ISCIII/buisciii-tools/pull/641)
-- - Fixed grep subtype anchor in IRMA variant-calling lablog to correctly filter Influenza B references [#644](https://github.com/BU-ISCIII/buisciii-tools/pull/644).
+- Fixed grep subtype anchor in IRMA variant-calling lablog to correctly filter Influenza B references [#644](https://github.com/BU-ISCIII/buisciii-tools/pull/644).
+- Updated assembly's RESULTS lablog in accordance to nf-core/bacass' 2.5.0 version []().
 
 ### Modules
 
