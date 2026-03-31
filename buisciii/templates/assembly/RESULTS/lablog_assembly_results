@@ -6,9 +6,9 @@ mkdir -p $DELIVERY_FOLDER/assembly
 cd $DELIVERY_FOLDER/assembly
 
 # Links to reports
-ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/multiqc/multiqc_report.html .
-ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/summary_assembly_metrics_mqc.csv .
-ln -s ../../../ANALYSIS/*ASSEMBLY/99-stats/kmerfinder_summary.csv .
+ln -s ../../../ANALYSIS/*ASSEMBLY/multiqc/multiqc_report.html .
+ln -s ../../../ANALYSIS/*ASSEMBLY/multiqc/summary_assembly_metrics_mqc.csv .
+ln -s ../../../ANALYSIS/*ASSEMBLY/Kmerfinder/kmerfinder_summary.csv .
 ln -s ../../../ANALYSIS/*ASSEMBLY/03-assembly/quast/global_report/report.html quast_global_report.html
 
 # Links to per reference reports
