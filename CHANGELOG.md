@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Enrique Sapena](https://github.com/ESapenaVentura)
+- [Sarai Varona](https://github.com/svarona)
 
 ### Template fixes and updates
 
 - Added parallelization to IRMA's 99-stats summary creation. [#648](https://github.com/BU-ISCIII/buisciii-tools/pull/648)
+- Fixed major error while filtering IRMA's vf files. [#649](https://github.com/BU-ISCIII/buisciii-tools/pull/649)
 
 ### Modules
 
