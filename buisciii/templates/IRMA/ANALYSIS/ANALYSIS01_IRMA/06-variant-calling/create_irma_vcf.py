@@ -166,7 +166,11 @@ def alleles_to_dict(alleles_file, min_freq=0.01, total_depth=10, alt_depth=10):
             if freq == "NA" or total == "NA" or count == "NA":
                 continue
 
-            keep = (int(total) >= total_depth and float(freq) >= min_freq and int(count) >= alt_depth)
+            keep = (
+                int(total) >= total_depth
+                and float(freq) >= min_freq
+                and int(count) >= alt_depth
+            )
             if not keep:
                 continue
 
@@ -1170,10 +1174,7 @@ def main(args=None):
         exit_with_error(
             "No alleles left after applying early frequency/depth filters",
             all_alleles,
-            (
-                f"min_freq={freq}; total_depth={total_dp}; "
-                f"alt_depth={alt_dp}"
-            ),
+            (f"min_freq={freq}; total_depth={total_dp}; " f"alt_depth={alt_dp}"),
         )
     alleles_frag = next(iter(alleles_dict.values()))["Reference_Name"].split("_")[1]
 
