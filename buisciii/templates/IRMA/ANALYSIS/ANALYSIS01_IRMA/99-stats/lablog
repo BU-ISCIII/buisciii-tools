@@ -245,7 +245,7 @@ bash aux_create_summary_stats.sh \"\$in\"
 
 echo "jobid=\$(sbatch --parsable _05_create_summary_stats.sbatch)
 # Clean after batch job - merge stats and remove tmp files
-sbatch --dependency=afterok:\$jobid <<EOF
+sbatch --dependency=afterok:\$jobid <<'EOF'
 #!/usr/bin/env bash
 #SBATCH --job-name=merge_stats
 #SBATCH --output=logs/MERGE_STATS.$(date "+%Y%m%d").log
