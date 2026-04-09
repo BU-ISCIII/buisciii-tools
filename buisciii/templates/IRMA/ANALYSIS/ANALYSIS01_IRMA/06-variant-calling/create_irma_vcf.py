@@ -37,8 +37,8 @@ def parse_args(args=None):
         "-f",
         "--min_freq",
         type=float,
-        default=0.25,
-        help="Minimum Allele Frequency for a variant to be included in the .vcf file, when that position has a dpeth>= total_depth. Default 0.25. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
+        default=0.01,
+        help="Minimum Allele Frequency for a variant to be included in the .vcf file, when that position has a dpeth>= total_depth. Default 0.01. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
     parser.add_argument(
         "-t",
@@ -51,8 +51,8 @@ def parse_args(args=None):
         "-d",
         "--alt_depth",
         type=int,
-        default=150,
-        help="Minimum depth for a variant to be included in the .vcf file. Default 150X. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
+        default=10,
+        help="Minimum depth for a variant to be included in the .vcf file. Default 10X. A variant will be included when (Alle Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
     )
 
     return parser.parse_args(args)
@@ -94,7 +94,7 @@ def exit_with_error(msg, sample, details=None):
     sys.exit()
 
 
-def alleles_to_dict(alleles_file):
+def alleles_to_dict(alleles_file, min_freq=0.01, total_depth=10, alt_depth=10):
     """Convert IRMA's allAlleles file to dictionary.
 
     Parameters
@@ -158,6 +158,18 @@ def alleles_to_dict(alleles_file):
             line_data = line.strip().split("\t")
             position = int(line_data[1])
             entry_dict = {header[i]: line_data[i] for i in range(len(header))}
+
+            # Early filter to reduce downstream processing.
+            freq = entry_dict.get("Frequency", "NA")
+            total = entry_dict.get("Total", "NA")
+            count = entry_dict.get("Count", "NA")
+            if freq == "NA" or total == "NA" or count == "NA":
+                continue
+
+            keep = (int(total) >= total_depth and float(freq) >= min_freq and int(count) >= alt_depth)
+            if not keep:
+                continue
+
             variant = str(line_data[0]) + "_" + str(position) + "_" + str(line_data[2])
             alleles_dict[variant] = entry_dict
     return alleles_dict
@@ -1148,7 +1160,21 @@ def main(args=None):
 
     # Start analysis
     # Convert allAlleles file to dictionary
-    alleles_dict = alleles_to_dict(all_alleles)
+    alleles_dict = alleles_to_dict(
+        all_alleles,
+        min_freq=freq,
+        total_depth=total_dp,
+        alt_depth=alt_dp,
+    )
+    if not alleles_dict:
+        exit_with_error(
+            "No alleles left after applying early frequency/depth filters",
+            all_alleles,
+            (
+                f"min_freq={freq}; total_depth={total_dp}; "
+                f"alt_depth={alt_dp}"
+            ),
+        )
     alleles_frag = next(iter(alleles_dict.values()))["Reference_Name"].split("_")[1]
 
     # Convert alignment to dictionary
