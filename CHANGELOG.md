@@ -11,12 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Enrique Sapena](https://github.com/ESapenaVentura)
 - [Sarai Varona](https://github.com/svarona)
 - [Magdalena Matito](https://github.com/magdasmat)
+- [Pau Pascual](https://github.com/PauPascualMas)
 
 ### Template fixes and updates
 
 - Added parallelization to IRMA's 99-stats summary creation. [#648](https://github.com/BU-ISCIII/buisciii-tools/pull/648)
 - Fixed major error while filtering IRMA's vf files. [#649](https://github.com/BU-ISCIII/buisciii-tools/pull/649)
 - Fixed wgstrio 99-stats lablog to prevent OutOfMemoryError on WGS samples. [#654](https://github.com/BU-ISCIII/buisciii-tools/pull/654)
+- Fixed wgstrio folder template structure [#655](https://github.com/BU-ISCIII/buisciii-tools/pull/655)
+- Updated recommended Nextflow version in taxprofiler lablog [#655](https://github.com/BU-ISCIII/buisciii-tools/pull/655)
 
 ### Modules
 
