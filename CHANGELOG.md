@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed wgstrio 99-stats lablog to prevent OutOfMemoryError on WGS samples. [#654](https://github.com/BU-ISCIII/buisciii-tools/pull/654)
 - Fixed wgstrio folder template structure [#655](https://github.com/BU-ISCIII/buisciii-tools/pull/655)
 - Updated recommended Nextflow version in taxprofiler lablog [#655](https://github.com/BU-ISCIII/buisciii-tools/pull/655)
+- Fixing AF filtering and results symlinks in wgstrio template [#659](https://github.com/BU-ISCIII/buisciii-tools/pull/659)
 
 ### Modules
 
