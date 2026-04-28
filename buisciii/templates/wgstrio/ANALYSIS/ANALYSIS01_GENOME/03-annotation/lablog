@@ -48,7 +48,9 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 
 # 6. Filter variants_annot_all.tab
 
-echo "awk 'NR>1 && \$61 > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> aux_03_awk.sh
+echo "max_af_col=\$( head -n 1 variants_annot_all.tab | tr '\t' '\n' | nl -v0 | grep -i 'MAX_AF$' | awk '{print $1 + 1}' )" >> aux_03_awk.sh
+
+echo "awk -v max_af_col=\$max_af_col 'NR>1 && \$max_af_col > 0.001 {print \$0}' variants_annot_all.tab > ./variants_annot_filterAF.tab" >> aux_03_awk.sh
 
 echo "cat header_vep_final_annot.txt variants_annot_filterAF.tab > variants_annot_filterAF_head.tab" >> aux_03_awk.sh
 
