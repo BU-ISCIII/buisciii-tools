@@ -557,10 +557,14 @@ class BioinfoDoc:
             log.info(f"PDF file created successfully: {pdf_file}")
         except OSError as e:
             if "QSslSocket" in repr(e):
-                log.info(f"QSslSocket error occurred while converting {html_file} to {pdf_file}. Ignoring...")
+                log.info(
+                    f"QSslSocket error occurred while converting {html_file} to {pdf_file}. Ignoring..."
+                )
                 pass
             else:
-                stderr.print("[red]Unable to convert to PDF! Check logs for more details")
+                stderr.print(
+                    "[red]Unable to convert to PDF! Check logs for more details"
+                )
                 log.error(f"Unable to convert to PDF. Error: \n{e}")
                 raise
         return pdf_file
