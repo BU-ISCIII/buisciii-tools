@@ -555,11 +555,15 @@ class BioinfoDoc:
                 html_file, output_path=pdf_file, configuration=self.config_pdfkit
             )
             log.info(f"PDF file created successfully: {pdf_file}")
-        except OSError:
-            stderr.print("[red]Unable to convert to PDF!")
-            log.error("Unable to convert to PDF")
-            raise
-        return
+        except OSError as e:
+            if "QSslSocket" in repr(e):
+                log.info(f"QSslSocket error occurred while converting {html_file} to {pdf_file}. Ignoring...")
+                pass
+            else:
+                stderr.print("[red]Unable to convert to PDF! Check logs for more details")
+                log.error(f"Unable to convert to PDF. Error: \n{e}")
+                raise
+        return pdf_file
 
     def generate_documentation_files(self, type):
         """
