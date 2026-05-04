@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixing AF filtering and results symlinks in wgstrio template [#659](https://github.com/BU-ISCIII/buisciii-tools/pull/659)
 - Fixed column selection, now selects MAX_AF in wgstrio template [#660](https://github.com/BU-ISCIII/buisciii-tools/pull/660)
 - Fixed QSslSocket and wkhtmltopdf errors in bioinfo-doc PDF generation [#662](https://github.com/BU-ISCIII/buisciii-tools/pull/662)
+- Make VEP header generation dynamic and remove static template dependency [#664] (https://github.com/BU-ISCIII/buisciii-tools/pull/664)
 
 ### Modules
 
