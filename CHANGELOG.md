@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sarai Varona](https://github.com/svarona)
 - [Magdalena Matito](https://github.com/magdasmat)
 - [Pau Pascual](https://github.com/PauPascualMas)
+- [Juan Ledesma](https://github.com/juanledesma78)
 
 ### Template fixes and updates
 
@@ -24,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed column selection, now selects MAX_AF in wgstrio template [#660](https://github.com/BU-ISCIII/buisciii-tools/pull/660)
 - Fixed QSslSocket and wkhtmltopdf errors in bioinfo-doc PDF generation [#662](https://github.com/BU-ISCIII/buisciii-tools/pull/662)
 - Make VEP header generation dynamic and remove static template dependency [#664] (https://github.com/BU-ISCIII/buisciii-tools/pull/664)
+- Updated blast database with new assemblies downloaded in March 2026 [#665](https://github.com/BU-ISCIII/buisciii-tools/pull/665)
 
 ### Modules
 
