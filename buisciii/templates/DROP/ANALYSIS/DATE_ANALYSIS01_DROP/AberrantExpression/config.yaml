@@ -1,0 +1,99 @@
+projectTitle: "DROP: Detection of RNA Outliers Pipeline"
+root:             OUTPUT_FOLDER
+htmlOutputPath:   OUTPUT_HTML
+indexWithFolderName: true # whether the root base name should be part of the index name
+
+hpoFile: null  
+sampleAnnotation: sample_annotation_AE.tsv
+
+geneAnnotation:
+    gencode29: /data/ucct/bi/references/refgenie/alias/hg19/gtf/gencode29/gencode.v29lift37.annotation.gtf
+genomeAssembly: hg19
+genome: /data/ucct/bi/references/igenomes/Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa
+    # You can define multiple reference genomes in yaml format, ncbi: path/to/ncbi, ucsc: path/to/ucsc
+    # the keywords that define the path should be in the GENOME column of the sample annotation table
+
+exportCounts:
+    # specify which gene annotations to include and which
+    # groups to exclude when exporting counts
+    geneAnnotations:
+        - gencode29
+    excludeGroups:
+
+aberrantExpression:
+    run: true
+    groups:
+        - aberrant_expression
+    fpkmCutoff: 0.5
+    implementation: autoencoder
+    padjCutoff: 0.1
+    zScoreCutoff: 0
+    genesToTest: null
+    maxTestedDimensionProportion: 3
+    yieldSize: 2000000
+    useOHTtoObtainQ: true
+
+aberrantSplicing:
+    run: false
+    groups:
+        - aberrant_splicing
+    recount: false
+    longRead: false
+    keepNonStandardChrs: false
+    filter: true
+    minExpressionInOneSample: 20
+    quantileMinExpression: 10
+    minDeltaPsi: 0.05
+    implementation: PCA
+    padjCutoff: 0.1
+    maxTestedDimensionProportion: 6
+    genesToTest: null
+    useOHTtoObtainQ: true
+    ### FRASER2 configuration
+    FRASER_version: "FRASER2"
+    deltaPsiCutoff : 0.1
+    quantileForFiltering: 0.75
+    ### For FRASER1, use the follwing parameters instead of the 3 lines above:
+    # FRASER_version: "FRASER"
+    # deltaPsiCutoff : 0.3
+    # quantileForFiltering: 0.95
+
+mae:
+    run: false
+    groups:
+        - group1
+        - group2
+        - group3
+    gatkIgnoreHeaderCheck: true
+    padjCutoff: 0.05
+    allelicRatioCutoff: 0.8
+    addAF: true
+    maxAF: 0.001
+    maxVarFreqCohort: 0.05
+    # VCF-BAM matching
+    qcVcf: Data/qc_vcf_1000G.vcf.gz
+    qcGroups:
+      - mae
+    dnaRnaMatchCutoff: 0.85
+
+rnaVariantCalling:
+    run: false
+    groups:
+        - batch_0
+    highQualityVCFs:
+        - Data/Mills_and_1000G_gold_standard.indels.hg19.sites.chrPrefix.vcf.gz
+        - Data/1000G_phase1.snps.high_confidence.hg19.sites.chrPrefix.vcf.gz
+    dbSNP: Data/00-All.vcf.gz
+    repeat_mask: Data/hg19_repeatMasker_sorted.chrPrefix.bed
+    createSingleVCF: true
+    addAF: true
+    maxAF: 0.001
+    maxVarFreqCohort: 0.05
+    hcArgs: ""
+    minAlt: 3
+    yieldSize: 100000
+
+tools:
+    gatkCmd: gatk
+    bcftoolsCmd: bcftools
+    samtoolsCmd: samtools

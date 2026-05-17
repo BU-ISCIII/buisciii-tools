@@ -1,0 +1,1 @@
+mv DATE_ANALYSIS01_DROP $(date '+%Y%m%d')_ANALYSIS01_DROP

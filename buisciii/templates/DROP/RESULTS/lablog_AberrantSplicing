@@ -1,0 +1,37 @@
+# CREATE RESULTS FOLDER
+
+mkdir -p aberrant_splicing
+
+
+# COPY DROP RESULTS
+
+ln -s ../ANALYSIS/*DROP/AberrantSplicing/Output_AS/processed_results/aberrant_splicing/results/gencode29/fraser/aberrant_splicing/results.tsv \
+./aberrant_splicing/
+
+
+# SPLIT RESULTS BY SAMPLE
+
+cd aberrant_splicing
+
+header=$(head -1 results.tsv)
+
+awk 'NR > 1 {print > $6".tmp"}' results.tsv
+
+for file in ND*.tmp
+do
+
+    sample=$(basename ${file} .tmp)
+
+    echo "${header}" > ${sample}_aberrant_splicing.tsv
+
+    cat ${file} >> ${sample}_aberrant_splicing.tsv
+
+    rm ${file}
+
+done
+
+# Prepare data for OmicsExplorer
+mkdir -p OmicsExplorer
+
+ln -s $(pwd)/ND*_aberrant_splicing.tsv \
+./OmicsExplorer/

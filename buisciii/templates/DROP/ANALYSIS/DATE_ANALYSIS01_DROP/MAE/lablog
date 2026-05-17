@@ -1,0 +1,97 @@
+# module load singularity
+
+# CONFIG FILE
+
+output_folder=$(realpath ./Output_MAE | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+output_html=$(realpath ./Output_MAE/html | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+qc_vcf=$(realpath ../../../REFERENCES/qc_vcf_1000G.vcf.gz | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+sed -i "s|OUTPUT_FOLDER|${output_folder}|g" config.yaml
+
+sed -i "s|OUTPUT_HTML|${output_html}|g" config.yaml
+
+sed -i "s|QC_VCF|${qc_vcf}|g" config.yaml
+
+
+# RNAseq BAM FILES
+
+find ../../*_RNASEQ/01-*_rnaseq/star_salmon/ \
+-name "*.sorted.bam" \
+! -name "*transcriptome*" \
+| sort -u | while read bam
+do
+
+    sample_id=$(basename ${bam} .sorted.bam)
+
+
+    # FIND VCF FILES
+
+    genome_vcf=$(find ../../*_GENOME \
+    -path "*/01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz" \
+    2>/dev/null | head -1)
+
+    exome_vcf=$(find ../../*_EXOME \
+    -path "*/01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz" \
+    2>/dev/null | head -1)
+
+
+    # FIND DNA ID
+
+    DNA_ID_GENOME=$(bcftools query -l ${genome_vcf} | grep "${sample_id}" | head -1)
+    DNA_ID_EXOME=$(bcftools query -l ${exome_vcf} | grep "${sample_id}" | head -1)
+
+
+    # APPEND GENOME SAMPLE
+
+     if [ ! -z "${DNA_ID_GENOME}" ]
+     then
+
+        echo -e "${sample_id}\t${DNA_ID_GENOME}\tmae_genome\t${bam}\t${genome_vcf}\tTRUE\tno\tIntersectionStrict\tTRUE\t\t\t"
+
+     fi
+
+     # APPEND EXOME SAMPLE
+
+     if [ ! -z "${DNA_ID_EXOME}" ]
+     then
+
+        echo -e "${sample_id}\t${DNA_ID_EXOME}\tmae_exome\t${bam}\t${exome_vcf}\tTRUE\tno\tIntersectionStrict\tTRUE\t\t\t"
+
+     fi
+
+
+done >> sample_annotation_MAE.tsv
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+
+cat <<EOF > DROP_MAE.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 2-00:00:0
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_DROP_MAE.log
+#SBATCH --chdir $scratch_dir
+
+unset R_LIBS
+unset R_LIBS_SITE
+unset R_LIBS_USER
+
+export R_BIOC_PARALLEL_REGISTER=SerialParam
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+singularity exec \
+-B ${scratch_dir}/../../../ \
+/data/ucct/bi/pipelines/singularity-images/drop_1.6.1.sif \
+snakemake --cores 1 mae --rerun-incomplete
+
+EOF
+
+
+echo "sbatch DROP_MAE.sbatch" > _01_run_DROP_MAE.sh

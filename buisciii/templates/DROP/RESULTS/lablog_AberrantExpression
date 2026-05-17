@@ -1,0 +1,57 @@
+# CREATE RESULTS FOLDER
+
+mkdir -p aberrant_expression
+
+
+# LINK DROP RESULTS
+
+ln -s ../ANALYSIS/*DROP/AberrantExpression/Output_AE/processed_results/aberrant_expression/gencode29/outrider/aberrant_expression/OUTRIDER_results.tsv \
+./aberrant_expression/results.tsv
+
+
+# CLEAN GENE IDs
+
+cd aberrant_expression
+
+awk 'BEGIN{FS=OFS="\t"}
+NR==1{
+    print
+    next
+}
+{
+    split($2,a,".")
+    $2=a[1]
+    print
+}' results.tsv > results_clean.tsv
+
+mv results_clean.tsv results.tsv
+
+
+# SPLIT RESULTS BY SAMPLE
+
+header=$(head -1 results.tsv)
+
+awk 'BEGIN{FS=OFS="\t"}
+NR > 1 {
+    print > $3".tmp"
+}' results.tsv
+
+for file in ND*.tmp
+do
+
+    sample=$(basename ${file} .tmp)
+
+    echo "${header}" > ${sample}_aberrant_expression.tsv
+
+    cat ${file} >> ${sample}_aberrant_expression.tsv
+
+    rm ${file}
+
+done
+
+
+# Prepare data for OmicsExplorer
+mkdir -p OmicsExplorer
+
+ln -s $(pwd)/ND*_aberrant_expression.tsv \
+./OmicsExplorer/

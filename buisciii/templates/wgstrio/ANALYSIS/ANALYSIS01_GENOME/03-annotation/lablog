@@ -136,3 +136,89 @@ cat inheritance_types.txt | xargs -I % echo "rm ./filter_inheritance/filter_inhe
 
 # annot_all table is huge, lets shrink it a little bit
 echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_inheritance_ALL.sh
+
+
+#--------------------------------------------------------------------------------------------------------
+
+# 11. Merge inheritance VEP annotations into unified files for downstream applications
+
+cat <<'EOF' > _06_merge_vep_annot.sh
+#!/bin/bash
+
+###############################################################################
+# MERGE FUNCTION
+###############################################################################
+
+merge_files () {
+
+    INPUT_DIR=$1
+    OUTPUT_FILE=$2
+
+    rm -f "${OUTPUT_FILE}"
+
+    first_file=true
+
+    for file in ${INPUT_DIR}/vep_annot*_final.txt
+    do
+
+        inheritance=$(basename "${file}" | sed -E 's/vep_annot_([A-Z]+).*/\1/')
+
+        if $first_file
+        then
+
+            awk -v inh="${inheritance}" '
+            BEGIN{FS=OFS="\t"}
+
+            NR==1{
+                print $0, "inheritance_source"
+            }
+
+            NR>1{
+                print $0, inh
+            }
+
+            ' "${file}" > "${OUTPUT_FILE}"
+
+            first_file=false
+
+        else
+
+            awk -v inh="${inheritance}" '
+            BEGIN{FS=OFS="\t"}
+
+            NR>1{
+                print $0, inh
+            }
+
+            ' "${file}" >> "${OUTPUT_FILE}"
+
+        fi
+
+    done
+}
+
+###############################################################################
+# WHOLE GENOME
+###############################################################################
+
+merge_files \
+"./filter_inheritance/filter_inheritance" \
+"./filter_inheritance/filter_inheritance/vep_annot_ALL_final.txt"
+
+###############################################################################
+# EXOME
+###############################################################################
+
+merge_files \
+"./filter_inheritance/filter_inheritance_exome" \
+"./filter_inheritance/filter_inheritance_exome/vep_annot_ALL_exome_final.txt"
+
+###############################################################################
+# GENES
+###############################################################################
+
+merge_files \
+"./filter_inheritance/filter_inheritance_genes" \
+"./filter_inheritance/filter_inheritance_genes/vep_annot_ALL_genes_final.txt"
+
+EOF

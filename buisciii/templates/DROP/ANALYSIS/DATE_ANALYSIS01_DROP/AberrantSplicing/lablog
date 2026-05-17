@@ -1,0 +1,74 @@
+# module load singularity
+
+# CONFIG FILE
+
+output_folder=$(realpath ./Output_AS | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+output_html=$(realpath ./Output_AS/html | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+sed -i "s|OUTPUT_FOLDER|${output_folder}|g" config.yaml
+
+sed -i "s|OUTPUT_HTML|${output_html}|g" config.yaml
+
+
+# RNAseq BAM FILES
+
+find ../../*_RNASEQ/01-*_rnaseq/star_salmon/ \
+-name "*.sorted.bam" \
+! -name "*transcriptome*" \
+| sort -u | while read bam
+do
+
+    sample_id=$(basename ${bam} .sorted.bam)
+
+
+    # APPEND SAMPLE
+
+    echo -e "${sample_id}\tNA\taberrant_splicing\t${bam}\tNA\tTRUE\tno\tIntersectionStrict\tTRUE\t\t\t"
+
+done >> sample_annotation_AS.tsv
+
+
+# ADD GTEx CONTROLS
+
+tail -n +2 /data/ucct/bi/references/refgenie/alias/hg19/drop_counts/GTEx_wholeblood_gencode29/sampleAnnotation.tsv \
+| cut -f1 | while read control
+do
+
+    echo -e "${control}\tNA\taberrant_splicing\tNA\tNA\tFALSE\tno\tNA\tTRUE\tNA\tgencode29\t/data/ucct/bi/references/refgenie/alias/hg19/drop_counts/GTEx_wholeblood_gencode29"
+
+done >> sample_annotation_AS.tsv
+
+
+
+scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+
+
+cat <<EOF > DROP_AS.sbatch
+#!/bin/sh
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 2
+#SBATCH --mem 4G
+#SBATCH --time 24:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_DROP_AS.log
+#SBATCH --chdir $scratch_dir
+
+unset R_LIBS
+unset R_LIBS_SITE
+unset R_LIBS_USER
+
+export R_BIOC_PARALLEL_REGISTER=SerialParam
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+singularity exec \
+-B ${scratch_dir}/../../../ \
+/data/ucct/bi/pipelines/singularity-images/drop_1.6.1.sif \
+snakemake --cores 1 aberrantSplicing --rerun-incomplete
+
+EOF
+
+
+echo "sbatch DROP_AS.sbatch" > _01_run_DROP_AS.sh

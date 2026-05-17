@@ -11,3 +11,14 @@ ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/variants_*filterAF*.tab .
 mkdir annotation_tables
 cd annotation_tables; ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot*.txt . ; cd -
 
+# Prepare data for OmicsExplorer
+mkdir OmicsExplorer
+
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot_ALL_final.txt \
+./OmicsExplorer/vep_annot_ALL_final_exome.txt
+
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out \
+./OmicsExplorer/mapping_metrics_exome.csv
+
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/bigWig \
+./OmicsExplorer/

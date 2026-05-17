@@ -322,5 +322,22 @@
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "results_md": ""
-  }
+   },
+    "DROP": {
+      "label": "DROP: Detection of RNA Outliers Pipeline",
+      "template": "DROP",
+      "url": "https://github.com/gagneurlab/drop",
+      "order": 2,
+      "begin": "",
+      "end": ["exometrio", "wgstrio", "rnaseq"],
+      "description": "Human: RNA outlier analysis including aberrant expression, aberrant splicing and monoallelic expression (MAE)",
+      "clean": {
+        "folders":[],
+        "files":[]
+      },
+      "no_copy": ["RAW", "TMP"],
+      "last_folder":"REFERENCES",
+      "delivery_md": "assets/reports/md/drop.md",
+      "results_md": "assets/reports/results/drop.md"
+    }
 }

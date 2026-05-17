@@ -91,3 +91,83 @@ cat inheritance_types.txt | xargs -I % echo "rm ./vep_annot_%.txt" >> _05_filter
 
 # annot_all table is huge, lets shrink it a little bit
 echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _05_filter_inheritance.sh
+
+
+#---------------------------------------------------------------------------------------------------------
+
+# 6. Merge inheritance VEP annotations into a single file for downstream applications
+
+cat <<'EOF' > _06_merge_vep_annot.sh
+#!/bin/bash
+
+###############################################################################
+# OUTPUT FILE
+###############################################################################
+
+OUTPUT_FILE="./vep_annot_ALL_final.txt"
+
+rm -f "${OUTPUT_FILE}"
+
+###############################################################################
+# MERGE FILES
+###############################################################################
+
+first_file=true
+
+for file in ./vep_annot_*_final.txt
+do
+
+    ###########################################################################
+    # SKIP FINAL FILE
+    ###########################################################################
+
+    [[ $(basename "${file}") == "vep_annot_ALL_final.txt" ]] && continue
+
+    ###########################################################################
+    # INHERITANCE
+    ###########################################################################
+
+    inheritance=$(basename "${file}" | sed -E 's/vep_annot_([A-Z]+)_final\.txt/\1/')
+
+    ###########################################################################
+    # FIRST FILE
+    ###########################################################################
+
+    if $first_file
+    then
+
+        awk -v inh="${inheritance}" '
+        BEGIN{FS=OFS="\t"}
+
+        NR==1{
+            print $0, "inheritance_source"
+        }
+
+        NR>1{
+            print $0, inh
+        }
+
+        ' "${file}" > "${OUTPUT_FILE}"
+
+        first_file=false
+
+    ###########################################################################
+    # APPEND FILES
+    ###########################################################################
+
+    else
+
+        awk -v inh="${inheritance}" '
+        BEGIN{FS=OFS="\t"}
+
+        NR>1{
+            print $0, inh
+        }
+
+        ' "${file}" >> "${OUTPUT_FILE}"
+
+    fi
+
+done
+
+EOF

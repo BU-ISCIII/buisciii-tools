@@ -1,0 +1,102 @@
+# CREATE RESULTS FOLDER
+
+mkdir -p mae_genome
+mkdir -p mae_exome
+
+
+# LINK DROP RESULTS
+
+ln -s ../ANALYSIS/*DROP/MAE/Output_MAE/processed_results/mae/mae_genome/MAE_results_gencode29.tsv \
+./mae_genome/results.tsv
+
+ln -s ../ANALYSIS/*DROP/MAE/Output_MAE/processed_results/mae/mae_exome/MAE_results_gencode29.tsv \
+./mae_exome/results.tsv
+
+
+
+# PROCESS MAE GENOME
+
+cd mae_genome
+
+awk 'BEGIN{FS=OFS="\t"}
+NR==1{
+    print
+    next
+}
+{
+    split($2,a,"--")
+    split(a[2],b,"_")
+    $2=b[1]
+    print
+}' results.tsv > results_clean.tsv
+
+mv results_clean.tsv results.tsv
+
+header=$(head -1 results.tsv)
+
+awk 'BEGIN{FS=OFS="\t"}
+NR > 1 {
+    print > $2".tmp"
+}' results.tsv
+
+for file in ND*.tmp
+do
+
+    sample=$(basename ${file} .tmp)
+
+    echo "${header}" > ${sample}_mae_genome.tsv
+
+    cat ${file} >> ${sample}_mae_genome.tsv
+
+    rm ${file}
+
+done
+
+
+# PROCESS MAE EXOME
+
+cd ../mae_exome
+
+awk 'BEGIN{FS=OFS="\t"}
+NR==1{
+    print
+    next
+}
+{
+    split($2,a,"--")
+    split(a[2],b,"_")
+    $2=b[1]
+    print
+}' results.tsv > results_clean.tsv
+
+mv results_clean.tsv results.tsv
+
+header=$(head -1 results.tsv)
+
+awk 'BEGIN{FS=OFS="\t"}
+NR > 1 {
+    print > $2".tmp"
+}' results.tsv
+
+for file in ND*.tmp
+do
+
+    sample=$(basename ${file} .tmp)
+
+    echo "${header}" > ${sample}_mae_exome.tsv
+
+    cat ${file} >> ${sample}_mae_exome.tsv
+
+    rm ${file}
+
+done
+
+
+# Prepare data for OmicsExplorer
+mkdir -p OmicsExplorer
+
+ln -s $(pwd)/ND*_mae_genome.tsv \
+./OmicsExplorer/
+
+ln -s $(pwd)/ND*_mae_exome.tsv \
+./OmicsExplorer/
