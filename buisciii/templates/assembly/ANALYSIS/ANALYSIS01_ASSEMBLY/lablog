@@ -81,12 +81,17 @@ ln -s ../samples_id.txt .
 
 echo "ID,R1,R2,LongFastQ,Fast5,GenomeSize" > samplesheet.csv
 cat samples_id.txt | while read in; do
+    if [[ "$in" =~ ^[0-9]+$ ]]; then
+        id="${in}_S"
+    else
+        id="${in}"
+    fi
     if [ "$ASSEMBLY_MODE" == "short" ]; then
-        echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,NA,NA,NA";
+        echo "${id},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,NA,NA,NA";
     elif [ "$ASSEMBLY_MODE" == "long" ]; then
-        echo "${in},NA,NA,00-reads/${in}.fastq.gz,NA,NA";
+        echo "${id},NA,NA,00-reads/${in}.fastq.gz,NA,NA";
     elif [ "$ASSEMBLY_MODE" == "hybrid" ]; then
-        echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,00-reads/${in}.fastq.gz,NA,NA";
+        echo "${id},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,00-reads/${in}.fastq.gz,NA,NA";
     else
         echo "Format not recognized for the sample : ${in}.";
     fi
