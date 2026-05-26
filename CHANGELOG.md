@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Make VEP header generation dynamic and remove static template dependency [#664] (https://github.com/BU-ISCIII/buisciii-tools/pull/664)
 - Updated blast database with new assemblies downloaded in March 2026 [#665](https://github.com/BU-ISCIII/buisciii-tools/pull/665)
 - Added numeric sample ID validation for samplesheet.csv in assembly lablog [#667](https://github.com/BU-ISCIII/buisciii-tools/pull/667)
+- Updated blast database location to refgenie directory [#669](https://github.com/BU-ISCIII/buisciii-tools/pull/669)
 
 ### Modules
 
