@@ -121,7 +121,6 @@ nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.5.0/main.nf
         --assembler ${ASSEMBLER} \\
         --skip_polish true \\
         --save_trimmed ${SAVETRIMMED} \\
-        --fastp_args '--qualified_quality_phred 20 --cut_mean_quality 20' \\
         --skip_kraken2 true \\
         --skip_kmerfinder false \\
         --kmerfinderdb /data/ucct/bi/references/kmerfinder/latest/bacteria \\
