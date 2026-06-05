@@ -20,5 +20,5 @@ ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot_ALL_final.txt \
 ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out \
 ./OmicsExplorer/mapping_metrics_exome.csv
 
-ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/bigWig \
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/bigwig \
 ./OmicsExplorer/

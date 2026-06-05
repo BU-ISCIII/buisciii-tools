@@ -26,5 +26,5 @@ ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_
 ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/hsMetrics_all.out \
 ./OmicsExplorer/mapping_metrics_genome.csv
 
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/bigWig \
+ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/bigwig \
 ./OmicsExplorer/
