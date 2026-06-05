@@ -4,38 +4,6 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.X.Xdev] - 2026-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.X.Xdev
-
-### Credits
-
-- [Sandra Sánchez](https://github.com/sandrasnchz)
-
-### Template fixes and updates
-
-- Added DROP as a new service template and integrated it into `services.json`.
-- Added automatic generation of input files and configuration updates required for DROP execution.
-- Added module-specific adaptations for DROP, including GTEx controls for expression and splicing analyses and separate MAE workflows for WES and WGS.
-- Added automatic processing and organization of DROP outputs into sample-specific result files.
-
-- Updated `wgstrio` annotation workflow to generate merged inheritance annotation tables (`vep_annot_ALL_final.txt`) including `inheritance_source`.
-- Updated `exometrio` annotation workflow to generate merged inheritance annotation tables (`vep_annot_ALL_final.txt`) including `inheritance_source`.
-
-- Updated `wgstrio`, `exometrio` and `rnaseq` RESULTS templates to generate standardized outputs compatible with OmicsExplorer.
-- Added automatic organization of coverage files (`BigWig`), mapping metrics and sample-specific expression tables for visualization purposes.
-- Added automatic preparation of OmicsExplorer-specific result structures.
-
-### Modules
-
-#### Added enhancements
-
-#### Fixes
-
-#### Changed
-
-#### Removed
-
-### Requirements
-
 ## [2.3.3dev] - 2026-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.3dev
 
 ### Credits
@@ -45,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Magdalena Matito](https://github.com/magdasmat)
 - [Pau Pascual](https://github.com/PauPascualMas)
 - [Juan Ledesma](https://github.com/juanledesma78)
+- [Sandra Sánchez](https://github.com/sandrasnchz)
 
 ### Template fixes and updates
 
@@ -59,7 +28,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Make VEP header generation dynamic and remove static template dependency [#664] (https://github.com/BU-ISCIII/buisciii-tools/pull/664)
 - Updated blast database with new assemblies downloaded in March 2026 [#665](https://github.com/BU-ISCIII/buisciii-tools/pull/665)
 - Added numeric sample ID validation for samplesheet.csv in assembly lablog [#667](https://github.com/BU-ISCIII/buisciii-tools/pull/667)
+- Updated `wgstrio`, `exometrio` and `rnaseq` templates to generate OmicsExplorer-compatible outputs. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
 - Updated blast database location to refgenie directory [#683](https://github.com/BU-ISCIII/buisciii-tools/pull/683)
+
+#### Implementation
+
+- Added DROP as a new service, including automatic input generation, module-specific adaptations and standardized result processing. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
 
 ### Modules
 
