@@ -28,7 +28,7 @@ mkdir OmicsExplorer
 ln -s ../../ANALYSIS/*_RNASEQ/03-bigwig/bigwig \
 ./OmicsExplorer/
 
-ln -s ../../RESULTS/controls_GTEx_wholeblood_gencode29_gene_TPM_stats.tsv \
+ln -s ../../REFERENCES/controls_GTEx_wholeblood_gencode29_gene_TPM_stats.tsv \
 ./OmicsExplorer/
 
 mkdir -p ./OmicsExplorer/gene_tpm
