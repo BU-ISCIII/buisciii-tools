@@ -31,11 +31,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated `wgstrio`, `exometrio` and `rnaseq` templates to generate OmicsExplorer-compatible outputs. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
 - Updated blast database location to refgenie directory [#683](https://github.com/BU-ISCIII/buisciii-tools/pull/683)
 
+### Modules
+
 #### Implementation
 
 - Added DROP as a new service, including automatic input generation, module-specific adaptations and standardized result processing. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
-
-### Modules
 
 #### Added enhancements
 
