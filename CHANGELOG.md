@@ -26,14 +26,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed column selection, now selects MAX_AF in wgstrio template [#660](https://github.com/BU-ISCIII/buisciii-tools/pull/660)
 - Fixed QSslSocket and wkhtmltopdf errors in bioinfo-doc PDF generation [#662](https://github.com/BU-ISCIII/buisciii-tools/pull/662)
 - Make VEP header generation dynamic and remove static template dependency [#664] (https://github.com/BU-ISCIII/buisciii-tools/pull/664)
-<<<<<<< HEAD
 - Updated blast database with new assemblies downloaded in March 2026 [#665](https://github.com/BU-ISCIII/buisciii-tools/pull/665)
 - Added numeric sample ID validation for samplesheet.csv in assembly lablog [#667](https://github.com/BU-ISCIII/buisciii-tools/pull/667)
 - Updated `wgstrio`, `exometrio` and `rnaseq` templates to generate OmicsExplorer-compatible outputs. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
 - Updated blast database location to refgenie directory [#683](https://github.com/BU-ISCIII/buisciii-tools/pull/683)
-=======
 - Add trim_poly_x fastp arg to assembly config [#685](https://github.com/BU-ISCIII/buisciii-tools/pull/685)
->>>>>>> 4519a1c (Updated CHANGELOG.md)
 
 ### Modules
 
