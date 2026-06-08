@@ -30,11 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added numeric sample ID validation for samplesheet.csv in assembly lablog [#667](https://github.com/BU-ISCIII/buisciii-tools/pull/667)
 - Updated `wgstrio`, `exometrio` and `rnaseq` templates to generate OmicsExplorer-compatible outputs. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
 - Updated blast database location to refgenie directory [#683](https://github.com/BU-ISCIII/buisciii-tools/pull/683)
-<<<<<<< HEAD
 - Add trim_poly_x fastp arg to assembly config [#685](https://github.com/BU-ISCIII/buisciii-tools/pull/685)
-=======
 - Updated A__N1 and A__N2 subtype results in flu_type_refs.txt [#687](https://github.com/BU-ISCIII/buisciii-tools/pull/687)
->>>>>>> 060ca94 (Updated CHANGELOG)
+
 
 ### Modules
 
