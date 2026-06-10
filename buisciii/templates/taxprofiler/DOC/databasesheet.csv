@@ -1,6 +1,7 @@
 tool,db_name,db_params,db_path
-kraken2,db1,,/data/ucct/bi/references/kraken/k2_standard_16gb_20240605.tar.gz
-bracken,db2,,/data/ucct/bi/references/kraken/k2_standard_16gb_20240605.tar.gz
-centrifuge,db3,,/data/ucct/bi/references/centrifuge/201612_centrifuge_index_p+h+v.tar.gz
-metaphlan,db4,,/data/ucct/bi/references/metaphlan/mpa_vJun23_CHOCOPhlAnSGB_20240/
-kaiju,db5,,/data/ucct/bi/references/kaiju/nr_euk_2023-05-10/
+kraken2,db1,,/data/ucct/bi/references/refgenie/alias/kraken/k2_standard_16gb/v20240605/k2_standard_16gb_20240605.tar.gz
+bracken,db2,,/data/ucct/bi/references/refgenie/alias/kraken/k2_standard_16gb/v20240605/k2_standard_16gb_20240605.tar.gz
+centrifuge,db3,,/data/ucct/bi/references/refgenie/alias/centrifuge/refseq/v20161201/20161201_centrifuge_index_p+h+v.tar.gz
+metaphlan,db4,,/data/ucct/bi/references/refgenie/alias/metaphlan/bowtie2index/v20250301
+kaiju,db5,,/data/ucct/bi/references/refgenie/alias/kaiju/nr_euk/v20230510/
+diamond,db6,,/data/ucct/bi/references/refgenie/alias/DIAMOND/diamond_db/v20251113/diamond_refseq_prok.dmnd
