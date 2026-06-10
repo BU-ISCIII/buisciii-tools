@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated blast database location to refgenie directory [#683](https://github.com/BU-ISCIII/buisciii-tools/pull/683)
 - Add trim_poly_x fastp arg to assembly config [#685](https://github.com/BU-ISCIII/buisciii-tools/pull/685)
 - Updated A__N1 and A__N2 subtype results in flu_type_refs.txt [#687](https://github.com/BU-ISCIII/buisciii-tools/pull/687)
+- Updated new paths to refgenie databases in databasesheet.csv of taxprofiler [#689](https://github.com/BU-ISCIII/buisciii-tools/pull/689)
 
 
 ### Modules
