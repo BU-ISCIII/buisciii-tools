@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Pau Pascual](https://github.com/PauPascualMas)
 - [Juan Ledesma](https://github.com/juanledesma78)
 - [Sandra Sánchez](https://github.com/sandrasnchz)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Template fixes and updates
 
@@ -33,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add trim_poly_x fastp arg to assembly config [#685](https://github.com/BU-ISCIII/buisciii-tools/pull/685)
 - Updated A__N1 and A__N2 subtype results in flu_type_refs.txt [#687](https://github.com/BU-ISCIII/buisciii-tools/pull/687)
 - Updated new paths to refgenie databases in databasesheet.csv of taxprofiler [#689](https://github.com/BU-ISCIII/buisciii-tools/pull/689)
-
+- Updated viralrecon's config file [#691](https://github.com/BU-ISCIII/buisciii-tools/pull/691).
 
 ### Modules
 
