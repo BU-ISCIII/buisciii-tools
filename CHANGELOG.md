@@ -35,14 +35,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated A__N1 and A__N2 subtype results in flu_type_refs.txt [#687](https://github.com/BU-ISCIII/buisciii-tools/pull/687)
 - Updated new paths to refgenie databases in databasesheet.csv of taxprofiler [#689](https://github.com/BU-ISCIII/buisciii-tools/pull/689)
 - Updated viralrecon's config file [#691](https://github.com/BU-ISCIII/buisciii-tools/pull/691).
+- Updated the services.json file's structure, so that an auxiliary cleaning file is used by the clean module if applicable [#692](https://github.com/BU-ISCIII/buisciii-tools/pull/692).
 
 ### Modules
 
 #### Implementation
 
 - Added DROP as a new service, including automatic input generation, module-specific adaptations and standardized result processing. [#668](https://github.com/BU-ISCIII/buisciii-tools/pull/668)
+- Created viralrecon_clean.py, an auxiliary file to clean unnecessary files from viralrecon service [#692](https://github.com/BU-ISCIII/buisciii-tools/pull/692).
 
 #### Added enhancements
+
+- Improved clean module so that an aux cleaning file is employed for specific services if applicable [#692](https://github.com/BU-ISCIII/buisciii-tools/pull/692).
 
 #### Fixes
 
