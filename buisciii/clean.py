@@ -393,8 +393,13 @@ class CleanUp:
 
     def purge_files(self):
         """
-        Remove the files that must be deleted before the service delivery.
-        If a clean_script is defined, use its output instead of self.delete_files.
+        Description:
+            Remove the files that must be deleted before the service delivery.
+
+        Usage:
+            object.purge_files()
+
+        Params:
         """
         if self.clean_scripts:
             search_path = self.scratch_path if self.scratch_path else self.full_path
