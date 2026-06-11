@@ -117,8 +117,12 @@ class CleanUp:
                 stderr.print(f"Using the following route: {self.scratch_path}")
                 log.info(f"Using the following route: {self.scratch_path}")
             else:
-                stderr.print(f"Scratch path was not found: {scratch_path}. The service path will be used instead: {self.full_path}")
-                log.warning(f"Scratch path not found: {scratch_path}, using service path")
+                stderr.print(
+                    f"Scratch path was not found: {scratch_path}. The service path will be used instead: {self.full_path}"
+                )
+                log.warning(
+                    f"Scratch path not found: {scratch_path}, using service path"
+                )
 
         self.delete_folders = self.get_clean_items(
             self.services_to_clean, type="folders"
@@ -149,16 +153,22 @@ class CleanUp:
             return []
         cmd = [sys.executable, str(script_path), search_path]
         try:
-            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=None, text=True, check=False)
+            result = subprocess.run(
+                cmd, stdout=subprocess.PIPE, stderr=None, text=True, check=False
+            )
             if result.returncode == 0:
-                files = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+                files = [
+                    line.strip() for line in result.stdout.splitlines() if line.strip()
+                ]
                 existing_files = [f for f in files if os.path.exists(f)]
                 if len(existing_files) != len(files):
                     missing = set(files) - set(existing_files)
                     log.warning(f"Some files from '{script}' do not exist: {missing}")
                 return existing_files
             else:
-                log.error(f"Error in clean script '{script}' (code {result.returncode})")
+                log.error(
+                    f"Error in clean script '{script}' (code {result.returncode})"
+                )
         except Exception as e:
             log.exception(f"Failed to execute clean script '{script}': {e}")
         return []
@@ -406,7 +416,9 @@ class CleanUp:
             for svc, script in self.clean_scripts.items():
                 files_to_delete = self.get_files_from_clean_script(script, search_path)
                 if not files_to_delete:
-                    stderr.print(f"[yellow]WARNING: No files to delete from {svc}! Let's keep going!")
+                    stderr.print(
+                        f"[yellow]WARNING: No files to delete from {svc}! Let's keep going!"
+                    )
                     log.info(f"No files to delete from {svc}. Continuing!")
                     continue
                 for file in files_to_delete:
@@ -417,8 +429,10 @@ class CleanUp:
                     except Exception as e:
                         stderr.print(f"[red]Error removing {file}: {e}")
                         log.error(f"Error removing {file}: {e}")
-        
-        services_without_script = [s for s in self.services_to_clean if s not in self.clean_scripts]
+
+        services_without_script = [
+            s for s in self.services_to_clean if s not in self.clean_scripts
+        ]
         if services_without_script and self.delete_files and self.service_samples:
             files_to_delete = []
             for sample_info in self.service_samples:

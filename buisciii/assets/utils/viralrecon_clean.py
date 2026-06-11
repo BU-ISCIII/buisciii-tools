@@ -22,13 +22,15 @@ stderr = Console(
 
 log = logging.getLogger(__name__)
 
+
 def setup_logging(service_path):
     log_file = Path(service_path) / "DOC" / "viralrecon_clean.log"
     logging.basicConfig(
         filename=log_file,
         level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s"
+        format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
 
 def get_protocol(service_path):
     """Reads protocol from config yml file"""
@@ -55,6 +57,7 @@ def get_protocol(service_path):
                 return protocol
     return None
 
+
 def find_bowtie2_dirs(service_path):
     """Finds all directories called 'variants/bowtie2' within the service"""
     bowtie2_dirs = []
@@ -71,6 +74,7 @@ def find_bowtie2_dirs(service_path):
             stderr.print(f"Bowtie2_dir NOT FOUND: {bowtie2_dir}")
             log.info(f"Bowtie2_dir NOT FOUND: {bowtie2_dir}")
     return bowtie2_dirs
+
 
 def main():
     if len(sys.argv) < 2:
@@ -107,6 +111,7 @@ def main():
 
     for f in to_delete:
         print(f)
+
 
 if __name__ == "__main__":
     main()
