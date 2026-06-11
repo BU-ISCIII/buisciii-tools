@@ -998,7 +998,7 @@ def fix_permissions(ctx, input_directory):
             else:
                 log.exception(f"EXCEPTION FOUND: {e}")
                 stderr.print(f"EXCEPTION FOUND: {e}")
-                sys.exit(1)
+                continue
 
 
 if __name__ == "__main__":
