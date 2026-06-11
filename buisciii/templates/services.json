@@ -11,6 +11,7 @@
           "folders":[],
           "files":["01-processing/fastp/sample_name_1.fastp.fastq.gz", "01-processing/fastp/sample_name_2.fastp.fastq.gz"]
         },
+        "clean_script": "",
         "no_copy": ["RAW", "TMP", "latest"],
         "last_folder":"REFERENCES",
         "delivery_md": "assets/reports/md/assembly.md",
@@ -28,6 +29,7 @@
           "folders":[],
           "files":[]
         },
+        "clean_script": "",
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "assets/reports/md/tbprofiler.md",
@@ -45,6 +47,7 @@
         "folders":["virus_coverage/plots"],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP", "01-PikaVirus-results"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/pikavirus.md",
@@ -62,6 +65,7 @@
         "folders":[],
         "files":["mapping/sample_name.sorted.bam", "kmer/database.msh"]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/plasmidid.md",
@@ -80,6 +84,7 @@
           "folders":[],
           "files":[]
         },
+        "clean_script": "",
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
@@ -98,6 +103,7 @@
           "folders":[],
           "files":[]
         },
+        "clean_script": "",
         "no_copy": ["RAW", "TMP"],
         "last_folder":"REFERENCES",
         "delivery_md": "assets/reports/md/wgmlst_chewbbaca.md",
@@ -113,8 +119,9 @@
         "description": "Viral genome reconstruction analysis for SARS-COV-2 data",
         "clean": {
           "folders":[],
-          "files":["variants/bowtie2/sample_name.sorted.bam","variants/bowtie2/sample_name.sorted.bam.bai"]
+          "files":[]
         },
+        "clean_script": "viralrecon_clean.py",
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
         "delivery_md": "assets/reports/md/viralrecon.md",
@@ -132,6 +139,7 @@
           "folders":[],
           "files":["star_salmon/sample_name.Aligned.out.bam", "star_salmon/sample_name.Aligned.toTranscriptome.out.bam"]
         },
+        "clean_script": "",
         "no_copy": ["RAW", "TMP"],
         "last_folder":"RESULTS",
         "delivery_md": "assets/reports/md/rnaseq_deg.md",
@@ -149,6 +157,7 @@
           "folders":["02-preprocessing", "05-samtools"],
           "files":[]
         },
+        "clean_script": "",
         "no_copy": ["RAW", "TMP", "00-reads"],
         "last_folder":"REFERENCES",
         "delivery_md": "",
@@ -166,6 +175,7 @@
         "folders":["02-preprocessing"],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
@@ -183,6 +193,7 @@
         "folders":[],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP", "00-reads"],
       "delivery_md": "",
       "delivery_pdf": ""
@@ -199,6 +210,7 @@
         "folders":["01-preprocessing"],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP", "00-reads", "fasta_inputs"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
@@ -216,6 +228,7 @@
         "folders":[],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"RESULTS",
       "delivery_md": "assets/reports/md/taxprofiler.md",
@@ -233,6 +246,7 @@
         "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates", "03-annotation/vep", "03-annotation/exomiser"],
         "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/sarek.md",
@@ -250,6 +264,7 @@
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing"],
         "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/sarek.md",
@@ -267,6 +282,7 @@
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
         "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/sarek.md",
@@ -284,6 +300,7 @@
         "folders":["02-preprocessing"],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"RESULTS",
       "delivery_md": "",
@@ -301,6 +318,7 @@
         "folders":["02-preprocessing", "intermediate"],
         "files":["sample_name/RSV_AD.bam", "sample_name/RSV_BD.bam"]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "assets/reports/md/irma.md",
@@ -318,26 +336,10 @@
         "folders":[],
         "files":[]
       },
+      "clean_script": "",
       "no_copy": ["RAW", "TMP"],
       "last_folder":"REFERENCES",
       "delivery_md": "",
       "results_md": ""
-   },
-    "DROP": {
-      "label": "DROP: Detection of RNA Outliers Pipeline",
-      "template": "DROP",
-      "url": "https://github.com/gagneurlab/drop",
-      "order": 2,
-      "begin": "",
-      "end": ["exometrio", "wgstrio", "rnaseq"],
-      "description": "Human: RNA outlier analysis including aberrant expression, aberrant splicing and monoallelic expression (MAE)",
-      "clean": {
-        "folders":[],
-        "files":[]
-      },
-      "no_copy": ["RAW", "TMP"],
-      "last_folder":"REFERENCES",
-      "delivery_md": "assets/reports/md/drop.md",
-      "results_md": "assets/reports/results/drop.md"
-    }
+  }
 }
