@@ -4,6 +4,7 @@ import json
 import requests
 import sys
 import rich
+from http import HTTPStatus
 import buisciii.utils
 
 log = logging.getLogger(__name__)
@@ -34,27 +35,35 @@ class RestServiceApi:
     # TODO: this is waaay too dirty, find a way to pass variable number of parameters and values.
     # by Guille: I used an f-string instead of all the + stuff, I think thats cleaner?
     # by Guille: **kwargs time!
+
+    def handle_error_status(self, status_code, safe, context=None):
+        try:
+            status = HTTPStatus(status_code)
+            message = f"{status_code} {status.phrase}: {status.description}."
+        except ValueError:
+            message = f"Unexpected HTTP status code: {status_code}."
+        
+        if context:
+            message += f" Context: {context}"
+
+        if safe:
+            log.error(message)
+            stderr.print(message)
+            sys.exit(1)
+        else:
+            return status_code
     def get_request(self, request_info, safe=True, **kwargs):
         url_http = f"{self.request_url}{request_info}?{''.join([f'{key}={value}&' for key,value in kwargs.items()])[:-1]}"
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
-                if safe:
-                    resolution = kwargs.get("resolution", "unknown")
-                    log.info(
-                        f"Resolution {resolution} does not exist. Status code: {req.status_code}"
-                    )
-                    stderr.print(
-                        f"Resolution {resolution} does not exist! Please make sure the resolution ID is correct and has been created"
-                    )
-                    sys.exit(1)
-                else:
-                    return req.status_code
+                resolution = kwargs.get("resolution", None)
+                context = f"resolution={resolution}" if resolution else None
+                return self.handle_error_status(req.status_code, safe, context)
             return json.loads(req.text)
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS, aborting")
             sys.exit(1)
-            return False
 
     def put_request(
         self, request_info, parameter1, value1, parameter2, value2, safe=True
@@ -74,15 +83,7 @@ class RestServiceApi:
         try:
             req = requests.put(url_http, headers=self.headers, auth=self.auth)
             if req.status_code > 201:
-                if safe:
-                    log.error(
-                        "Resolution id does not exist. Status code: "
-                        + str(req.status_code)
-                    )
-                    sys.exit(1)
-                else:
-                    return req.status_code
-            # return json.loads(req.text)
+                return self.handle_error_status(req.status_code, safe)
             return True
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS")
@@ -96,16 +97,8 @@ class RestServiceApi:
                 url_http, data=data, headers=self.headers, auth=self.auth
             )
             if req.status_code > 201:
-                if safe:
-                    log.error(
-                        "Some error occurred. Status code: " + str(req.status_code)
-                    )
-                    log.error("Status text: " + str(json.loads(req.text)))
-                    sys.exit()
-                else:
-                    return req.status_code
+                return self.handle_error_status(req.status_code, safe)
             return True
-
         except requests.ConnectionError:
             log.error("Unable to open connection towards iSkyLIMS, aborting")
             sys.exit(1)
