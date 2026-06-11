@@ -26,7 +26,7 @@ jobs:
         id: file_check
         uses: tj-actions/changed-files@v44
         with:
-          sha: ${{ github.event.pull_request.head.sha }}
+          sha: ${{ github.event.pull_request.head.sha || github.sha }}
           files: |
              **.py
       - name: Run flake8
@@ -49,7 +49,7 @@ jobs:
           id: file_check
           uses: tj-actions/changed-files@v44
           with:
-            sha: ${{ github.event.pull_request.head.sha }}
+            sha: ${{ github.event.pull_request.head.sha || github.sha }}
             files: '**.py'
         - name: Check code lints with Black
           if: steps.file_check.outputs.any_changed == 'true'
