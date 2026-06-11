@@ -5,6 +5,8 @@ import sys
 import os
 import logging
 import shutil
+import subprocess
+from pathlib import Path
 from rich.console import Console
 
 # Local imports
@@ -95,9 +97,29 @@ class CleanUp:
             )
 
         self.full_path = os.path.join(self.path, self.service_folder)
+        self.scratch_path = None
 
-        # Load service conf
         self.services_to_clean = buisciii.utils.get_service_ids(self.services_requested)
+        service_conf_all = buisciii.service_json.ServiceJson()
+        self.clean_scripts = {}
+
+        for svc in self.services_to_clean:
+            script = service_conf_all.get_find_deep(svc, "clean_script")
+            if script:
+                self.clean_scripts[svc] = script
+                log.info(f"clean_script for {svc} = {script}")
+
+        if self.clean_scripts:
+            scratch_base = "/data/ucct/bi/scratch_tmp/bi"
+            scratch_path = os.path.join(scratch_base, self.service_folder)
+            if os.path.exists(scratch_path):
+                self.scratch_path = scratch_path
+                stderr.print(f"Using the following route: {self.scratch_path}")
+                log.info(f"Using the following route: {self.scratch_path}")
+            else:
+                stderr.print(f"Scratch path was not found: {scratch_path}. The service path will be used instead: {self.full_path}")
+                log.warning(f"Scratch path not found: {scratch_path}, using service path")
+
         self.delete_folders = self.get_clean_items(
             self.services_to_clean, type="folders"
         )
@@ -119,6 +141,27 @@ class CleanUp:
             )
         else:
             self.option = option
+
+    def get_files_from_clean_script(self, script, search_path):
+        script_path = Path(__file__).parent / "assets" / "utils" / script
+        if not script_path.exists():
+            log.warning(f"Clean script '{script}' not found in {script_path}")
+            return []
+        cmd = [sys.executable, str(script_path), search_path]
+        try:
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=None, text=True, check=False)
+            if result.returncode == 0:
+                files = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+                existing_files = [f for f in files if os.path.exists(f)]
+                if len(existing_files) != len(files):
+                    missing = set(files) - set(existing_files)
+                    log.warning(f"Some files from '{script}' do not exist: {missing}")
+                return existing_files
+            else:
+                log.error(f"Error in clean script '{script}' (code {result.returncode})")
+        except Exception as e:
+            log.exception(f"Failed to execute clean script '{script}': {e}")
+        return []
 
     def get_clean_items(self, services_ids, type="files"):
         """
@@ -244,6 +287,7 @@ class CleanUp:
 
         """
         self.check_path_exists()
+        search_path = self.scratch_path if self.scratch_path else self.full_path
         pathlist = []
         found = []
 
@@ -253,7 +297,7 @@ class CleanUp:
             target_name = path_parts[-1]
             parent_dirs = path_parts[:-1]
 
-            for root, dirs, files in os.walk(self.full_path):
+            for root, dirs, files in os.walk(search_path):
                 if root.endswith(os.sep.join(parent_dirs)):
                     # Check for matching directories, if any
                     if target_name in dirs:
@@ -349,16 +393,28 @@ class CleanUp:
 
     def purge_files(self):
         """
-        Description:
-            Remove the files that must be deleted before the service delivery.
-
-        Usage:
-            object.purge_files()
-
-        Params:
-
+        Remove the files that must be deleted before the service delivery.
+        If a clean_script is defined, use its output instead of self.delete_files.
         """
-        if self.service_samples is not None:
+        if self.clean_scripts:
+            search_path = self.scratch_path if self.scratch_path else self.full_path
+            for svc, script in self.clean_scripts.items():
+                files_to_delete = self.get_files_from_clean_script(script, search_path)
+                if not files_to_delete:
+                    stderr.print(f"[yellow]WARNING: No files to delete from {svc}! Let's keep going!")
+                    log.info(f"No files to delete from {svc}. Continuing!")
+                    continue
+                for file in files_to_delete:
+                    try:
+                        os.remove(file)
+                        stderr.print("[green]Successfully removed " + file)
+                        log.info(f"Successfully removed {file}!")
+                    except Exception as e:
+                        stderr.print(f"[red]Error removing {file}: {e}")
+                        log.error(f"Error removing {file}: {e}")
+        
+        services_without_script = [s for s in self.services_to_clean if s not in self.clean_scripts]
+        if services_without_script and self.delete_files and self.service_samples:
             files_to_delete = []
             for sample_info in self.service_samples:
                 for file in self.delete_files:
@@ -367,10 +423,13 @@ class CleanUp:
                         files_to_delete.append(file_to_delete)
             path_content = self.scan_dirs(to_find=files_to_delete)
             for file in path_content:
-                os.remove(file)
-                stderr.print("[green]Successfully removed " + file)
-                log.info(f"Successfully removed {file}!")
-        return
+                try:
+                    os.remove(file)
+                    stderr.print("[green]Successfully removed " + file)
+                    log.info(f"Successfully removed {file}!")
+                except Exception as e:
+                    stderr.print(f"[red]Error removing {file}: {e}")
+                    log.error(f"Error removing {file}: {e}")
 
     def purge_folders(self, sacredtexts=["lablog", "logs"], add="", verbose=True):
         """
@@ -455,7 +514,7 @@ class CleanUp:
         # Purge work
         self.delete_work()
         # Delete files
-        if self.delete_files != "":
+        if self.clean_scripts or self.delete_files:
             self.purge_files()
         else:
             stderr.print("No files to remove!")
