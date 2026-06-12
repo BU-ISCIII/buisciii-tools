@@ -30,7 +30,8 @@ vep <- fread(
   sep = "\t",
   quote = "",
   header = TRUE,
-  check.names = TRUE
+  check.names = TRUE,
+  fill = TRUE
 )
 
 # Pegamos las tablas usando de referencia la columna ID
