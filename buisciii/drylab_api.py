@@ -42,7 +42,7 @@ class RestServiceApi:
             message = f"{status_code} {status.phrase}: {status.description}."
         except ValueError:
             message = f"Unexpected HTTP status code: {status_code}."
-        
+
         if context:
             message += f" Context: {context}"
 
@@ -52,6 +52,7 @@ class RestServiceApi:
             sys.exit(1)
         else:
             return status_code
+
     def get_request(self, request_info, safe=True, **kwargs):
         url_http = f"{self.request_url}{request_info}?{''.join([f'{key}={value}&' for key,value in kwargs.items()])[:-1]}"
         try:
