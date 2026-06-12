@@ -47,6 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 #### Added enhancements
 
 - Improved clean module so that an aux cleaning file is employed for specific services if applicable [#692](https://github.com/BU-ISCIII/buisciii-tools/pull/692).
+- Improved HTTP error handling in drylab_api module and fixed fix-permissions so that it does not break given insufficient permissions [#694](https://github.com/BU-ISCIII/buisciii-tools/pull/694).
 
 #### Fixes
 
