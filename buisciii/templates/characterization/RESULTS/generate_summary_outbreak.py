@@ -11,7 +11,7 @@ from openpyxl import load_workbook
 xlsx_template = "summary_outbreak_template.xlsx"
 samples_file = "../ANALYSIS/samples_id.txt"
 tsv_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_mlst_full.tsv")
-csv_file = glob.glob("../ANALYSIS/*_ASSEMBLY/99-stats/kmerfinder_summary.csv")
+csv_file = glob.glob("../ANALYSIS/*_ASSEMBLY/Kmerfinder/kmerfinder_summary.csv")
 mapping_file = glob.glob("../ANALYSIS/*_SNIPPY/99-stats/mapping_stats_summary.txt")
 wgs_metrics_file = glob.glob(
     "../ANALYSIS/*_SNIPPY/99-stats/wgs_metrics_all_filtered.txt"

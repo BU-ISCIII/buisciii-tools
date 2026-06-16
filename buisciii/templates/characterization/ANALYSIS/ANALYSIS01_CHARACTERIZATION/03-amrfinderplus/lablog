@@ -1,4 +1,4 @@
-# micromamba activate amrfinder_3.12.8
+# micromamba activate amrfinder_4.2.7
 
 # Only works with assemblies, prior to this you must have executed assembly pipeline
 
