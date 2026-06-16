@@ -90,3 +90,4 @@ nextflow run /data/ucct/bi/pipelines/nf-core-taxprofiler/nf-core-taxprofiler_2.0
 EOF
 
 echo "sbatch taxprofiler.sbatch" > _01_nf_taxprofiler.sh
+

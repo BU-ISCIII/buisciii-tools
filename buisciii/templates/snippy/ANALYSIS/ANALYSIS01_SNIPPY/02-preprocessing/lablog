@@ -24,3 +24,4 @@ read -p $'\e[1;37mDid you save the trimmed reads from previous assembly pipeline
         echo -e "\e[32mFile _01_fastp.sh ready.\e[0m"
         
     fi
+

@@ -46,3 +46,4 @@ echo "
   echo -e \"-----Generating nextclade_combined.csv-----\"
   python3 merge_results.py
 " > _02_run_merge_results.sh
+

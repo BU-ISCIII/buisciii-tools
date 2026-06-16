@@ -34,3 +34,4 @@ output_file="amrfinder_summary.tsv"
   done
 } > "$output_file"
 EOF
+
