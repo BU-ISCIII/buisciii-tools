@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated the services.json file's structure, so that an auxiliary cleaning file is used by the clean module if applicable [#692](https://github.com/BU-ISCIII/buisciii-tools/pull/692).
 - Optimized annotation wgs & exome [#695](https://github.com/BU-ISCIII/buisciii-tools/pull/695)
 - Updated several software versions [#696](https://github.com/BU-ISCIII/buisciii-tools/pull/696)
+- Updated nextclade checks for IRMA and viralrecon [#697](https://github.com/BU-ISCIII/buisciii-tools/pull/697)
 
 ### Modules
 
