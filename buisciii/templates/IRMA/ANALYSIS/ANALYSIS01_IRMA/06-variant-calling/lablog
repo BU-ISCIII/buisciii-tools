@@ -50,7 +50,9 @@ cat ./sample_type_ref.txt | xargs -I % echo '
   awk -v id="${header_id}_${fragment}" "BEGIN{RS=\">\"; ORS=\"\"} \$0 ~ id {print \">\"\$0}" \
     ../04-irma/all_samples_completo.txt > concatenated_sequences/${sample_id}/${sample_id}_${fragment}_ref.fasta
   # Activate the conda environment
-  eval "$(micromamba shell hook --shell bash)"
+  export MAMBA_EXE="/data/ucct/bi/pipelines/micromamba/bin/micromamba"
+  export MAMBA_ROOT_PREFIX="/data/ucct/bi/pipelines/micromamba"
+  eval "$($MAMBA_EXE shell hook --shell bash)"
   micromamba activate refgenie_v0.12.1
   # Get the reference path from refgenie
   ref_path=$(refgenie seek orthomyxoviridae/fasta:${ref} -c /data/ucct/bi/references/refgenie/genome_config.yaml)
@@ -75,7 +77,9 @@ cat ./sample_type_ref.txt | xargs -I {} echo "
   mkdir -p vcf_files/\${sample_id}
   echo -e \"-----Starting \$sample_id \${fragment}-----\"
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate biopython_v1.84
   if [ -z \"\$input_file\" ]; then
     echo \"No allAlleles file found in IRMA results for \${sample_id} and \${fragment}. Skipping...\"
@@ -98,7 +102,9 @@ cat ./sample_type_ref.txt | xargs -I {} echo "
   fragment=\$(echo '{}' | awk '{print \$3}')
   mkdir -p annotated_vcfs/\${sample_id}
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate refgenie_v0.12.1
   dataDir=$(refgenie seek snpeff/flu_surveillance_db -c /data/ucct/bi/references/refgenie/genome_config.yaml)
   echo -e \"-----Annotating \$sample_id \${fragment} vcf file-----\"
@@ -119,7 +125,9 @@ cat ./sample_type_ref.txt | xargs -I {} echo "
   ref=\$(echo '{}' | awk '{print \$4}')
   fragment=\$(echo '{}' | awk '{print \$3}')
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate refgenie_v0.12.1
   dataDir=$(refgenie seek snpeff/flu_surveillance_db -c /data/ucct/bi/references/refgenie/genome_config.yaml)
   echo -e \"-----Extracting relevant fields for \$sample_id \${fragment} vcf file-----\"

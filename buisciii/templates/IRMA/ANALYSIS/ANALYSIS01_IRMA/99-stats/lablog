@@ -21,7 +21,9 @@ cat ./sample_type_ref.txt | xargs -I % echo '
 # Create a table of all the reported variants for a set of samples.
 echo "
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate biopython_v1.84
   echo -e \"-----Generating variants_long_table.csv-----\"
   python3 create_variants_long_table.py ../06-variant-calling/annotated_vcfs
@@ -30,7 +32,9 @@ echo "
 # Create a .tab file containing the percentage of Ns for each sample and each fragment.
 echo "
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate biopython_v1.84
   echo -e \"-----Generating %Ns.tab-----\"
   python3 percentajeNs.py consensus_files %Ns.tab
@@ -40,7 +44,9 @@ echo "
 # Create a table indicating the number of unambiguous bases and the total number of Ns.
 echo "
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate biopython_v1.84
   echo -e \"-----Generating qc_metrics.tsv-----\"
   # Define the input directory and the output file
@@ -81,7 +87,9 @@ echo "#!/usr/bin/env bash
   fi
 
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate refgenie_v0.12.1
 
   in=\"\$1\"

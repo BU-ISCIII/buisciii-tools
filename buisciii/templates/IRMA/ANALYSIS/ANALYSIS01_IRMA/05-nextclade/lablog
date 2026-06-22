@@ -95,7 +95,9 @@ echo "
 # Combine all results into one single file.
 echo "
   # Activate the conda environment
-  eval \"\$(micromamba shell hook --shell bash)\"
+  export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"
+  export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"
+  eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"
   micromamba activate biopython_v1.84
   echo -e \"-----Generating nextclade_combined.csv-----\"
   python3 merge_results.py
