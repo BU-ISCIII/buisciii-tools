@@ -1,6 +1,8 @@
 # module load singularity
 # Activate the micromamba environment
-eval "$(micromamba shell hook --shell bash)"
+export MAMBA_EXE="/data/ucct/bi/pipelines/micromamba/bin/micromamba"
+export MAMBA_ROOT_PREFIX="/data/ucct/bi/pipelines/micromamba"
+eval "$($MAMBA_EXE shell hook --shell bash)"
 micromamba activate refgenie_v0.12.1
 
 # Create folders.
