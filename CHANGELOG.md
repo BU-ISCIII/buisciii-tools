@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.3dev] - 2026-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.3dev
+## [2.3.3] - 2026-06-22 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.3
 
 ### Credits
 
@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated several software versions [#696](https://github.com/BU-ISCIII/buisciii-tools/pull/696)
 - Updated nextclade checks for IRMA and viralrecon [#697](https://github.com/BU-ISCIII/buisciii-tools/pull/697)
 - Enabled micromamba env activation when launching a script [#699](https://github.com/BU-ISCIII/buisciii-tools/pull/699)
+- Updated kaiju conf for taxprofiler [#701](https://github.com/BU-ISCIII/buisciii-tools/pull/701)
 
 ### Modules
 
