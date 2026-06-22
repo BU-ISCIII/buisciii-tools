@@ -315,7 +315,7 @@ def uncompress_targz_directory(tar_name, directory):
     Untar GZ file
     """
     with tarfile.open(tar_name) as out_tar:
-        out_tar.extractall("/".join(directory.split("/")[:-1]))
+        out_tar.extractall("/".join(directory.split("/")[:-1]), filter="fully_trusted")
     return
 
 
@@ -510,7 +510,7 @@ def remake_permissions(copied_folder_path, permissions_config):
     # Change permissions for directories
     if "directory_chmod" in permissions_config:
         subprocess.run(
-            f"find {copied_folder_path} -type d -exec chmod {permissions_config['directory_chmod']} {{}} \;",
+            f"find {copied_folder_path} -type d -exec chmod {permissions_config['directory_chmod']} {{}} \\;",
             shell=True,
             check=True,
         )
@@ -518,7 +518,7 @@ def remake_permissions(copied_folder_path, permissions_config):
     # Change permissions for files
     if "file_chmod" in permissions_config:
         subprocess.run(
-            f"find {copied_folder_path} -type f -exec chmod {permissions_config['file_chmod']} {{}} \;",
+            f"find {copied_folder_path} -type f -exec chmod {permissions_config['file_chmod']} {{}} \\;",
             shell=True,
             check=True,
         )
