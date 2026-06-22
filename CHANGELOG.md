@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Optimized annotation wgs & exome [#695](https://github.com/BU-ISCIII/buisciii-tools/pull/695)
 - Updated several software versions [#696](https://github.com/BU-ISCIII/buisciii-tools/pull/696)
 - Updated nextclade checks for IRMA and viralrecon [#697](https://github.com/BU-ISCIII/buisciii-tools/pull/697)
+- Enabled micromamba env activation when launching a script [#699](https://github.com/BU-ISCIII/buisciii-tools/pull/699)
 
 ### Modules
 
