@@ -34,6 +34,6 @@ mv @@/data.json @@/@@_data.json
 mv @@/results.txt @@/@@_results.txt
 ln -s ../@@/@@_results.txt reports/" >> _02_kmerfinder_summary.sh
 
-echo "eval \"\$(micromamba shell hook --shell bash)\"; micromamba activate outbreakinfo" >> _02_kmerfinder_summary.sh
+echo "export MAMBA_EXE=\"/data/ucct/bi/pipelines/micromamba/bin/micromamba\"; export MAMBA_ROOT_PREFIX=\"/data/ucct/bi/pipelines/micromamba\"; eval \"\$(\$MAMBA_EXE shell hook --shell bash)\"; micromamba activate outbreakinfo" >> _02_kmerfinder_summary.sh
 echo "python3 /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.4.0/2_4_0/bin/kmerfinder_summary.py --path reports/ --output_bn kmerfinder.bn --output_csv kmerfinder_summary.csv" >> _02_kmerfinder_summary.sh
 echo "rm -rf reports" >> _02_kmerfinder_summary.sh
