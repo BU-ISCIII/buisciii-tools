@@ -5,6 +5,7 @@ import os
 import shutil
 import sys
 from math import pow
+from datetime import datetime
 
 import rich
 import sysrsync
@@ -159,13 +160,11 @@ class Archive:
             and (service_id is None)
             and (services_file is None)
         ):
-            if self.ser_type == "services_and_colaborations":
+            if self.ser_type in ["services_and_colaborations", "research"]:
                 prompt_response = buisciii.utils.prompt_selection(
                     "Search services by date, or by service ID?",
                     ["Search by date", "Service ID"],
                 )
-            else:
-                prompt_response = "Service ID"
 
             log.info("Services chosen by: " + prompt_response)
             if prompt_response == "Search by date":
@@ -229,37 +228,71 @@ class Archive:
         if (self.date_from is not None) and (self.date_until is not None):
             stderr.print("Asking our trusty API about selected services")
             log.info("Asking our trusty API about selected services")
-            try:
-                for service in rest_api.get_request(
-                    request_info="services",
-                    safe=True,
-                    state="delivered",
-                    date_from=str(self.date_from),
-                    date_until=str(self.date_until),
-                ):
-                    self.services[service["service_request_number"]] = {
-                        key: value for key, value in dictionary_template.items()
-                    }
-                    self.services[service["service_request_number"]][
-                        "found_in_system"
-                    ] = True
-                    self.services[service["service_request_number"]][
-                        "delivery_date"
-                    ] = service["service_delivered_date"]
+            
+            if self.ser_type == "research":
+                research_base = os.path.join(
+                    conf.get_configuration("global")["data_path"],
+                    self.ser_type,
+                )
+                stderr.print(f"Scanning directory: {research_base}")
+                log.info(f"Scanning research directory: {research_base}")
+                
+                date_from_ts = datetime.strptime(str(self.date_from), "%Y-%m-%d").timestamp()
+                date_until_ts = datetime.strptime(str(self.date_until), "%Y-%m-%d").timestamp()
+                
+                try:
+                    for entry in os.scandir(research_base):
+                        if entry.is_dir(follow_symlinks=False):
+                            mtime = entry.stat(follow_symlinks=False).st_mtime
+                            if date_from_ts <= mtime <= date_until_ts:
+                                self.services[entry.name] = {
+                                    key: value for key, value in dictionary_template.items()
+                                }
+                                self.services[entry.name]["found_in_system"] = True
+                                self.services[entry.name]["delivery_date"] = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
+                except FileNotFoundError:
+                    stderr.print(f"[red]Directory not found: {research_base}")
+                    log.error(f"Research base directory not found: {research_base}")
+                    raise
+                    
+                log.info(f"Research folders found in time interval: {len(self.services)}")
+            else:
+                try:
+                    for service in rest_api.get_request(
+                        request_info="services",
+                        safe=True,
+                        state="delivered",
+                        date_from=str(self.date_from),
+                        date_until=str(self.date_until),
+                    ):
+                        self.services[service["service_request_number"]] = {
+                            key: value for key, value in dictionary_template.items()
+                        }
+                        self.services[service["service_request_number"]][
+                            "found_in_system"
+                        ] = True
+                        self.services[service["service_request_number"]][
+                            "delivery_date"
+                        ] = service["service_delivered_date"]
 
-                log.info(f"Services found in the time interval: {len(self.services)}")
-                log.info(
-                    "Names of the services found in said interval:"
-                    f"{','.join([service for service in self.services.keys()])}"
-                )
-            except TypeError:
-                stderr.print(
-                    "Could not connect to the API (wrong password?)", style="red"
-                )
-                log.error(
-                    "ERROR: Connection to the API was not successful. Possible reasons: wrong API password or bad connection."
-                )
-                raise
+                    log.info(f"Services found in the time interval ({self.date_from} - {self.date_until}): {len(self.services)}")
+                    log.info(
+                        "Names of the services found in said interval:"
+                        f"{','.join([service for service in self.services.keys()])}"
+                    )
+                    stderr.print(f"Services found in the time interval ({self.date_from} - {self.date_until}): {len(self.services)}")
+                    stderr.print(
+                        "Names of the services found in said interval:"
+                        f"{','.join([service for service in self.services.keys()])}"
+                    )
+                except TypeError:
+                    stderr.print(
+                        "Could not connect to the API (wrong password?)", style="red"
+                    )
+                    log.error(
+                        "ERROR: Connection to the API was not successful. Possible reasons: wrong API password or bad connection."
+                    )
+                    raise
 
         for service in self.services.keys():
             stderr.print(service)
@@ -301,12 +334,12 @@ class Archive:
                 self.services[service]["archived_path"] = os.path.join(
                     conf.get_configuration("global")["archived_path"],
                     self.ser_type,
-                    service_id,
+                    service,
                 )
                 self.services[service]["non_archived_path"] = os.path.join(
                     conf.get_configuration("global")["data_path"],
                     self.ser_type,
-                    service_id,
+                    service,
                 )
 
             self.services[service]["found"] = []
@@ -966,15 +999,15 @@ class Archive:
         for service in self.services.keys():
             if not os.path.exists(self.services[service]["non_archived_path"]):
                 stderr.print(
-                    f"Service {self.services[service]['non_archived_path'].split('/')[-1]}"
-                    "has already been removed from"
-                    f"{'/'.join(self.services[service]['non_archived_path'].split('/')[:-1])[:-1]}."
+                    f"Service {self.services[service]['non_archived_path'].split('/')[-1]} "
+                    "has already been removed from "
+                    f"{'/'.join(self.services[service]['non_archived_path'].split('/')[:-1])}. "
                     "Nothing to delete so skipping.\n"
                 )
                 log.info(
                     f"Service {self.services[service]['non_archived_path'].split('/')[-1]} "
                     "has already been removed from"
-                    f"{'/'.join(self.services[service]['non_archived_path'].split('/')[:-1])[:-1]}."
+                    f"{'/'.join(self.services[service]['non_archived_path'].split('/')[:-1])}. "
                     "Nothing to delete so skipping.\n"
                 )
                 continue
@@ -990,14 +1023,23 @@ class Archive:
                     )
                 else:
                     stderr.print(
-                        f"Found archived path for service {self.services[service]['archived_path'].split('/')[-1]}."
+                        f"Found archived path for service {self.services[service]['archived_path'].split('/')[-1]}. "
                         "It is safe to delete this non_archived service. Deleting.\n"
                     )
                     log.info(
-                        f"Found archived path for service {self.services[service]['archived_path'].split('/')[-1]}."
+                        f"Found archived path for service {self.services[service]['archived_path'].split('/')[-1]}. "
                         "It is safe to delete this non_archived service. Deleting.\n"
                     )
-                    shutil.rmtree(self.services[service]["non_archived_path"])
+                    try:
+                        shutil.rmtree(self.services[service]["non_archived_path"])
+                    except Exception as e:
+                        stderr.print(
+                            f"Could not delete {self.services[service]['non_archived_path']}: {e}. Skipping.\n"
+                        )
+                        log.error(
+                            f"Could not delete {self.services[service]['non_archived_path']}: {e}. Skipping.\n"
+                        )
+                        continue
         return
 
     def generate_tsv_table(self, filename):
