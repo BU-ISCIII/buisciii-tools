@@ -301,7 +301,9 @@ check_references() {
             exit 1
         fi
         # Activate the micromamba environment
-        eval "$(micromamba shell hook --shell bash)"
+        export MAMBA_EXE="/data/ucct/bi/pipelines/micromamba/bin/micromamba"
+        export MAMBA_ROOT_PREFIX="/data/ucct/bi/pipelines/micromamba"
+        eval "$($MAMBA_EXE shell hook --shell bash)"
         micromamba activate refgenie_v0.12.1
         environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
         if [[ $environment == *"refgenie"* ]]; then
@@ -361,7 +363,9 @@ check_references() {
         log_message "File ${ref}.gff is not yet downloaded."
         if [ ! -v family ]; then obtain_family; if [ -z ${family} ]; then return; fi; fi
         if [[ $environment != *"refgenie"* ]]; then
-            eval "$(micromamba shell hook --shell bash)"
+            export MAMBA_EXE="/data/ucct/bi/pipelines/micromamba/bin/micromamba"
+            export MAMBA_ROOT_PREFIX="/data/ucct/bi/pipelines/micromamba"
+            eval "$($MAMBA_EXE shell hook --shell bash)"
             micromamba activate refgenie_v0.12.1
             environment=$(micromamba info | awk '/environment/ && /active/ {print $3}')
             if [[ $environment == *"refgenie"* ]]; then

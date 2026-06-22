@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Activate the micromamba environment
-eval "$(micromamba shell hook --shell bash)"
+export MAMBA_EXE="/data/ucct/bi/pipelines/micromamba/bin/micromamba"
+export MAMBA_ROOT_PREFIX="/data/ucct/bi/pipelines/micromamba"
+eval "$($MAMBA_EXE shell hook --shell bash)"
 micromamba activate outbreakinfo
 
 # Ensure required tools are available
