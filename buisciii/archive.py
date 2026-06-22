@@ -228,7 +228,7 @@ class Archive:
         if (self.date_from is not None) and (self.date_until is not None):
             stderr.print("Asking our trusty API about selected services")
             log.info("Asking our trusty API about selected services")
-            
+
             if self.ser_type == "research":
                 research_base = os.path.join(
                     conf.get_configuration("global")["data_path"],
@@ -236,26 +236,35 @@ class Archive:
                 )
                 stderr.print(f"Scanning directory: {research_base}")
                 log.info(f"Scanning research directory: {research_base}")
-                
-                date_from_ts = datetime.strptime(str(self.date_from), "%Y-%m-%d").timestamp()
-                date_until_ts = datetime.strptime(str(self.date_until), "%Y-%m-%d").timestamp()
-                
+
+                date_from_ts = datetime.strptime(
+                    str(self.date_from), "%Y-%m-%d"
+                ).timestamp()
+                date_until_ts = datetime.strptime(
+                    str(self.date_until), "%Y-%m-%d"
+                ).timestamp()
+
                 try:
                     for entry in os.scandir(research_base):
                         if entry.is_dir(follow_symlinks=False):
                             mtime = entry.stat(follow_symlinks=False).st_mtime
                             if date_from_ts <= mtime <= date_until_ts:
                                 self.services[entry.name] = {
-                                    key: value for key, value in dictionary_template.items()
+                                    key: value
+                                    for key, value in dictionary_template.items()
                                 }
                                 self.services[entry.name]["found_in_system"] = True
-                                self.services[entry.name]["delivery_date"] = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
+                                self.services[entry.name]["delivery_date"] = (
+                                    datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
+                                )
                 except FileNotFoundError:
                     stderr.print(f"[red]Directory not found: {research_base}")
                     log.error(f"Research base directory not found: {research_base}")
                     raise
-                    
-                log.info(f"Research folders found in time interval: {len(self.services)}")
+
+                log.info(
+                    f"Research folders found in time interval: {len(self.services)}"
+                )
             else:
                 try:
                     for service in rest_api.get_request(
@@ -275,12 +284,16 @@ class Archive:
                             "delivery_date"
                         ] = service["service_delivered_date"]
 
-                    log.info(f"Services found in the time interval ({self.date_from} - {self.date_until}): {len(self.services)}")
+                    log.info(
+                        f"Services found in the time interval ({self.date_from} - {self.date_until}): {len(self.services)}"
+                    )
                     log.info(
                         "Names of the services found in said interval:"
                         f"{','.join([service for service in self.services.keys()])}"
                     )
-                    stderr.print(f"Services found in the time interval ({self.date_from} - {self.date_until}): {len(self.services)}")
+                    stderr.print(
+                        f"Services found in the time interval ({self.date_from} - {self.date_until}): {len(self.services)}"
+                    )
                     stderr.print(
                         "Names of the services found in said interval:"
                         f"{','.join([service for service in self.services.keys()])}"
