@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [Enrique Sapena](https://github.com/ESapenaVentura)
 - [Victor Lopez](https://github.com/victor5lm)
+- [Sara Monzon](https://github.com/saramonzon)
 
 ### Template fixes and updates
 
 - Updated assembly config for MultiQC and RESULTS lablog [#708](https://github.com/BU-ISCIII/buisciii-tools/pull/708)
 - Updated iGenomes paths [#710](https://github.com/BU-ISCIII/buisciii-tools/pull/710)
 - Updated the assembly template to skip busco and some paths in correspondence to refgenie system [#711](https://github.com/BU-ISCIII/buisciii-tools/pull/711)
+- Updated assembly template to nf-core/bacass 2.6.1 and restored BUSCO execution with matching config changes [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 
 ### Modules
 
