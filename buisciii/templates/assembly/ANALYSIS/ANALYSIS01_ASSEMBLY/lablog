@@ -26,7 +26,7 @@ assembly_options=("short" "long" "hybrid")
 print_color "Indicate the preferred assembly mode:" 'blue'
 select ASSEMBLY_MODE in "${assembly_options[@]}"; do
     if [ -n "$ASSEMBLY_MODE" ]; then
-        if [ $ASSEMBLY_MODE == "short" ]; then 
+        if [ $ASSEMBLY_MODE == "short" ]; then
             ASSEMBLER="unicycler"
         elif [ "$ASSEMBLY_MODE" == "long" ] || [ "$ASSEMBLY_MODE" == "hybrid" ]; then
             ASSEMBLER="dragonflye"
@@ -46,7 +46,7 @@ select TRIMMED in "${trim_options[@]}"; do
         # rename trimmed
         if [ "$TRIMMED" == "Yes" ] || [ "$TRIMMED" == "y" ]; then
             SAVETRIMMED="true"
-        else 
+        else
             SAVETRIMMED="false"
         fi
 
@@ -112,18 +112,16 @@ cat <<EOF > assembly.sbatch
 # module load Nextflow/25.04.6 singularity
 export NXF_OPTS="-Xms500M -Xmx8G"
 
-nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.5.0/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.6.1/2_6_1/main.nf \\
         -c ../../DOC/hpc_slurm_assembly.config \\
         -profile singularity \\
         --input samplesheet.csv \\
         --outdir ./ \\
         --assembly_type ${ASSEMBLY_MODE} \\
         --assembler ${ASSEMBLER} \\
-        --skip_polish true \\
+        --skip_polish \\
         --save_trimmed ${SAVETRIMMED} \\
-        --skip_kraken2 true \\
-        --skip_kmerfinder false \\
-        --skip_busco true \\
+        --skip_kraken2 \\
         --kmerfinderdb /data/ucct/bi/references/kmerfinder/latest/bacteria \\
         --ncbi_assembly_metadata /data/ucct/bi/references/bacteria/20240626/assembly_summary_refseq.txt \\
         ${PROKKA_ARGS} \\
