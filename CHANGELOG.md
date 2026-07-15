@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added Bacass numeric sample ID compatibility to characterization, Snippy, and PlasmidID templates [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 - Updated the Snippy IQ-TREE workflow to reuse the detected best-fit model [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 - Enhanced the outbreak summary workbook with normalized sample IDs, updated AMRFinderPlus parsing, SNP distance tables, provenance, and consistent formatting [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Added reusable Snippy SNP-distance matrices and close-pair variant QC tooling [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 
 ### Modules
 
