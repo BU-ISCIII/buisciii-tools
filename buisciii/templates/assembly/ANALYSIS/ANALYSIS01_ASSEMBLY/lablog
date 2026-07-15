@@ -57,6 +57,11 @@ select TRIMMED in "${trim_options[@]}"; do
 done
 print_color "Selected trimmed file option: $TRIMMED save trimmed" 'green'
 
+SAVE_TRIMMED_ARG=""
+if [ "$SAVETRIMMED" = "true" ]; then
+    SAVE_TRIMMED_ARG="--save_trimmed"
+fi
+
 # Select Prokka gram type
 gram_options=("+" "-" "skip")
 
@@ -120,7 +125,7 @@ nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.6.1/2_6_1/m
         --assembly_type ${ASSEMBLY_MODE} \\
         --assembler ${ASSEMBLER} \\
         --skip_polish \\
-        --save_trimmed ${SAVETRIMMED} \\
+        ${SAVE_TRIMMED_ARG} \\
         --skip_kraken2 \\
         --kmerfinderdb /data/ucct/bi/references/kmerfinder/latest/bacteria \\
         --ncbi_assembly_metadata /data/ucct/bi/references/bacteria/20240626/assembly_summary_refseq.txt \\
