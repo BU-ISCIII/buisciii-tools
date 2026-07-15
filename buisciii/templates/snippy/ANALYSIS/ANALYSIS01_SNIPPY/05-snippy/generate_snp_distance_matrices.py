@@ -10,7 +10,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 VALID_BASES = np.frombuffer(b"ACGT", dtype=np.uint8)
 
 
@@ -19,11 +18,15 @@ def parse_args() -> argparse.Namespace:
         description="Generate core.tab, phylo.aln, and clean.core.aln distance matrices."
     )
     parser.add_argument(
-        "snippy_dir", nargs="?", type=Path, default=Path("."),
+        "snippy_dir",
+        nargs="?",
+        type=Path,
+        default=Path("."),
         help="Snippy output directory (default: current directory)",
     )
     parser.add_argument(
-        "--output-dir", type=Path,
+        "--output-dir",
+        type=Path,
         help="matrix output directory (default: SNIPPY_DIR)",
     )
     return parser.parse_args()
@@ -47,7 +50,9 @@ def read_fasta_alignment(path: Path) -> tuple[list[str], list[str]]:
                     raise ValueError(f"Empty FASTA identifier at {path}:{line_number}")
                 current_sequence = []
             elif current_name is None:
-                raise ValueError(f"Sequence before first FASTA header at {path}:{line_number}")
+                raise ValueError(
+                    f"Sequence before first FASTA header at {path}:{line_number}"
+                )
             else:
                 current_sequence.append(line)
     if current_name is not None:
@@ -85,23 +90,28 @@ def validate_sequences(path: Path, names: list[str], sequences: list[str]) -> No
         raise ValueError(f"Duplicate sequence identifiers in {path}")
     lengths = {len(sequence) for sequence in sequences}
     if len(lengths) != 1:
-        raise ValueError(f"Sequences have different lengths in {path}: {sorted(lengths)}")
+        raise ValueError(
+            f"Sequences have different lengths in {path}: {sorted(lengths)}"
+        )
 
 
 def calculate_distances(sequences: list[str], chunk_size: int = 100_000) -> np.ndarray:
     """Count absolute differences with pairwise deletion of non-ACGT calls."""
     sequence_array = np.vstack(
-        [np.frombuffer(sequence.encode("ascii"), dtype=np.uint8) for sequence in sequences]
+        [
+            np.frombuffer(sequence.encode("ascii"), dtype=np.uint8)
+            for sequence in sequences
+        ]
     )
     sequence_count, alignment_length = sequence_array.shape
     distances = np.zeros((sequence_count, sequence_count), dtype=np.int64)
     for start in range(0, alignment_length, chunk_size):
-        block = sequence_array[:, start:start + chunk_size]
+        block = sequence_array[:, start : start + chunk_size]
         valid = np.isin(block, VALID_BASES)
         for first in range(sequence_count - 1):
-            pair_valid = valid[first + 1:] & valid[first]
-            different = (block[first + 1:] != block[first]) & pair_valid
-            distances[first, first + 1:] += np.count_nonzero(different, axis=1)
+            pair_valid = valid[first + 1 :] & valid[first]
+            different = (block[first + 1 :] != block[first]) & pair_valid
+            distances[first, first + 1 :] += np.count_nonzero(different, axis=1)
     distances += distances.T
     return distances
 
@@ -120,9 +130,24 @@ def main() -> int:
     output_dir = (args.output_dir or snippy_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     inputs = [
-        ("core_tab", snippy_dir / "core.tab", "core_tab_snp_distances.tsv", read_core_tab),
-        ("phylo", snippy_dir / "phylo.aln", "phylo_snp_distances.tsv", read_fasta_alignment),
-        ("clean_core", snippy_dir / "clean.core.aln", "clean_core_snp_distances.tsv", read_fasta_alignment),
+        (
+            "core_tab",
+            snippy_dir / "core.tab",
+            "core_tab_snp_distances.tsv",
+            read_core_tab,
+        ),
+        (
+            "phylo",
+            snippy_dir / "phylo.aln",
+            "phylo_snp_distances.tsv",
+            read_fasta_alignment,
+        ),
+        (
+            "clean_core",
+            snippy_dir / "clean.core.aln",
+            "clean_core_snp_distances.tsv",
+            read_fasta_alignment,
+        ),
     ]
     metadata = {
         "method": "Absolute A/C/G/T differences with pairwise deletion of other calls",

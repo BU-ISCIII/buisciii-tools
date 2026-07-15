@@ -19,7 +19,6 @@ import sys
 import tempfile
 from pathlib import Path
 
-
 VALID_BASES = frozenset("ACGT")
 
 
@@ -147,7 +146,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def read_core_tab(path: Path) -> tuple[list[str], list[tuple[str, int, str, list[str]]]]:
+def read_core_tab(
+    path: Path,
+) -> tuple[list[str], list[tuple[str, int, str, list[str]]]]:
     with path.open(newline="") as handle:
         reader = csv.reader(handle, delimiter="\t")
         try:
@@ -167,7 +168,9 @@ def read_core_tab(path: Path) -> tuple[list[str], list[tuple[str, int, str, list
                 raise ValueError(
                     f"Line {line_number} has {len(row)} columns; expected {len(header)}"
                 )
-            sites.append((row[0], int(row[1]), row[2].upper(), [x.upper() for x in row[3:]]))
+            sites.append(
+                (row[0], int(row[1]), row[2].upper(), [x.upper() for x in row[3:]])
+            )
     return samples, sites
 
 
@@ -196,7 +199,9 @@ def find_close_pairs(samples, sites, threshold):
                     "differences": differences,
                 }
             )
-    return sorted(results, key=lambda x: (x["snp_distance"], x["sample_1"], x["sample_2"]))
+    return sorted(
+        results, key=lambda x: (x["snp_distance"], x["sample_1"], x["sample_2"])
+    )
 
 
 def read_distance_matrix(path: Path) -> dict[frozenset[str], int]:
@@ -322,7 +327,9 @@ def read_vcf(path: Path) -> dict[tuple[str, int, str], dict[str, str]]:
                     "nearest_indel_distance": "",
                 }
                 if len(ref) == len(alt):
-                    for offset, (ref_base, alt_base) in enumerate(zip(ref.upper(), alt.upper())):
+                    for offset, (ref_base, alt_base) in enumerate(
+                        zip(ref.upper(), alt.upper())
+                    ):
                         if ref_base != alt_base and alt_base in VALID_BASES:
                             index[(chrom, pos + offset, alt_base)] = evidence
                 elif len(ref) == 1 and len(alt) == 1 and alt.upper() in VALID_BASES:
@@ -370,7 +377,7 @@ def nearest_distance(sorted_positions: list[int], position: int) -> int | None:
     import bisect
 
     index = bisect.bisect_left(sorted_positions, position)
-    candidates = sorted_positions[max(0, index - 1):index + 1]
+    candidates = sorted_positions[max(0, index - 1) : index + 1]
     return min((abs(position - other) for other in candidates), default=None)
 
 
@@ -420,9 +427,17 @@ def read_bam_pileup(
             bed.write(f"{chrom}\t{pos - 1}\t{pos}\n")
         bed.flush()
         command = [
-            samtools, "mpileup",
-            "-q", str(minimum_mapq), "-Q", str(minimum_baseq), "-f", str(reference),
-            "-l", bed.name, str(bam),
+            samtools,
+            "mpileup",
+            "-q",
+            str(minimum_mapq),
+            "-Q",
+            str(minimum_baseq),
+            "-f",
+            str(reference),
+            "-l",
+            bed.name,
+            str(bam),
         ]
         result = subprocess.run(command, text=True, capture_output=True)
     if result.returncode:
@@ -468,15 +483,31 @@ def evidence_for(index, bam_index, chrom, pos, core_ref, call, other_call):
             }
         )
         return "reference_call_mpileup", evidence
-    status = "reference_call_no_bam_evidence" if call == core_ref else "variant_not_found_in_vcf"
+    status = (
+        "reference_call_no_bam_evidence"
+        if call == core_ref
+        else "variant_not_found_in_vcf"
+    )
     return status, {key: "" for key in EVIDENCE_COLUMNS}
 
 
 EVIDENCE_COLUMNS = (
-    "vcf_record_pos", "vcf_ref", "vcf_alt", "qual", "filter", "genotype",
-    "depth", "ref_count", "alt_count", "variant_type",
-    "ref_forward_count", "ref_reverse_count", "alt_forward_count",
-    "alt_reverse_count", "homopolymer_run", "nearest_indel_distance",
+    "vcf_record_pos",
+    "vcf_ref",
+    "vcf_alt",
+    "qual",
+    "filter",
+    "genotype",
+    "depth",
+    "ref_count",
+    "alt_count",
+    "variant_type",
+    "ref_forward_count",
+    "ref_reverse_count",
+    "alt_forward_count",
+    "alt_reverse_count",
+    "homopolymer_run",
+    "nearest_indel_distance",
 )
 
 
@@ -530,7 +561,9 @@ def collect_qc_warnings(
             ("low_depth", f"{context} depth={depth:g} threshold={minimum_depth:g}")
         )
 
-    fraction_name = "ref_fraction" if row[f"{prefix}_call"] == row["core_ref"] else "alt_fraction"
+    fraction_name = (
+        "ref_fraction" if row[f"{prefix}_call"] == row["core_ref"] else "alt_fraction"
+    )
     called_fraction = numeric(row[f"{prefix}_{fraction_name}"])
     if called_fraction is None:
         warnings.append(("missing_called_fraction", context))
@@ -590,16 +623,22 @@ def main() -> int:
     if not 0 <= args.warn_min_strand_fraction <= 0.5:
         raise ValueError("--warn-min-strand-fraction must be between 0 and 0.5")
     if args.warn_indel_distance < 0 or args.warn_homopolymer_run < 1:
-        raise ValueError("indel distance must be non-negative and homopolymer run positive")
+        raise ValueError(
+            "indel distance must be non-negative and homopolymer run positive"
+        )
     if args.cluster_window < 1 or args.cluster_min_snps < 2:
-        raise ValueError("cluster window must be positive and --cluster-min-snps at least 2")
+        raise ValueError(
+            "cluster window must be positive and --cluster-min-snps at least 2"
+        )
     snippy_dir = args.snippy_dir.resolve()
     core_tab = (args.core_tab or snippy_dir / "core.tab").resolve()
     samples, sites = read_core_tab(core_tab)
     pairs = find_close_pairs(samples, sites, args.threshold)
 
     chromosomes = {chrom for chrom, *_ in sites}
-    gubbins_path = (args.gubbins_gff or snippy_dir / "gubbins.recombination_predictions.gff").resolve()
+    gubbins_path = (
+        args.gubbins_gff or snippy_dir / "gubbins.recombination_predictions.gff"
+    ).resolve()
     gubbins_intervals = []
     if gubbins_path.is_file():
         if len(chromosomes) == 1:
@@ -625,7 +664,9 @@ def main() -> int:
         if matrix_path.is_file():
             matrices[column] = read_distance_matrix(matrix_path)
         else:
-            print(f"WARNING: comparison matrix not found: {matrix_path}", file=sys.stderr)
+            print(
+                f"WARNING: comparison matrix not found: {matrix_path}", file=sys.stderr
+            )
             matrices[column] = {}
     for pair in pairs:
         key = frozenset((pair["sample_1"], pair["sample_2"]))
@@ -634,19 +675,22 @@ def main() -> int:
         phylo_distance = pair["phylo_aln_distance"]
         clean_distance = pair["clean_core_aln_distance"]
         pair["core_tab_matrix_matches"] = (
-            "yes" if pair["core_tab_matrix_distance"] == pair["snp_distance"] else
-            ("" if pair["core_tab_matrix_distance"] == "" else "no")
+            "yes"
+            if pair["core_tab_matrix_distance"] == pair["snp_distance"]
+            else ("" if pair["core_tab_matrix_distance"] == "" else "no")
         )
         pair["phylo_matches_core_tab"] = (
-            "yes" if phylo_distance == pair["snp_distance"] else
-            ("" if phylo_distance == "" else "no")
+            "yes"
+            if phylo_distance == pair["snp_distance"]
+            else ("" if phylo_distance == "" else "no")
         )
         pair["snps_removed_by_gubbins"] = (
             pair["snp_distance"] - clean_distance if clean_distance != "" else ""
         )
         pair["clean_distance_valid"] = (
-            "yes" if clean_distance != "" and clean_distance <= pair["snp_distance"] else
-            ("" if clean_distance == "" else "no")
+            "yes"
+            if clean_distance != "" and clean_distance <= pair["snp_distance"]
+            else ("" if clean_distance == "" else "no")
         )
         comparison_warnings = []
         if pair["core_tab_matrix_matches"] == "no":
@@ -677,8 +721,11 @@ def main() -> int:
             if raw_path is not None:
                 raw_index = read_vcf(raw_path)
                 contextual_fields = (
-                    "ref_forward_count", "ref_reverse_count", "alt_forward_count",
-                    "alt_reverse_count", "homopolymer_run",
+                    "ref_forward_count",
+                    "ref_reverse_count",
+                    "alt_forward_count",
+                    "alt_reverse_count",
+                    "homopolymer_run",
                 )
                 for key, evidence in vcf_indexes[sample].items():
                     raw_evidence = raw_index.get(key, {})
@@ -701,7 +748,11 @@ def main() -> int:
 
     bam_indexes = {sample: {} for sample in needed_samples}
     if not args.no_bam_evidence:
-        samtools = shutil.which(args.samtools) if Path(args.samtools).name == args.samtools else args.samtools
+        samtools = (
+            shutil.which(args.samtools)
+            if Path(args.samtools).name == args.samtools
+            else args.samtools
+        )
         if not samtools:
             raise FileNotFoundError(
                 f"samtools executable not found: {args.samtools!r}; load samtools, use "
@@ -728,11 +779,17 @@ def main() -> int:
             if not reference.is_file():
                 raise FileNotFoundError(f"Reference FASTA not found: {reference}")
             bam_indexes[sample] = read_bam_pileup(
-                str(samtools), reference, bam, positions,
-                args.pileup_mapq, args.pileup_baseq,
+                str(samtools),
+                reference,
+                bam,
+                positions,
+                args.pileup_mapq,
+                args.pileup_baseq,
             )
             for (chrom, pos), pileup in bam_indexes[sample].items():
-                distance = nearest_distance(non_snp_positions[sample].get(chrom, []), pos)
+                distance = nearest_distance(
+                    non_snp_positions[sample].get(chrom, []), pos
+                )
                 pileup["nearest_indel_distance"] = "" if distance is None else distance
 
     prefix = args.output_prefix
@@ -743,23 +800,46 @@ def main() -> int:
     variants_path = prefix.with_name(prefix.name + "_variants.tsv")
 
     pair_columns = [
-        "pair_id", "sample_1", "sample_2", "snp_distance",
-        "comparable_core_sites", "ignored_non_acgt_sites",
-        "core_tab_matrix_distance", "core_tab_matrix_matches",
-        "phylo_aln_distance", "phylo_matches_core_tab",
-        "clean_core_aln_distance", "snps_removed_by_gubbins",
-        "clean_distance_valid", "distance_comparison_warnings",
+        "pair_id",
+        "sample_1",
+        "sample_2",
+        "snp_distance",
+        "comparable_core_sites",
+        "ignored_non_acgt_sites",
+        "core_tab_matrix_distance",
+        "core_tab_matrix_matches",
+        "phylo_aln_distance",
+        "phylo_matches_core_tab",
+        "clean_core_aln_distance",
+        "snps_removed_by_gubbins",
+        "clean_distance_valid",
+        "distance_comparison_warnings",
     ]
     with pairs_path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=pair_columns, delimiter="\t")
         writer.writeheader()
         for number, pair in enumerate(pairs, 1):
-            writer.writerow({"pair_id": f"pair_{number:04d}", **{k: pair[k] for k in pair_columns[1:]}})
+            writer.writerow(
+                {
+                    "pair_id": f"pair_{number:04d}",
+                    **{k: pair[k] for k in pair_columns[1:]},
+                }
+            )
 
     base_columns = [
-        "pair_id", "sample_1", "sample_2", "snp_distance", "chrom", "pos",
-        "core_ref", "sample_1_call", "sample_2_call", "pair_local_snp_count",
-        "pair_clustered_snp", "removed_by_gubbins", "qc_warnings",
+        "pair_id",
+        "sample_1",
+        "sample_2",
+        "snp_distance",
+        "chrom",
+        "pos",
+        "core_ref",
+        "sample_1_call",
+        "sample_2_call",
+        "pair_local_snp_count",
+        "pair_clustered_snp",
+        "removed_by_gubbins",
+        "qc_warnings",
     ]
     evidence_output = []
     for n in (1, 2):
@@ -770,7 +850,9 @@ def main() -> int:
         )
     qc_warnings: dict[tuple[str, str, int, str], tuple[str, str]] = {}
     with variants_path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=base_columns + evidence_output, delimiter="\t")
+        writer = csv.DictWriter(
+            handle, fieldnames=base_columns + evidence_output, delimiter="\t"
+        )
         writer.writeheader()
         for number, pair in enumerate(pairs, 1):
             for chrom, pos, ref, call_1, call_2 in pair["differences"]:
@@ -780,11 +862,18 @@ def main() -> int:
                 )
                 row = {
                     "pair_id": f"pair_{number:04d}",
-                    "sample_1": pair["sample_1"], "sample_2": pair["sample_2"],
-                    "snp_distance": pair["snp_distance"], "chrom": chrom, "pos": pos,
-                    "core_ref": ref, "sample_1_call": call_1, "sample_2_call": call_2,
+                    "sample_1": pair["sample_1"],
+                    "sample_2": pair["sample_2"],
+                    "snp_distance": pair["snp_distance"],
+                    "chrom": chrom,
+                    "pos": pos,
+                    "core_ref": ref,
+                    "sample_1_call": call_1,
+                    "sample_2_call": call_2,
                     "pair_local_snp_count": local_snp_count,
-                    "pair_clustered_snp": "yes" if local_snp_count >= args.cluster_min_snps else "no",
+                    "pair_clustered_snp": (
+                        "yes" if local_snp_count >= args.cluster_min_snps else "no"
+                    ),
                     "removed_by_gubbins": (
                         "yes" if position_in_intervals(pos, gubbins_intervals) else "no"
                     ),
@@ -804,15 +893,26 @@ def main() -> int:
                 for n, call, other_call in ((1, call_1, call_2), (2, call_2, call_1)):
                     sample = pair[f"sample_{n}"]
                     status, evidence = evidence_for(
-                        vcf_indexes[sample], bam_indexes[sample], chrom, pos, ref,
-                        call, other_call,
+                        vcf_indexes[sample],
+                        bam_indexes[sample],
+                        chrom,
+                        pos,
+                        ref,
+                        call,
+                        other_call,
                     )
                     row[f"sample_{n}_evidence_status"] = status
-                    row.update({f"sample_{n}_{key}": value for key, value in evidence.items()})
+                    row.update(
+                        {f"sample_{n}_{key}": value for key, value in evidence.items()}
+                    )
                     add_fractions(row, f"sample_{n}")
                     sample_warnings = collect_qc_warnings(
-                        row, n, args.warn_min_depth, args.warn_min_called_fraction,
-                        args.warn_min_strand_fraction, args.warn_indel_distance,
+                        row,
+                        n,
+                        args.warn_min_depth,
+                        args.warn_min_called_fraction,
+                        args.warn_min_strand_fraction,
+                        args.warn_indel_distance,
                         args.warn_homopolymer_run,
                     )
                     for warning_type, message in sample_warnings:
@@ -838,7 +938,9 @@ def main() -> int:
     for warning_type, _ in qc_warnings.values():
         warning_counts[warning_type] = warning_counts.get(warning_type, 0) + 1
     if warning_counts:
-        summary = ", ".join(f"{key}={value}" for key, value in sorted(warning_counts.items()))
+        summary = ", ".join(
+            f"{key}={value}" for key, value in sorted(warning_counts.items())
+        )
         print(f"Unique QC warnings: {summary}")
     else:
         print("Unique QC warnings: none")
