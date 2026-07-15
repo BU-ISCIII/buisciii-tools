@@ -332,14 +332,22 @@ def read_amrfinder_results(directory):
 
             # AMRFinderPlus renamed these fields in recent releases.
             gene_column = next(
-                (column for column in ("Element symbol", "Gene symbol") if column in df.columns),
+                (
+                    column
+                    for column in ("Element symbol", "Gene symbol")
+                    if column in df.columns
+                ),
                 None,
             )
             if gene_column:
                 # The output can also contain virulence/stress hits; only AMR
                 # elements belong in the resistance summary.
                 type_column = next(
-                    (column for column in ("Type", "Element type") if column in df.columns),
+                    (
+                        column
+                        for column in ("Type", "Element type")
+                        if column in df.columns
+                    ),
                     None,
                 )
                 if type_column:
@@ -590,7 +598,9 @@ def read_fasta_alignment(file_path):
                     sequences.append("".join(current_sequence).upper())
                 current_name = line[1:].split()[0]
                 if not current_name:
-                    raise ValueError(f"Empty FASTA identifier at {file_path}:{line_number}")
+                    raise ValueError(
+                        f"Empty FASTA identifier at {file_path}:{line_number}"
+                    )
                 current_sequence = []
             else:
                 if current_name is None:
@@ -669,8 +679,12 @@ def read_snippy_mapping_reference(commands_file):
             ]
         else:
             candidates = [
-                os.path.normpath(os.path.join(os.path.dirname(commands_file), reference)),
-                os.path.normpath(os.path.join("../REFERENCES", os.path.basename(reference))),
+                os.path.normpath(
+                    os.path.join(os.path.dirname(commands_file), reference)
+                ),
+                os.path.normpath(
+                    os.path.join("../REFERENCES", os.path.basename(reference))
+                ),
             ]
         resolved = next((path for path in candidates if os.path.isfile(path)), None)
         resolved_files.append(resolved or reference)
@@ -702,7 +716,10 @@ def calculate_pairwise_nucleotide_differences(sequences, chunk_size=100000):
     independently for each pair.
     """
     sequence_array = np.vstack(
-        [np.frombuffer(sequence.encode("ascii"), dtype=np.uint8) for sequence in sequences]
+        [
+            np.frombuffer(sequence.encode("ascii"), dtype=np.uint8)
+            for sequence in sequences
+        ]
     )
     sequence_count, alignment_length = sequence_array.shape
     differences = np.zeros((sequence_count, sequence_count), dtype=np.int64)
@@ -1048,10 +1065,7 @@ def apply_homogeneous_formatting(wb):
         # Determine the real populated range rather than using template-only
         # formatting, which can extend hundreds of blank rows.
         populated_cells = [
-            cell
-            for row in ws.iter_rows()
-            for cell in row
-            if cell.value is not None
+            cell for row in ws.iter_rows() for cell in row if cell.value is not None
         ]
         if populated_cells:
             last_row = max(cell.row for cell in populated_cells)
