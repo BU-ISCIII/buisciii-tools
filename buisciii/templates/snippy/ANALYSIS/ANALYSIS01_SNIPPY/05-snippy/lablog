@@ -15,7 +15,7 @@ cat ../samples_id.txt | while read in; do echo -e "${in}\t${scratch_dir}/../02-p
 
 ## If you are going to include .fasta files in the analysis, run the following line. Run the previous line as well if you also have .fastq.gz files for your analysis.
 ## Bear in mind this line considers the .fasta files are inside a certain folder from REFERENCES! Change this line accordingly.
-## ls ../../../REFERENCES/*/*.fasta | cut -d '/' -f6 | sed 's/.fasta//g' | while read in; do paste <(echo ${in}) <(echo ${scratch_dir}/../../../REFERENCES/*/${in}.fasta); done >> input.tab
+ls ../../../REFERENCES/*/*.fasta | cut -d '/' -f6 | sed 's/.fasta//g' | while read in; do paste <(echo ${in}) <(echo ${scratch_dir}/../../../REFERENCES/*/${in}.fasta); done >> input.tab
 
 ls ../../../REFERENCES/*.fna | xargs -I %%  snippy-multi ${scratch_dir}/input.tab --mincov 10 --mapqual 10 --basequal 5 --minqual 30 --ref %% --cpus 5 > commands.out
 
@@ -55,3 +55,49 @@ echo "snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln" >>
 
 ## Run gubbins
 echo "srun --chdir ${scratch_dir} --output logs/GUBBINS.%j.log --job-name GUBBINS --cpus-per-task 20 --mem 49152 --partition short_idx --time 02:00:00 bash _03_gubbins.sh &" > _03_run_gubbins.sh
+
+# BLOCK 6: CHECK SNP DIFFERENCES AND POSSIBLE CALLING ERRORS
+
+## Run after the Snippy, phylo.aln, and Gubbins/clean.core.aln steps are complete.
+## The QC script calculates pairwise
+## distances directly from core.tab, so the Excel distance matrix is not needed.
+## It selects pairs with fewer than 20 SNP differences, reads ALT evidence from
+## each sample's VCF, and uses samtools mpileup on snps.bam for REF evidence.
+## Activate an environment containing samtools before running it (the Snippy
+## environment should normally provide it).
+#
+## First generate the reusable distance matrices. These files are also consumed
+## by RESULTS/generate_summary_outbreak.py, which does not recalculate distances.
+echo "python3 generate_snp_distance_matrices.py ." > _04_snp_distance_matrices.sh
+
+## Run the SNP-distance matrix generation script.
+echo "srun --chdir ${scratch_dir} --output logs/SNP_DISTANCE_MATRICES.%j.log --job-name SNP_DISTANCES --cpus-per-task 1 --mem 8192 --partition short_idx --time 02:00:00 bash _04_snp_distance_matrices.sh &" > _04_run_snp_distance_matrices.sh
+#
+# python3 evaluate_close_pairs.py . \
+#   --threshold 20 \
+#   --warn-min-depth 10 \
+#   --warn-min-called-fraction 0.90 \
+#   --warn-min-strand-fraction 0.10 \
+#   --warn-indel-distance 5 \
+#   --warn-homopolymer-run 5 \
+#   --cluster-window 100 \
+#   --cluster-min-snps 3 \
+#   --no-qc-warnings \
+#   --output-prefix close_pair_snp_qc
+#
+## Output files:
+##   core_tab_snp_distances.tsv     distances calculated directly from core.tab
+##   phylo_snp_distances.tsv        distances calculated from phylo.aln
+##   clean_core_snp_distances.tsv    distances calculated from clean.core.aln
+##   snp_distance_matrices_metadata.json sources, sample counts, and site counts
+##   close_pair_snp_qc_pairs.tsv    close pairs and their SNP distances
+##   close_pair_snp_qc_variants.tsv differing positions, read evidence, and a
+##                                    semicolon-separated qc_warnings column
+##
+## Possible qc_warnings values include low_depth, low_called_fraction,
+## strand_bias, near_indel_or_complex, homopolymer_context, local_snp_cluster,
+## missing_depth, missing_called_fraction, and missing_evidence.
+## --no-qc-warnings suppresses the long per-position stdout list; warning totals
+## are still printed, and all row-level warnings remain in the variants TSV.
+## In the variants TSV, filter removed_by_gubbins=yes or qc_warnings containing
+## gubbins_removed to inspect individual differences removed from clean.core.aln.
