@@ -1,7 +1,12 @@
 import os
 import glob
+import re
+import shlex
+import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
+from openpyxl.styles import Alignment, Border, Font, PatternFill
+from openpyxl.utils import get_column_letter
 
 # ------------------------------------------------------
 # File Paths
@@ -11,7 +16,7 @@ from openpyxl import load_workbook
 xlsx_template = "summary_outbreak_template.xlsx"
 samples_file = "../ANALYSIS/samples_id.txt"
 tsv_file = glob.glob("../ANALYSIS/*_CHARACTERIZATION/99-stats/ariba_mlst_full.tsv")
-csv_file = glob.glob("../ANALYSIS/*_ASSEMBLY/Kmerfinder/kmerfinder_summary.csv")
+csv_file = glob.glob("../ANALYSIS/*_ASSEMBLY/99-stats/kmerfinder_summary.csv")
 mapping_file = glob.glob("../ANALYSIS/*_SNIPPY/99-stats/mapping_stats_summary.txt")
 wgs_metrics_file = glob.glob(
     "../ANALYSIS/*_SNIPPY/99-stats/wgs_metrics_all_filtered.txt"
@@ -32,10 +37,33 @@ plasmid_file = glob.glob(
 mlva_file = glob.glob(
     "../ANALYSIS/*_CHARACTERIZATION/05-mlva/MLVA_output/MLVA_analysis_assemblies.csv"
 )
+phylo_alignment_file = glob.glob("../ANALYSIS/*_SNIPPY/05-snippy/phylo.aln")
+nonrecombinant_alignment_file = glob.glob(
+    "../ANALYSIS/*_SNIPPY/05-snippy/clean.core.aln"
+)
+snippy_commands_file = glob.glob("../ANALYSIS/*_SNIPPY/05-snippy/commands.out")
 
 
 def get_first_match(file_list):
     return file_list[0] if file_list else None
+
+
+def normalize_sample_id(sample_id):
+    """Return the sample identifier used in ``samples_id.txt``.
+
+    Analysis programs add pipeline-specific suffixes to the sample name.  Keeping
+    the normalization in one place prevents otherwise valid results from being
+    skipped when they are matched to workbook rows.
+    """
+    sample_id = os.path.basename(str(sample_id).strip())
+    sample_id = re.sub(
+        r"(?:-unicycler)?\.scaffolds(?:\.(?:fa|fasta|fna)(?:\.gz)?)?$",
+        "",
+        sample_id,
+        flags=re.IGNORECASE,
+    )
+    sample_id = re.sub(r"_S$", "", sample_id, flags=re.IGNORECASE)
+    return sample_id
 
 
 tsv_file = get_first_match(tsv_file)
@@ -50,6 +78,9 @@ card_file = get_first_match(card_file)
 amrfinder_dir = get_first_match(amrfinder_dir)
 plasmid_file = get_first_match(plasmid_file)
 mlva_file = get_first_match(mlva_file)
+phylo_alignment_file = get_first_match(phylo_alignment_file)
+nonrecombinant_alignment_file = get_first_match(nonrecombinant_alignment_file)
+snippy_commands_file = get_first_match(snippy_commands_file)
 
 # ------------------------------------------------------
 # File Reading Functions
@@ -69,7 +100,7 @@ def read_samples(file_path):
     samples = {}
     with open(file_path, "r") as f:
         for index, line in enumerate(f, start=3):  # Start at row 3 in Excel
-            sample_id = line.strip()
+            sample_id = normalize_sample_id(line)
             samples[sample_id] = index
     return samples
 
@@ -124,7 +155,7 @@ def read_kmerfinder(csv_file):
                 raise KeyError(f"Missing expected column: {col}")
 
         return {
-            str(row["sample_name"]): {
+            normalize_sample_id(row["sample_name"]): {
                 "colE": row.iloc[1],
                 "colF": row.iloc[2],
                 "colG": row.iloc[4],
@@ -292,17 +323,30 @@ def read_amrfinder_results(directory):
     """
     resistance_dict = {}
 
-    for filename in os.listdir(directory):
+    for filename in sorted(os.listdir(directory)):
         if filename.endswith("_out.tsv"):
-            sample_id = filename.replace("_out.tsv", "")
+            sample_id = normalize_sample_id(filename.replace("_out.tsv", ""))
             file_path = os.path.join(directory, filename)
 
-            df = pd.read_csv(file_path, sep="\t")
+            df = pd.read_csv(file_path, sep="\t", keep_default_na=False)
 
-            # Check if required columns exist
-            if "Name" in df.columns and "Gene symbol" in df.columns:
-                # Extract unique resistance genes
-                filtered_genes = df["Gene symbol"].dropna().astype(str).unique()
+            # AMRFinderPlus renamed these fields in recent releases.
+            gene_column = next(
+                (column for column in ("Element symbol", "Gene symbol") if column in df.columns),
+                None,
+            )
+            if gene_column:
+                # The output can also contain virulence/stress hits; only AMR
+                # elements belong in the resistance summary.
+                type_column = next(
+                    (column for column in ("Type", "Element type") if column in df.columns),
+                    None,
+                )
+                if type_column:
+                    df = df[df[type_column].astype(str).str.upper() == "AMR"]
+                filtered_genes = (
+                    df[gene_column].replace("", pd.NA).dropna().astype(str).unique()
+                )
                 gene_list = ", ".join(filtered_genes)
                 resistance_dict[sample_id] = gene_list
 
@@ -321,23 +365,26 @@ def read_amrfinderplus_resistance(directory):
     """
     amr_data = {}
 
-    for filename in os.listdir(directory):
+    for filename in sorted(os.listdir(directory)):
         if filename.endswith("_out.tsv"):
-            sample_id = filename.replace("_out.tsv", "")
+            sample_id = normalize_sample_id(filename.replace("_out.tsv", ""))
             file_path = os.path.join(directory, filename)
 
-            df = pd.read_csv(file_path, sep="\t")
+            df = pd.read_csv(file_path, sep="\t", keep_default_na=False)
 
             # Remove unnecessary columns
             columns_to_remove = [
                 "Name",
+                "Protein id",
                 "Protein identifier",
+                "HMM accession",
                 "HMM id",
                 "HMM description",
             ]
             df_filtered = df.drop(
                 columns=[col for col in columns_to_remove if col in df.columns]
             )
+            df_filtered = df_filtered.where(pd.notna(df_filtered), None)
 
             # Store the filtered DataFrame in the dictionary
             amr_data[sample_id] = df_filtered
@@ -400,7 +447,7 @@ def read_quast_report(quast_file):
                 raise KeyError(f"Missing required column: {col}")
 
         df_quast = df_quast.copy()
-        df_quast.loc[:, "Sample"] = df_quast["Assembly"].str.replace(".scaffolds", "")
+        df_quast.loc[:, "Sample"] = df_quast["Assembly"].map(normalize_sample_id)
 
         return df_quast.set_index("Sample")[required_columns].to_dict(orient="index")
     except Exception as e:
@@ -446,9 +493,7 @@ def read_quast_per_reference(directory):
                             )
 
                     # Limpiar el nombre de la muestra eliminando `.scaffolds`
-                    df["Sample"] = df["Assembly"].str.replace(
-                        ".scaffolds", "", regex=False
-                    )
+                    df["Sample"] = df["Assembly"].map(normalize_sample_id)
 
                     # Crear diccionario de resultados
                     for _, row in df.iterrows():
@@ -525,6 +570,157 @@ def read_mlva_results(mlva_file):
     except Exception as e:
         print(f"Error reading MLVA file: {e}")
         return [], {}
+
+
+def read_fasta_alignment(file_path):
+    """Read an aligned FASTA file while preserving its sequence order."""
+    names = []
+    sequences = []
+    current_name = None
+    current_sequence = []
+
+    with open(file_path, "r") as alignment:
+        for line_number, raw_line in enumerate(alignment, start=1):
+            line = raw_line.strip()
+            if not line:
+                continue
+            if line.startswith(">"):
+                if current_name is not None:
+                    names.append(current_name)
+                    sequences.append("".join(current_sequence).upper())
+                current_name = line[1:].split()[0]
+                if not current_name:
+                    raise ValueError(f"Empty FASTA identifier at {file_path}:{line_number}")
+                current_sequence = []
+            else:
+                if current_name is None:
+                    raise ValueError(
+                        f"Sequence data before the first FASTA header at "
+                        f"{file_path}:{line_number}"
+                    )
+                current_sequence.append(line)
+
+    if current_name is not None:
+        names.append(current_name)
+        sequences.append("".join(current_sequence).upper())
+
+    if not names:
+        raise ValueError(f"No sequences found in alignment: {file_path}")
+    if len(names) != len(set(names)):
+        raise ValueError(f"Duplicate sequence identifiers in alignment: {file_path}")
+
+    lengths = {len(sequence) for sequence in sequences}
+    if len(lengths) != 1:
+        raise ValueError(
+            f"Sequences have different lengths in alignment {file_path}: "
+            f"{sorted(lengths)}"
+        )
+
+    return names, sequences
+
+
+def read_snippy_mapping_reference(commands_file):
+    """Read the actual ``--ref`` used by the generated Snippy commands.
+
+    The lablog supplies a wildcard placeholder to ``snippy-multi``; commands.out
+    is therefore the authoritative record of the reference used for every run.
+    """
+    result = {
+        "commands_file": commands_file or "Not found",
+        "references": [],
+        "display": "Not detected",
+        "notes": "Snippy commands.out was not found.",
+    }
+    if not commands_file:
+        return result
+
+    references = []
+    with open(commands_file, "r") as commands:
+        for line in commands:
+            try:
+                tokens = shlex.split(line)
+            except ValueError:
+                continue
+            if not tokens or os.path.basename(tokens[0]) != "snippy":
+                continue
+            for index, token in enumerate(tokens):
+                if token == "--ref" and index + 1 < len(tokens):
+                    references.append(tokens[index + 1])
+                elif token.startswith("--ref="):
+                    references.append(token.split("=", 1)[1])
+
+    references = list(dict.fromkeys(references))
+    result["references"] = references
+    if not references:
+        result["notes"] = f"No --ref argument found in {commands_file}."
+        return result
+
+    descriptions = []
+    resolved_files = []
+    for reference in references:
+        if os.path.isabs(reference):
+            candidates = [
+                reference,
+                re.sub(
+                    r"^/scratch/",
+                    "/data/ucct/bi/scratch_tmp/",
+                    reference,
+                ),
+            ]
+        else:
+            candidates = [
+                os.path.normpath(os.path.join(os.path.dirname(commands_file), reference)),
+                os.path.normpath(os.path.join("../REFERENCES", os.path.basename(reference))),
+            ]
+        resolved = next((path for path in candidates if os.path.isfile(path)), None)
+        resolved_files.append(resolved or reference)
+
+        fasta_header = ""
+        if resolved:
+            with open(resolved, "r") as fasta:
+                for line in fasta:
+                    if line.startswith(">"):
+                        fasta_header = line[1:].strip()
+                        break
+        descriptions.append(fasta_header or os.path.basename(reference))
+
+    result["display"] = "; ".join(descriptions)
+    result["notes"] = (
+        f"Reference file(s): {', '.join(resolved_files)}. "
+        f"Detected from --ref in {commands_file}."
+    )
+    if len(references) > 1:
+        result["notes"] += " Warning: multiple distinct references were detected."
+    return result
+
+
+def calculate_pairwise_nucleotide_differences(sequences, chunk_size=100000):
+    """Calculate MEGA-style absolute differences with pairwise deletion.
+
+    A position is compared for a pair only when both sequences contain an
+    unambiguous A, C, G, or T. Gaps, Ns, and other ambiguity codes are excluded
+    independently for each pair.
+    """
+    sequence_array = np.vstack(
+        [np.frombuffer(sequence.encode("ascii"), dtype=np.uint8) for sequence in sequences]
+    )
+    sequence_count, alignment_length = sequence_array.shape
+    differences = np.zeros((sequence_count, sequence_count), dtype=np.int64)
+    valid_bases = np.frombuffer(b"ACGT", dtype=np.uint8)
+
+    # Work in position chunks so whole-genome alignments do not require large
+    # temporary arrays for every pair.
+    for start in range(0, alignment_length, chunk_size):
+        block = sequence_array[:, start : start + chunk_size]
+        valid = np.isin(block, valid_bases)
+        for first in range(sequence_count - 1):
+            pair_valid = valid[first + 1 :] & valid[first]
+            pair_differences = (block[first + 1 :] != block[first]) & pair_valid
+            counts = np.count_nonzero(pair_differences, axis=1)
+            differences[first, first + 1 :] += counts
+
+    differences += differences.T
+    return differences
 
 
 # ------------------------------------------------------
@@ -639,9 +835,9 @@ def add_quast_stats(ws, samples, quast_dict):
     """
     try:
         for sample, row_num in samples.items():
-            sample_without_scaffolds = sample.replace(".scaffolds", "")
-            if sample_without_scaffolds in quast_dict:
-                quast_stats = quast_dict[sample_without_scaffolds]
+            normalized_sample = normalize_sample_id(sample)
+            if normalized_sample in quast_dict:
+                quast_stats = quast_dict[normalized_sample]
                 ws[f"L{row_num}"] = quast_stats.get("# contigs (>= 1000 bp)", "NA")
                 ws[f"N{row_num}"] = quast_stats.get("GC (%)", "NA")
                 ws[f"P{row_num}"] = quast_stats.get("L50", "NA")
@@ -780,13 +976,192 @@ def add_mlva_results(ws, mlva_headers, mlva_dict):
     mlva_dict (dict): Dictionary containing MLVA results per sample.
     """
     try:
-        ws.append(["Sample ID"] + mlva_headers)
+        for column, header in enumerate(["Sample ID"] + mlva_headers, start=1):
+            ws.cell(1, column, header)
 
-        for sample_id, values in mlva_dict.items():
-            ws.append([sample_id] + values)
+        for row_number, (sample_id, values) in enumerate(mlva_dict.items(), start=2):
+            for column, value in enumerate([sample_id] + values, start=1):
+                ws.cell(row_number, column, value)
 
     except Exception as e:
         print(f"Error adding MLVA results to xlsx: {e}")
+
+
+def reset_worksheet(wb, sheet_name):
+    """Clear a template worksheet while retaining its name and position."""
+    if sheet_name not in wb.sheetnames:
+        raise KeyError(f"Missing worksheet in template: {sheet_name}")
+    index = wb.sheetnames.index(sheet_name)
+    wb.remove(wb[sheet_name])
+    return wb.create_sheet(sheet_name, index)
+
+
+def add_readme_sheet(wb, entries):
+    """Populate the first worksheet with descriptions and data provenance."""
+    ws = reset_worksheet(wb, "README")
+    headers = [
+        "Sheet",
+        "Description",
+        "Source",
+        "Included samples/sequences",
+        "Alignment sites",
+        "Notes",
+    ]
+    header_fill = PatternFill("solid", fgColor="D9EAF7")
+    for column, header in enumerate(headers, start=1):
+        cell = ws.cell(1, column, header)
+        cell.font = Font(bold=True)
+        cell.fill = header_fill
+        cell.alignment = Alignment(wrap_text=True, vertical="top")
+
+    for row_number, entry in enumerate(entries, start=2):
+        values = [
+            entry.get("sheet"),
+            entry.get("description"),
+            entry.get("source"),
+            entry.get("count"),
+            entry.get("sites"),
+            entry.get("notes"),
+        ]
+        for column, value in enumerate(values, start=1):
+            ws.cell(row_number, column, value)
+            ws.cell(row_number, column).alignment = Alignment(
+                wrap_text=True, vertical="top"
+            )
+
+    widths = [30, 55, 42, 26, 18, 55]
+    for column, width in enumerate(widths, start=1):
+        ws.column_dimensions[get_column_letter(column)].width = width
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = f"A1:F{len(entries) + 1}"
+
+
+def apply_homogeneous_formatting(wb):
+    """Apply a consistent borderless, filterable layout to every worksheet."""
+    header_fill = PatternFill("solid", fgColor="4472C4")
+    header_font = Font(bold=True, color="FFFFFF")
+    no_border = Border()
+
+    for ws in wb.worksheets:
+        header_row = 2 if ws.title == "summary" else 1
+
+        # Determine the real populated range rather than using template-only
+        # formatting, which can extend hundreds of blank rows.
+        populated_cells = [
+            cell
+            for row in ws.iter_rows()
+            for cell in row
+            if cell.value is not None
+        ]
+        if populated_cells:
+            last_row = max(cell.row for cell in populated_cells)
+            last_column = max(cell.column for cell in populated_cells)
+        else:
+            last_row = header_row
+            last_column = 1
+
+        # Remove borders from every instantiated template cell as well as all
+        # newly populated cells.
+        for row in ws.iter_rows():
+            for cell in row:
+                cell.border = no_border
+
+        style_rows = (1, 2) if ws.title == "summary" else (header_row,)
+        for row_number in style_rows:
+            for column in range(1, last_column + 1):
+                cell = ws.cell(row_number, column)
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.alignment = Alignment(
+                    horizontal="center", vertical="center", wrap_text=True
+                )
+
+        ws.freeze_panes = f"B{header_row + 1}"
+        header_has_values = any(
+            ws.cell(header_row, column).value is not None
+            for column in range(1, last_column + 1)
+        )
+        if header_has_values:
+            ws.auto_filter.ref = (
+                f"A{header_row}:{get_column_letter(last_column)}{last_row}"
+            )
+        else:
+            ws.auto_filter.ref = None
+
+
+def add_snp_distance_sheets(
+    wb,
+    samples,
+    alignment_file,
+    matrix_sheet,
+    pairs_sheet,
+    description,
+):
+    """Create a symmetric distance matrix and a three-column pair table."""
+    ws_matrix = reset_worksheet(wb, matrix_sheet)
+    ws_pairs = reset_worksheet(wb, pairs_sheet)
+
+    if not alignment_file:
+        print(f"Warning: alignment not found for {description}")
+        return {
+            "source": "Not found",
+            "count": 0,
+            "sites": 0,
+            "missing": sorted(samples),
+        }
+
+    names, sequences = read_fasta_alignment(alignment_file)
+    distances = calculate_pairwise_nucleotide_differences(sequences)
+    present_samples = {normalize_sample_id(name) for name in names}
+    missing_samples = sorted(set(samples) - present_samples)
+    site_count = len(sequences[0])
+
+    header_fill = PatternFill("solid", fgColor="D9EAF7")
+    table_row = 1
+    ws_matrix.cell(table_row, 1, "Sample")
+    for column, name in enumerate(names, start=2):
+        ws_matrix.cell(table_row, column, name)
+    for row, name in enumerate(names, start=table_row + 1):
+        ws_matrix.cell(row, 1, name)
+        for column, value in enumerate(distances[row - table_row - 1], start=2):
+            ws_matrix.cell(row, column, int(value))
+    for cell in ws_matrix[table_row]:
+        cell.font = Font(bold=True)
+        cell.fill = header_fill
+        cell.alignment = Alignment(text_rotation=90 if cell.column > 1 else 0)
+    for row in range(table_row + 1, table_row + 1 + len(names)):
+        ws_matrix.cell(row, 1).font = Font(bold=True)
+    ws_matrix.freeze_panes = "B2"
+    ws_matrix.column_dimensions["A"].width = 28
+    for column in range(2, len(names) + 2):
+        # Leave enough room for five-digit distances without requiring users
+        # to resize every matrix column manually in Excel.
+        ws_matrix.column_dimensions[get_column_letter(column)].width = 12
+
+    pair_headers = ["Sample 1", "Sample 2", "Nucleotide differences"]
+    for column, header in enumerate(pair_headers, start=1):
+        cell = ws_pairs.cell(table_row, column, header)
+        cell.font = Font(bold=True)
+        cell.fill = header_fill
+    pair_row = table_row + 1
+    for first in range(len(names) - 1):
+        for second in range(first + 1, len(names)):
+            ws_pairs.cell(pair_row, 1, names[first])
+            ws_pairs.cell(pair_row, 2, names[second])
+            ws_pairs.cell(pair_row, 3, int(distances[first, second]))
+            pair_row += 1
+    ws_pairs.freeze_panes = "A2"
+    ws_pairs.auto_filter.ref = f"A{table_row}:C{pair_row - 1}"
+    ws_pairs.column_dimensions["A"].width = 28
+    ws_pairs.column_dimensions["B"].width = 28
+    ws_pairs.column_dimensions["C"].width = 23
+
+    return {
+        "source": alignment_file,
+        "count": len(names),
+        "sites": site_count,
+        "missing": missing_samples,
+    }
 
 
 # ------------------------------------------------------
@@ -814,6 +1189,7 @@ def main():
     )
     plasmid_data = read_plasmid_data(plasmid_file) if plasmid_file else pd.DataFrame()
     mlva_headers, mlva_dict = read_mlva_results(mlva_file) if mlva_file else ([], {})
+    mapping_reference = read_snippy_mapping_reference(snippy_commands_file)
 
     wb = load_workbook(xlsx_template)
 
@@ -823,6 +1199,11 @@ def main():
     ws_resistance = wb["Resistance result"]
     ws_mlva = wb["MLVA"]
     ws_amrfinder_resistance = wb["AMRFinderPlus Resistance result"]
+
+    if mapping_reference["display"] == "Not detected":
+        ws_summary["H1"] = "MAPPING: reference not detected"
+    else:
+        ws_summary["H1"] = f"MAPPING: {mapping_reference['display']}"
 
     add_samples(ws_summary, samples)
     add_ariba_mlst_stats(ws_summary, samples, mlst_dict, mlst_header)
@@ -836,11 +1217,130 @@ def main():
     add_amrfinder_results(ws_resistance, samples, amrfinder_dict)
     add_amrfinderplus_resistance(ws_amrfinder_resistance, samples, amr_resistance_data)
 
+    core_all_sites = add_snp_distance_sheets(
+        wb,
+        samples,
+        phylo_alignment_file,
+        "SNP core all sites",
+        "SNP core all sites pairs",
+        "Core-genome invariant and variable positions called in all included sequences",
+    )
+    variable_no_recomb = add_snp_distance_sheets(
+        wb,
+        samples,
+        nonrecombinant_alignment_file,
+        "SNP variable no recomb",
+        "SNP variable no recomb pairs",
+        "Variable positions after removal of recombinant regions",
+    )
+
     if not plasmid_data.empty:
         add_plasmid_data(ws_plasmids, plasmid_data)
 
     if mlva_headers and mlva_dict:
         add_mlva_results(ws_mlva, mlva_headers, mlva_dict)
+    else:
+        ws_mlva["A1"] = "Sample ID"
+
+    distance_method = (
+        "Absolute nucleotide differences with pairwise deletion; only A/C/G/T "
+        "positions are compared, and gaps or ambiguous bases are excluded per pair."
+    )
+
+    def distance_notes(metadata):
+        missing = metadata.get("missing", [])
+        missing_note = (
+            f" Absent outbreak samples: {', '.join(missing)}."
+            if missing
+            else " All outbreak samples are present."
+        )
+        return distance_method + missing_note
+
+    plasmid_count = (
+        plasmid_data["Sample"].astype(str).nunique()
+        if not plasmid_data.empty and "Sample" in plasmid_data.columns
+        else 0
+    )
+    readme_entries = [
+        {
+            "sheet": "README",
+            "description": "Workbook contents, sources, counts, and calculation notes.",
+        },
+        {
+            "sheet": "summary",
+            "description": "Per-sample typing, taxonomy, mapping, variants, and assembly statistics.",
+            "source": f"Analysis summary files; {mapping_reference['commands_file']}",
+            "count": len(samples),
+            "notes": (
+                f"Snippy mapping reference: {mapping_reference['display']}. "
+                f"{mapping_reference['notes']}"
+            ),
+        },
+        {
+            "sheet": "SNP core all sites",
+            "description": "Symmetric SNP-distance matrix across invariant and variable core-genome positions called in all included sequences.",
+            "source": core_all_sites["source"],
+            "count": core_all_sites["count"],
+            "sites": core_all_sites["sites"],
+            "notes": distance_notes(core_all_sites),
+        },
+        {
+            "sheet": "SNP core all sites pairs",
+            "description": "Long-format pair list corresponding to the SNP core all sites matrix.",
+            "source": core_all_sites["source"],
+            "count": core_all_sites["count"],
+            "sites": core_all_sites["sites"],
+            "notes": distance_notes(core_all_sites),
+        },
+        {
+            "sheet": "SNP variable no recomb",
+            "description": "Symmetric SNP-distance matrix across variable positions after recombinant regions were removed.",
+            "source": variable_no_recomb["source"],
+            "count": variable_no_recomb["count"],
+            "sites": variable_no_recomb["sites"],
+            "notes": distance_notes(variable_no_recomb),
+        },
+        {
+            "sheet": "SNP variable no recomb pairs",
+            "description": "Long-format pair list corresponding to the variable non-recombinant matrix.",
+            "source": variable_no_recomb["source"],
+            "count": variable_no_recomb["count"],
+            "sites": variable_no_recomb["sites"],
+            "notes": distance_notes(variable_no_recomb),
+        },
+        {
+            "sheet": "plasmids",
+            "description": "Per-sample PlasmidID matches.",
+            "source": plasmid_file or "Not found",
+            "count": plasmid_count,
+        },
+        {
+            "sheet": "virulence",
+            "description": "Per-sample virulence genes detected with ARIBA/VFDB.",
+            "source": virulence_file or "Not found",
+            "count": len(virulence_dict),
+        },
+        {
+            "sheet": "Resistance result",
+            "description": "Per-sample antimicrobial-resistance gene summary from CARD and AMRFinderPlus.",
+            "source": "ARIBA/CARD and AMRFinderPlus",
+            "count": len(set(resistance_dic) | set(amrfinder_dict)),
+        },
+        {
+            "sheet": "AMRFinderPlus Resistance result",
+            "description": "Detailed AMRFinderPlus element calls.",
+            "source": amrfinder_dir or "Not found",
+            "count": len(amr_resistance_data),
+        },
+        {
+            "sheet": "MLVA",
+            "description": "Multiple-locus variable-number tandem-repeat analysis results.",
+            "source": mlva_file or "Not found",
+            "count": len(mlva_dict),
+        },
+    ]
+    add_readme_sheet(wb, readme_entries)
+    apply_homogeneous_formatting(wb)
 
     output_xlsx = "summary_outbreak_filled.xlsx"
     wb.save(output_xlsx)
