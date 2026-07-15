@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated iGenomes paths [#710](https://github.com/BU-ISCIII/buisciii-tools/pull/710)
 - Updated the assembly template to skip busco and some paths in correspondence to refgenie system [#711](https://github.com/BU-ISCIII/buisciii-tools/pull/711)
 - Updated assembly template to nf-core/bacass 2.6.1 and restored BUSCO execution with matching config changes [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Fixed conditional trimmed-read output and corrected MultiQC result paths in the assembly template [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Added Bacass numeric sample ID compatibility to characterization, Snippy, and PlasmidID templates [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Updated the Snippy IQ-TREE workflow to reuse the detected best-fit model [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Enhanced the outbreak summary workbook with normalized sample IDs, updated AMRFinderPlus parsing, SNP distance tables, provenance, and consistent formatting [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 
 ### Modules
 
@@ -919,4 +923,3 @@ Code contributions to the inital release:
 - [Alberto Lema](https://github.com/Alema91)
 - [Daniel Valle](https://github.com/Daniel-VM)
 - [Fernando Gomez](https://github.com/FGomez-Aldecoa)
-
