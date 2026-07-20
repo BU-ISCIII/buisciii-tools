@@ -4,30 +4,6 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.5]_dev - XXXX-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.5_dev
-
-### Credits
-
-- [Pau Pascual](https://github.com/PauPascualMas)
-
-### Template fixes and updates
-
-- Fix IRMA stats generation when 3-match is absent [#719](https://github.com/BU-ISCIII/buisciii-tools/pull/719)
-
-### Modules
-
-#### Implementation
-
-#### Added enhancements
-
-#### Fixes
-
-#### Changed
-
-#### Removed
-
-### Requirements
-
 
 ## [2.3.4] - 2026-07-02 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.4
 
@@ -36,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Enrique Sapena](https://github.com/ESapenaVentura)
 - [Victor Lopez](https://github.com/victor5lm)
 - [Sara Monzon](https://github.com/saramonzon)
+- [Pau Pascual](https://github.com/PauPascualMas)
 
 ### Template fixes and updates
 
@@ -48,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated the Snippy IQ-TREE workflow to reuse the detected best-fit model [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 - Enhanced the outbreak summary workbook with normalized sample IDs, updated AMRFinderPlus parsing, SNP distance tables, provenance, and consistent formatting [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 - Added reusable Snippy SNP-distance matrices and close-pair variant QC tooling [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Fix IRMA stats generation when 3-match is absent [#719](https://github.com/BU-ISCIII/buisciii-tools/pull/719)
 
 ### Modules
 
