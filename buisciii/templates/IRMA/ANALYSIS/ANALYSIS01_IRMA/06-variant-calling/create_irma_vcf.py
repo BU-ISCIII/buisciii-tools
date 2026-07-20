@@ -440,48 +440,102 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
     return af_merged_dict
 
 
-def handle_initial_insertion(vcf_dictionary, consensus):
-    """Combine an insertion before reference position 1 into VCF form.
+def handle_initial_insertion(
+    vcf_dictionary,
+    consensus,
+    freq,
+    alt_depth,
+    total_depth,
+):
+    """Combine a supported contiguous insertion before reference position 1.
 
-    Returns ``None`` when the insertion cannot be normalized because either the
-    insertion data or reference position 1 is unavailable.
+    IRMA reports inserted bases as separate rows. For each sample position, the
+    best-supported allele is selected by allele frequency and then quality. The
+    insertion is assembled from the earliest inserted sample position and stops
+    at the first coordinate gap or component that does not pass the configured
+    variant filter. This prevents low-support internal bases from being skipped
+    while non-adjacent flanking bases are incorrectly joined into one allele.
+
+    Returns ``None`` when there is no initial insertion, the first component
+    does not pass filtering, or reference position 1 is unavailable.
     """
-    initial_ins_data = {
-        k: v
-        for k, v in vcf_dictionary.items()
-        if v["REF_POS"] == 0
-        and v["CONSENSUS"] == consensus
-        and v["TYPE"] == "INS"
-    }
+    initial_candidates = [
+        value
+        for value in vcf_dictionary.values()
+        if value["REF_POS"] == 0
+        and value["CONSENSUS"] == consensus
+        and value["TYPE"] == "INS"
+    ]
 
-    if not initial_ins_data:
+    if not initial_candidates:
         return None
 
     first_ref_data = next(
-        (v for v in vcf_dictionary.values() if v["REF_POS"] == 1),
+        (
+            value
+            for value in vcf_dictionary.values()
+            if value["REF_POS"] == 1 and value["REF"] not in {"-", "N"}
+        ),
         None,
     )
     if first_ref_data is None:
         return None
 
-    # Process by sample position so multi-base insertions are assembled in
-    # sequence order rather than relying on dictionary insertion order.
-    ordered_data = sorted(
-        initial_ins_data.values(),
-        key=lambda data: data["SAMPLE_POS"][0],
-    )
+    # Multiple minority alleles can occur at one inserted sample position. Keep
+    # only the best-supported allele at each position before building the event.
+    best_by_sample_position = {}
+    for data in initial_candidates:
+        sample_pos = data["SAMPLE_POS"][0]
+        current = best_by_sample_position.get(sample_pos)
+        if current is None or (
+            numeric_value(data["AF"][0]),
+            numeric_value(data["QUAL"][0]),
+            numeric_value(data["DP"][0]),
+        ) > (
+            numeric_value(current["AF"][0]),
+            numeric_value(current["QUAL"][0]),
+            numeric_value(current["DP"][0]),
+        ):
+            best_by_sample_position[sample_pos] = data
 
-    initial_dict = None
+    ordered_data = [
+        best_by_sample_position[position]
+        for position in sorted(best_by_sample_position)
+    ]
+
+    contiguous_data = []
+    expected_position = ordered_data[0]["SAMPLE_POS"][0]
+
     for data in ordered_data:
-        if initial_dict is None:
-            initial_dict = copy.deepcopy(data)
-        else:
-            initial_dict["SAMPLE_POS"].append(data["SAMPLE_POS"][0])
-            initial_dict["DP"].append(data["DP"][0])
-            initial_dict["TOTAL_DP"].append(data["TOTAL_DP"][0])
-            initial_dict["AF"].append(data["AF"][0])
-            initial_dict["QUAL"].append(data["QUAL"][0])
-            initial_dict["ALT"] += data["ALT"]
+        sample_pos = data["SAMPLE_POS"][0]
+
+        if sample_pos != expected_position:
+            break
+
+        if not passes_variant_filter(
+            data["DP"][0],
+            data["AF"][0],
+            data["TOTAL_DP"][0],
+            freq,
+            alt_depth,
+            total_depth,
+        ):
+            break
+
+        contiguous_data.append(data)
+        expected_position += 1
+
+    if not contiguous_data:
+        return None
+
+    initial_dict = copy.deepcopy(contiguous_data[0])
+    for data in contiguous_data[1:]:
+        initial_dict["SAMPLE_POS"].append(data["SAMPLE_POS"][0])
+        initial_dict["DP"].append(data["DP"][0])
+        initial_dict["TOTAL_DP"].append(data["TOTAL_DP"][0])
+        initial_dict["AF"].append(data["AF"][0])
+        initial_dict["QUAL"].append(data["QUAL"][0])
+        initial_dict["ALT"] += data["ALT"]
 
     initial_dict["REF_POS"] = 1
     initial_dict["REF"] = first_ref_data["REF"]
@@ -699,12 +753,16 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                 if value["REF_POS"] == 0:
                     if value["CONSENSUS"] and "INIT_INS_CONS" not in combined_vcf_dict:
                         initial_dict = handle_initial_insertion(
-                            vcf_dictionary, consensus=True
+                            vcf_dictionary,
+                            consensus=True,
+                            freq=freq,
+                            alt_depth=alt_depth,
+                            total_depth=total_depth,
                         )
                         if initial_dict is None:
                             msg = (
                                 "Cannot normalize initial consensus insertion: "
-                                "reference position 1 or insertion context is unavailable."
+                                "no supported contiguous event or reference anchor is available."
                             )
                             print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
                             skipped_normalizations.append(msg)
@@ -715,12 +773,16 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                         and "INIT_INS_MIN" not in combined_vcf_dict
                     ):
                         initial_dict = handle_initial_insertion(
-                            vcf_dictionary, consensus=False
+                            vcf_dictionary,
+                            consensus=False,
+                            freq=freq,
+                            alt_depth=alt_depth,
+                            total_depth=total_depth,
                         )
                         if initial_dict is None:
                             msg = (
                                 "Cannot normalize initial minority insertion: "
-                                "reference position 1 or insertion context is unavailable."
+                                "no supported contiguous event or reference anchor is available."
                             )
                             print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
                             skipped_normalizations.append(msg)
