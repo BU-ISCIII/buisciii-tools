@@ -743,9 +743,9 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
         af = value["AF"][0]
         tot_dp = value["TOTAL_DP"][0]
 
-        if passes_variant_filter(
-            dp, af, tot_dp, freq, alt_depth, total_depth
-        ) or (dp == "NA" and af == "NA"):
+        if passes_variant_filter(dp, af, tot_dp, freq, alt_depth, total_depth) or (
+            dp == "NA" and af == "NA"
+        ):
             # Manage insertions
             if value["TYPE"] == "INS":
                 # If the insertion is at the begining of the sequence, we use the first reference nucleotide at the end of ALT
@@ -1214,4 +1214,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     sys.exit(main())
-    
