@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.5]_dev - XXXX-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.5
+
+### Credits
+
+- [Pau Pascual](https://github.com/PauPascualMas)
+
+
+### Template fixes and updates
+- Fix lablog_assembly FASTQ matching with shared sample prefix (https://github.com/BU-ISCIII/buisciii-tools/pull/726)
+
+
+### Modules
+
+#### Implementation
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 
 ## [2.3.4] - 2026-07-02 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.4
 
