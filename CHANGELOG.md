@@ -30,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Enhanced the SNP QC script from snippy's template [#724](https://github.com/BU-ISCIII/buisciii-tools/pull/724).
 - Fix lablog_assembly FASTQ matching with shared sample prefix [#726](https://github.com/BU-ISCIII/buisciii-tools/pull/726).
 - Force interactive plots for MultiQC [#727](https://github.com/BU-ISCIII/buisciii-tools/pull/727).
-- Remove modules purge and load for viralrecon's _00_autorun.sh file [#728](https://github.com/BU-ISCIII/buisciii-tools/pull/728)
+- Fix nextflow's version for viralrecon's _00_autorun.sh file [#728](https://github.com/BU-ISCIII/buisciii-tools/pull/728)
 
 ### Modules
 
