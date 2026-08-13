@@ -8,9 +8,45 @@ echo_green() { echo -e "\e[32m$1\e[0m"; }
 mkdir logs
 date_str=$(date +"%Y%m%d")
 
+default_nextflow_version="25.04.6"
+default_singularity="singularity"
+
+# Lets the user pick a specific module version from `module avail`, or just
+# press Enter to accept the default (latest singularity / Nextflow 25.04.6).
+select_module_version() {
+    local search_pattern="$1" default_choice="$2" label="$3"
+    local versions
+    mapfile -t versions < <(module -t avail "$search_pattern" 2>&1 | grep -E "^${search_pattern}(/|$)" | sed 's/([^)]*)$//' | sort -Vu)
+
+    if [[ ${#versions[@]} -eq 0 ]]; then
+        echo_red "No ${label} modules found via 'module avail'; using default: ${default_choice}"
+        echo "$default_choice"
+        return
+    fi
+
+    echo_bold "Available ${label} versions:" >&2
+    PS3="Select ${label} version [Enter = default: ${default_choice}]: "
+    local choice
+    select choice in "${versions[@]}"; do
+        if [[ -z "$REPLY" ]]; then
+            choice="$default_choice"
+        fi
+        if [[ -n "$choice" ]]; then
+            break
+        fi
+        echo_red "Invalid selection, try again." >&2
+    done
+    echo "$choice"
+}
+
+nextflow_version=$(select_module_version "Nextflow" "Nextflow/${default_nextflow_version}" "Nextflow")
+singularity_module=$(select_module_version "singularity" "$default_singularity" "Singularity")
+
+module purge
+module load "$nextflow_version" "$singularity_module"
 modules_loaded=$(module -t list 2>&1 | grep -E "Nextflow|singularity")
 if [[ $(echo "$modules_loaded" | grep -c -E "Nextflow|singularity") -eq 2 ]]; then
-    echo_green "Nextflow and Singularity modules successfully loaded."
+    echo_green "${nextflow_version} and ${singularity_module} modules successfully loaded."
 else
     echo_red "Modules not loaded correctly. Exiting..."
     exit 1
