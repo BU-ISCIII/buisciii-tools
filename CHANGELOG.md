@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Enhanced the outbreak summary workbook with normalized sample IDs, updated AMRFinderPlus parsing, SNP distance tables, provenance, and consistent formatting [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 - Added reusable Snippy SNP-distance matrices and close-pair variant QC tooling [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
 - Fix IRMA stats generation when 3-match is absent [#719](https://github.com/BU-ISCIII/buisciii-tools/pull/719)
+- Fix and refactor create_irma_vcf.py [#720](https://github.com/BU-ISCIII/buisciii-tools/pull/720)
 - Modified bind in BLAST lablog to alow access to refgenie data [#722](https://github.com/BU-ISCIII/buisciii-tools/pull/722)
 - Enhanced the SNP QC script from snippy's template [#724](https://github.com/BU-ISCIII/buisciii-tools/pull/724).
 - Fix lablog_assembly FASTQ matching with shared sample prefix [#726](https://github.com/BU-ISCIII/buisciii-tools/pull/726).
