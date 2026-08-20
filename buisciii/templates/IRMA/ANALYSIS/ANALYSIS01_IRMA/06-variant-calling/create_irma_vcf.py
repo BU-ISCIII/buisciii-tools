@@ -38,50 +38,85 @@ def parse_args(args=None):
         "--min_freq",
         type=float,
         default=0.01,
-        help="Minimum Allele Frequency for a variant to be included in the .vcf file, when that position has a depth >= total_depth. Default 0.01. A variant will be included when (Allele Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
-    )
-    parser.add_argument(
-        "-t",
-        "--total_depth",
-        type=int,
-        default=10,
-        help="Minimum position depth for a variant to be included in the .vcf file when Allele Frequency >= min_freq. Default 10. A variant will be included when (Allele Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
+        help=(
+            "Minimum alternate allele frequency required for a variant. Default 0.01. "
+            "A variant is retained only when ALT_FREQ >= min_freq AND "
+            "ALT_DP >= alt_depth."
+        ),
     )
     parser.add_argument(
         "-d",
         "--alt_depth",
         type=int,
         default=10,
-        help="Minimum depth for a variant to be included in the .vcf file. Default 10X. A variant will be included when (Allele Frequency >= min_freq and position depth >= total_depth) OR (allele depth >= alt_depth)",
+        help=(
+            "Minimum number of reads supporting the alternate allele. Default 10. "
+            "A variant is retained only when ALT_DP >= alt_depth AND "
+            "ALT_FREQ >= min_freq."
+        ),
     )
 
     return parser.parse_args(args)
 
 
 def calc_mean(values, cast=float, precision=2):
-    """Calculate the mean of non-missing values and return a VCF-safe string.
+    """Calculate lists means
 
-    Missing values (``NA``, ``.``, empty strings, or ``None``) are ignored. If
-    no numeric values remain, ``.`` is returned, which is the VCF missing-value
-    marker.
+    Parameters
+    ----------
+    values : list
+        List of values to calculate mean.
+    cast :
+        Type of number (float, int)
+    precusion: int
+        Number of decimals in the results.
+
+    Returns
+    -------
+    number
+        Number with the mean rounded
     """
-    missing = {"NA", ".", "", None}
-    valid = []
-    for value in values:
-        if value in missing:
-            continue
-        try:
-            valid.append(cast(value))
-        except (TypeError, ValueError):
-            continue
-
+    valid = [cast(v) for v in values if v != "NA"]
     if not valid:
-        return "."
-
+        return "NA"
     mean_val = statistics.mean(valid)
     if precision == 0:
-        return str(int(round(mean_val)))
-    return str(round(mean_val, precision))
+        number = str(int(round(mean_val)))
+    else:
+        number = str(round(mean_val, precision))
+    return number
+
+
+def parse_numeric_metric(value, cast):
+    """Safely convert an IRMA metric to a numeric value.
+
+    IRMA can report missing values as ``NA``. Malformed or missing values should
+    never make VCF generation crash; they are treated as unavailable instead.
+    """
+    if value in {None, "", "NA"}:
+        return None
+    try:
+        return cast(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def passes_variant_filter(alt_dp, alt_af, min_freq, alt_depth):
+    """Return True when a measured alternate allele passes both thresholds.
+
+    Filtering is intentionally based only on support for the alternate allele:
+    
+    * ALT_DP >= alt_depth
+    * ALT_AF >= min_freq
+
+    Total position depth is retained as VCF metadata but is not an independent
+    filter. Requiring ALT_DP already guarantees at least that much total depth.
+    """
+    dp = parse_numeric_metric(alt_dp, int)
+    af = parse_numeric_metric(alt_af, float)
+    if dp is None or af is None:
+        return False
+    return dp >= alt_depth and af >= min_freq
 
 
 def exit_with_error(msg, sample, details=None):
@@ -92,102 +127,59 @@ def exit_with_error(msg, sample, details=None):
     sys.exit()
 
 
-def numeric_value(value, default=float("-inf")):
-    """Return a float for ranking/comparison, or *default* if unavailable."""
-    if value in {None, "", "NA", "."}:
-        return default
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return default
-
-
-def passes_variant_filter(dp, af, total_dp, min_freq, alt_depth, total_depth):
-    """Apply the documented variant-retention rule safely.
-
-    Keep when ``(AF >= min_freq and total depth >= total_depth)`` OR
-    ``allele depth >= alt_depth``. Missing/non-numeric values do not satisfy a
-    numeric branch of the rule.
-    """
-    dp_num = numeric_value(dp, default=None)
-    af_num = numeric_value(af, default=None)
-    total_num = numeric_value(total_dp, default=None)
-
-    frequency_branch = (
-        total_num is not None
-        and af_num is not None
-        and total_num >= total_depth
-        and af_num >= min_freq
-    )
-    depth_branch = dp_num is not None and dp_num >= alt_depth
-    return frequency_branch or depth_branch
-
-
 def alleles_to_dict(alleles_file):
-    """Convert IRMA's allAlleles file to a dictionary.
+    """Convert IRMA's allAlleles file to a dictionary without variant filtering.
 
-    All parseable allele rows are retained here. Variant-reporting thresholds
-    are applied later, after alignment merging and indel normalization, so that
-    low-frequency/reference rows can still provide positional context required
-    to anchor insertions and deletions.
+    All valid allele rows are kept at this stage. Reference and low-frequency
+    alleles can be required later to anchor and normalize indels correctly.
+    Applying ALT_DP/ALT_AF filtering here would remove that context before the
+    reference-based VCF representation has been constructed.
     """
     alleles_dict = {}
 
     with open(alleles_file, "r") as file:
-        header_line = file.readline()
+        header_line = file.readline().strip()
         if not header_line:
             return alleles_dict
 
-        header = header_line.rstrip("\n").split("\t")
-        if len(header) < 3:
-            raise ValueError(
-                f"Unexpected allAlleles header in {alleles_file}: {header_line!r}"
-            )
-
-        for raw_line in file:
-            line = raw_line
-
-            # Preserve the original behavior for wrapped records, but fail
-            # clearly instead of looping forever at EOF.
-            while line.count("\t") < len(header) - 1:
+        header = header_line.split("\t")
+        for line_number, line in enumerate(file, start=2):
+            # Some IRMA records can contain embedded newlines. Continue reading
+            # until the expected number of tab-separated fields is available.
+            while line and line.count("\t") < len(header) - 1:
                 continuation = file.readline()
                 if not continuation:
-                    print(
-                        f"WARNING: Skipping incomplete allAlleles record: "
-                        f"{line.rstrip()!r}",
-                        file=sys.stderr,
-                    )
-                    line = ""
                     break
                 line += continuation
 
-            if not line:
-                continue
-
-            line_data = line.rstrip("\n").split("\t")
+            line_data = line.strip().split("\t")
             if len(line_data) < len(header):
                 print(
-                    f"WARNING: Skipping malformed allAlleles record with "
-                    f"{len(line_data)} fields; expected {len(header)}.",
-                    file=sys.stderr,
+                    f"WARNING: skipping malformed allAlleles record near line "
+                    f"{line_number}: expected {len(header)} columns, "
+                    f"found {len(line_data)}."
                 )
                 continue
-
-            line_data = line_data[: len(header)]
-            entry_dict = dict(zip(header, line_data))
 
             try:
-                position = int(entry_dict["Position"])
-            except (KeyError, TypeError, ValueError):
+                position = int(line_data[1])
+            except (IndexError, ValueError):
                 print(
-                    f"WARNING: Skipping allAlleles record with invalid Position: "
-                    f"{entry_dict.get('Position')!r}",
-                    file=sys.stderr,
+                    f"WARNING: skipping allAlleles record with invalid position "
+                    f"near line {line_number}."
                 )
                 continue
 
-            reference_name = entry_dict.get("Reference_Name", line_data[0])
-            allele = entry_dict.get("Allele", line_data[2])
+            entry_dict = {header[i]: line_data[i] for i in range(len(header))}
+            reference_name = entry_dict.get("Reference_Name")
+            allele = entry_dict.get("Allele")
+            if not reference_name or allele is None:
+                print(
+                    f"WARNING: skipping incomplete allAlleles record near line "
+                    f"{line_number}."
+                )
+                continue
+
             variant = f"{reference_name}_{position}_{allele}"
             alleles_dict[variant] = entry_dict
 
@@ -195,69 +187,79 @@ def alleles_to_dict(alleles_file):
 
 
 def align2dict(alignment_file):
-    """Convert a two-sequence FASTA alignment to a positional dictionary.
+    """Convert alignment file to dictionary.
 
-    The alignment is expected to contain the sample/consensus sequence first
-    and the reference sequence second, matching the original script contract.
-    The function now validates record count, duplicate IDs, and aligned lengths
-    before processing.
+    Parameters
+    ----------
+    alignment_file : str
+        Path to the alignment file in fasta format.
+
+    Returns
+    -------
+    align_dict
+        Dictionary containing alignment information with alignment positions as keys.
+        E.g.:
+        {
+            "1": {'CHROM': 'NC_007372.1', 'REF_POS': 1, 'SAMPLE_POS': [0], 'REF': 'A', 'ALT': '-'}, # Deletions
+            "46": {'CHROM': 'NC_007372.1', 'REF_POS': 46, 'SAMPLE_POS': [22], 'REF': 'C', 'ALT': 'T'}, #SNP
+            "56": {'CHROM': 'NC_007372.1', 'REF_POS': 52, 'SAMPLE_POS': [29], 'REF': '-', 'ALT': 'T'}, #Insertion middle/end
+            # Insertion begining
+        }
+    frag_name
+        Fragment name
+        E.g.: "PB1"
     """
+    sequences_dict = {}
+    frag_name = ""
     sample = os.path.basename(alignment_file).split("_ref.fasta")[0]
-
     with open(alignment_file, "r") as alignment:
-        records = list(SeqIO.parse(alignment, "fasta"))
-
-    if len(records) == 0:
+        for sequence in SeqIO.parse(alignment, "fasta"):
+            sequences_dict[sequence.id] = str(sequence.seq)
+    # Validate the alignment before indexing sequence records. This avoids an
+    # IndexError on empty/corrupt FASTA files and produces an actionable error.
+    if len(sequences_dict) == 0:
         exit_with_error("No sequences in alignment", sample)
-    if len(records) == 1:
-        exit_with_error("Only one sequence in alignment", sample, records[0].id)
-    if len(records) > 2:
+    elif len(sequences_dict) == 1:
         exit_with_error(
-            "More than two sequences in alignment",
-            sample,
-            [record.id for record in records],
+            "Only one sequence in alignment", sample, list(sequences_dict.keys())[0]
+        )
+    elif len(sequences_dict) > 2:
+        exit_with_error(
+            "More than two sequences in alignment", sample, list(sequences_dict.keys())
         )
 
-    ids = [record.id for record in records]
-    if len(set(ids)) != len(ids):
-        exit_with_error("Duplicate sequence IDs in alignment", sample, ids)
+    frag_name = list(sequences_dict.keys())[0].split("_")[-1]
+    _, sample_seq = list(sequences_dict.items())[0]
+    ref_id, ref_seq = list(sequences_dict.items())[1]
 
-    sample_record, ref_record = records
-    sample_seq = str(sample_record.seq)
-    ref_id = ref_record.id
-    ref_seq = str(ref_record.seq)
-
-    if len(sample_seq) != len(ref_seq):
-        exit_with_error(
-            "Aligned sequences have different lengths",
-            sample,
-            f"sample={len(sample_seq)}, reference={len(ref_seq)}",
-        )
-
-    frag_name = sample_record.id.rsplit("_", 1)[-1]
-
+    # initialize positions, dictionaries and counters
     sample_position = 0
     ref_position = 0
     align_dict = {}
+    CHROM = ref_id
 
     for i, (sample_base, ref_base) in enumerate(zip(sample_seq, ref_seq)):
         align_position = i + 1
-
+        # Ns and gaps aligned together are not considered though are not included in the dict
         if sample_base != "-":
             sample_position += 1
         if ref_base != "-":
             ref_position += 1
 
         condition = (
+            # Insertions in the sample respect to the reference
             (ref_base == "-" and sample_base != "N")
+            # Delettions in the sample respect to the reference
             or (sample_base == "-" and ref_base != "N")
+            # Low coverage region in the sample
             or (sample_base == "N" and ref_base != "-")
+            # Do not consider Ns aligned with gaps.
             or (ref_base not in {"N", "-"} and sample_base not in {"N", "-"})
         )
 
         if condition:
             align_dict[align_position] = {
-                "CHROM": ref_id,
+                "CHROM": CHROM,
                 "REF_POS": ref_position,
                 "SAMPLE_POS": [sample_position],
                 "REF": ref_base,
@@ -427,7 +429,7 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
                     "DP": [val["Count"]],
                     "TOTAL_DP": [val["Total"]],
                     "AF": [val["Frequency"]],
-                    "QUAL": [val.get("Average_Quality", "NA")],
+                    "QUAL": [val["Frequency"]],
                 }
                 if allele_type == "low_cov" and content_dict["CONSENSUS"]:
                     content_dict["ALT"] = "N"
@@ -440,110 +442,190 @@ def merge_allele_aligment(alignment_dict, alleles_dict):
     return af_merged_dict
 
 
-def handle_initial_insertion(
-    vcf_dictionary,
-    consensus,
-    freq,
-    alt_depth,
-    total_depth,
-):
-    """Combine a supported contiguous insertion before reference position 1.
+def handle_initial_insertion(vcf_dictionary, consensus, freq, alt_depth):
+    """Generates the dictionary for insertions at the begining of sequence
 
-    IRMA reports inserted bases as separate rows. For each sample position, the
-    best-supported allele is selected by allele frequency and then quality. The
-    insertion is assembled from the earliest inserted sample position and stops
-    at the first coordinate gap or component that does not pass the configured
-    variant filter. This prevents low-support internal bases from being skipped
-    while non-adjacent flanking bases are incorrectly joined into one allele.
+    Parameters
+    ----------
+    vcf_dictionary : dict
+        Dictionary containing VCF information.
+    consensus: boolean
+        If the insertion is included in the consensus sequence or not
+    freq : float
+        Minimum alternate allele frequency.
+    alt_depth : int
+        Minimum alternate allele depth.
 
-    Returns ``None`` when there is no initial insertion, the first component
-    does not pass filtering, or reference position 1 is unavailable.
+    Returns
+    -------
+    initial_dict
+        Dictionary with all the insertion data
+        {
+            "CHROM": "MW626062.1",
+            "CONSENSUS": true,
+            "AF": [
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332"
+            ],
+            "ALT": "GGAAAACAAAAGCAACAAAAA",
+            "DP": [
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770",
+                "1761",
+                "1764",
+                "1768",
+                "1770"
+            ],
+            "QUAL": [
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332",
+                "1",
+                "1",
+                "1",
+                "0.998871332"
+            ],
+            "REF": "A",
+            "REF_POS": 1,
+            "SAMPLE_POS": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+            ],
+            "TOTAL_DP": [
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772",
+                "1761",
+                "1764",
+                "1768",
+                "1772"
+            ],
+            "TYPE": "INS"
+        }
     """
-    initial_candidates = [
-        value
-        for value in vcf_dictionary.values()
-        if value["REF_POS"] == 0
-        and value["CONSENSUS"] == consensus
-        and value["TYPE"] == "INS"
-    ]
-
-    if not initial_candidates:
+    initial_dict = {}
+    # Get all the insertion data at the begining of sequence for the same frequency/consensus
+    initial_ins_data = {
+        k: v
+        for k, v in vcf_dictionary.items()
+        if v["REF_POS"] == 0
+        and v["CONSENSUS"] == consensus
+        and v["TYPE"] == "INS"
+        and passes_variant_filter(
+            v["DP"][0], v["AF"][0], min_freq=freq, alt_depth=alt_depth
+        )
+    }
+    if not initial_ins_data:
         return None
 
+    # A VCF insertion must be anchored to a real reference nucleotide. Keeping
+    # all alleles until this point makes this anchor much less likely to be lost.
     first_ref_data = next(
-        (
-            value
-            for value in vcf_dictionary.values()
-            if value["REF_POS"] == 1 and value["REF"] not in {"-", "N"}
-        ),
-        None,
+        (v for v in vcf_dictionary.values() if v["REF_POS"] == 1), None
     )
     if first_ref_data is None:
+        print(
+            "WARNING: cannot normalize an insertion at the beginning of the "
+            "reference because REF_POS 1 is unavailable. Skipping it."
+        )
         return None
 
-    # Multiple minority alleles can occur at one inserted sample position. Keep
-    # only the best-supported allele at each position before building the event.
-    best_by_sample_position = {}
-    for data in initial_candidates:
-        sample_pos = data["SAMPLE_POS"][0]
-        current = best_by_sample_position.get(sample_pos)
-        if current is None or (
-            numeric_value(data["AF"][0]),
-            numeric_value(data["QUAL"][0]),
-            numeric_value(data["DP"][0]),
-        ) > (
-            numeric_value(current["AF"][0]),
-            numeric_value(current["QUAL"][0]),
-            numeric_value(current["DP"][0]),
-        ):
-            best_by_sample_position[sample_pos] = data
+    for data in initial_ins_data.values():
+        # If the first nucleotide, copy dictionary, else, just add new info
+        if 1 in data["SAMPLE_POS"]:
+            initial_dict = copy.deepcopy(data)
+        else:
+            initial_dict["SAMPLE_POS"].append(data["SAMPLE_POS"][0])
+            initial_dict["DP"].append(data["DP"][0])
+            initial_dict["TOTAL_DP"].append(data["TOTAL_DP"][0])
+            initial_dict["AF"].append(data["AF"][0])
+            initial_dict["QUAL"].append(data["QUAL"][0])
+            initial_dict["ALT"] += data["ALT"]
 
-    ordered_data = [
-        best_by_sample_position[position]
-        for position in sorted(best_by_sample_position)
-    ]
-
-    contiguous_data = []
-    expected_position = ordered_data[0]["SAMPLE_POS"][0]
-
-    for data in ordered_data:
-        sample_pos = data["SAMPLE_POS"][0]
-
-        if sample_pos != expected_position:
-            break
-
-        if not passes_variant_filter(
-            data["DP"][0],
-            data["AF"][0],
-            data["TOTAL_DP"][0],
-            freq,
-            alt_depth,
-            total_depth,
-        ):
-            break
-
-        contiguous_data.append(data)
-        expected_position += 1
-
-    if not contiguous_data:
-        return None
-
-    initial_dict = copy.deepcopy(contiguous_data[0])
-    for data in contiguous_data[1:]:
-        initial_dict["SAMPLE_POS"].append(data["SAMPLE_POS"][0])
-        initial_dict["DP"].append(data["DP"][0])
-        initial_dict["TOTAL_DP"].append(data["TOTAL_DP"][0])
-        initial_dict["AF"].append(data["AF"][0])
-        initial_dict["QUAL"].append(data["QUAL"][0])
-        initial_dict["ALT"] += data["ALT"]
-
+    # Add reference data
     initial_dict["REF_POS"] = 1
     initial_dict["REF"] = first_ref_data["REF"]
     initial_dict["ALT"] += first_ref_data["REF"]
     return initial_dict
 
 
-def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
+def ref_based_dict(vcf_dictionary, freq, alt_depth):
     """Converts information in variants to reference based positions. Combines insertion and deletion to be reference based.
 
     Parameters
@@ -554,9 +636,6 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
         Minimum allele frequency to consider a variant
     alt_depth : int
         Minimum allele depth to consider a variant
-    total_depth : int
-        Minimum total depth to consider a variant
-
     Returns
     -------
     combined_vcf_dict
@@ -734,18 +813,30 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
     """
 
     combined_vcf_dict = {}
-    skipped_normalizations = []
     for key, value in vcf_dictionary.items():
         content_dict = copy.deepcopy(value)
 
-        # Only process variants passing filters
+        # Apply the variant threshold only after the reference-based context
+        # has been built. Measured variants must satisfy BOTH alternate-depth
+        # and alternate-frequency thresholds. TOTAL_DP is metadata only.
         dp = value["DP"][0]
         af = value["AF"][0]
-        tot_dp = value["TOTAL_DP"][0]
+        measured_variant_passes = passes_variant_filter(
+            dp, af, min_freq=freq, alt_depth=alt_depth
+        )
 
-        if passes_variant_filter(dp, af, tot_dp, freq, alt_depth, total_depth) or (
-            dp == "NA" and af == "NA"
-        ):
+        # Consensus deletions inferred directly from the consensus/reference
+        # alignment have no Count/Frequency entry in IRMA allAlleles. They must
+        # remain available for VCF reconstruction; otherwise genuine consensus
+        # deletions would be lost solely because IRMA reports their metrics as NA.
+        alignment_consensus_deletion = (
+            value["TYPE"] == "DEL"
+            and value["CONSENSUS"]
+            and dp == "NA"
+            and af == "NA"
+        )
+
+        if measured_variant_passes or alignment_consensus_deletion:
             # Manage insertions
             if value["TYPE"] == "INS":
                 # If the insertion is at the begining of the sequence, we use the first reference nucleotide at the end of ALT
@@ -753,41 +844,19 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                 if value["REF_POS"] == 0:
                     if value["CONSENSUS"] and "INIT_INS_CONS" not in combined_vcf_dict:
                         initial_dict = handle_initial_insertion(
-                            vcf_dictionary,
-                            consensus=True,
-                            freq=freq,
-                            alt_depth=alt_depth,
-                            total_depth=total_depth,
+                            vcf_dictionary, consensus=True, freq=freq, alt_depth=alt_depth
                         )
-                        if initial_dict is None:
-                            msg = (
-                                "Cannot normalize initial consensus insertion: "
-                                "no supported contiguous event or reference anchor is available."
-                            )
-                            print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
-                            skipped_normalizations.append(msg)
-                            continue
-                        combined_vcf_dict["INIT_INS_CONS"] = initial_dict
+                        if initial_dict is not None:
+                            combined_vcf_dict["INIT_INS_CONS"] = initial_dict
                     elif (
                         not value["CONSENSUS"]
                         and "INIT_INS_MIN" not in combined_vcf_dict
                     ):
                         initial_dict = handle_initial_insertion(
-                            vcf_dictionary,
-                            consensus=False,
-                            freq=freq,
-                            alt_depth=alt_depth,
-                            total_depth=total_depth,
+                            vcf_dictionary, consensus=False, freq=freq, alt_depth=alt_depth
                         )
-                        if initial_dict is None:
-                            msg = (
-                                "Cannot normalize initial minority insertion: "
-                                "no supported contiguous event or reference anchor is available."
-                            )
-                            print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
-                            skipped_normalizations.append(msg)
-                            continue
-                        combined_vcf_dict["INIT_INS_MIN"] = initial_dict
+                        if initial_dict is not None:
+                            combined_vcf_dict["INIT_INS_MIN"] = initial_dict
                 else:
                     # Check if it is a minority insertion. In that case,
                     minority_ins = not value["CONSENSUS"]
@@ -810,24 +879,41 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
 
                         # If insertion is not found, look for the insetion with highest AF and QUAL for that position in the sample
                         if not ins_found:
+                            # Only compare minority insertion candidates that
+                            # themselves pass BOTH ALT_DP and ALT_AF thresholds.
+                            # Otherwise a passing candidate could be replaced by
+                            # a high-AF but poorly supported insertion.
                             insertion_data = {
                                 k: v
                                 for k, v in vcf_dictionary.items()
                                 if value["SAMPLE_POS"] == v["SAMPLE_POS"]
                                 and value["TYPE"] == v["TYPE"]
                                 and value["CONSENSUS"] == v["CONSENSUS"]
+                                and passes_variant_filter(
+                                    v["DP"][0],
+                                    v["AF"][0],
+                                    min_freq=freq,
+                                    alt_depth=alt_depth,
+                                )
                             }
+                            if not insertion_data:
+                                continue
+
                             max_key = max(
                                 insertion_data,
                                 key=lambda k: (
-                                    numeric_value(insertion_data[k]["AF"][0]),
-                                    numeric_value(insertion_data[k]["QUAL"][0]),
+                                    parse_numeric_metric(insertion_data[k]["AF"][0], float)
+                                    or float("-inf"),
+                                    parse_numeric_metric(insertion_data[k]["QUAL"][0], float)
+                                    or float("-inf"),
                                 ),
                             )
-                            # Replace the data with the top insertion
+                            # Replace the data with the highest-supported passing
+                            # insertion while keeping all depth metadata aligned.
                             value = vcf_dictionary[max_key]
                             content_dict["ALT"] = value["ALT"]
                             content_dict["DP"] = value["DP"].copy()
+                            content_dict["TOTAL_DP"] = value["TOTAL_DP"].copy()
                             content_dict["AF"] = value["AF"].copy()
                             content_dict["QUAL"] = value["QUAL"].copy()
 
@@ -844,20 +930,17 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                             k: v
                             for k, v in vcf_dictionary.items()
                             if v["REF_POS"] == value["REF_POS"]
-                            and v["REF"] not in {"-", "N"}
                         }
                         if not ref_pos_data:
-                            msg = (
-                                f"Cannot normalize insertion at REF_POS "
-                                f"{value['REF_POS']}: reference anchor not found."
+                            print(
+                                f"WARNING: cannot anchor insertion at REF_POS "
+                                f"{value['REF_POS']}: reference context not found. "
+                                "Skipping this insertion."
                             )
-                            print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
-                            skipped_normalizations.append(msg)
                             continue
-
-                        anchor_allele = next(iter(ref_pos_data.values()))["REF"]
-                        content_dict["ALT"] = anchor_allele + value["ALT"]
-                        content_dict["REF"] = anchor_allele
+                        prev_pos_allele = next(iter(ref_pos_data.values()))["REF"]
+                        content_dict["ALT"] = prev_pos_allele + value["ALT"]
+                        content_dict["REF"] = prev_pos_allele
 
                     variant_found = False
 
@@ -915,15 +998,13 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                         k: v
                         for k, v in vcf_dictionary.items()
                         if v["REF_POS"] == value["REF_POS"] + 1
-                        and v["REF"] not in {"-", "N"}
                     }
                     if not next_pos_data:
-                        msg = (
-                            f"Cannot normalize deletion at REF_POS "
-                            f"{value['REF_POS']}: next reference position not found."
+                        print(
+                            f"WARNING: cannot normalize deletion at REF_POS "
+                            f"{value['REF_POS']}: next reference position not found. "
+                            "Skipping this deletion instead of aborting VCF generation."
                         )
-                        print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
-                        skipped_normalizations.append(msg)
                         continue
 
                     next_pos_allele = next(iter(next_pos_data.values()))["REF"]
@@ -936,15 +1017,13 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                         k: v
                         for k, v in vcf_dictionary.items()
                         if v["REF_POS"] == value["REF_POS"] - 1
-                        and v["REF"] not in {"-", "N"}
                     }
                     if not prev_pos_data:
-                        msg = (
-                            f"Cannot normalize deletion at REF_POS "
-                            f"{value['REF_POS']}: previous reference position not found."
+                        print(
+                            f"WARNING: cannot normalize deletion at REF_POS "
+                            f"{value['REF_POS']}: previous reference position not found. "
+                            "Skipping this deletion instead of aborting VCF generation."
                         )
-                        print(f"\033[93mWARNING: {msg}\033[0m", file=sys.stderr)
-                        skipped_normalizations.append(msg)
                         continue
 
                     prev_pos_allele = next(iter(prev_pos_data.values()))["REF"]
@@ -1024,13 +1103,6 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth, total_depth):
                 print("Different annotation type found for:")
                 print(value)
 
-    if skipped_normalizations:
-        print(
-            f"\033[93mWARNING: {len(skipped_normalizations)} indel normalization "
-            f"event(s) were skipped and will be absent from the VCF.\033[0m",
-            file=sys.stderr,
-        )
-
     return combined_vcf_dict
 
 
@@ -1059,7 +1131,7 @@ def get_vcf_header(chromosome, sample_name):
     header_info = [
         '##INFO=<ID=TYPE,Number=1,Type=String,Description="Either SNP (Single Nucleotide Polymorphism), DEL (deletion) or INS (Insertion)">',
         '##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">',
-        '##INFO=<ID=consensus,Number=0,Type=Flag,Description="Variant is included in consensus FASTA">',
+        '##INFO=<ID=consensus,Number=1,Type=String,Description="present if variant is included in consensus fasta">',
     ]
     header_filter = [
         '##FILTER=<ID=PASS,Description="All filters passed">',
@@ -1067,7 +1139,7 @@ def get_vcf_header(chromosome, sample_name):
     header_format = [
         '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
         '##FORMAT=<ID=ALT_DP,Number=1,Type=Integer,Description="Depth of alternate base">',
-        '##FORMAT=<ID=ALT_QUAL,Number=1,Type=Float,Description="Mean quality of alternate base">',
+        '##FORMAT=<ID=ALT_QUAL,Number=1,Type=Integer,Description="Mean quality of alternate base">',
         '##FORMAT=<ID=ALT_FREQ,Number=1,Type=Float,Description="Frequency of alternate base">',
     ]
     columns = ["#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" + sample_name]
@@ -1111,12 +1183,15 @@ def create_vcf(variants_dict, out_vcf, alignment):
             ALT_DP = calc_mean(value["DP"], int, 0)
             AF = calc_mean(value["AF"], float, 4)
 
-            info_fields = [f"TYPE={value['TYPE']}"]
-            if TOTAL_DP != ".":
-                info_fields.append(f"DP={TOTAL_DP}")
-            if value["CONSENSUS"]:
-                info_fields.append("consensus")
-            INFO = ";".join(info_fields)
+            INFO = (
+                "TYPE="
+                + value["TYPE"]
+                + ";"
+                + "DP="
+                + TOTAL_DP
+                + ";"
+                + ("consensus" if value["CONSENSUS"] else "")
+            )
 
             SAMPLE = GT + ":" + ALT_DP + ":" + ALT_QUAL + ":" + AF
             oline = (
@@ -1153,7 +1228,6 @@ def main(args=None):
     output_vcf = args.out_vcf
     freq = args.min_freq
     alt_dp = args.alt_depth
-    total_dp = args.total_depth
 
     if not os.path.exists(alignment):
         exit_with_error("Alignment file does not exist:", alignment)
@@ -1165,10 +1239,19 @@ def main(args=None):
     # Convert allAlleles file to dictionary
     alleles_dict = alleles_to_dict(all_alleles)
     if not alleles_dict:
-        exit_with_error("No parseable alleles found", all_alleles)
-
-    reference_name = next(iter(alleles_dict.values()))["Reference_Name"]
-    alleles_frag = reference_name.rsplit("_", 1)[-1]
+        exit_with_error(
+            "No valid alleles found in allAlleles file",
+            all_alleles,
+        )
+    reference_name = next(iter(alleles_dict.values())).get("Reference_Name", "")
+    reference_parts = reference_name.split("_")
+    if len(reference_parts) < 2:
+        exit_with_error(
+            "Cannot infer fragment from allAlleles Reference_Name",
+            all_alleles,
+            f"Reference_Name={reference_name!r}",
+        )
+    alleles_frag = reference_parts[1]
 
     # Convert alignment to dictionary
     alignment_dict, align_frag = align2dict(alignment)
@@ -1188,8 +1271,9 @@ def main(args=None):
     # Merge info from allAlleles and alignment
     af_merged_dict = merge_allele_aligment(alignment_dict, alleles_dict)
 
-    # Convert merged info into reference based position format prior to vcf, merge INDELS and filter based on thresholds
-    combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp, total_dp)
+    # Build reference-based variants and only then apply ALT_DP + ALT_AF filtering.
+    # Delaying filtering preserves reference alleles needed to normalize indels.
+    combined_vcf_dict = ref_based_dict(af_merged_dict, freq, alt_dp)
 
     if not combined_vcf_dict:
         print("\033[91mERROR: No variants found, so no vcf is generated.\033[0m")
