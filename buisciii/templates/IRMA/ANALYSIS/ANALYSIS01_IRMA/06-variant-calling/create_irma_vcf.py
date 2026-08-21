@@ -105,7 +105,7 @@ def passes_variant_filter(alt_dp, alt_af, min_freq, alt_depth):
     """Return True when a measured alternate allele passes both thresholds.
 
     Filtering is intentionally based only on support for the alternate allele:
-    
+
     * ALT_DP >= alt_depth
     * ALT_AF >= min_freq
 
@@ -883,7 +883,10 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth):
                 if value["REF_POS"] == 0:
                     if value["CONSENSUS"] and "INIT_INS_CONS" not in combined_vcf_dict:
                         initial_dict = handle_initial_insertion(
-                            vcf_dictionary, consensus=True, freq=freq, alt_depth=alt_depth
+                            vcf_dictionary,
+                            consensus=True,
+                            freq=freq,
+                            alt_depth=alt_depth,
                         )
                         if initial_dict is not None:
                             combined_vcf_dict["INIT_INS_CONS"] = initial_dict
@@ -892,7 +895,10 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth):
                         and "INIT_INS_MIN" not in combined_vcf_dict
                     ):
                         initial_dict = handle_initial_insertion(
-                            vcf_dictionary, consensus=False, freq=freq, alt_depth=alt_depth
+                            vcf_dictionary,
+                            consensus=False,
+                            freq=freq,
+                            alt_depth=alt_depth,
                         )
                         if initial_dict is not None:
                             combined_vcf_dict["INIT_INS_MIN"] = initial_dict
@@ -941,9 +947,13 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth):
                             max_key = max(
                                 insertion_data,
                                 key=lambda k: (
-                                    parse_numeric_metric(insertion_data[k]["AF"][0], float)
+                                    parse_numeric_metric(
+                                        insertion_data[k]["AF"][0], float
+                                    )
                                     or float("-inf"),
-                                    parse_numeric_metric(insertion_data[k]["QUAL"][0], float)
+                                    parse_numeric_metric(
+                                        insertion_data[k]["QUAL"][0], float
+                                    )
                                     or float("-inf"),
                                 ),
                             )
