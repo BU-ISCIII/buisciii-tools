@@ -869,10 +869,7 @@ def ref_based_dict(vcf_dictionary, freq, alt_depth):
         # remain available for VCF reconstruction; otherwise genuine consensus
         # deletions would be lost solely because IRMA reports their metrics as NA.
         alignment_consensus_deletion = (
-            value["TYPE"] == "DEL"
-            and value["CONSENSUS"]
-            and dp == "NA"
-            and af == "NA"
+            value["TYPE"] == "DEL" and value["CONSENSUS"] and dp == "NA" and af == "NA"
         )
 
         if measured_variant_passes or alignment_consensus_deletion:
