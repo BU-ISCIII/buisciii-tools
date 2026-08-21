@@ -134,6 +134,45 @@ def alleles_to_dict(alleles_file):
     alleles can be required later to anchor and normalize indels correctly.
     Applying ALT_DP/ALT_AF filtering here would remove that context before the
     reference-based VCF representation has been constructed.
+
+    Returns
+    -------
+    alleles_dict : dict
+        Dictionary containing all parsed IRMA allele rows, keyed by
+        ``Reference_Name_Position_Allele``. Values retain the original
+        ``allAlleles`` fields as strings. No ALT_DP/ALT_AF filtering is applied
+        at this stage.
+
+        Example::
+
+            {
+                "rsv_a2_2204_A": {
+                    "Reference_Name": "rsv_a2",
+                    "Position": "2204",
+                    "Allele": "A",
+                    "Count": "6532",
+                    "Total": "15323",
+                    "Frequency": "0.426287280558637",
+                    "Average_Quality": "34.5708818126148",
+                    "ConfidenceNotMacErr": "0.999181140401206",
+                    "PairedUB": "0.00396999257813604",
+                    "QualityUB": "0.0010642711614851",
+                    "Allele_Type": "Minority",
+                },
+                "rsv_a2_2204_G": {
+                    "Reference_Name": "rsv_a2",
+                    "Position": "2204",
+                    "Allele": "G",
+                    "Count": "8768",
+                    "Total": "15323",
+                    "Frequency": "0.5722117078901",
+                    "Average_Quality": "35.0286268248175",
+                    "ConfidenceNotMacErr": "0.999450989591763",
+                    "PairedUB": "0.00396999257813604",
+                    "QualityUB": "0.00100698799816366",
+                    "Allele_Type": "Consensus",
+                },
+            }
     """
     alleles_dict = {}
 
