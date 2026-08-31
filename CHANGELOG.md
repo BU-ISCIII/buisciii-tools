@@ -4,6 +4,57 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.4] - 2026-08-31 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.4
+
+### Credits
+
+- [Enrique Sapena](https://github.com/ESapenaVentura)
+- [Victor Lopez](https://github.com/victor5lm)
+- [Sara Monzon](https://github.com/saramonzon)
+- [Pau Pascual](https://github.com/PauPascualMas)
+- [Juan Ledesma](https://github.com/juanledesma78)
+
+### Template fixes and updates
+
+- Updated assembly config for MultiQC and RESULTS lablog [#708](https://github.com/BU-ISCIII/buisciii-tools/pull/708)
+- Updated iGenomes paths [#710](https://github.com/BU-ISCIII/buisciii-tools/pull/710)
+- Updated the assembly template to skip busco and some paths in correspondence to refgenie system [#711](https://github.com/BU-ISCIII/buisciii-tools/pull/711)
+- Updated assembly template to nf-core/bacass 2.6.1 and restored BUSCO execution with matching config changes [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Fixed conditional trimmed-read output and corrected MultiQC result paths in the assembly template [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Added Bacass numeric sample ID compatibility to characterization, Snippy, and PlasmidID templates [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Updated the Snippy IQ-TREE workflow to reuse the detected best-fit model [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Enhanced the outbreak summary workbook with normalized sample IDs, updated AMRFinderPlus parsing, SNP distance tables, provenance, and consistent formatting [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Added reusable Snippy SNP-distance matrices and close-pair variant QC tooling [#718](https://github.com/BU-ISCIII/buisciii-tools/pull/718)
+- Fix IRMA stats generation when 3-match is absent [#719](https://github.com/BU-ISCIII/buisciii-tools/pull/719)
+- Fix and refactor create_irma_vcf.py [#720](https://github.com/BU-ISCIII/buisciii-tools/pull/720)
+- Modified bind in BLAST lablog to alow access to refgenie data [#722](https://github.com/BU-ISCIII/buisciii-tools/pull/722)
+- Enhanced the SNP QC script from snippy's template [#724](https://github.com/BU-ISCIII/buisciii-tools/pull/724).
+- Fix lablog_assembly FASTQ matching with shared sample prefix [#726](https://github.com/BU-ISCIII/buisciii-tools/pull/726).
+- Force interactive plots for MultiQC [#727](https://github.com/BU-ISCIII/buisciii-tools/pull/727).
+- Fix nextflow's version for viralrecon's _00_autorun.sh file [#728](https://github.com/BU-ISCIII/buisciii-tools/pull/728).
+- Updated summary report creation script to take nextclade's tag from pathogen.json [#730](https://github.com/BU-ISCIII/buisciii-tools/pull/730).
+- Fixed wrong path for summary_assembly_metrics_mqc.csv in lablog_assembly_results [#732](https://github.com/BU-ISCIII/buisciii-tools/pull/732).
+- Updated bacass to v2.7.0dev and pinned SPAdes 4.3.0 for Unicycler [#734](https://github.com/BU-ISCIII/buisciii-tools/pull/734).
+- Updated IRMA's template to handle possible flu coinfections [#736](https://github.com/BU-ISCIII/buisciii-tools/pull/736). 
+
+### Modules
+
+#### Implementation
+
+#### Added enhancements
+
+#### Fixes
+
+- Fixed local file access for PDF generation via wkhtmltopdf [#705](https://github.com/BU-ISCIII/buisciii-tools/pull/705)
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
+- Updated wkhtmltopdf version requirement from 0.12.4 to 0.12.6.1 [#708](https://github.com/BU-ISCIII/buisciii-tools/pull/708)
+
 ## [2.3.3] - 2026-06-22 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.3
 
 ### Credits
@@ -886,4 +937,3 @@ Code contributions to the inital release:
 - [Alberto Lema](https://github.com/Alema91)
 - [Daniel Valle](https://github.com/Daniel-VM)
 - [Fernando Gomez](https://github.com/FGomez-Aldecoa)
-

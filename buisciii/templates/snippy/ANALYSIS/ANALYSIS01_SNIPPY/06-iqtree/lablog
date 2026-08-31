@@ -3,8 +3,8 @@
 scratch_dir=$(echo $PWD | sed 's/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g')
 
 #1
-mkdir logs
-echo "srun --chdir ${scratch_dir} --output logs/IQTREEMFP.%j.log --job-name IQTREEMFP --cpus-per-task 20 --mem 5G --partition short_idx --time 00:30:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/iqtree:2.1.4_beta--hdcc8f71_0 iqtree -s ${scratch_dir}/../05-snippy/phylo.aln -m MFP &" > _00_iqtreemfp.sh
+mkdir -p logs
+echo "srun --chdir ${scratch_dir} --output logs/IQTREEMFP.%j.log --job-name IQTREEMFP --cpus-per-task 20 --mem 5G --partition short_idx --time 02:30:00 singularity exec -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/iqtree:2.1.4_beta--hdcc8f71_0 iqtree -s ${scratch_dir}/../05-snippy/phylo.aln -m MFP &" > _00_iqtreemfp.sh
 
 #2
 #bestfitmodel=$(grep Best logs/IQTREEMFP* | awk -F": " '{print $2}' | awk '{print $1}')

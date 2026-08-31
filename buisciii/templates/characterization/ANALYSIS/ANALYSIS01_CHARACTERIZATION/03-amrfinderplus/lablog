@@ -2,9 +2,18 @@
 
 # Only works with assemblies, prior to this you must have executed assembly pipeline
 
+bacass_id() {
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+        printf '%s_S\n' "$1"
+    else
+        printf '%s\n' "$1"
+    fi
+}
+
 scratch_dir=$(echo $(pwd) | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
 
-mkdir logs	
+mkdir logs
+: > _01_run_amrfinder.sh
 
 possible_organisms=("Acinetobacter_baumannii" "Burkholderia_cepacia" "Burkholderia_pseudomallei" "Campylobacter" "Citrobacter_freundii" "Clostridioides_difficile" "Enterobacter_asburiae" "Enterobacter_cloacae" "Enterococcus_faecalis" "Enterococcus_faecium" "Escherichia" "Klebsiella_oxytoca" "Klebsiella_pneumoniae" "Neisseria_gonorrhoeae" "Neisseria_meningitidis" "Pseudomonas_aeruginosa" "Salmonella" "Serratia_marcescens" "Staphylococcus_aureus" "Staphylococcus_pseudintermedius" "Streptococcus_agalactiae" "Streptococcus_pneumoniae" "Streptococcus_pyogenes" "Vibrio_cholerae" "Vibrio_parahaemolyticus" "Vibrio_vulnificus" "OTHER")
 echo
@@ -13,11 +22,23 @@ PS3=$(echo -e "\n\033[1;37mSelect number:\033[0m ")
 select bacteria in "${possible_organisms[@]}"; do
     if [[ -n "$bacteria" ]]; then
         echo -e "\033[0;32mOrganism selected: ${bacteria}\033[0m"
-        if [ $bacteria = "OTHER" ]; then
-            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx --output logs/AMRFINDER_${in}.%j.log --job-name AMRFINDER_${in} amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh; done
-        else
-            cat ../samples_id.txt | while read in; do echo "srun --chdir $scratch_dir --partition middle_idx --output logs/AMRFINDER_${in}.%j.log --job-name AMRFINDER_${in} amrfinder -n $(ls ../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${in}.fasta.gz)  --organism ${bacteria} --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh; done
-        fi
+        shopt -s nullglob
+        while IFS= read -r in; do
+            assembly_id=$(bacass_id "$in")
+            assemblies=(../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${assembly_id}-unicycler.fasta.gz)
+            if (( ${#assemblies[@]} == 0 )); then
+                assemblies=(../../*ANALYSIS*ASSEMBLY/03-assembly/unicycler/${assembly_id}-unicycler.fasta)
+            fi
+            if (( ${#assemblies[@]} != 1 )); then
+                echo "ERROR: expected one Bacass assembly for ${in} (${assembly_id}); found ${#assemblies[@]}" >&2
+                exit 1
+            fi
+            organism_arg=""
+            if [ "$bacteria" != "OTHER" ]; then
+                organism_arg="--organism ${bacteria}"
+            fi
+            echo "srun --chdir $scratch_dir --partition middle_idx --output logs/AMRFINDER_${in}.%j.log --job-name AMRFINDER_${in} amrfinder -n ${assemblies[0]} ${organism_arg} --name ${in} --plus -o ${in}_out.tsv &" >> _01_run_amrfinder.sh
+        done < ../samples_id.txt
         break
     else
         echo -e "\n\033[0;31mInvalid input.\033[0m"
@@ -27,11 +48,10 @@ done
 cat << "EOF" > _02_amrfinder_summary.sh
 #!/bin/bash
 output_file="amrfinder_summary.tsv"
-{ 
+{
   for file in *_out.tsv; do
     [ "$header_added" ] || { head -n 1 "$file"; header_added=true; }
     tail -n +2 "$file"
   done
 } > "$output_file"
 EOF
-

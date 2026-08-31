@@ -13,12 +13,63 @@ while true; do
         ORGANISM="FLU"
         echo "You selected $ORGANISM."
         ln -s ../../ANALYSIS/*_IRMA/04-irma/all_samples_completo.txt .
+        ln -s ../../ANALYSIS/*_IRMA/04-irma/irma_stats_flu.txt .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/A_H* .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/B .
         ln -s ../../ANALYSIS/*_IRMA/04-irma/C .
         ln -s ../../ANALYSIS/*_IRMA/99-stats/summary_stats_*.tab summary_stats.tab
         ln -s ../../ANALYSIS/*_IRMA/99-stats/variants_long_table.csv .
-        tail -n +2 ../../ANALYSIS/*_IRMA/04-irma/irma_stats_flu.txt | cut -f5 | sort | uniq -c > flu_type_summary.txt
+        FLU_STATS=$(echo ../../ANALYSIS/*_IRMA/04-irma/irma_stats_flu.txt)
+        # List the main flu types/subtypes detected in the samples.
+        awk -F '\t' '
+            NR == 1 { next }
+            {
+                sample = $1
+                type   = $5
+                reads  = $3 + 0
+                types[sample] = (sample in count) ? types[sample] ", " type : type
+                count[sample]++
+                if (!(sample in best) || reads > best[sample]) {
+                    best[sample]     = reads
+                    majority[sample] = type
+                }
+            }
+            END {
+                for (s in majority) print majority[s]
+            }
+        ' "$FLU_STATS" | sort | uniq -c > flu_type_summary.txt
+        # Check for coinfections and print a warning if detected.
+        awk -F '\t' '
+            NR == 1 { next }
+            {
+                sample = $1
+                types[sample] = (sample in count) ? types[sample] ", " $5 : $5
+                count[sample]++
+            }
+            END {
+                found = 0
+                for (s in count) {
+                    if (count[s] > 1) {
+                        print "WARNING: Coinfection detected in " s ": " types[s]
+                        found = 1
+                    }
+                }
+                if (found) {
+                    print "Please note: only the virus type/subtype with the highest read count is displayed in the summary above when coinfections are detected in the same sample."
+                    print "Check the irma_stats_flu.txt file for more details."
+                }
+            }
+        ' "$FLU_STATS" >> flu_type_summary.txt
+        # Link secondary consensus folders (amended_consensus) for samples with coinfection.
+        IRMA_DIR=$(dirname "$FLU_STATS")
+        amended_dirs=("$IRMA_DIR"/*/secondary_assembly/amended_consensus)
+        if [ -d "${amended_dirs[0]}" ]; then
+            mkdir -p secondary_consensus
+            for amended_dir in "${amended_dirs[@]}"; do
+                sample=$(basename "$(dirname "$(dirname "$amended_dir")")")
+                ln -s "$(realpath "$amended_dir")" secondary_consensus/"$sample"
+            done
+        fi
         break
     elif [ "$ORGANISM" == "2" ]; then
         ORGANISM="RSV"

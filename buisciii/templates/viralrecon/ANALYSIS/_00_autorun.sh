@@ -9,10 +9,10 @@ mkdir logs
 date_str=$(date +"%Y%m%d")
 
 module purge
-module load Nextflow singularity
-modules_loaded=$(module -t list 2>&1 | grep -E "Nextflow|singularity")
-if [[ $(echo "$modules_loaded" | grep -c -E "Nextflow|singularity") -eq 2 ]]; then
-    echo_green "Nextflow and Singularity modules successfully loaded."
+module load Nextflow/25.04.6 singularity
+modules_loaded=$(module -t list 2>&1 | grep -c -E "Nextflow|singularity")
+if [[ $modules_loaded -eq 2 ]]; then
+    echo_green "Nextflow 25.04.6 and Singularity modules successfully loaded."
 else
     echo_red "Modules not loaded correctly. Exiting..."
     exit 1

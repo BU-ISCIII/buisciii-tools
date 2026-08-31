@@ -18,7 +18,13 @@ fi
 # The flu_type (p.e A_H1_N1) is the subtype of the sample, the fragment_id (pe. HA) is the fragment of the sample and the fasta_ref (pe. NC_007370.1) is the reference of the fragment
 cat ../samples_id.txt | xargs -I @@ bash -c '
     sample="@@"
-    subtype=$(grep "$sample" ../04-irma/irma_stats_flu.txt | cut -f 5)
+    subtype=$(awk -F "\t" -v s="$sample" "
+        NR > 1 && \$1 == s {
+            reads = \$3 + 0
+            if (reads > best) { best = reads; type = \$5 }
+        }
+        END { print type }
+    " ../04-irma/irma_stats_flu.txt)
     if [ -z "$subtype" ]; then
       echo "No subtype found for sample $sample. Skipping..."
     else
