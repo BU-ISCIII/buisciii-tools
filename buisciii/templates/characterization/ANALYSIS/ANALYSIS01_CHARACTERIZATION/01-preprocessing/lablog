@@ -1,23 +1,41 @@
 # module load singularity
 
+# Bacass rejects all-numeric IDs and appends _S in its samplesheet.  Keep the
+# service-wide samples_id.txt canonical and translate only when reading Bacass
+# output files.
+bacass_id() {
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+        printf '%s_S\n' "$1"
+    else
+        printf '%s\n' "$1"
+    fi
+
+}
+
 # if assembly pipeline was performed first and the trimmed sequences were saved, this should work:
 read -p $'\e[1;37mDid you save the trimmed reads from previous assembly pipeline? [y/N]: \e[1;38;5;220m' -n 1 answer; tput sgr0; echo
     if [ "$answer" == "y" ]; then
         echo "Creating links to trimmed reads..."
 
-        while read in; do
-        mkdir ${in}
-        cd ${in}
-        ln -s ../../../*/01-processing/fastp/${in}_1.fastp.fastq.gz ${in}_R1_filtered.fastq.gz
-        ln -s ../../../*/01-processing/fastp/${in}_2.fastp.fastq.gz ${in}_R2_filtered.fastq.gz
-        cd -
+        shopt -s nullglob
+        while IFS= read -r in; do
+        assembly_id=$(bacass_id "$in")
+        r1=(../../*_ASSEMBLY/01-processing/fastp/${assembly_id}_R1.fastp.fastq.gz)
+        r2=(../../*_ASSEMBLY/01-processing/fastp/${assembly_id}_R2.fastp.fastq.gz)
+        if (( ${#r1[@]} != 1 || ${#r2[@]} != 1 )); then
+            echo "ERROR: expected one Bacass read pair for ${in} (${assembly_id}); found R1=${#r1[@]}, R2=${#r2[@]}" >&2
+            exit 1
+        fi
+        mkdir -p "${in}"
+        ln -s -f "$(readlink -f "${r1[0]}")" "${in}/${in}_R1_filtered.fastq.gz"
+        ln -s -f "$(readlink -f "${r2[0]}")" "${in}/${in}_R2_filtered.fastq.gz"
         done < ../samples_id.txt
 
         echo -e "\e[32mLinks for $(cat ../samples_id.txt | wc -l) samples succesfully created.\e[0m"
-    
-    else 
+
+    else
         echo "Preparing _01_fastp.sh file for trimming..."
-        
+
         mkdir logs
         scratch_dir=$(echo $(pwd) | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
         cat ../samples_id.txt | xargs -I @@ echo "mkdir @@; srun --chdir ${scratch_dir} --mem 10G --time 1:00:00 --job-name FP.@@ --output logs/FP.@@.%j.log --partition short_idx --cpus-per-task 5 singularity exec -B ${scratch_dir}/../../../ -B /srv/fastq_repo/ /data/ucct/bi/pipelines/singularity-images/fastp:1.2.0--h43da1c4_0 fastp --in1 ${scratch_dir}/../00-reads/@@_R1.fastq.gz --in2 ${scratch_dir}/../00-reads/@@_R2.fastq.gz --thread 5 --cut_front --cut_tail --cut_mean_quality 15 --qualified_quality_phred 15 --trim_poly_x --length_required 50 --detect_adapter_for_pe --json ${scratch_dir}/@@/@@_fastp.json --html ${scratch_dir}/@@/@@_fastp.html --out1 ${scratch_dir}/@@/@@_R1_filtered.fastq.gz --out2 ${scratch_dir}/@@/@@_R2_filtered.fastq.gz --unpaired1 ${scratch_dir}/@@/@@_R1_unpaired.fastq.gz --unpaired2 ${scratch_dir}/@@/@@_R2_unpaired.fastq.gz &" > _01_fastp.sh
@@ -25,5 +43,3 @@ read -p $'\e[1;37mDid you save the trimmed reads from previous assembly pipeline
 	echo -e "\e[32mFile _01_fastp.sh ready.\e[0m"
 
     fi
-
-

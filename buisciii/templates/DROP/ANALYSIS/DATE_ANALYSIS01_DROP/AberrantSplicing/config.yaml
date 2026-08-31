@@ -9,7 +9,7 @@ sampleAnnotation: sample_annotation_AS.tsv
 geneAnnotation:
     gencode29: /data/ucct/bi/references/refgenie/alias/hg19/gtf/gencode29/gencode.v29lift37.annotation.gtf
 genomeAssembly: hg19
-genome: /data/ucct/bi/references/igenomes/Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa
+genome: /data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh37/fasta/v20230419/genome.fa
     # You can define multiple reference genomes in yaml format, ncbi: path/to/ncbi, ucsc: path/to/ucsc
     # the keywords that define the path should be in the GENOME column of the sample annotation table
 

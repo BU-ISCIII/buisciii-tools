@@ -1,20 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob
+
 mkdir -p 00-reads
 cd 00-reads
 
-# Loop through each file in the directory
-while IFS= read -r sample; do
-    # Extract the file name with&without extension
-    filename_noext=$(basename -s .fastq.gz ../../RAW/${sample}*)
+while IFS= read -r sample || [[ -n "$sample" ]]; do
+    # Remove Windows carriage returns and skip empty lines
+    sample=${sample//$'\r'/}
+    [[ -z "$sample" ]] && continue
 
-    ### Check if reads are single o paired end
-    for fileitem in $filename_noext; do
-        if [[ "$fileitem" =~ _R[12] ]]; then
-            ln -s -f ../../RAW/${sample}*_R1*.fastq.gz ${sample}_R1.fastq.gz
-            ln -s -f ../../RAW/${sample}*_R2*.fastq.gz ${sample}_R2.fastq.gz
-        elif [[ ! "$fileitem" =~ _R[12] ]]; then
-            ln -s -f ../../RAW/${sample}.fastq.gz ${sample}.fastq.gz
-        fi
-    done
+    # Require "_S" after the exact sample ID to avoid prefix matches
+    r1_files=(../../RAW/"${sample}"_S*_R1_*.fastq.gz)
+    r2_files=(../../RAW/"${sample}"_S*_R2_*.fastq.gz)
+    single_files=(../../RAW/"${sample}"_S*.fastq.gz)
+
+    if (( ${#r1_files[@]} == 1 && ${#r2_files[@]} == 1 )); then
+        ln -sfn "${r1_files[0]}" "${sample}_R1.fastq.gz"
+        ln -sfn "${r2_files[0]}" "${sample}_R2.fastq.gz"
+
+        echo "PAIRED: $sample"
+
+    elif (( ${#r1_files[@]} > 1 || ${#r2_files[@]} > 1 )); then
+        echo "ERROR: multiple FASTQ pairs found for $sample" >&2
+        printf '  %s\n' "${r1_files[@]}" "${r2_files[@]}" >&2
+
+    elif (( ${#single_files[@]} == 1 )); then
+        ln -sfn "${single_files[0]}" "${sample}.fastq.gz"
+
+        echo "SINGLE: $sample"
+
+    elif (( ${#single_files[@]} > 1 )); then
+        echo "ERROR: multiple single-end FASTQs found for $sample" >&2
+        printf '  %s\n' "${single_files[@]}" >&2
+
+    else
+        echo "MISSING: $sample" >&2
+    fi
 done < ../samples_id.txt
 
 cd -

@@ -552,7 +552,10 @@ class BioinfoDoc:
         pdf_file = html_file.replace(".html", ".pdf")
         try:
             pdfkit.from_file(
-                html_file, output_path=pdf_file, configuration=self.config_pdfkit
+                html_file,
+                output_path=pdf_file,
+                configuration=self.config_pdfkit,
+                options={"enable-local-file-access": ""},
             )
             log.info(f"PDF file created successfully: {pdf_file}")
         except OSError as e:

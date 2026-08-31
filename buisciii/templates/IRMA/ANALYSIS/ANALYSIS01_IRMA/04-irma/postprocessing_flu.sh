@@ -11,8 +11,19 @@ if test -d D; then rm -rf D; fi
 
 cat ../samples_id.txt | while read sample; do
 	echo $sample
-    FLUSUBTYPE=$(grep -w ${sample} irma_stats_flu.txt | cut -f5 | cut -d '_' -f1,2)
-    FLUTYPE=$(grep -w ${sample} irma_stats_flu.txt | cut -f5 | cut -d '_' -f1)
+    main_flu_type=$(awk -F '\t' -v s="${sample}" '
+        NR > 1 && $1 == s {
+            reads = $3 + 0
+            if (reads > best) {
+                best = reads
+                type = $5
+            }
+        }
+        END { print type }
+    ' irma_stats_flu.txt)
+
+    FLUSUBTYPE=$(echo "${main_flu_type}" | cut -d '_' -f1,2)
+    FLUTYPE=$(echo "${main_flu_type}" | cut -d '_' -f1)
 	valid_sample_name=0
 	if [ $(echo "${sample}" | grep -o "-" | wc -l) == 3 ]; then
 		# check and validate each item

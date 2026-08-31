@@ -58,7 +58,7 @@ nextflow run /data/ucct/bi/pipelines/nf-core-sarek/nf-core-sarek_3.4.4/3_4_4/mai
           --save_reference \\
           --joint_germline \\
 		  --igenomes_ignore \\
-		  --igenomes_base '/data/ucct/bi/references/igenomes/' \\
+		  --igenomes_base '/data/ucct/bi/references/refgenie/alias/' \\
 	  	  -resume
 EOF
 
