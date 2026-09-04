@@ -297,7 +297,12 @@ class CleanUp:
 
         """
         self.check_path_exists()
-        search_path = self.scratch_path if self.scratch_path else self.full_path
+
+        if self.option == "rename":
+            search_path = self.full_path
+        else:
+            search_path = self.scratch_path if self.scratch_path else self.full_path
+
         pathlist = []
         found = []
 
