@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.5dev] - 2026-09-04 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.5dev
+
+### Credits
+
+- [Magdalena Matito](https://github.com/magdasmat)
+
+### Template fixes and updates
+
+- Fixed `finish` renaming `_NC` and `_DEL` folders in scratch instead of the service directory in `clean.py` [743](https://github.com/BU-ISCIII/buisciii-tools/pull/743)
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.3.4] - 2026-08-31 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.4
 
 ### Credits
@@ -13,7 +33,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sara Monzon](https://github.com/saramonzon)
 - [Pau Pascual](https://github.com/PauPascualMas)
 - [Juan Ledesma](https://github.com/juanledesma78)
-- [Magdalena Matito](https://github.com/magdasmat)
 
 ### Template fixes and updates
 
@@ -37,7 +56,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed wrong path for summary_assembly_metrics_mqc.csv in lablog_assembly_results [#732](https://github.com/BU-ISCIII/buisciii-tools/pull/732).
 - Updated bacass to v2.7.0dev and pinned SPAdes 4.3.0 for Unicycler [#734](https://github.com/BU-ISCIII/buisciii-tools/pull/734).
 - Updated IRMA's template to handle possible flu coinfections [#736](https://github.com/BU-ISCIII/buisciii-tools/pull/736). 
-- Fixed `finish` renaming `_NC` and `_DEL` folders in scratch instead of the service directory [743](https://github.com/BU-ISCIII/buisciii-tools/pull/743)
 
 ### Modules
 
