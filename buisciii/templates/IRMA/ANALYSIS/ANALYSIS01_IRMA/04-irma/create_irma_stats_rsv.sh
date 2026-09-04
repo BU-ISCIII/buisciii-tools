@@ -14,7 +14,7 @@ while read -r in; do
                 END {
                     t+=0
                     m+=0
-                    printf "%d %d %.2f\n", t, m, t>0 ? (m/t)*100 : 0
+                    printf "%d %d %.2f\n", t, m, (t>0 ? (m/t)*100 : 0)
                 }
             ' "$FILE"
         )
