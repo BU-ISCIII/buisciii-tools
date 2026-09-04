@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Template fixes and updates
 
 - Fixed `finish` renaming `_NC` and `_DEL` folders in scratch instead of the service directory in `clean.py` [#743](https://github.com/BU-ISCIII/buisciii-tools/pull/743)
+- Fixed AWK syntax error in IRMA RSV stats generation [#744](https://github.com/BU-ISCIII/buisciii-tools/pull/744)
 
 ### Modules
 
