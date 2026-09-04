@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [Sara Monzon](https://github.com/saramonzon)
 - [Pau Pascual](https://github.com/PauPascualMas)
 - [Juan Ledesma](https://github.com/juanledesma78)
+- [Magdalena Matito](https://github.com/magdasmat)
 
 ### Template fixes and updates
 
@@ -36,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed wrong path for summary_assembly_metrics_mqc.csv in lablog_assembly_results [#732](https://github.com/BU-ISCIII/buisciii-tools/pull/732).
 - Updated bacass to v2.7.0dev and pinned SPAdes 4.3.0 for Unicycler [#734](https://github.com/BU-ISCIII/buisciii-tools/pull/734).
 - Updated IRMA's template to handle possible flu coinfections [#736](https://github.com/BU-ISCIII/buisciii-tools/pull/736). 
+- Fixed `finish` renaming `_NC` and `_DEL` folders in scratch instead of the service directory [743](https://github.com/BU-ISCIII/buisciii-tools/pull/743)
 
 ### Modules
 
