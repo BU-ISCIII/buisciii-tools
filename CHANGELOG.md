@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed AWK syntax error in IRMA RSV stats generation [#744](https://github.com/BU-ISCIII/buisciii-tools/pull/744)
 - Added A_H5_N1 to flu_type_refs.txt [#746](https://github.com/BU-ISCIII/buisciii-tools/pull/746)
+- Fixed assembly template issues [#748](https://github.com/BU-ISCIII/buisciii-tools/pull/748)
 
 ### Modules
 
