@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Modules
 
 - Fixed `finish` renaming `_NC` and `_DEL` folders in scratch instead of the service directory in `clean.py` [#743](https://github.com/BU-ISCIII/buisciii-tools/pull/743)
+- Implemented indentations application in service mails [#747](https://github.com/BU-ISCIII/buisciii-tools/pull/747)
 
 #### Implementation
 
