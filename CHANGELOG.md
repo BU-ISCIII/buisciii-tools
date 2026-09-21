@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed AWK syntax error in IRMA RSV stats generation [#744](https://github.com/BU-ISCIII/buisciii-tools/pull/744)
 - Added A_H5_N1 to flu_type_refs.txt [#746](https://github.com/BU-ISCIII/buisciii-tools/pull/746)
 - Fixed assembly template issues [#748](https://github.com/BU-ISCIII/buisciii-tools/pull/748)
+- Fixed ana.donoso's user in sftp_user.json [#751](https://github.com/BU-ISCIII/buisciii-tools/pull/751)
 
 ### Modules
 
@@ -23,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Implemented indentations application in service mails [#747](https://github.com/BU-ISCIII/buisciii-tools/pull/747)
 
 #### Implementation
+
+- Added `download-software` to check software versions in templates and download latest versions [#750](https://github.com/BU-ISCIII/buisciii-tools/pull/750)
 
 #### Added enhancements
 
