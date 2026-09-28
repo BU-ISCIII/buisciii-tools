@@ -25,8 +25,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Implementation
 
-- Added `download-software` to check software versions in templates and download latest versions [#750](https://github.com/BU-ISCIII/buisciii-tools/pull/750)
-
 #### Added enhancements
 
 #### Fixes
