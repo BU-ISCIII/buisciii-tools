@@ -65,5 +65,16 @@
     "archive": {
         "protocol": "rsync",
         "options": ["-rv"]
+    },
+    "download_software": {
+        "singularity_images_path": "/data/ucct/bi/pipelines/singularity-images",
+        "pipelines_path": "/data/ucct/bi/pipelines",
+        "logs_path": "/data/ucct/bi/logs/download_software",
+        "templates_path": "/data/ucct/bi/pipelines/buisciii-tools/buisciii/templates",
+        "depot_url": "https://depot.galaxyproject.org/singularity/",
+        "nf_core_env": "auto",
+        "nf_core_cache_mode": "amend",
+        "nf_core_cache_index": null,
+        "nf_core_compress": "none"
     }
 }

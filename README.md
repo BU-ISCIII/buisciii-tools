@@ -21,6 +21,7 @@ BU-ISCIII provides a serie or services in its portfolio for supporting bioinform
       - [bioinfo\_doc](#bioinfo_doc)
       - [archive](#archive)
       - [autoclean\_sftp](#autoclean_sftp)
+      - [download\_software](#download-software)
       - [fix-permissions](#fix-permissions)
   - [Acknowledgements](#acknowledgements)
 
@@ -98,6 +99,7 @@ Commands:
   bioinfo-doc  Create the folder documentation structure in bioinfo_doc...
   archive      Archive services or retrieve services from archive
   autoclean-sftp   Clean old sftp services
+  download-software  Check Singularity and nf-core software versions and...
   fix-permissions  Fix permissions
 ```
 
@@ -380,6 +382,38 @@ Options:
   -d, --days INTEGER      Integer, remove files older than a window of `-d
                           [int]` days. Default 14 days.
   --help                  Show this message and exit.
+```
+#### download-software
+
+Example of usage:
+
+```bash
+buisciii download-software
+```
+
+Help:
+
+```bash
+Usage: buisciii download-software [OPTIONS]
+
+  Check Singularity and nf-core software versions and download newer candidates.
+
+Options:
+  -t, --templates-path PATH  Path to templates to inspect. Default templates
+                             path: /data/ucct/bi/pipelines/buisciii-
+                             tools/buisciii/templates.
+  -i, --image TEXT           Select image names separated by commas (e.g.
+                             fastp,fastqc) to be checked and downloaded, if
+                             applicable. Skip pipelines unless --pipeline is
+                             provided.
+  -p, --pipeline TEXT        Select pipeline names separated by commas (e.g.
+                             sarek,rnaseq). Skip Singularity images unless
+                             --image is provided.
+  -c, --check-only           Check versions, write a TSV report and preview
+                             nf-core commands without downloading anything.
+  -d, --dry-run              Check versions and preview nf-core commands
+                             without creating logs, reports or downloads.
+  --help                     Show this message and exit.
 ```
 
 #### fix-permissions

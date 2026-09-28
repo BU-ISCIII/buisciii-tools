@@ -23,6 +23,7 @@ import buisciii.clean
 import buisciii.archive
 import buisciii.copy_sftp
 import buisciii.autoclean_sftp
+import buisciii.download_software
 
 log = logging.getLogger()
 
@@ -172,6 +173,17 @@ def setup_automatic_logging(service_path, resolution_id, command_name, conf):
                     service_path = tempfile.gettempdir()
             log_filename = f"{command_name}_{timestamp}.log"
             log_filepath = os.path.join(service_path, log_filename)
+
+        elif command_name == "download-software":
+            download_params = conf.get_configuration("download_software") or {}
+            logs_dir = download_params.get(
+                "logs_path",
+                os.path.join(data_path, "logs", "download_software"),
+            )
+            os.makedirs(logs_dir, exist_ok=True)
+
+            log_filename = f"download_software_{timestamp}.log"
+            log_filepath = os.path.join(logs_dir, log_filename)
 
         else:
             if command_name == "bioinfo-doc":
@@ -961,8 +973,73 @@ def autoclean_sftp(ctx, sftp_folder, days):
             sys.exit(1)
 
 
+# DOWNLOAD SOFTWARE
+@buisciii_cli.command("download-software", help_priority=9)
+@click.option(
+    "-t",
+    "--templates-path",
+    type=click.Path(),
+    default=None,
+    help="Path to templates to inspect. Default templates path: /data/ucct/bi/pipelines/buisciii-tools/buisciii/templates.",
+)
+@click.option(
+    "-i",
+    "--image",
+    multiple=True,
+    help="Select image names separated by commas (e.g. fastp,fastqc) to be checked and downloaded, if applicable. Skip pipelines unless --pipeline is provided.",
+)
+@click.option(
+    "-p",
+    "--pipeline",
+    multiple=True,
+    help="Select pipeline names separated by commas (e.g. sarek,rnaseq). Skip Singularity images unless --image is provided.",
+)
+@click.option(
+    "-c",
+    "--check-only",
+    is_flag=True,
+    default=False,
+    help="Check versions, write a TSV report and preview nf-core commands without downloading anything.",
+)
+@click.option(
+    "-d",
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Check versions and preview nf-core commands without creating logs, reports or downloads.",
+)
+@click.pass_context
+def download_software(ctx, templates_path, image, pipeline, check_only, dry_run):
+    """
+    Check Singularity and nf-core software versions and download newer candidates.
+    """
+    debug = ctx.obj.get("debug", False)
+    try:
+        if not ctx.obj.get("manual_log_file") and not dry_run:
+            setup_automatic_logging(None, None, "download-software", ctx.obj["conf"])
+
+        downloader = buisciii.download_software.DownloadSoftware(
+            ctx.obj["conf"],
+            templates_path,
+            image,
+            pipeline,
+            dry_run,
+            check_only,
+        )
+        downloader.handle_download_software()
+
+    except Exception as e:
+        if debug:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            raise
+        else:
+            log.exception(f"EXCEPTION FOUND: {e}")
+            stderr.print(f"EXCEPTION FOUND: {e}")
+            sys.exit(1)
+
+
 # FIX PERMISSIONS
-@buisciii_cli.command(help_priority=9)
+@buisciii_cli.command(help_priority=10)
 @click.option(
     "-d",
     "--input_directory",
