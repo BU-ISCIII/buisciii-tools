@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed assembly template issues [#748](https://github.com/BU-ISCIII/buisciii-tools/pull/748)
 - Fixed ana.donoso's user in sftp_user.json [#751](https://github.com/BU-ISCIII/buisciii-tools/pull/751)
 - Updated lablog_irma_results for proper coinfection reporting [#753](https://github.com/BU-ISCIII/buisciii-tools/pull/753)
+- Implemented docx report generation in tbprofiler [#755](https://github.com/BU-ISCIII/buisciii-tools/pull/755)
 
 ### Modules
 
