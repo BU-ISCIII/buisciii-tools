@@ -288,16 +288,16 @@
       "delivery_md": "assets/reports/md/sarek.md",
       "results_md": "assets/reports/results/trios.md"
     },
-    "freebayes_outbreak": {
+    "diploid_outbreak": {
       "label": "Eukaria (non-human): Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)",
-      "template": "freebayes_outbreak",
+      "template": "diploid_outbreak",
       "url": "-",
       "order": 1,
       "begin": "",
       "end": "",
       "description": "Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)",
       "clean": {
-        "folders":["02-preprocessing"],
+        "folders":[],
         "files":[]
       },
       "clean_script": "",
