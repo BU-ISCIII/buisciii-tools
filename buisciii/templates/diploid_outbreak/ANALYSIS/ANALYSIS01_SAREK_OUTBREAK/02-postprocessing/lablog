@@ -1,0 +1,58 @@
+# module load singularity
+
+scratch_dir=$(echo "$PWD" | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
+# Change the singularity images if an updated version has been downloaded.
+gatk_image="/data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.6.2.0--hdfd78af_0"
+bcftools_image="/data/ucct/bi/pipelines/singularity-images/bcftools:1.23.1--hb2cee57_0"
+mkdir -p logs
+
+cat <<EOF > _01_separate_snps_indels.sh
+#!/bin/bash
+set -euo pipefail
+srun --partition short_idx --time 02:00:00 --mem 16G --chdir "$scratch_dir" --output logs/SELECTSNPS.%j.log --job-name SELECTSNPS \\
+    singularity exec -B "$scratch_dir/../../../" "$gatk_image" gatk --java-options '-Xmx12g' SelectVariants \\
+    -V ../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \\
+    --select-type-to-include SNP -O snps.vcf.gz &
+srun --partition short_idx --time 02:00:00 --mem 16G --chdir "$scratch_dir" --output logs/SELECTINDELS.%j.log --job-name SELECTINDELS \\
+    singularity exec -B "$scratch_dir/../../../" "$gatk_image" gatk --java-options '-Xmx12g' SelectVariants \\
+    -V ../01-sarek/variant_calling/haplotypecaller/joint_variant_calling/joint_germline.vcf.gz \\
+    --select-type-to-include INDEL -O indels.vcf.gz &
+EOF
+
+cat <<EOF > _02_filter.sh
+#!/bin/bash
+set -euo pipefail
+srun --partition short_idx --time 02:00:00 --mem 16G --chdir "$scratch_dir" --output logs/FILSNP.%j.log --job-name FILSNP \\
+    singularity exec -B "$scratch_dir/../../../" "$gatk_image" gatk --java-options '-Xmx12g' VariantFiltration \\
+    -V snps.vcf.gz \\
+    --filter-expression 'QD < 2.0' --filter-name QD2 \\
+    --filter-expression 'QUAL < 30.0' --filter-name QUAL30 \\
+    --filter-expression 'SOR > 3.0' --filter-name SOR3 \\
+    --filter-expression 'FS > 60.0' --filter-name FS60 \\
+    --filter-expression 'MQ < 40.0' --filter-name MQ40 \\
+    --filter-expression 'MQRankSum < -12.5' --filter-name MQRankSum-12.5 \\
+    --filter-expression 'ReadPosRankSum < -8.0' --filter-name ReadPosRankSum-8 \\
+    -O snps_filtered.vcf.gz &
+srun --partition short_idx --time 02:00:00 --mem 16G --chdir "$scratch_dir" --output logs/FILINDEL.%j.log --job-name FILINDEL \\
+    singularity exec -B "$scratch_dir/../../../" "$gatk_image" gatk --java-options '-Xmx12g' VariantFiltration \\
+    -V indels.vcf.gz \\
+    --filter-expression 'QD < 2.0' --filter-name QD2 \\
+    --filter-expression 'QUAL < 30.0' --filter-name QUAL30 \\
+    --filter-expression 'FS > 200.0' --filter-name FS200 \\
+    --filter-expression 'ReadPosRankSum < -20.0' --filter-name ReadPosRankSum-20 \\
+    -O indels_filtered.vcf.gz &
+EOF
+
+cat <<EOF > _03_merge_vcfs.sh
+#!/bin/bash
+set -euo pipefail
+srun --partition short_idx --time 02:00:00 --mem 16G --chdir "$scratch_dir" --output logs/MERGEVCF.%j.log --job-name MERGEVCF \\
+    singularity exec -B "$scratch_dir/../../../" "$gatk_image" gatk --java-options '-Xmx12g' MergeVcfs \\
+    -I snps_filtered.vcf.gz -I indels_filtered.vcf.gz -O variants_fil.vcf.gz &
+EOF
+
+cat <<EOF > _04_gzip.sh
+#!/bin/bash
+set -euo pipefail
+srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/GZIP.log --job-name GZIP gzip -d variants_fil.vcf.gz &
+EOF

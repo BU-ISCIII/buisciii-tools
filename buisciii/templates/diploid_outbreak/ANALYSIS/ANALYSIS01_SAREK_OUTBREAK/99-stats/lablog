@@ -1,0 +1,17 @@
+# module load singularity
+
+scratch_dir=$(echo "$PWD" | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
+# Change the singularity images if an updated version has been downloaded.
+picard_image="/data/ucct/bi/pipelines/singularity-images/picard:3.5.0--hdfd78af_0"
+reference="/data/ucct/bi/references/fungi/Candida_parapsilosis/indexes/Candida_parapsilosis.GCA000182765v2.dna.toplevel.fa"
+
+mkdir -p logs picard
+cat ../../samples_id.txt | xargs -I @@ echo "srun --chdir '$scratch_dir' --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 02:00:00 --cpus-per-task 1 --mem 8G singularity exec -B '$scratch_dir/../../../,/data/ucct/bi/references' '$picard_image' env JAVA_TOOL_OPTIONS=-Xmx6g picard CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I ../01-sarek/preprocessing/markduplicates/@@/@@.md.bam -O picard/@@_collect_wgs_metrics.txt -R '$reference' &" > _02_wgsmetrics.sh
+
+# Run after checking that all Picard jobs completed successfully.
+echo "printf 'SAMPLENAME\t%s\n' \"\$(grep -h '^GENOME_TERRITORY' picard/*_collect_wgs_metrics.txt | sort -u)\" > wgs_metrics_all.txt" > _03_gather_wgs_metrics.sh
+
+# Read the row after the header, independently of the number of comment lines.
+echo "while read -r sample; do printf '%s\t' \"\$sample\"; awk '/^GENOME_TERRITORY\t/ {getline; print; exit}' \"picard/\${sample}_collect_wgs_metrics.txt\"; done < ../../samples_id.txt >> wgs_metrics_all.txt" >> _03_gather_wgs_metrics.sh
+
+echo "cut -f 1,2,3,14,17 wgs_metrics_all.txt > wgs_metrics_all_filtered.txt" >> _03_gather_wgs_metrics.sh

@@ -1,0 +1,6 @@
+# micromamba activate snphylo
+
+scratch_dir=$(echo "$PWD" | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
+mkdir -p logs
+
+echo "srun --partition middle_idx --time 24:00:00 --cpus-per-task 4 --mem 32G --chdir '$scratch_dir' --output logs/SNPHYLO.%j.log --job-name SNPHYLO Rscript --vanilla /data/ucct/bi/pipelines/snphylo/snphylo_modified_buisciii/SNPhylo/scripts/generate_snp_sequence.R -o snphylo.output -l 2 -m 0.05 -M 0.5 -t 4 -v ../02-postprocessing/variants_fil.vcf" > _01_snphylo.sh

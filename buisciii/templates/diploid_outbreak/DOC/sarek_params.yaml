@@ -1,0 +1,7 @@
+igenomes_ignore: true
+trim_fastq: true
+save_output_as_bam: true
+joint_germline: true
+concatenate_vcfs: true
+save_reference: true
+only_paired_variant_calling: false

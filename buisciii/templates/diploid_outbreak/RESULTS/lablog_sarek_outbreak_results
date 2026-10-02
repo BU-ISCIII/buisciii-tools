@@ -1,0 +1,11 @@
+DELIVERY_FOLDER="$(date '+%Y%m%d')_entrega01"
+
+mkdir -p $DELIVERY_FOLDER/variant_calling
+
+# Sarek for fungal diploid outbreak service
+cd $DELIVERY_FOLDER/variant_calling
+
+# Links to reports
+ln -s ../../../ANALYSIS/*_ANALYSIS01_SAREK_OUTBREAK/01-sarek/multiqc/multiqc_report.html .
+ln -s ../../../ANALYSIS/*_ANALYSIS01_SAREK_OUTBREAK/02-postprocessing/variants_fil.vcf .
+ln -s ../../../ANALYSIS/*_ANALYSIS01_SAREK_OUTBREAK/04-iqtree/phylo.iqtree.bootstrap.treefile .
