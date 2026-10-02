@@ -1,0 +1,45 @@
+# module load Nextflow singularity
+# nf-core/sarek 3.10.0 requires Nextflow >=25.10.4, please use the 26.04.3 version installed in the HPC.
+
+# Add the reference before running this script!
+reference=""
+
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+
+printf 'patient,sample,sex,status,lane,fastq_1,fastq_2\n' > samplesheet.csv
+while IFS= read -r sample || [[ -n "$sample" ]]; do
+    sample=${sample//$'\r'/}
+    [[ -z "$sample" ]] && continue
+    printf '%s,%s,NA,0,1,00-reads/%s_R1.fastq.gz,00-reads/%s_R2.fastq.gz\n' "$sample" "$sample" "$sample" "$sample" >> samplesheet.csv
+done < samples_id.txt
+
+scratch_dir=$(echo "$PWD" | sed 's@/data/ucct/bi/scratch_tmp/@/scratch/@g')
+
+cat <<EOF > sarek.sbatch
+#!/bin/bash
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 12G
+#SBATCH --time 2-00:00:00
+#SBATCH --partition middle_idx
+#SBATCH --output $(date '+%Y%m%d')_sarek.log
+#SBATCH --chdir $scratch_dir
+
+set -euo pipefail
+export NXF_OPTS="-Xms500M -Xmx4G"
+
+nextflow run /data/ucct/bi/pipelines/nf-core-sarek/nf-core-sarek_3.10.0/3_10_0/main.nf \\
+    -c ../../DOC/hpc_slurm_sarek.config \\
+    -params-file ../../DOC/sarek_params.yaml \\
+    --input 'samplesheet.csv' \\
+    --outdir 01-sarek \\
+    --fasta '$reference' \\
+    --tools 'haplotypecaller' \\
+    --aligner bwa-mem \\
+    --use_gatk_spark 'markduplicates' \\
+    --skip_tools 'baserecalibrator' \\
+    -resume
+EOF
+
+echo 'sbatch sarek.sbatch' > _01_run_sarek.sh
