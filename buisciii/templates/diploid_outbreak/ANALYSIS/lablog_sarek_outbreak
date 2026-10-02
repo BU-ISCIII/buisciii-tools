@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob
+
+mkdir -p 00-reads
+cd 00-reads
+
+while IFS= read -r sample || [[ -n "$sample" ]]; do
+    sample=${sample//$'\r'/}
+    [[ -z "$sample" ]] && continue
+
+    r1_files=(../../RAW/"${sample}"_*R1*.fastq.gz)
+    r2_files=(../../RAW/"${sample}"_*R2*.fastq.gz)
+    if (( ${#r1_files[@]} != 1 || ${#r2_files[@]} != 1 )); then
+        echo "ERROR: expected one FASTQ pair for $sample; check RAW files or prepare merged lanes." >&2
+        exit 1
+    fi
+    ln -sfn "${r1_files[0]}" "${sample}_R1.fastq.gz"
+    ln -sfn "${r2_files[0]}" "${sample}_R2.fastq.gz"
+done < ../samples_id.txt
+
+cd -
+mv ANALYSIS01_SAREK_OUTBREAK "$(date '+%Y%m%d')_ANALYSIS01_SAREK_OUTBREAK"
