@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated lablog_irma_results for proper coinfection reporting [#753](https://github.com/BU-ISCIII/buisciii-tools/pull/753)
 - Implemented docx report generation in tbprofiler [#755](https://github.com/BU-ISCIII/buisciii-tools/pull/755)
 - Updated obtain_family download links in lablog_viralrecon [#759](https://github.com/BU-ISCIII/buisciii-tools/pull/759)
+- Updated host paths in taxprofiler's lablog [#760](https://github.com/BU-ISCIII/buisciii-tools/pull/760)
 
 ### Modules
 
