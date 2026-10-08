@@ -1,0 +1,4 @@
+fasta: '/data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh38/fasta/release_116/Homo_sapiens.GRCh38.dna.toplevel.fa'
+gtf: '/data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh38/gtf/release_116/Homo_sapiens.GRCh38.116.gtf'
+star_index: '/data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh38/STAR_index/release_116/STAR_Homo_Sapiens_Ensembl_GRCh38/'
+salmon_index: '/data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh38/salmon_index/release_116/transcripts_index/'
