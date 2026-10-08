@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Implemented docx report generation in tbprofiler [#755](https://github.com/BU-ISCIII/buisciii-tools/pull/755)
 - Updated obtain_family download links in lablog_viralrecon [#759](https://github.com/BU-ISCIII/buisciii-tools/pull/759)
 - Updated host paths in taxprofiler's lablog [#760](https://github.com/BU-ISCIII/buisciii-tools/pull/760)
+- Updated rnaseq template to the latest pipeline and VEP releases [#761](https://github.com/BU-ISCIII/buisciii-tools/pull/761)
 
 ### Modules
 
