@@ -3,7 +3,7 @@ ln -s ../samples_id.txt .
 echo "sample,fastq_1,fastq_2,strandedness" > samplesheet.csv
 cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz,reverse"; done >> samplesheet.csv
 
-#module load Nextflow singularity
+#module load Nextflow/25.04.6 singularity
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
@@ -19,7 +19,7 @@ cat <<EOF > rnaseq.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-/data/ucct/bi/pipelines/nf-core-rnaseq/nf-core-rnaseq-3.24.0/nf-core-rnaseq_3.24.0/3_24_0/main.nf \\
+/data/ucct/bi/pipelines/nf-core-rnaseq/nf-core-rnaseq-3.26.0/nf-core-rnaseq_3.26.0/3_26_0/main.nf \\
           -c ../../DOC/hpc_slurm_rnaseq.config \\
           -params-file ../../DOC/hg38_ensmbl_rnaseq.yml \\
           --input samplesheet.csv \\
