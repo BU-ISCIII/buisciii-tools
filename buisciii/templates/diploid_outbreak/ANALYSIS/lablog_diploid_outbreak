@@ -20,4 +20,4 @@ while IFS= read -r sample || [[ -n "$sample" ]]; do
 done < ../samples_id.txt
 
 cd -
-mv ANALYSIS01_SAREK_OUTBREAK "$(date '+%Y%m%d')_ANALYSIS01_SAREK_OUTBREAK"
+mv ANALYSIS01_DIPLOID_OUTBREAK "$(date '+%Y%m%d')_ANALYSIS01_DIPLOID_OUTBREAK"
