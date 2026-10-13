@@ -21,7 +21,7 @@ export NXF_OPTS="-Xms500M -Xmx4G"
 
 /data/ucct/bi/pipelines/nf-core-rnaseq/nf-core-rnaseq-3.26.0/nf-core-rnaseq_3.26.0/3_26_0/main.nf \\
           -c ../../DOC/hpc_slurm_rnaseq.config \\
-          -params-file ../../DOC/hg38_ensmbl_rnaseq.yml \\
+          -params-file ../../DOC/hg38_ensembl_rnaseq.yml \\
           --input samplesheet.csv \\
           --outdir 01-$(date '+%Y%m%d')_rnaseq \\
           --skip_markduplicates \\
