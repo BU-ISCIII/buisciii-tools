@@ -13,18 +13,19 @@ ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance annotat
 # Prepare data for OmicsExplorer
 
 mkdir OmicsExplorer
+cd OmicsExplorer
 
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_inheritance/vep_annot_ALL_final.txt \
-./OmicsExplorer/vep_annot_ALL_genes_final_genome.txt
+ln -s ../../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_inheritance/vep_annot_ALL_final.txt \
+./vep_annot_ALL_genes_final_genome.txt
 
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_inheritance_exome/vep_annot_ALL_exome_final.txt \
-./OmicsExplorer/
+ln -s ../../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_inheritance_exome/vep_annot_ALL_exome_final.txt \
+./
 
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_inheritance_genes/vep_annot_ALL_genes_final.txt \
-./OmicsExplorer/
+ln -s ../../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance/filter_inheritance_genes/vep_annot_ALL_genes_final.txt \
+./
 
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/hsMetrics_all.out \
-./OmicsExplorer/mapping_metrics_genome.csv
+ln -s ../../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/hsMetrics_all.out \
+./mapping_metrics_genome.csv
 
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/bigwig \
-./OmicsExplorer/
+ln -s ../../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/bigwig \
+./
