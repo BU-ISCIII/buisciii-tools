@@ -4,7 +4,7 @@
 ---
 analysis:
     # hg19 or hg38 - ensure that the application has been configured to run the specified assembly otherwise it will halt.
-    genomeAssembly: hg19
+    genomeAssembly: hg38
     vcf: VCF_FILE
     ped: PED_FILE
     proband: PROBAND
