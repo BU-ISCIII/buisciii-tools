@@ -7,7 +7,7 @@ This script should be run from 03-annotation (using the _06_filter_inheritance_A
     python3 aux_postprocess_exomiser_direct.py exometrio
 
 Requires Python >=3.6. Reads inheritance_types.txt, exomiser's variants TSV
-and variants_annot_all.tab, and generates annotated results from Exomiser 
+and variants_annot_all.tab, and generates annotated results from Exomiser
 separated in different files depending on MOI. In the case of wgstrio, this is done
 for general, exome and genes results (within a folder called filter_inheritance);
 while for exometrio this is done only for exome (results are directly saved in the cwd).
@@ -60,13 +60,13 @@ def variant_key(chrom, pos, ref, alt):
 
 def read_selection(path, models):
     """Map each distinct PASS allele to its selected inheritance models.
-    Only variants from Exomiser with FILTER == PASS and MOI within 
+    Only variants from Exomiser with FILTER == PASS and MOI within
     the inheritance models external file are kept.
-    
+
     Takes the inheritance models and the variants TSV file from Exomiser
     and returns a dictionary of variants each one linked to their corresponding
     mode/s of inheritance.
-    
+
     Example of return:
     CONTIG = 15 (it is actually the chromosome)
     POSITION = 78776843
@@ -84,10 +84,14 @@ def read_selection(path, models):
                 raise ValueError("{}: incomplete row {}".format(path, reader.line_num))
             if row["FILTER"] != "PASS" or row["MOI"] not in models:
                 continue
-            if (not re.fullmatch(r"[0-9]+", row["START"])
-                    or not re.fullmatch(r"[ACGTN]+", row["REF"])
-                    or not re.fullmatch(r"[ACGTN]+", row["ALT"])):
-                raise ValueError("{}: unsupported variant at row {}".format(path, reader.line_num))
+            if (
+                not re.fullmatch(r"[0-9]+", row["START"])
+                or not re.fullmatch(r"[ACGTN]+", row["REF"])
+                or not re.fullmatch(r"[ACGTN]+", row["ALT"])
+            ):
+                raise ValueError(
+                    "{}: unsupported variant at row {}".format(path, reader.line_num)
+                )
             key = variant_key(row["CONTIG"], row["START"], row["REF"], row["ALT"])
             selected.setdefault(key, set()).add(row["MOI"])
     return selected
@@ -95,7 +99,7 @@ def read_selection(path, models):
 
 def candidates(row, selected):
     """Check which alleles of a variant were selected by Exomiser. Each
-    line of the annotations file is checked against the exomiser's variants 
+    line of the annotations file is checked against the exomiser's variants
     file. Its CHROM, POS, REF and ALT columns hold the original VCF record,
     which may have several ALT alleles (e.g. "C,CA"). Each ALT is compared
     against `selected`, not just the one this row annotates.
@@ -115,14 +119,16 @@ def candidates(row, selected):
     ALT = C
     Returns: [(('15', 78776843, 'T', 'C'), 'C', 'C')]
     """
-    if (not re.fullmatch(r"[0-9]+", row["POS"])
-            or not re.fullmatch(r"[ACGTN]+", row["REF"])):
+    if not re.fullmatch(r"[0-9]+", row["POS"]) or not re.fullmatch(
+        r"[ACGTN]+", row["REF"]
+    ):
         raise ValueError("Invalid original coordinates/REF for {}".format(row["ID"]))
     ref, alts = row["REF"], row["ALT"].split(",")
     # VEP 116 without --minimal trims ONE anchor base if the record has an
     # indel and all non-'*' alleles share that base. Empty ALT becomes '-'.
-    trim = (any(len(alt) != len(ref) for alt in alts)
-            and all(alt == "*" or (alt and alt[0] == ref[0]) for alt in alts))
+    trim = any(len(alt) != len(ref) for alt in alts) and all(
+        alt == "*" or (alt and alt[0] == ref[0]) for alt in alts
+    )
     result = []
     for alt in alts:
         if alt != "*" and not re.fullmatch(r"[ACGTN]+", alt):
@@ -156,7 +162,7 @@ def process(tsv, annotations, directory, suffix, models):
 
     Notes:
         An '*' in the ALT column of the annotations table marks a spanning deletion:
-        the position is covered by a deletion described in another record. It has no sequence, 
+        the position is covered by a deletion described in another record. It has no sequence,
         so VEP gives it no annotation, and Exomiser writes it as 'N' in its variants TSV file.
 
         Example: the record chr1:6790377 T>*,A. Exomiser selects the '*'
@@ -184,12 +190,23 @@ def process(tsv, annotations, directory, suffix, models):
     directory.mkdir()
     opener = gzip.open if annotations.suffix == ".gz" else open
     with ExitStack() as stack:
-        outputs = {m: stack.enter_context(
-            (directory / ("vep_annot_{}{}_final.txt".format(m, suffix))).open("w", encoding="utf-8")
-        ) for m in models}
-        handle = stack.enter_context(opener(annotations, "rt", newline="", encoding="utf-8"))
+        outputs = {
+            m: stack.enter_context(
+                (directory / ("vep_annot_{}{}_final.txt".format(m, suffix))).open(
+                    "w", encoding="utf-8"
+                )
+            )
+            for m in models
+        }
+        handle = stack.enter_context(
+            opener(annotations, "rt", newline="", encoding="utf-8")
+        )
         header = next(handle, "").rstrip("\r\n")
-        indexes = columns(header.split("\t"), ["ID", "CHROM", "POS", "REF", "ALT", "Allele"], annotations)
+        indexes = columns(
+            header.split("\t"),
+            ["ID", "CHROM", "POS", "REF", "ALT", "Allele"],
+            annotations,
+        )
         last = max(indexes.values())
         for output in outputs.values():
             output.write(header + "\n")
@@ -231,31 +248,46 @@ def process(tsv, annotations, directory, suffix, models):
     # Missing originals and wrong/missing Allele annotations both stop publication.
     missing = set(selected) - set(originals)
     if missing:
-        raise ValueError("{} selected variants absent from annotations; examples: {}".format(
-            len(missing), sorted(missing)[:5]))
+        raise ValueError(
+            "{} selected variants absent from annotations; examples: {}".format(
+                len(missing), sorted(missing)[:5]
+            )
+        )
     missing = selected_alleles - matched
     if missing:
-        raise ValueError("{} ID/Allele/MOI matches lack annotations; examples: {}".format(
-            len(missing), sorted(missing)[:5]))
+        raise ValueError(
+            "{} ID/Allele/MOI matches lack annotations; examples: {}".format(
+                len(missing), sorted(missing)[:5]
+            )
+        )
 
     with (directory / "selected_alleles.tsv").open("w", encoding="utf-8") as handle:
         handle.write("MOI\tFILTER\tID\tVEP_ALLELE\n")
         for id_, allele, model in sorted(selected_alleles):
             handle.write("{}\tPASS\t{}\t{}\n".format(model, id_, allele))
     stars = 0
-    with (directory / "exomiser_spanning_deletions.tsv").open("w", encoding="utf-8") as handle:
+    with (directory / "exomiser_spanning_deletions.tsv").open(
+        "w", encoding="utf-8"
+    ) as handle:
         handle.write("MOI\tID\tREF\tALT\tREASON\n")
         for key in sorted(originals):
             record, alt, allele = originals[key]
             if alt == "*":
                 for model in sorted(selected[key]):
-                    handle.write("{}\t{}\t{}\t*\tSPANNING_DELETION_PLACEHOLDER\n".format(
-                        model, record[0], record[3]))
+                    handle.write(
+                        "{}\t{}\t{}\t*\tSPANNING_DELETION_PLACEHOLDER\n".format(
+                            model, record[0], record[3]
+                        )
+                    )
                     stars += 1
     print("{}: {} '*' allele/model markers recorded".format(tsv, stars), flush=True)
     for model in models:
-        print("{}: {} PASS alleles; {} annotated rows".format(
-            model, sum(m[2] == model for m in selected_alleles), counts[model]), flush=True)
+        print(
+            "{}: {} PASS alleles; {} annotated rows".format(
+                model, sum(m[2] == model for m in selected_alleles), counts[model]
+            ),
+            flush=True,
+        )
 
 
 def main():
@@ -275,18 +307,39 @@ def main():
         if model not in models:
             models.append(model)
     if not models:
-        raise ValueError("No inheritance models supplied. Please make sure these are being provided")
+        raise ValueError(
+            "No inheritance models supplied. Please make sure these are being provided"
+        )
     annotations = Path("variants_annot_all.tab")
     if not annotations.is_file() or not annotations.stat().st_size:
         annotations = Path("variants_annot_all.tab.gz")
     require_file(annotations)
 
     # Input TSV, staging subdirectory, output suffix, destination directory.
-    analyses = [
-        ("exomiser/exomiser/exomiser.variants.tsv", "genome", "", "filter_inheritance/filter_inheritance"),
-        ("exomiser/exomiser_exome/exomiser_exome.variants.tsv", "exome", "_exome", "filter_inheritance/filter_inheritance_exome"),
-        ("exomiser/exomiser_genes/exomiser_genes.variants.tsv", "genes", "_genes", "filter_inheritance/filter_inheritance_genes"),
-    ] if args.mode == "wgstrio" else [("exomiser/exomiser.variants.tsv", "exome", "", ".")]
+    analyses = (
+        [
+            (
+                "exomiser/exomiser/exomiser.variants.tsv",
+                "genome",
+                "",
+                "filter_inheritance/filter_inheritance",
+            ),
+            (
+                "exomiser/exomiser_exome/exomiser_exome.variants.tsv",
+                "exome",
+                "_exome",
+                "filter_inheritance/filter_inheritance_exome",
+            ),
+            (
+                "exomiser/exomiser_genes/exomiser_genes.variants.tsv",
+                "genes",
+                "_genes",
+                "filter_inheritance/filter_inheritance_genes",
+            ),
+        ]
+        if args.mode == "wgstrio"
+        else [("exomiser/exomiser.variants.tsv", "exome", "", ".")]
+    )
     for tsv, name, suffix, destination in analyses:
         require_file(tsv)
 
@@ -304,7 +357,9 @@ def main():
             path.replace(dest / path.name)
         (stage / name).rmdir()
     stage.rmdir()
-    print("Annotation of exomiser's results completed! Please run _08_merge_vep_annot.sh next.")
+    print(
+        "Annotation of exomiser's results completed! Please run _08_merge_vep_annot.sh next."
+    )
 
 
 if __name__ == "__main__":
