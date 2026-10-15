@@ -280,7 +280,7 @@
       "description": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
-        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
+        "files":[]
       },
       "clean_script": "",
       "no_copy": ["RAW", "TMP"],
