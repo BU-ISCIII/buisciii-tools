@@ -104,7 +104,7 @@ done >> samplesheet.csv
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
-cat <<EOF > assembly.sbatch
+cat <<EOF | sed '/^[[:space:]]*\\$/d' > assembly.sbatch
 #!/bin/sh
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 2

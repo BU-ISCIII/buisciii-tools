@@ -132,7 +132,7 @@ Output:
 │    characterization │ Multi-Locus Sequence Typing (MLST), analysis of virulence factors, antimicrobial resistance and plasmid characterization │ -                                             │
 │             exomeeb │ Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)  │ -                                             │
 │           exometrio │ Human: Exome sequencing for variant calling, annotation and inheritance filtering                                        │ -                                             │
-│  freebayes_outbreak │ Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)                               │ -                                             │
+│  diploid_outbreak │ Variant calling, annotation and SNP-based outbreak analysis (e.g. diploid fungal outbreak)                               │ -                                             │
 │       lowfreq_panel │ Low frequency variant calling from enrichment panel                                                                      │ -                                             │
 │           pikavirus │ PikaVirus, a mapping-based tool for metagenome analysis of virus                                                         │ https://github.com/BU-ISCIII/PikaVirus        │
 │  plasmidid_assembly │ Plasmid identification tool based on mapping and assisted by assembly                                                    │ https://github.com/BU-ISCIII/plasmidID        │

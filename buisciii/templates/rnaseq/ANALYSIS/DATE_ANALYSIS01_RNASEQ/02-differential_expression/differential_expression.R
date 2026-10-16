@@ -565,7 +565,7 @@ cat(blue("########################\nStarting loading data\n#####################
 
 #### LOAD TRANSCRIPT RELATION DATA FILE #########################
 if (opt$differential_expression != "DEM") {
-  tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "tx2gene.tsv"), header = F)
+  tx2gene <- read.table(file.path(opt$rnaseq_dir, "star_salmon", "salmon.merged.tx2gene.tsv"), header = F)
   colnames(tx2gene) <- c("TXNAME", "GENEID", "gene_name")
   if ( opt$differential_expression == "DEG") {
     gene_genename <- tx2gene[,c(2:3)]

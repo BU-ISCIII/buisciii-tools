@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.5] - 2026-10-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.5
+
+### Credits
+
+- [Magdalena Matito](https://github.com/magdasmat)
+- [Victor Lopez](https://github.com/victor5lm)
+
+### Template fixes and updates
+
+- Fixed AWK syntax error in IRMA RSV stats generation [#744](https://github.com/BU-ISCIII/buisciii-tools/pull/744)
+- Added A_H5_N1 to flu_type_refs.txt [#746](https://github.com/BU-ISCIII/buisciii-tools/pull/746)
+- Fixed assembly template issues [#748](https://github.com/BU-ISCIII/buisciii-tools/pull/748)
+- Fixed ana.donoso's user in sftp_user.json [#751](https://github.com/BU-ISCIII/buisciii-tools/pull/751)
+- Updated lablog_irma_results for proper coinfection reporting [#753](https://github.com/BU-ISCIII/buisciii-tools/pull/753)
+- Implemented docx report generation in tbprofiler [#755](https://github.com/BU-ISCIII/buisciii-tools/pull/755)
+- Updated freebayes_outbreak template to diploid_outbreak [#758](https://github.com/BU-ISCIII/buisciii-tools/pull/758).
+- Updated obtain_family download links in lablog_viralrecon [#759](https://github.com/BU-ISCIII/buisciii-tools/pull/759)
+- Updated host paths in taxprofiler's lablog [#760](https://github.com/BU-ISCIII/buisciii-tools/pull/760)
+- Updated rnaseq template to the latest pipeline and VEP releases [#761](https://github.com/BU-ISCIII/buisciii-tools/pull/761)
+- Updated wgstrio template to GRCh38 and the latest pipeline versions and releases [#762](https://github.com/BU-ISCIII/buisciii-tools/pull/762)
+- Added gripelab to sftp_user.json [#766](https://github.com/BU-ISCIII/buisciii-tools/pull/766)
+
+### Modules
+
+- Fixed `finish` renaming `_NC` and `_DEL` folders in scratch instead of the service directory in `clean.py` [#743](https://github.com/BU-ISCIII/buisciii-tools/pull/743)
+- Implemented indentations application in service mails [#747](https://github.com/BU-ISCIII/buisciii-tools/pull/747)
+
+#### Implementation
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.3.4] - 2026-08-31 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.4
 
 ### Credits

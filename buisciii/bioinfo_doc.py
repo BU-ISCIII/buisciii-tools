@@ -2,6 +2,7 @@
 
 # Generic imports
 from datetime import datetime
+from html import escape
 import logging
 import rich.console
 import os
@@ -819,9 +820,7 @@ class BioinfoDoc:
                 if buisciii.utils.prompt_yn_question(
                     f"Do you want to use notes from {self.provided_txt}?", dflt=False
                 ):
-                    email_data["email_notes"] = self.delivery_notes.replace(
-                        "\n", "<br />"
-                    )
+                    email_data["email_notes"] = self.delivery_notes
                 else:
                     if buisciii.utils.prompt_yn_question(
                         msg="Do you wish to provide a text file for email notes?",
@@ -859,11 +858,11 @@ class BioinfoDoc:
 
                     if email_data["email_notes"]:
                         with open(os.path.expanduser(email_data["email_notes"])) as f:
-                            email_data["email_notes"] = f.read().replace("\n", "<br />")
+                            email_data["email_notes"] = f.read()
                     else:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                             msg="Write email notes"
-                        ).replace("\n", "<br />")
+                        )
                         log.info(f'Email notes: {email_data["email_notes"]}')
             else:
                 if buisciii.utils.prompt_yn_question(
@@ -900,12 +899,22 @@ class BioinfoDoc:
 
                 if email_data["email_notes"]:
                     with open(os.path.expanduser(email_data["email_notes"])) as f:
-                        email_data["email_notes"] = f.read().replace("\n", "<br />")
+                        email_data["email_notes"] = f.read()
                 else:
                     email_data["email_notes"] = buisciii.utils.ask_for_some_text(
                         msg="Write email notes"
-                    ).replace("\n", "<br />")
+                    )
                     log.info(f'Email notes: {email_data["email_notes"]}')
+
+        if email_data.get("email_notes"):
+            notes = email_data["email_notes"].replace("\r\n", "\n").replace("\r", "\n")
+            # Preserve indentation while allowing the remaining text to wrap.
+            email_data["email_notes"] = re.sub(
+                r"^ +",
+                lambda match: "&nbsp;" * len(match.group()),
+                escape(notes.expandtabs(4)),
+                flags=re.MULTILINE,
+            ).replace("\n", "<br />")
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
