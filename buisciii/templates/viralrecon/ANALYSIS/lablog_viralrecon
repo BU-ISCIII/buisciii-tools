@@ -269,20 +269,17 @@ check_references() {
 
     # Obtaining family information
     obtain_family() {
-        organism_id=$(curl -s "https://www.ncbi.nlm.nih.gov/nuccore/${ref}" | grep -o 'ORGANISM=[0-9]\+' | head -n 1 | awk -F '=' '{print $2}')
+        organism_id=$(curl -s "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nuccore&id=$ref&retmode=json" | jq -r '.result[]?.taxid? // empty')
         if [ -z $organism_id ]; then
             log_message "$ref not found in NCBI. Please download it manually." blk_red
             return
         fi
-        family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'TITLE="family">.*<' | awk -F 'TITLE="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
-        if [ -z $family ]; then
-            family=$(curl -s "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${organism_id}" | grep -o 'ALT="family">.*<' | awk -F 'ALT="family">' '{print $2}' | cut -d '<' -f 1 | tr '[:upper:]' '[:lower:]')
+        family=$(curl -s "https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/$organism_id/dataset_report" | jq -r '.reports[0].taxonomy.classification.family.name // empty | ascii_downcase')
             if [ -z $family ]; then
                 family="miscellanous"
                 log_message "Reference $ref does not currently belong to any family. Assigned to $family."
                 return
             fi
-        fi
         log_message "Reference $ref belongs to $family family."
     }
 

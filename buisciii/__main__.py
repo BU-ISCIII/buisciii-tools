@@ -66,7 +66,7 @@ def run_buisciii():
         highlight=False,
     )
 
-    __version__ = "2.3.4"
+    __version__ = "2.3.5"
     stderr.print(
         "[grey39]    BUISCIII-tools version {}".format(__version__), highlight=False
     )
