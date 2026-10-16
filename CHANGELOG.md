@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.5dev] - 2026-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.5dev
+## [2.3.5] - 2026-10-16 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.5
 
 ### Credits
 
@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated host paths in taxprofiler's lablog [#760](https://github.com/BU-ISCIII/buisciii-tools/pull/760)
 - Updated rnaseq template to the latest pipeline and VEP releases [#761](https://github.com/BU-ISCIII/buisciii-tools/pull/761)
 - Updated wgstrio template to GRCh38 and the latest pipeline versions and releases [#762](https://github.com/BU-ISCIII/buisciii-tools/pull/762)
+- Added gripelab to sftp_user.json [#766](https://github.com/BU-ISCIII/buisciii-tools/pull/766)
 
 ### Modules
 
