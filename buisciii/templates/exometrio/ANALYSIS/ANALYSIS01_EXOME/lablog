@@ -1,9 +1,9 @@
-# module load Nextflow singularity
+# module load Nextflow/26.04.3 singularity
 
 ln -s ../00-reads/ .
 ln -s ../samples_id.txt .
 
-# create ped file:
+# create PED file:
 while read -r sample;
 do
     family_id=${sample%?}
@@ -18,17 +18,16 @@ do
     elif [ "$suffix" == "3" ]; then
         echo -e "$family_id\t${sample}_${sample}\t${father}_${father}\t${mother}_${mother}\t1\t2" >> ../../DOC/family.ped
     else
-        echo -e "$family_id\t${sample}_${sample}\t${father}_${father}\t${mother}_${mother}\t1\t1" >> ../../DOC/family.ped
+        echo -e "$family_id\t${sample}_${sample}\t${father}_${father}\t${mother}_${mother}\t1\t1" >> ../../DOC/family.ped # The brother could be affected but there's only one proband that should be analysed for Exomiser.
         echo "[INFO] Extra individual found for family $family_id: $sample"
-        echo "[INFO] Please double-check ../../DOC/family.ped and verify the individual assignment:"
+        echo "[INFO] Please double-check ../../DOC/family.ped and verify the individual assignment!"
         echo "[INFO] Format: FAMILY  SAMPLE  FATHER  MOTHER  SEX  PHENOTYPE"
     fi
 
 done < ./samples_id.txt
 
 echo -e "patient,sex,status,sample,lane,fastq_1,fastq_2" > samplesheet.csv
-cat samples_id.txt | xargs -I % echo -e "%,XY,0,%,1,00-reads/%_R1.fastq.gz,00-reads/%_R2.fastq.gz" >> samplesheet.csv
-mkdir -p 02-postprocessing 03-annotation 99-stats
+cat samples_id.txt | xargs -I % echo -e "%,NA,0,%,1,00-reads/%_R1.fastq.gz,00-reads/%_R2.fastq.gz" >> samplesheet.csv
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
@@ -44,26 +43,18 @@ cat <<EOF > sarek.sbatch
 
 export NXF_OPTS="-Xms500M -Xmx4G"
 
-nextflow run /data/ucct/bi/pipelines/nf-core-sarek/nf-core-sarek_3.4.4/3_4_4/main.nf \\
-          -c ../../DOC/hpc_slurm_sarek.config \\
-          --input 'samplesheet.csv' \\
-          --outdir 01-sarek \\
-          --genome GATK.GRCh37 \\
-	  	  --wes \\
-          --intervals '../../REFERENCES/Illumine_Exome_CEX_TargetedRegions_v1.2_modb37_mod.bed' \\
-          --dbsnp '/data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz' \\
-	      --dbsnp_tbi '/data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/variants/20131208/dbsnp_138_mod.b37.vcf.gz.tbi' \\
-	      --dbsnp_vqsr '--resource:dbsnp,known=false,training=true,truth=false,prior=2.0 dbsnp_138_mod.b37.vcf.gz' \\
-	      --tools 'haplotypecaller' \\
-          --save_reference \\
-          --joint_germline \\
-		  --igenomes_ignore \\
-		  --igenomes_base '/data/ucct/bi/references/refgenie/alias/' \\
-	  	  -resume
+nextflow run /data/ucct/bi/pipelines/nf-core-sarek/nf-core-sarek_3.10.0/3_10_0/main.nf \\
+        -c ../../DOC/hpc_slurm_sarek.config \\
+        -params-file ../../DOC/exometrio_sarek_params.yaml \\
+        --input 'samplesheet.csv' \\
+        --outdir 01-sarek \\
+        --genome GATK.GRCh38 \\
+        --intervals '/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed' \\
+        --igenomes_base '/data/ucct/bi/references/refgenie/alias' \\
+        --tools 'haplotypecaller' \\
+        -resume
 EOF
 
 echo "sbatch sarek.sbatch" > _01_run_sarek.sh
 
 echo "srun --partition middle_idx --chdir $scratch_dir rm -rf work &" > _02_clean.sh
-echo "srun --partition middle_idx --chdir $scratch_dir rm -rf 01-sarek/gatk4/ &" >> _02_clean.sh
-echo "srun --partition middle_idx --chdir $scratch_dir rm -rf 01-sarek/preprocessing/markduplicates &" >> _02_clean.sh
