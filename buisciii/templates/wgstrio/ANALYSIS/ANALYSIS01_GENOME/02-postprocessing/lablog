@@ -4,7 +4,6 @@
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 gatk_image="/data/ucct/bi/pipelines/singularity-images/gatk4-spark:4.6.2.0--hdfd78af_0"
-bcftools_image="/data/ucct/bi/pipelines/singularity-images/bcftools:1.23.1--hb2cee57_0"
 mkdir -p logs
 
 cat <<EOF > _01_separate_snps_indels.sh
