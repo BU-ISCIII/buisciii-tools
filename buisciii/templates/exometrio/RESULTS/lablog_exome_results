@@ -6,19 +6,20 @@ cd $(date '+%Y%m%d')_entrega01
 
 ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out mapping_metrics.csv
 ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/01-sarek/multiqc/multiqc_report.html .
-ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/variants_*filterAF*.tab .
+ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/variants_*filterAF*.tab.gz .
 
 mkdir annotation_tables
 cd annotation_tables; ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot*.txt . ; cd -
 
 # Prepare data for OmicsExplorer
 mkdir OmicsExplorer
+cd OmicsExplorer
 
-ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot_ALL_final.txt \
+ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/03-annotation/vep_annot_ALL_final.txt \
 ./OmicsExplorer/vep_annot_ALL_final_exome.txt
 
-ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out \
+ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/hsMetrics_all.out \
 ./OmicsExplorer/mapping_metrics_exome.csv
 
-ln -s ../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/bigwig \
+ln -s ../../../ANALYSIS/*ANALYSIS01_EXOME/99-stats/bigwig \
 ./OmicsExplorer/
