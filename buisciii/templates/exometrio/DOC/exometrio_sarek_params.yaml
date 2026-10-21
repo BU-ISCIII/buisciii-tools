@@ -1,0 +1,4 @@
+joint_germline: true
+igenomes_ignore: true
+wes: true
+save_reference: true
