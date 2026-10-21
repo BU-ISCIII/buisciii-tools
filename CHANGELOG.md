@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Template fixes and updates
 
-- Updated diploid_outbreak template by adding missing subfolders and fixing minor issues with 99-stats' lablog script [#770](https://github.com/BU-ISCIII/buisciii-tools/pull/770)
+- Updated diploid_outbreak template by adding missing subfolders and fixing minor issues with 99-stats' lablog script [#770](https://github.com/BU-ISCIII/buisciii-tools/pull/770).
+- Updated exometrio, exomeeb and wgstrio templates with GRCh38 and latest software versions [#771](https://github.com/BU-ISCIII/buisciii-tools/pull/771).
 
 ### Modules
 
