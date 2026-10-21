@@ -244,7 +244,7 @@
       "description": "Human: Exome sequencing for variant calling, annotation and inheritance filtering",
       "clean": {
         "folders":["02-postprocessing", "01-sarek/preprocessing/markduplicates", "03-annotation/vep", "03-annotation/exomiser"],
-        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
+        "files":["03-annotation/dbNSFP_ENSG_gene_GRCh38.txt", "03-annotation/dbNSFP_ENSG_plugin_hg38.txt"]
       },
       "clean_script": "",
       "no_copy": ["RAW", "TMP"],
@@ -262,7 +262,7 @@
       "description": "Eukaria: Variant calling and annotation for a sequencing panel (e.g. epidermolysis gene panel, mouse or rat gene panel)",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing"],
-        "files":["03-annotation/dbNSFP_ENSG_plugin_hg19.txt", "03-annotation/dbNSFP_ENSG_plugin_Columns.txt"]
+        "files":["03-annotation/dbNSFP_ENSG_gene_GRCh38.txt"]
       },
       "clean_script": "",
       "no_copy": ["RAW", "TMP"],
@@ -280,7 +280,7 @@
       "description": "Human: Whole genome sequencing for SNPs variant calling, annotation and inheritance filtering",
       "clean": {
         "folders":["01-sarek/preprocessing/markduplicates", "02-postprocessing", "03-annotation/vep", "03-annotation/exomiser"],
-        "files":[]
+        "files":["03-annotation/dbNSFP_ENSG_gene_GRCh38.txt", "03-annotation/dbNSFP_ENSG_plugin_hg38.txt"]
       },
       "clean_script": "",
       "no_copy": ["RAW", "TMP"],
