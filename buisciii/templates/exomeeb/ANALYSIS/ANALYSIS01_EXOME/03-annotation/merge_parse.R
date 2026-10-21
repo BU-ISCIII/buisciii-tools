@@ -1,10 +1,32 @@
-args = commandArgs(trailingOnly=TRUE)
-variants_file <- args[1]
-variants_annot_file <- args[2]
+#!/usr/bin/env Rscript
+# Attach original coordinates, alleles, FILTER and sample genotypes to VEP rows.
+# Usage: Rscript merge_parse.R vep/variants.table vep/vep_dbNSFP.txt
+suppressPackageStartupMessages(library(data.table))
+setDTthreads(as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1")))
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 2L) stop("Expected variants.table and annotated VEP table")
 
-variants <- read.table(variants_file,header=T,sep="\t",quote="")
-variants_annot <- read.csv(variants_annot_file,header=T,sep="\t",quote="")
+variants <- fread(args[1], sep = "\t", header = TRUE, quote = "",
+                  colClasses = "character", na.strings = NULL, check.names = TRUE)
+annotations <- fread(args[2], sep = "\t", header = TRUE, quote = "",
+                     colClasses = "character", na.strings = NULL, check.names = TRUE)
+if (!"ID" %in% names(variants) || !"ID" %in% names(annotations)) {
+    stop("Both tables require an ID column")
+}
+if (anyNA(variants$ID) || any(variants$ID %in% c("", ".")) ||
+    anyDuplicated(variants$ID)) {
+    stop("variants.table must contain one row per non-empty variant ID")
+}
 
-table_comp <- merge(variants,variants_annot,by="ID",all.x=F,all.y=F)
+# Each VEP transcript/allele row
+# receives the genotype fields for its original VCF record.
+result <- merge(variants, annotations, by = "ID", all.x = FALSE, all.y = FALSE)
+message("Genotype join: ", nrow(annotations), " annotation rows -> ",
+        nrow(result), " rows")
+if (nrow(result) != nrow(annotations)) {
+    stop("Some annotation IDs have no match in variants.table; check the inputs")
+}
 
-write.table(table_comp, file="variants_annot_all.tab", sep="\t", na="-", row.names=F, quote=FALSE)
+output <- "./variants_annot_all.tab"
+fwrite(result, paste0(output, ".partial"), sep = "\t", na = "-", quote = FALSE)
+if (!file.rename(paste0(output, ".partial"), output)) stop("Cannot publish ", output)
