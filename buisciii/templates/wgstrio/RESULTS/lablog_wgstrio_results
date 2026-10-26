@@ -6,7 +6,7 @@ cd $(date '+%Y%m%d')_entrega01
 
 ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/99-stats/hsMetrics_all.out mapping_metrics.csv
 ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/01-sarek/multiqc/multiqc_report.html .
-ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/variants_*filterAF*.tab .
+ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/variants_*filterAF*.tab.gz .
 
 ln -s ../../ANALYSIS/*ANALYSIS01_GENOME/03-annotation/filter_inheritance annotation_tables
 

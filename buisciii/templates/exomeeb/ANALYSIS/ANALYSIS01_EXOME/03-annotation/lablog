@@ -1,15 +1,42 @@
 # module load singularity
-# module load Java/17.0.2.lua R/4.2.1
+# micromamba activate R_4.4.3
 
-scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+set -euo pipefail
 
-ln -s /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP_ENSG_gene_GRCh37.txt .
-mkdir -p vep
-mkdir -p exomiser
-mkdir -p logs
+scratch_dir=$(pwd | sed 's|^/data/ucct/bi/scratch_tmp|/scratch|')
+VEP_CACHE=/data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh38/cache_vep/release_116
+VEP_FASTA=/data/ucct/bi/references/refgenie/alias/Homo_sapiens_GATK_GRCh38/fasta/v20181116/Homo_sapiens_assembly38.fasta
+VEP_IMAGE=/data/ucct/bi/pipelines/singularity-images/ensembl-vep:116.0--pl5321h2a3209d_0
+VEP_PLUGINS=/data/ucct/bi/references/refgenie/alias/Homo_sapiens_Ensembl_GRCh38/cache_vep/Plugins
+DBNSFP_DIR=/data/ucct/bi/references/refgenie/alias/Homo_sapiens_dbNSFP/GRCh38/v5.4
+DBNSFP_VARIANTS=${DBNSFP_DIR}/dbNSFP5.4a_grch38.gz
+DBNSFP_GENES=${DBNSFP_DIR}/dbNSFP5.4_ENSG_gene.txt
+DBNSFP_FIELDS=clinvar_id,clinvar_trait,clinvar_OMIM_id,clinvar_Orphanet_id,HGVSc_snpEff,HGVSp_snpEff,SIFT_score,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_pred,MutationTaster_score,MutationTaster_pred,MutationAssessor_score,MutationAssessor_pred,PROVEAN_score,PROVEAN_pred,VEST4_score,MetaSVM_score,MetaSVM_pred,MetaLR_score,MetaLR_pred,CADD_raw,CADD_phred,GERP++_NR,GERP++_RS,phyloP100way_vertebrate,phastCons100way_vertebrate
+BCFTOOLS_IMAGE=/data/ucct/bi/pipelines/singularity-images/bcftools:1.12--h45bccc9_1
+EXOMISER_APP=/data/ucct/bi/pipelines/exomiser/exomiser-cli-15.1.0/app
 
+# Fail before generating jobs when an input/reference is missing.
+for file in "$VEP_FASTA" "${VEP_FASTA}.fai" "$VEP_IMAGE" "$BCFTOOLS_IMAGE" \
+    "$VEP_PLUGINS/dbNSFP.pm" "$VEP_PLUGINS/dbNSFP_replacement_logic" \
+    "$DBNSFP_VARIANTS" "${DBNSFP_VARIANTS}.tbi" "$DBNSFP_GENES" \
+    "$EXOMISER_APP/exomiser-cli-15.1.0.jar" "$EXOMISER_APP/application.properties" \
+    ../02-postprocessing/variants_fil.vcf ../../../DOC/family.ped \
+    merge_dbNSFP.R merge_parse.R exomiser_configfile.yml
+do
+    [[ -s "$file" ]] || { echo "ERROR: missing or empty file: $file" >&2; exit 1; }
+done
 
-# 1 . Lablog to modify VCF ID field before running VEP.
+mkdir -p vep exomiser logs
+# Keep an existing link only if it already resolves to the requested resource.
+if [[ -e dbNSFP_ENSG_gene_GRCh38.txt || -L dbNSFP_ENSG_gene_GRCh38.txt ]]; then
+    [[ $(realpath dbNSFP_ENSG_gene_GRCh38.txt) == "$(realpath "$DBNSFP_GENES")" ]] || {
+        echo 'ERROR: dbNSFP_ENSG_gene_GRCh38.txt points to a different resource' >&2; exit 1;
+    }
+else
+    ln -fns "$DBNSFP_GENES" dbNSFP_ENSG_gene_GRCh38.txt
+fi
+
+# 1. Lablog to modify VCF ID field before running VEP.
 echo "awk 'BEGIN{FS=\"\t\";OFS=\"\t\"} {if( \$0 ~ /^#/ ){print \$0}else{printf \"%s\t%s\t%s\t\", \$1,\$2,\$1\"_\"\$2\"_\"\$4\"_\"\$5 ; for (i=4; i<=NF; i++){printf \"%s\t\",\$i} ; printf \"\n\"}}' ../02-postprocessing/variants_fil.vcf > ./vep/variants_fil_mod.vcf" > _01_bcftools_query.sh
 echo "sed -i 's/\t$//' ./vep/variants_fil_mod.vcf" >> _01_bcftools_query.sh
 
@@ -22,34 +49,67 @@ echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output 
 
 ## 4-5. Lablog for annotating whole genome samples using Variant Effect Predictor (VEP).
 
-echo "srun --partition short_idx --mem 100G --time 4:00:00 --chdir ${scratch_dir} --output logs/VEP.log --job-name VEP singularity exec -B /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/ -B /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/homo_sapiens -B /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/ -B ${scratch_dir}/../../../ /data/ucct/bi/pipelines/singularity-images/ensembl-vep:103.1--pl5262h4a94de4_2 vep --fasta /data/ucct/bi/references/eukaria/homo_sapiens/hg19/1000genomes_b37/genome/human_g1k_v37.fasta -i ${scratch_dir}/vep/variants_fil_mod.vcf -o ${scratch_dir}/vep/vep_annot.vcf --cache --offline --dir_cache /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/ --everything --dir_plugins /data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/Plugins/ --assembly GRCh37 --tab --plugin dbNSFP,/data/ucct/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP4.1a_grch37.gz,clinvar_id,clinvar_trait,clinvar_OMIM_id,clinvar_Orphanet_id,HGVSc_snpEff,HGVSp_snpEff,SIFT_score,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_pred,MutationTaster_score,MutationTaster_pred,MutationAssessor_score,MutationAssessor_pred,FATHMM_score,FATHMM_pred,PROVEAN_score,PROVEAN_pred,VEST4_score,MetaSVM_score,MetaSVM_pred,MetaLR_score,MetaLR_pred,CADD_raw,CADD_phred,CADD_raw_hg19,CADD_phred_hg19,GERP++_NR,GERP++_RS,phyloP100way_vertebrate,phastCons100way_vertebrate &" > _02_vep_annotation.sh
+cat > _02_vep_annotation.sh <<SCRIPT
+#!/usr/bin/env bash
+set -euo pipefail
+srun --partition short_idx --mem 100G --time 4:00:00 --chdir "$scratch_dir" --output "logs/VEP.log" --job-name VEP \\
+    singularity exec -B /data/ucct/bi/references -B "${scratch_dir}/../../../" "$VEP_IMAGE" \\
+    vep --fasta "$VEP_FASTA" -i "$scratch_dir/vep/variants_fil_mod.vcf" -o "$scratch_dir/vep/vep_annot.vcf" \\
+    --cache --offline --dir_cache "$VEP_CACHE" --cache_version 116 --assembly GRCh38 --species homo_sapiens \\
+    --everything --tab --force_overwrite --safe --dir_plugins "$VEP_PLUGINS" \\
+    --plugin "dbNSFP,$DBNSFP_VARIANTS,$VEP_PLUGINS/dbNSFP_replacement_logic,$DBNSFP_FIELDS" &
+SCRIPT
 
-echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" > _03_merge_data1.sh
-echo "sed -i 's/#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_merge_data1.sh
+echo "grep -v '^##' ./vep/vep_annot.vcf > ./vep/vep_annot_head.txt" > _03_merge_data.sh
+echo "sed -i '1s/^#Uploaded_variation/ID/' ./vep/vep_annot_head.txt" >> _03_merge_data.sh
 
 # 6. Merge the output generated by VEP with dbNSFP_ENSG_gene_compl.txt
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEDBNFSP.log --job-name MERGEDBNSFP Rscript merge_dbNSFP.R ./vep/vep_annot_head.txt ./dbNSFP_ENSG_gene_GRCh37.txt &" >> _03_merge_data1.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEDBNFSP.log --job-name MERGEDBNSFP Rscript merge_dbNSFP.R ./vep/vep_annot_head.txt ./dbNSFP_ENSG_gene_GRCh38.txt &" >> _03_merge_data.sh
 
 # 7. Once we have merged Vep output with gene notation from dbNSFP,we have to merge again with variants.table file.
 
-echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt &" >> _04_merge_data2.sh
+echo "srun --partition short_idx --time 2:00:00 --chdir ${scratch_dir} --output logs/MERGEPARSE.log --job-name MERGEPARSE Rscript merge_parse.R ./vep/variants.table ./vep/vep_dbNSFP.txt &" >> _04_merge_data.sh
 
 # 8. Consequence filtering
-echo 'grep -P "(HIGH|MODERATE)" ./variants_annot_all.tab > ./variants_annot_highModerate.tab ' > _05_conseq_filtering.sh
+cat > _05_conseq_filtering.sh <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+awk 'BEGIN {FS=OFS="\t"}
+    NR==1 {
+        for (i=1; i<=NF; i++) if ($i=="IMPACT") {impact=i; found++}
+        if (found!=1) {print "ERROR: expected one IMPACT column" > "/dev/stderr"; exit 1}
+        print; next
+    }
+    $impact=="HIGH" || $impact=="MODERATE" {print}
+' ./variants_annot_all.tab > ./variants_annot_highModerate.tab.partial
+mv ./variants_annot_highModerate.tab.partial ./variants_annot_highModerate.tab
+SCRIPT
 
 # 9. Running exomiser
-vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
-proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-output_folder=$(realpath ./exomiser/exomiser | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed 's|^/data/ucct/bi/scratch_tmp|/scratch|')
+proband=$(awk '$0 !~ /^#/ && $6 == 2 {print $2}' ../../../DOC/family.ped)
+[[ -n "$proband" && "$proband" != *$'\n'* ]] || {
+    echo 'ERROR: family.ped must identify exactly one affected proband' >&2; exit 1;
+}
+output_folder="$scratch_dir/exomiser"
+sed -i "s|VCF_FILE|${vcf_file}|g;s|PROBAND|${proband}|g;s|OUTPUT_FOLDER|${output_folder}|g" exomiser_configfile.yml
 
-sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
-sed -i "s|PROBAND|${proband}|g" ./exomiser_configfile.yml
-sed -i "s|OUTPUT_FOLDER|${output_folder}|g" ./exomiser_configfile.yml
+cat > aux_06_exomiser_exome.sh <<SCRIPT
+#!/usr/bin/env bash
+set -euo pipefail
+module load Java/21.0.2
+java -Xms2g -Xmx4g -jar "$EXOMISER_APP/exomiser-cli-15.1.0.jar" analyse --analysis "$scratch_dir/exomiser_configfile.yml"
+SCRIPT
+cat > _06_exomiser_exome.sh <<SCRIPT
+#!/usr/bin/env bash
+set -euo pipefail
+srun --partition short_idx --mem 100G --time 2:00:00 --chdir "$EXOMISER_APP" --output "logs/EXOMISER.log" --job-name EXOMISER bash -l "$scratch_dir/aux_06_exomiser_exome.sh" &
+SCRIPT
 
-# THE FILE "spring.log" MUST BE DELETED IN THE CORRESPONDING NODE
-echo "java -Xms2g -Xmx4g -jar exomiser-cli-13.0.0.jar --analysis ${scratch_dir}/exomiser_configfile.yml; rm /tmp/spring.log" > aux_06_exomiser_exome.sh
-echo "srun --partition short_idx --mem 100G --time 2:00:00 --chdir /data/ucct/bi/pipelines/exomiser/exomiser-cli-13.0.0 --output logs/EXOMISER.log --job-name EXOMISER bash ${scratch_dir}/aux_06_exomiser_exome.sh &" > _06_exomiser_exome.sh
-
-# annot_all table is huge, lets shrink it a little bit
-echo "srun --partition short_idx --chdir ${scratch_dir} --output logs/COMPRESS_ALL.log --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" >> _07_gzip_table.sh
+# 7. Run compression only after both R merges and consequence filtering succeed.
+cat > _07_gzip_table.sh <<SCRIPT
+#!/usr/bin/env bash
+set -euo pipefail
+srun --partition short_idx --time 2:00:00 --chdir "$scratch_dir" --output "logs/COMPRESS_ALL.log" --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &
+SCRIPT

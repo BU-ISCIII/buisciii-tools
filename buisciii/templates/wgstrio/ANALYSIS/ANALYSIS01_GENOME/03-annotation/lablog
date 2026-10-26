@@ -23,8 +23,8 @@ done
 
 scratch_dir=$(echo "$PWD" | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
-ln -s "$DBNSFP_DIR/dbNSFP5.4_ENSG_gene.txt" dbNSFP_ENSG_gene_GRCh38.txt
-ln -s "$DBNSFP_DIR/dbNSFP5.4a_plugin_GRCh38.txt" dbNSFP_ENSG_plugin_hg38.txt
+ln -nfs "$DBNSFP_DIR/dbNSFP5.4_ENSG_gene.txt" dbNSFP_ENSG_gene_GRCh38.txt
+ln -nfs "$DBNSFP_DIR/dbNSFP5.4a_plugin_GRCh38.txt" dbNSFP_ENSG_plugin_hg38.txt
 mkdir -p vep
 mkdir -p logs
 mkdir -p exomiser/{exomiser,exomiser_exome,exomiser_genes}
@@ -130,7 +130,7 @@ echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir ${EXOMISER_A
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../REFERENCES/exomiser_exome_GRCh38.bed | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed"
 output_folder=$(realpath ./exomiser/exomiser_exome/exomiser_exome | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_exome.yml
@@ -147,7 +147,7 @@ echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir ${EXOMISER_A
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file=$(realpath ../../../REFERENCES/exomiser_genes_GRCh38.bed | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed"
 output_folder=$(realpath ./exomiser/exomiser_genes/exomiser_genes | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_genes.yml
@@ -173,9 +173,10 @@ EOF
 
 #--------------------------------------------------------------------------------------------------------
 
-#11. Compress variants_annot_all.tab, once annotation of Exomiser's results is finished.
+#11. Compress variants_annot_all.tab, once annotation of Exomiser's results is finished, along with the filtered table.
 
-echo "srun --partition short_idx --time 12:00:00 --chdir ${scratch_dir} --output "logs/COMPRESS.log" --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" > _07_compress_variants_table.sh
+echo "srun --partition short_idx --time 12:00:00 --chdir ${scratch_dir} --output "logs/COMPRESS_ANNOT_ALL.log" --job-name COMPRESS_ANNOT_ALL gzip variants_annot_all.tab &" > _07_compress_variants_tables.sh
+echo "srun --partition short_idx --time 12:00:00 --chdir ${scratch_dir} --output "logs/COMPRESS_FILTERAF.log" --job-name COMPRESS_FILTERAF gzip variants_annot_filterAF_head.tab &" >> _07_compress_variants_tables.sh
 
 #--------------------------------------------------------------------------------------------------------
 
