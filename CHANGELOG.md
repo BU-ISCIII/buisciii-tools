@@ -4,18 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.7dev] - 2026-XX-XX : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.7dev
+
+### Credits
+
+- [Magdalena Matito](https://github.com/magdasmat)
+
+### Template fixes and updates
+
+- Fix Exomiser variants.tsv paths and update exome/genes BED files in wgstrio 03-annotation lablog [#779](https://github.com/BU-ISCIII/buisciii-tools/pull/779)
+
+### Modules
+
+#### Implementation
+
+#### Added enhancements
+
+#### Fixes
+
+#### Changed
+
+#### Removed
+
+### Requirements
+
 ## [2.3.6] - 2026-10-23 : https://github.com/BU-ISCIII/buisciii-tools/releases/tag/2.3.6
 
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
-- [Magdalena Matito](https://github.com/magdasmat)
 
 ### Template fixes and updates
 
 - Updated diploid_outbreak template by adding missing subfolders and fixing minor issues with 99-stats' lablog script [#770](https://github.com/BU-ISCIII/buisciii-tools/pull/770).
 - Updated exometrio, exomeeb and wgstrio templates with GRCh38 and latest software versions [#771](https://github.com/BU-ISCIII/buisciii-tools/pull/771).
-- Fix Exomiser variants.tsv paths in wgstrio postprocess template [#779](https://github.com/BU-ISCIII/buisciii-tools/pull/779)
 
 ### Modules
 

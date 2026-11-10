@@ -114,7 +114,7 @@ EOF
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-output_folder=$(realpath ./exomiser/exomiser/exomiser | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile.yml
 sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile.yml
@@ -131,7 +131,7 @@ vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
 bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed"
-output_folder=$(realpath ./exomiser/exomiser_exome/exomiser_exome | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser_exome | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_exome.yml
 sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile_exome.yml
@@ -148,7 +148,7 @@ vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
 bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed"
-output_folder=$(realpath ./exomiser/exomiser_genes/exomiser_genes | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
+output_folder=$(realpath ./exomiser/exomiser_genes | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_genes.yml
 sed -i "s|PED_FILE|${ped_file}|g" ./exomiser_configfile_genes.yml

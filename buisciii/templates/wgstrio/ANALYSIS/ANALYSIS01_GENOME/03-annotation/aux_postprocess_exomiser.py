@@ -319,19 +319,19 @@ def main():
     analyses = (
         [
             (
-                "exomiser/exomiser/exomiser/exomiser.variants.tsv",
+                "exomiser/exomiser/exomiser.variants.tsv",
                 "genome",
                 "",
                 "filter_inheritance/filter_inheritance",
             ),
             (
-                "exomiser/exomiser_exome/exomiser_exome/exomiser.variants.tsv",
+                "exomiser/exomiser_exome/exomiser.variants.tsv",
                 "exome",
                 "_exome",
                 "filter_inheritance/filter_inheritance_exome",
             ),
             (
-                "exomiser/exomiser_genes/exomiser_genes/exomiser.variants.tsv",
+                "exomiser/exomiser_genes/exomiser.variants.tsv",
                 "genes",
                 "_genes",
                 "filter_inheritance/filter_inheritance_genes",
