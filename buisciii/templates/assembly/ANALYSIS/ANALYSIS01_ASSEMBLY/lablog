@@ -57,11 +57,6 @@ select TRIMMED in "${trim_options[@]}"; do
 done
 print_color "Selected trimmed file option: $TRIMMED save trimmed" 'green'
 
-SAVE_TRIMMED_ARG=""
-if [ "$SAVETRIMMED" = "true" ]; then
-    SAVE_TRIMMED_ARG="--save_trimmed"
-fi
-
 # Select Prokka gram type
 gram_options=("+" "-" "skip")
 
@@ -102,6 +97,14 @@ cat samples_id.txt | while read in; do
     fi
 done >> samplesheet.csv
 
+# SETUP PARAMS
+
+echo '
+skip_kraken2: true
+skip_polish: true
+save_trimmed: ${SAVETRIMMED}
+' > ../../DOC/${DATE}_bacass_params.yaml
+
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 cat <<EOF | sed '/^[[:space:]]*\\$/d' > assembly.sbatch
@@ -114,19 +117,17 @@ cat <<EOF | sed '/^[[:space:]]*\\$/d' > assembly.sbatch
 #SBATCH --output $(date '+%Y%m%d')_assembly01.log
 #SBATCH --chdir $scratch_dir
 
-# module load Nextflow/25.04.6 singularity
+# module load Nextflow/26.04.3 singularity
 export NXF_OPTS="-Xms500M -Xmx8G"
 
-nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.7.0dev/nf-core-bacass_dev/dev/main.nf \\
+nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.7.0/nf-core-bacass_2.7.0/2_7_0/main.nf \\
         -c ../../DOC/hpc_slurm_assembly.config \\
         -profile singularity \\
+        -params-file ../../DOC/${DATE}_bacass_params.yaml
         --input samplesheet.csv \\
         --outdir ./ \\
         --assembly_type ${ASSEMBLY_MODE} \\
         --assembler ${ASSEMBLER} \\
-        --skip_polish \\
-        ${SAVE_TRIMMED_ARG} \\
-        --skip_kraken2 \\
         --kmerfinderdb /data/ucct/bi/references/kmerfinder/latest/bacteria \\
         --ncbi_assembly_metadata /data/ucct/bi/references/bacteria/20240626/assembly_summary_refseq.txt \\
         ${PROKKA_ARGS} \\
