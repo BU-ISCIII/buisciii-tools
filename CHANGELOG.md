@@ -9,11 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Victor Lopez](https://github.com/victor5lm)
+- [Enrique Sapena](https://github.com/ESapenaVentura)
 
 ### Template fixes and updates
 
 - Updated diploid_outbreak template by adding missing subfolders and fixing minor issues with 99-stats' lablog script [#770](https://github.com/BU-ISCIII/buisciii-tools/pull/770).
 - Updated exometrio, exomeeb and wgstrio templates with GRCh38 and latest software versions [#771](https://github.com/BU-ISCIII/buisciii-tools/pull/771).
+- Updated assembly template with bacass 2.7.0 [#781](https://github.com/BU-ISCIII/buisciii-tools/pull/781)
 
 ### Modules
 
