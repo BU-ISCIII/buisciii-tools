@@ -130,7 +130,7 @@ echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir ${EXOMISER_A
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed"
+bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/wgstrio_bed_files/v20261015/exomiser_exome_GRCh38.bed"
 output_folder=$(realpath ./exomiser/exomiser_exome | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_exome.yml
@@ -147,7 +147,7 @@ echo "srun --partition short_idx --mem 350G --time 12:00:00 --chdir ${EXOMISER_A
 vcf_file=$(realpath ../02-postprocessing/variants_fil.vcf | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 ped_file=$(realpath ../../../DOC/family.ped | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 proband=$(awk 'BEGIN{FS="\t"} $6 == 2 {print $2}' ../../../DOC/family.ped)
-bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/Nextera_flex_for_enrichment_Illumina/v2.5_hg38/hg38_Twist_Bioscience_for_Illumina_Exome_2_5.bed"
+bed_file="/data/ucct/bi/references/refgenie/alias/exome_beds/wgstrio_bed_files/v20261015/exomiser_genes_GRCh38.bed"
 output_folder=$(realpath ./exomiser/exomiser_genes | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
 sed -i "s|VCF_FILE|${vcf_file}|g" ./exomiser_configfile_genes.yml
