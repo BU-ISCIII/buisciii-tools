@@ -9,12 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Credits
 
 - [Enrique Sapena](https://github.com/ESapenaVentura)
+- [Victor Lopez](https://github.com/victor5lm)
 
 ### Template fixes and updates
 
 - Updated assembly template with bacass 2.7.0 [#781](https://github.com/BU-ISCIII/buisciii-tools/pull/781)
+- Fixed some scripts as reported by flake8 [#782](https://github.com/BU-ISCIII/buisciii-tools/pull/782)
 
 ### Modules
+
+- Fixed some scripts as reported by flake8 [#782](https://github.com/BU-ISCIII/buisciii-tools/pull/782)
 
 #### Implementation
 
