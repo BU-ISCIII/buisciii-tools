@@ -124,7 +124,7 @@ export NXF_OPTS="-Xms500M -Xmx8G"
 nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.7.0/nf-core-bacass_2.7.0/2_7_0/main.nf \\
         -c ../../DOC/hpc_slurm_assembly.config \\
         -profile singularity \\
-        -params-file ../../DOC/${DATE}_bacass_params.yaml
+        -params-file ../../DOC/${DATE}_bacass_params.yaml \\
         --input samplesheet.csv \\
         --outdir ./ \\
         --assembly_type ${ASSEMBLY_MODE} \\
