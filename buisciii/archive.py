@@ -671,7 +671,7 @@ class Archive:
         """
         log.info(
             f"STARTING: Compressed service copy "
-            f"({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir' )})"
+            f"({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir')})"
         )
 
         for service in self.services.keys():
@@ -847,7 +847,7 @@ class Archive:
 
         log.info(
             f"FINISHED: Compressed service movement "
-            f"({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir' )})"
+            f"({('Data dir to Archive' if direction == 'archive' else 'Archive to Data dir')})"
         )
         return
 
@@ -888,7 +888,7 @@ class Archive:
             # Check whether the compressed file is not there
             if not os.path.exists(dir_to_untar + ".tar.gz"):
                 stderr.print(
-                    f"The compressed service { service + '.tar.gz'} could not be found"
+                    f"The compressed service {service + '.tar.gz'} could not be found"
                 )
                 log.info(
                     f"Service {service}: not uncompressed because compressed file was not found."
