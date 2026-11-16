@@ -98,12 +98,13 @@ cat samples_id.txt | while read in; do
 done >> samplesheet.csv
 
 # SETUP PARAMS
+DATE=$(date '+%Y%m%d')
 
-echo '
+echo "
 skip_kraken2: true
 skip_polish: true
 save_trimmed: ${SAVETRIMMED}
-' > ../../DOC/${DATE}_bacass_params.yaml
+" > ../../DOC/${DATE}_bacass_params.yaml
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/ucct\/bi\/scratch_tmp/\/scratch/g")
 
