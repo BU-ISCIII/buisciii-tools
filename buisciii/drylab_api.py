@@ -54,7 +54,7 @@ class RestServiceApi:
             return status_code
 
     def get_request(self, request_info, safe=True, **kwargs):
-        url_http = f"{self.request_url}{request_info}?{''.join([f'{key}={value}&' for key,value in kwargs.items()])[:-1]}"
+        url_http = f"{self.request_url}{request_info}?{''.join([f'{key}={value}&' for key, value in kwargs.items()])[:-1]}"
         try:
             req = requests.get(url_http, headers=self.headers)
             if req.status_code > 201:
