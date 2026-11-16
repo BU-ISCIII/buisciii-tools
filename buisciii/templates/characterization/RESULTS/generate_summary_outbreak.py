@@ -895,9 +895,9 @@ def add_virulence_stats(ws, samples, virulence_dict):
     try:
         for sample, row_num in samples.items():
             if sample in virulence_dict:
-                ws[f"A{row_num-1}"] = sample
-                ws[f"B{row_num-1}"] = virulence_dict[sample]["genes"]
-                ws[f"C{row_num-1}"] = virulence_dict[sample]["count"]
+                ws[f"A{row_num -1}"] = sample
+                ws[f"B{row_num -1}"] = virulence_dict[sample]["genes"]
+                ws[f"C{row_num -1}"] = virulence_dict[sample]["count"]
     except Exception as e:
         print(f"Error adding virulence stats to xlsx: {e}")
         return {}
@@ -915,8 +915,8 @@ def add_resistance_stats(ws, samples, card_dict):
     try:
         for sample, row_num in samples.items():
             if sample in card_dict:
-                ws[f"A{row_num-1}"] = sample
-                ws[f"B{row_num-1}"] = card_dict[sample]["genes"]
+                ws[f"A{row_num -1}"] = sample
+                ws[f"B{row_num -1}"] = card_dict[sample]["genes"]
     except Exception as e:
         print(f"Error adding resistance stats to xlsx: {e}")
         return {}
@@ -934,7 +934,7 @@ def add_amrfinder_results(ws, samples, resistance_dict):
     try:
         for sample, row_num in samples.items():
             if sample in resistance_dict:
-                ws[f"C{row_num-1}"] = resistance_dict[sample]
+                ws[f"C{row_num -1}"] = resistance_dict[sample]
     except Exception as e:
         print(f"Error adding amrfinder results to xlsx: {e}")
         return {}
