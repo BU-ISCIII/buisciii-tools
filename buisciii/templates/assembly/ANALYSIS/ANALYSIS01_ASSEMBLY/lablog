@@ -130,7 +130,6 @@ nextflow run /data/ucct/bi/pipelines/nf-core-bacass/nf-core-bacass-2.7.0/nf-core
         --assembly_type ${ASSEMBLY_MODE} \\
         --assembler ${ASSEMBLER} \\
         --kmerfinderdb /data/ucct/bi/references/kmerfinder/latest/bacteria \\
-        --ncbi_assembly_metadata /data/ucct/bi/references/bacteria/20240626/assembly_summary_refseq.txt \\
         ${PROKKA_ARGS} \\
         -resume
 
