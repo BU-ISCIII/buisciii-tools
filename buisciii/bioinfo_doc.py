@@ -37,11 +37,12 @@ stderr = rich.console.Console(
     force_terminal=buisciii.utils.rich_force_colors(),
 )
 
+
 def render_email_markdown(notes):
     """
-    This function takes a string containing markdown notes 
-    and converts it into HTML, while also applying custom 
-    color formatting for specific tags. The supported color 
+    This function takes a string containing markdown notes
+    and converts it into HTML, while also applying custom
+    color formatting for specific tags. The supported color
     tags are [red], [green], [blue], and [yellow].
     """
     html = markdown.markdown(
@@ -66,6 +67,7 @@ def render_email_markdown(notes):
         replace_color,
         html,
     )
+
 
 class BioinfoDoc:
     def __init__(
@@ -947,11 +949,7 @@ class BioinfoDoc:
                     log.info(f'Email notes: {email_data["email_notes"]}')
 
         if email_data.get("email_notes"):
-            notes = (
-                email_data["email_notes"]
-                .replace("\r\n", "\n")
-                .replace("\r", "\n")
-            )
+            notes = email_data["email_notes"].replace("\r\n", "\n").replace("\r", "\n")
             email_data["email_notes"] = render_email_markdown(notes)
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
