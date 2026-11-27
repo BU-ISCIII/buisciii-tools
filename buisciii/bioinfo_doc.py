@@ -42,8 +42,8 @@ def render_email_markdown(notes):
     This function takes a string containing markdown notes 
     and converts it into HTML, while also applying custom 
     color formatting for specific tags. The supported color 
-    tags are [rojo], [verde], [azul], and [naranja], 
-    which correspond to red, green, blue, and orange.
+    tags are [rojo], [verde], [azul], and [amarillo], 
+    which correspond to red, green, blue, and yellow.
     """
     html = markdown.markdown(
         escape(notes),
@@ -54,7 +54,7 @@ def render_email_markdown(notes):
         "rojo": "#c62828",
         "verde": "#2e7d32",
         "azul": "#1565c0",
-        "naranja": "#a65300",
+        "amarillo": "#fffb00",
     }
 
     def replace_color(match):
@@ -63,7 +63,7 @@ def render_email_markdown(notes):
         return f'<span style="color: {color};">{content}</span>'
 
     return re.sub(
-        r"\[(rojo|verde|azul|naranja)\](.*?)\[/\1\]",
+        r"\[(rojo|verde|azul|amarillo)\](.*?)\[/\1\]",
         replace_color,
         html,
     )
