@@ -95,7 +95,7 @@
                                                 </tbody>
                                               </table>
                                               <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left">
-                                                La entrega {{ delivery_number }} del an&#225;lisis del servicio <b><u>{{ service_id }} - {{ service_acronym }}</u></b> ha conclu&#237;do.<br>
+                                                La entrega {{ delivery_number }} del an&#225;lisis del servicio <b><u>{{ service_id }} - {{ service_acronym }}</u></b> ha concluido.<br>
                                               </p>
                                               <table class="s-3 w-full" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
                                                 <tbody>
@@ -117,7 +117,7 @@
                                                   </tr>
                                                 </tbody>
                                               </table>
-                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left">{{ email_notes }} </p>
+                                              <div class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left">{{ email_notes }}</div>
                                               <table class="s-3 w-full" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
                                                 <tbody>
                                                   <tr>
@@ -128,7 +128,7 @@
                                                 </tbody>
                                               </table>
                                               {% endif %}
-                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left"><u>Datos sftp:</u></p>
+                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left"><u>Datos SFTP:</u></p>
                                               <table class="s-3 w-full" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
                                                 <tbody>
                                                   <tr>
@@ -138,7 +138,7 @@
                                                   </tr>
                                                 </tbody>
                                               </table>
-                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left"><i>Para descargar los datos desde el sftp:</i></p>
+                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left"><i>Para descargar los datos desde el SFTP:</i></p>
                                             </div>
                                             <div>
                                               <ul class="text-gray-700" style="color: #4a5568;">
@@ -147,18 +147,18 @@
                                                 <li>
                                                   <b>Carpeta:</b> {{ sftp_folder }}</li>
                                                 <li>
-                                                  <b>Usuario:</b> {{ user_data.email }} (mail isciii)</li>
+                                                  <b>Usuario:</b> {{ user_data.email }} (Mail ISCIII)</li>
                                                 <li>
                                                   <b>Contrase&#241;a:</b> contrase&#241;a de dominio</li>
                                                 <li>
-                                                  <b>Puerto:</b> 22 (desde el isciii)</li>
+                                                  <b>Puerto:</b> 22 (desde el ISCIII)</li>
                                                 <li>
-                                                  <b>Puerto:</b> 50122 (desde fuera del isciii)</li>
+                                                  <b>Puerto:</b> 50122 (desde fuera del ISCIII)</li>
                                               </ul>
                                             </div>
                                             <div class="space-y-3">
                                               <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left">
-                                                Los resultados estar&#225;n disponibles en la carpeta del sftp durante un periodo de <b>14 d&#237;as</b> a partir de la fecha de entrega.
+                                                Los resultados estar&#225;n disponibles en la carpeta del SFTP durante un periodo de <b>14 d&#237;as</b> a partir de la fecha de entrega.
                                               </p>
                                               <table class="s-3 w-full" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
                                                 <tbody>
@@ -181,7 +181,7 @@
                                                   </tr>
                                                 </tbody>
                                               </table>
-                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left">Un saludo</p>
+                                              <p class="text-gray-700" style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;" align="left">Un saludo.</p>
                                               <table class="s-3 w-full" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
                                                 <tbody>
                                                   <tr>
