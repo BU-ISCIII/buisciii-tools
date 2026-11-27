@@ -38,6 +38,37 @@ stderr = rich.console.Console(
 )
 
 
+def render_email_markdown(notes):
+    """
+    This function takes a string containing markdown notes
+    and converts it into HTML, while also applying custom
+    color formatting for specific tags. The supported color
+    tags are [red], [green], [blue], and [yellow].
+    """
+    html = markdown.markdown(
+        escape(notes),
+        extensions=["nl2br"],
+    ).replace("<p>", '<p style="margin: 0;">')
+
+    colors = {
+        "red": "#c62828",
+        "green": "#2e7d32",
+        "blue": "#1565c0",
+        "yellow": "#fffb00",
+    }
+
+    def replace_color(match):
+        color = colors[match.group(1)]
+        content = match.group(2)
+        return f'<span style="color: {color};">{content}</span>'
+
+    return re.sub(
+        r"\[(red|green|blue|yellow)\](.*?)\[/\1\]",
+        replace_color,
+        html,
+    )
+
+
 class BioinfoDoc:
     def __init__(
         self,
@@ -772,6 +803,11 @@ class BioinfoDoc:
             Generate and store a tree view of the service content on the SFTP.
         """
         sftp_path = os.path.join(self.sftp_folder, self.service_name)
+        if not os.path.isdir(sftp_path):
+            raise FileNotFoundError(
+                f"[red]Service folder not found or inaccessible on SFTP: {sftp_path}. "
+                "Check that it exists and that the SFTP is mounted and accessible."
+            )
         try:
             tree_result = subprocess.run(
                 ["tree", sftp_path], capture_output=True, text=True, check=True
@@ -797,9 +833,13 @@ class BioinfoDoc:
                 f"Successfully created tree file from '{sftp_path}' in '{tree_file_path}'"
             )
 
-        except subprocess.CalledProcessError:
-            stderr.print("[red]ERROR: Failed to create tree from SFTP")
-            log.error("ERROR: Failed to create tree from SFTP")
+        except subprocess.CalledProcessError as exc:
+            message = (
+                f"Failed to list SFTP folder '{sftp_path}' "
+                f"(tree exited with code {exc.returncode}): {exc.stderr}"
+            )
+            stderr.print(f"ERROR: {message}", style="red", markup=False)
+            log.error(message)
             raise
         except IOError:
             stderr.print("[red]ERROR: Failed to create tree file")
@@ -828,7 +868,7 @@ class BioinfoDoc:
                     ):
                         for i in range(3, -1, -1):
                             email_data["email_notes"] = buisciii.utils.prompt_path(
-                                msg="Write the path to the file with RAW text mail notes"
+                                msg="Write the path to the email notes file (.txt or .md; Markdown supported)"
                             )
                             if not os.path.isfile(
                                 os.path.expanduser(email_data["email_notes"])
@@ -857,7 +897,8 @@ class BioinfoDoc:
                         email_data["email_notes"] = None
 
                     if email_data["email_notes"]:
-                        with open(os.path.expanduser(email_data["email_notes"])) as f:
+                        notes_path = os.path.expanduser(email_data["email_notes"])
+                        with open(notes_path) as f:
                             email_data["email_notes"] = f.read()
                     else:
                         email_data["email_notes"] = buisciii.utils.ask_for_some_text(
@@ -871,7 +912,7 @@ class BioinfoDoc:
                 ):
                     for i in range(3, -1, -1):
                         email_data["email_notes"] = buisciii.utils.prompt_path(
-                            msg="Write the path to the file with RAW text mail notes"
+                            msg="Write the path to the email notes file (.txt or .md; Markdown supported)"
                         )
                         if not os.path.isfile(
                             os.path.expanduser(email_data["email_notes"])
@@ -898,7 +939,8 @@ class BioinfoDoc:
                     email_data["email_notes"] = None
 
                 if email_data["email_notes"]:
-                    with open(os.path.expanduser(email_data["email_notes"])) as f:
+                    notes_path = os.path.expanduser(email_data["email_notes"])
+                    with open(notes_path) as f:
                         email_data["email_notes"] = f.read()
                 else:
                     email_data["email_notes"] = buisciii.utils.ask_for_some_text(
@@ -908,13 +950,7 @@ class BioinfoDoc:
 
         if email_data.get("email_notes"):
             notes = email_data["email_notes"].replace("\r\n", "\n").replace("\r", "\n")
-            # Preserve indentation while allowing the remaining text to wrap.
-            email_data["email_notes"] = re.sub(
-                r"^ +",
-                lambda match: "&nbsp;" * len(match.group()),
-                escape(notes.expandtabs(4)),
-                flags=re.MULTILINE,
-            ).replace("\n", "<br />")
+            email_data["email_notes"] = render_email_markdown(notes)
 
         email_data["user_data"] = self.resolution_info["service_user_id"]
         email_data["service_id"] = self.service_name.split("_", 5)[0]
